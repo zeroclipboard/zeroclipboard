@@ -5,7 +5,7 @@ The Zero Clipboard library provides an easy way to copy text to the clipboard us
 
 This library is fully compatible with Flash Player 10, which requires that the clipboard copy operation be initiated by a user click event inside the Flash movie. This is achieved by automatically floating the invisible movie on top of a DOM element of your choice. Standard mouse events are even propagated out to your DOM element, so you can still have rollover and mouse down effects.
 
-See the [Instructions](./docs/instructions.md) for instructions on how to use the library on your site.
+See the [Instructions](docs/instructions.md) for instructions on how to use the library on your site.
 
 ### Zero Clipboard Does Not Work From Local Disk
 
