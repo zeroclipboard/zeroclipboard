@@ -40,6 +40,11 @@ var ZeroClipboard = {
 		this.moviePath = path;
 	},
 	
+	// use this method in JSNI calls to obtain a new Client instance
+	newClient: function() {
+		return new ZeroClipboard.Client();
+	},
+	
 	dispatch: function(id, eventName, args) {
 		// receive event from flash movie, send to client		
 		var client = this.clients[id];
@@ -96,16 +101,16 @@ ZeroClipboard.Client.prototype = {
 	handCursorEnabled: true, // whether to show hand cursor, or default pointer cursor
 	cssEffects: true, // enable CSS mouse effects on dom container
 	handlers: null, // user event handlers
+	zIndex: 99, // default zIndex of the movie object
 	
 	glue: function(elem, appendElem, stylesToAdd) {
 		// glue to DOM element
 		// elem can be ID or actual DOM element object
 		this.domElement = ZeroClipboard.$(elem);
 		
-		// float just above object, or zIndex 99 if dom element isn't set
-		var zIndex = 99;
+		// float just above object, or default zIndex if dom element isn't set
 		if (this.domElement.style.zIndex) {
-			zIndex = parseInt(this.domElement.style.zIndex, 10) + 1;
+			this.zIndex = parseInt(this.domElement.style.zIndex, 10) + 1;
 		}
 		
 		if (typeof(appendElem) == 'string') {
@@ -126,7 +131,7 @@ ZeroClipboard.Client.prototype = {
 		style.top = '' + box.top + 'px';
 		style.width = '' + box.width + 'px';
 		style.height = '' + box.height + 'px';
-		style.zIndex = zIndex;
+		style.zIndex = this.zIndex;
 		
 		if (typeof(stylesToAdd) == 'object') {
 			for (addedStyle in stylesToAdd) {
