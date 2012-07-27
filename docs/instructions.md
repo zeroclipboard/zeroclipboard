@@ -341,30 +341,30 @@ Here is a complete example which exercises every option and event handler:
       clip.setHandCursor( true );
       clip.setCSSEffects( true );
 
-      clip.addEventListener( 'load', function(client) {
+      clip.addEventListener( 'onLoad', function(client) {
         // alert( "movie is loaded" );
       } );
 
-      clip.addEventListener( 'complete', function(client, text) {
+      clip.addEventListener( 'onComplete', function(client, text) {
         alert("Copied text to clipboard: " + text );
       } );
 
-      clip.addEventListener( 'mouseOver', function(client) {
+      clip.addEventListener( 'onMouseOver', function(client) {
         // alert("mouse over");
       } );
 
-      clip.addEventListener( 'mouseOut', function(client) {
+      clip.addEventListener( 'onMouseOut', function(client) {
         // alert("mouse out");
       } );
 
-      clip.addEventListener( 'mouseDown', function(client) {
+      clip.addEventListener( 'onMouseDown', function(client) {
         // set text to copy here
         clip.setText( document.getElementById('clip_text').value );
 
         // alert("mouse down");
       } );
 
-      clip.addEventListener( 'mouseUp', function(client) {
+      clip.addEventListener( 'onMouseUp', function(client) {
         // alert("mouse up");
       } );
 
