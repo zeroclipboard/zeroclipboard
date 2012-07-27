@@ -46,7 +46,7 @@ var ZeroClipboard = {
 	},
 	
 	dispatch: function(id, eventName, args) {
-		// receive event from flash movie, send to client		
+		// receive event from flash movie, send to client
 		var client = this.clients[id];
 		if (client) {
 			client.receiveEvent(eventName, args);
@@ -61,9 +61,9 @@ var ZeroClipboard = {
 	getDOMObjectPosition: function(obj, stopObj) {
 		// get absolute coordinates for dom element
 		var info = {
-			left: 0, 
-			top: 0, 
-			width: obj.width ? obj.width : obj.offsetWidth, 
+			left: 0,
+			top: 0,
+			width: obj.width ? obj.width : obj.offsetWidth,
 			height: obj.height ? obj.height : obj.offsetHeight
 		};
 
@@ -134,7 +134,7 @@ ZeroClipboard.Client.prototype = {
 		style.zIndex = this.zIndex;
 		
 		if (typeof(stylesToAdd) == 'object') {
-			for (addedStyle in stylesToAdd) {
+			for (var addedStyle in stylesToAdd) {
 				style[addedStyle] = stylesToAdd[addedStyle];
 			}
 		}
@@ -149,8 +149,8 @@ ZeroClipboard.Client.prototype = {
 	getHTML: function(width, height) {
 		// return HTML for movie
 		var html = '';
-		var flashvars = 'id=' + this.id + 
-			'&width=' + width + 
+		var flashvars = 'id=' + this.id +
+			'&width=' + width +
 			'&height=' + height;
 			
 		if (navigator.userAgent.match(/MSIE/)) {
@@ -184,7 +184,7 @@ ZeroClipboard.Client.prototype = {
 			this.div.innerHTML = '';
 			
 			var body = document.getElementsByTagName('body')[0];
-			try { body.removeChild( this.div ); } catch(e) {;}
+			try { body.removeChild( this.div ); } catch(e) {}
 			
 			this.domElement = null;
 			this.div = null;
@@ -314,3 +314,5 @@ ZeroClipboard.Client.prototype = {
 	}
 	
 };
+
+module.exports = ZeroClipboard;
