@@ -315,4 +315,7 @@ ZeroClipboard.Client.prototype = {
 	
 };
 
-module.exports = ZeroClipboard;
+if (typeof module !== "undefined") {
+	module.exports = ZeroClipboard;
+}
+
