@@ -7,7 +7,7 @@ This library is fully compatible with Flash Player 10, which requires that the c
 
 See the [Instructions](https://github.com/jonrohan/ZeroClipboard/blob/master/docs/instructions.md) for instructions on how to use the library on your site.
 
-Here is a working [Test Page](http://bowser.effectgames.com/~jhuckaby/zeroclipboard/) where you can try out ZeroClipboard in your browser.
+Here is a working [Test Page](http://jonrohan.github.com/ZeroClipboard/#demo) where you can try out ZeroClipboard in your browser.
 
 ### Zero Clipboard Does Not Work From Local Disk
 
