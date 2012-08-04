@@ -8,3 +8,10 @@ all: \
 ZeroClipboard.min.js: Makefile
 	@rm -f $@
 	$(JS_COMPILER) ./src/javascript/ZeroClipboard.js > $@
+
+testpage:
+	git stash
+	git checkout gh-pages
+	git checkout master ZeroClipboard.min.js ZeroClipboard.swf
+	rm -f javascript/ZeroClipboard*
+	mv ZeroClipboard.* javascript/
