@@ -14,4 +14,9 @@ testpage:
 	git checkout gh-pages
 	git checkout master ZeroClipboard.min.js ZeroClipboard.swf
 	rm -f javascript/ZeroClipboard*
-	mv ZeroClipboard.* javascript/
+	mv ZeroClipboard.* javascripts/
+	git add .
+	git commit -a -m "Update demo files to latest changes."
+	git push
+	git checkout master
+	git stash pop
