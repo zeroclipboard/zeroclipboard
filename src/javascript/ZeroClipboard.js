@@ -1,7 +1,7 @@
 // Simple Set Clipboard System
 // Author: Joseph Huckaby
 
-var ZeroClipboard = {
+window.ZeroClipboard = {
 
 	version: "1.0.8",
 	clients: {}, // registered upload clients on page, indexed by id
