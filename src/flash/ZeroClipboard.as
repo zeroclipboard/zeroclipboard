@@ -22,7 +22,8 @@
     
     public function ZeroClipboard() {
       // constructor, setup event listeners and external interfaces
-      stage.scaleMode = StageScaleMode.EXACT_FIT;
+      stage.align = "TL";
+      stage.scaleMode = "noScale";
       flash.system.Security.allowDomain("*");
       
       // import flashvars
@@ -34,7 +35,7 @@
       button.buttonMode = true;
       button.useHandCursor = true;
       button.graphics.beginFill(0xCCFF00);
-      button.graphics.drawRect(0, 0, Math.floor(flashvars.width), Math.floor(flashvars.height));
+      button.graphics.drawRect(0, 0, stage.stageWidth, stage.stageHeight);
       button.alpha = 0.0;
       addChild(button);
       button.addEventListener(MouseEvent.CLICK, function(event:Event): void {
