@@ -17,7 +17,15 @@
     "type": "git",
     "url": "https://github.com/jonrohan/ZeroClipboard.git"
   },
+  "dependencies": {
+    "send": "0"
+  },
   "devDependencies": {
     "uglify-js": "1.2.3"
+  },
+  "component": {
+    "scripts": {
+      "zeroclipboard": "src/javascript/ZeroClipboard.js"
+    }
   }
 }
