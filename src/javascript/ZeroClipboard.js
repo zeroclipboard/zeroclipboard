@@ -69,7 +69,9 @@ window.ZeroClipboard = {
 
 		while (obj && (obj != stopObj)) {
 			info.left += obj.offsetLeft;
+			info.left += obj.style.borderLeftWidth ? parseInt(obj.style.borderLeftWidth) : 0;
 			info.top += obj.offsetTop;
+			info.top += obj.style.borderTopWidth ? parseInt(obj.style.borderTopWidth) : 0;
 			obj = obj.offsetParent;
 		}
 
