@@ -6,17 +6,17 @@ all: \
 	ZeroClipboard.min.js \
 	testpage \
 
-ZeroClipboard.min.js: Makefile \
-	$(JS_COMPILER) ./src/javascript/ZeroClipboard.js > $@ \
+ZeroClipboard.min.js: Makefile
+	$(JS_COMPILER) ./src/javascript/ZeroClipboard.js > $@
 
-testpage: \
-	git stash \
-	git checkout gh-pages \
-	git checkout master ZeroClipboard.min.js ZeroClipboard.swf \
-	rm -f javascript/ZeroClipboard* \
-	mv ZeroClipboard.* javascripts/ \
-	git add . \
-	git commit -a -m "Update demo files to latest changes." \
-	git push \
-	git checkout master \
-	git stash pop \
+testpage:
+	git stash
+	git checkout gh-pages
+	git checkout master ZeroClipboard.min.js ZeroClipboard.swf
+	rm -f javascript/ZeroClipboard*
+	mv ZeroClipboard.* javascripts/
+	git add .
+	git commit -a -m "Update demo files to latest changes."
+	git push
+	git checkout master
+	git stash pop
