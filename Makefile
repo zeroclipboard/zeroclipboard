@@ -4,11 +4,9 @@ JS_BEAUTIFIER = $(NODE_PATH)/uglify-js/bin/uglifyjs -b -i 2 -nm -ns
 
 all: \
 	ZeroClipboard.min.js \
-	testpage \
 
 ZeroClipboard.min.js: Makefile
 	$(JS_COMPILER) ./src/javascript/ZeroClipboard.js > $@
-	git commit -a -m "Compiling ZeroClipboard.min.js"
 
 testpage:
 	git stash
