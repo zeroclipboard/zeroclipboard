@@ -97,7 +97,7 @@ window.ZeroClipboard = {
 ZeroClipboard.Client.prototype = {
 
   id: 0, // unique ID for us
-    title: "",  // tooltip for the flash element
+  title: "",  // tooltip for the flash element
   ready: false, // whether movie is ready to receive events or not
   movie: null, // reference to movie object
   clipText: '', // text to copy to clipboard
@@ -114,6 +114,11 @@ ZeroClipboard.Client.prototype = {
     // float just above object, or default zIndex if dom element isn't set
     if (this.domElement.style.zIndex) {
       this.zIndex = parseInt(this.domElement.style.zIndex, 10) + 1;
+    }
+
+    // check if the element has a title
+    if (this.domElement.getAttribute("title") != null) {
+      this.title = this.domElement.getAttribute("title");
     }
 
     if (typeof(appendElem) == 'string') {
@@ -218,7 +223,7 @@ ZeroClipboard.Client.prototype = {
   },
 
   setTitle: function(newTitle) {
-    // set text to be copied to clipboard
+    // set title of flash element
     this.title = newTitle;
     if (this.ready) this.movie.setTitle(newTitle);
   },
