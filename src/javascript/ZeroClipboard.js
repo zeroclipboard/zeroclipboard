@@ -225,7 +225,6 @@ ZeroClipboard.Client.prototype = {
   setTitle: function(newTitle) {
     // set title of flash element
     this.title = newTitle;
-    if (this.ready) this.movie.setTitle(newTitle);
   },
 
   addEventListener: function(eventName, func) {
@@ -273,7 +272,6 @@ ZeroClipboard.Client.prototype = {
 
         this.ready = true;
         this.movie.setText( this.clipText );
-        this.movie.setTitle( this.title );
         this.movie.setHandCursor( this.handCursorEnabled );
         break;
 
