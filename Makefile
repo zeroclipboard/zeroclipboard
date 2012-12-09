@@ -1,12 +1,22 @@
 NODE_PATH ?= ./node_modules
 JS_COMPILER = $(NODE_PATH)/uglify-js/bin/uglifyjs
 JS_BEAUTIFIER = $(NODE_PATH)/uglify-js/bin/uglifyjs -b -i 2 -nm -ns
+JS_TEST = $(NODE_PATH)/nodeunit/bin/nodeunit
 
 all: \
-	ZeroClipboard.min.js \
+	node_modules \
+	zeroclipboard.min.js \
+	test \
 
-ZeroClipboard.min.js: Makefile
-	$(JS_COMPILER) ./src/javascript/ZeroClipboard.js > $@
+node_modules:
+	npm install
+
+zeroclipboard.min.js: Makefile
+	@rm -f $@
+	$(JS_COMPILER) ./src/javascript/zeroclipboard.js > $@
+
+test: zeroclipboard.min.js
+	$(JS_TEST) ./test.js
 
 testpage:
 	git stash

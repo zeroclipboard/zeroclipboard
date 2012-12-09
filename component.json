@@ -1,0 +1,5 @@
+{
+  "name": "zeroclipboard",
+  "version": "1.8.0",
+  "main": "./zeroclipboard.min.js"
+}
