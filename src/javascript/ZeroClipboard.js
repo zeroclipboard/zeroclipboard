@@ -335,7 +335,7 @@
   if (typeof module !== "undefined") {
     module.exports = zeroclipboard;
   } else {
-    window.zeroclipboard = zeroclipboard;
+    window.ZeroClipboard = zeroclipboard;
   }
 
 })();
