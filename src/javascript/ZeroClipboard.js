@@ -225,6 +225,13 @@ ZeroClipboard.Client.prototype = {
   setTitle: function(newTitle) {
     // set title of flash element
     this.title = newTitle;
+    // Update the already glued object if it exists.
+    if (this.div) {
+      var flashElems = this.div.children;
+      if (flashElems.length) {
+        flashElems[0].setAttribute('title', this.title);
+      }
+    }
   },
 
   addEventListener: function(eventName, func) {
