@@ -18,3 +18,20 @@ However, there is a way for you to edit your local Flash Player security setting
 http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04a.html
 
 And add the path to your local "ZeroClipboard.swf" file to the trusted files list, or try the "allow all" option.
+
+Contributing
+==============
+
+If you find an issue, a pull request is always better than a bug report.
+
+### Cloning
+
+    $ git clone https://github.com/jonrohan/ZeroClipboard.git
+    $ cd ZeroClipboard/
+    $ npm install
+
+### Minifying
+
+This will minify the `src/javascript/ZeroClipboard.js` file to `ZeroClipboard.min.js`
+
+    $ make
