@@ -117,7 +117,7 @@ ZeroClipboard.Client.prototype = {
     }
 
     // check if the element has a title
-    if (this.domElement.getAttribute("title") != null) {
+    if (!this.title && this.domElement.getAttribute("title") != null) {
       this.title = this.domElement.getAttribute("title");
     }
 
