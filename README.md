@@ -27,3 +27,7 @@ If you find an issue, a pull request is always better than a bug report.
 ### Tests
 
     $ make test
+    
+### Last Build
+
+[![Build Status](https://secure.travis-ci.org/jonrohan/ZeroClipboard.png?branch=master)](https://travis-ci.org/jonrohan/ZeroClipboard)
