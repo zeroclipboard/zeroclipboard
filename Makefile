@@ -3,7 +3,6 @@ SWF_COMPILER ?= /Applications/Adobe\ Flash\ Builder\ 4.7/sdks/4.6.0/bin/mxmlc -s
 
 NODE_PATH ?= ./node_modules
 JS_COMPILER = $(NODE_PATH)/uglify-js/bin/uglifyjs
-JS_BEAUTIFIER = $(NODE_PATH)/uglify-js/bin/uglifyjs -b -i 2 -nm -ns
 JS_TEST = $(NODE_PATH)/nodeunit/bin/nodeunit
 JS_HINT = $(NODE_PATH)/jshint/bin/hint
 
