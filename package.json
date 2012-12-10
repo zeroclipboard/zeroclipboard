@@ -10,10 +10,18 @@
     "paste"
   ],
   "homepage": "http://jonrohan.github.com/ZeroClipboard/",
-  "author": {
-    "name": "Jon Rohan",
-    "url": "http://jonrohan.me/"
-  },
+  "license": "MIT",
+  "contributors": [
+    {
+      "name": "Jon Rohan",
+      "url": "http://jonrohan.me/"
+    },
+    {
+      "name": "James M. Greene",
+      "email": "james.m.greene@gmail.com",
+      "url": "http://jamesgreene.net/"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/jonrohan/ZeroClipboard.git"
@@ -23,7 +31,8 @@
   },
   "devDependencies": {
     "uglify-js": "1.2.3",
-    "nodeunit": "latest"
+    "nodeunit": "latest",
+    "handlebars": "latest"
   },
   "component": {
     "scripts": {
