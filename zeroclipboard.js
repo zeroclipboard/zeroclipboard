@@ -1,5 +1,7 @@
-// Simple Set Clipboard System
-// Author: Joseph Huckaby
+// zeroclipboard
+//
+// The Zero Clipboard library provides an easy way to copy text to the clipboard using an invisible Adobe Flash movie, and a JavaScript interface.
+// Author: Jon Rohan
 window.ZeroClipboard = {
 
   version: "1.0.8",

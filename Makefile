@@ -1,14 +1,19 @@
 NODE_PATH ?= ./node_modules
 JS_COMPILER = $(NODE_PATH)/uglify-js/bin/uglifyjs
 JS_BEAUTIFIER = $(NODE_PATH)/uglify-js/bin/uglifyjs -b -i 2 -nm -ns
-SRC_FILE = ./src/javascript/zeroclipboard.js
 
 all: \
 	zeroclipboard.min.js \
+	LICENSE \
+
+LICENSE: Makefile
+	@rm -f $@
+	@node src/build.js ./src/license.js $@
+	@chmod a-w $@
 
 zeroclipboard.js: Makefile
 	@rm -f $@
-	@node src/build.js $(SRC_FILE) $@
+	@node src/build.js ./src/javascript/zeroclipboard.js $@
 	@chmod a-w $@
 
 zeroclipboard.min.js: zeroclipboard.js

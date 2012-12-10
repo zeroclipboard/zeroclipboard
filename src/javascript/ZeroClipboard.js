@@ -1,5 +1,7 @@
-// Simple Set Clipboard System
-// Author: Joseph Huckaby
+// {{name}}
+// {{description}}
+{{#each contributors}}// Author: {{name}}{{/each}}
+// License: {{license}}
 window.ZeroClipboard = {
 
   version: "{{version}}",

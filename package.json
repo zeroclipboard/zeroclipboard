@@ -9,10 +9,13 @@
     "paste"
   ],
   "homepage": "http://jonrohan.github.com/ZeroClipboard/",
-  "author": {
-    "name": "Jon Rohan",
-    "url": "http://jonrohan.me/"
-  },
+  "license": "MIT",
+  "contributors": [
+    {
+      "name": "Jon Rohan",
+      "url": "http://jonrohan.me/"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/jonrohan/ZeroClipboard.git"
