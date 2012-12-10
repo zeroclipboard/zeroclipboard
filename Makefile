@@ -1,5 +1,5 @@
 # set a environment variable to override this to your location. export SWF_COMPILER = /My/Location/bin/mxmlc
-SWF_COMPILER ?= /Applications/Adobe\ Flash\ Builder\ 4.7/sdks/4.6.0/bin/mxmlc
+SWF_COMPILER ?= /Applications/Adobe\ Flash\ Builder\ 4.7/sdks/4.6.0/bin/mxmlc -static-link-runtime-shared-libraries=true
 
 NODE_PATH ?= ./node_modules
 JS_COMPILER = $(NODE_PATH)/uglify-js/bin/uglifyjs
@@ -46,6 +46,6 @@ ZeroClipboard.swf: clean
 
 test: ZeroClipboard.min.js
 	$(JS_HINT) ./ZeroClipboard.js
-	$(JS_TEST) ./test.js
+	$(JS_TEST) ./tests
 
 .PHONY: all test clean
