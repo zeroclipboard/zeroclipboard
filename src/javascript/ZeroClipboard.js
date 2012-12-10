@@ -1,8 +1,11 @@
-// {{name}}
-// {{description}}
-//
-{{#each contributors}}// Author: {{name}}
-{{/each}}// License: {{license}}
+/*!
+ * {{name}}
+ * {{description}}
+ * Copyright 2012 {{#each contributors}}{{name}}, {{/each}}.
+ * Released under the {{license}} license
+ * {{homepage}}
+ * v{{version}} ({{build_date}})
+ */
 (function () {
   "use strict";
   var ZeroClipboard;
