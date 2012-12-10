@@ -31,7 +31,6 @@
   },
   "devDependencies": {
     "uglify-js": "1.2.3",
-    "mxmlc": "0.0.7",
     "nodeunit": "0.7.4",
     "jshint": "0.9.1",
     "handlebars": "1.0.7"
