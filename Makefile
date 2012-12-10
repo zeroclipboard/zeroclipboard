@@ -6,6 +6,7 @@ JS_HINT = $(NODE_PATH)/jshint/bin/hint
 
 all: \
 	node_modules \
+	clean \
 	ZeroClipboard.min.js \
 	LICENSE \
 	test \
@@ -13,18 +14,18 @@ all: \
 node_modules: Makefile
 	npm install
 
+clean: Makefile
+	@rm -f ./ZeroClipboard*.js
+
 LICENSE: Makefile
-	@rm -f $@
 	@node src/build.js ./src/license.js $@
 	@chmod a-w $@
 
-ZeroClipboard.js: Makefile
-	@rm -f $@
+ZeroClipboard.js: clean
 	@node src/build.js ./src/javascript/ZeroClipboard.js $@
 	@chmod a-w $@
 
 ZeroClipboard.min.js: ZeroClipboard.js
-	@rm -f $@
 	$(JS_COMPILER) ./ZeroClipboard.js > $@
 	@chmod a-w $@
 
@@ -43,3 +44,5 @@ testpage:
 	git push
 	git checkout master
 	git stash pop
+
+.PHONY: all test clean
