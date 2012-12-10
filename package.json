@@ -1,6 +1,7 @@
 {
   "name": "zeroclipboard",
   "version": "1.0.8",
+  "main": "./ZeroClipboard.js",
   "description": "The Zero Clipboard library provides an easy way to copy text to the clipboard using an invisible Adobe Flash movie, and a JavaScript interface.",
   "keywords": [
     "flash",
@@ -30,11 +31,16 @@
   },
   "devDependencies": {
     "uglify-js": "1.2.3",
-    "handlebars": "latest"
+    "nodeunit": "0.7.4",
+    "jshint": "0.9.1",
+    "handlebars": "1.0.7"
   },
   "component": {
     "scripts": {
       "zeroclipboard": "src/javascript/ZeroClipboard.js"
     }
+  },
+  "scripts": {
+    "test": "make test"
   }
 }

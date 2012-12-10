@@ -1,25 +1,38 @@
 NODE_PATH ?= ./node_modules
 JS_COMPILER = $(NODE_PATH)/uglify-js/bin/uglifyjs
 JS_BEAUTIFIER = $(NODE_PATH)/uglify-js/bin/uglifyjs -b -i 2 -nm -ns
+JS_TEST = $(NODE_PATH)/nodeunit/bin/nodeunit
+JS_HINT = $(NODE_PATH)/jshint/bin/hint
 
 all: \
-	zeroclipboard.min.js \
+	node_modules \
+	clean \
+	ZeroClipboard.min.js \
 	LICENSE \
+	test \
 
-LICENSE: Makefile
-	@rm -f $@
+node_modules: Makefile
+	npm install
+
+clean: Makefile
+	@rm -f ./ZeroClipboard*.js
+	@rm -f ./LICENSE
+
+LICENSE: clean
 	@node src/build.js ./src/license.js $@
 	@chmod a-w $@
 
-zeroclipboard.js: Makefile
-	@rm -f $@
-	@node src/build.js ./src/javascript/zeroclipboard.js $@
+ZeroClipboard.js: clean
+	@node src/build.js ./src/javascript/ZeroClipboard.js $@
 	@chmod a-w $@
 
-zeroclipboard.min.js: zeroclipboard.js
-	@rm -f $@
-	$(JS_COMPILER) ./zeroclipboard.js > $@
+ZeroClipboard.min.js: ZeroClipboard.js
+	$(JS_COMPILER) ./ZeroClipboard.js > $@
 	@chmod a-w $@
+
+test: ZeroClipboard.min.js
+	$(JS_HINT) ./ZeroClipboard.js
+	$(JS_TEST) ./test.js
 
 testpage:
 	git stash
@@ -32,3 +45,5 @@ testpage:
 	git push
 	git checkout master
 	git stash pop
+
+.PHONY: all test clean
