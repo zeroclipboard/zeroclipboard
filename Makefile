@@ -1,3 +1,6 @@
+# set a environment variable to override this to your location. export SWF_COMPILER = /My/Location/bin/mxmlc
+SWF_COMPILER ?= /Applications/Adobe\ Flash\ Builder\ 4.7/sdks/4.6.0/bin/mxmlc
+
 NODE_PATH ?= ./node_modules
 JS_COMPILER = $(NODE_PATH)/uglify-js/bin/uglifyjs
 JS_BEAUTIFIER = $(NODE_PATH)/uglify-js/bin/uglifyjs -b -i 2 -nm -ns
@@ -7,6 +10,7 @@ JS_HINT = $(NODE_PATH)/jshint/bin/hint
 all: \
 	node_modules \
 	clean \
+	ZeroClipboard.swf \
 	ZeroClipboard.min.js \
 	LICENSE \
 	test \
@@ -16,6 +20,7 @@ node_modules: Makefile
 
 clean: Makefile
 	@rm -f ./ZeroClipboard*.js
+	@rm -f ./ZeroClipboard.swf
 	@rm -f ./LICENSE
 
 LICENSE: clean
@@ -28,6 +33,15 @@ ZeroClipboard.js: clean
 
 ZeroClipboard.min.js: ZeroClipboard.js
 	$(JS_COMPILER) ./ZeroClipboard.js > $@
+	@chmod a-w $@
+
+ZeroClipboard10.swf: Makefile
+	@rm -f $@
+	$(SWF_COMPILER) -output $@ src/flash/ZeroClipboard10.as -source-path src/flash
+	@chmod a-w $@
+
+ZeroClipboard.swf: clean
+	$(SWF_COMPILER) -output $@ src/flash/ZeroClipboard.as -source-path src/flash
 	@chmod a-w $@
 
 test: ZeroClipboard.min.js
