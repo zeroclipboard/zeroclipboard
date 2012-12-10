@@ -11,7 +11,7 @@ Here is a working [Test Page](http://jonrohan.github.com/ZeroClipboard/#demo) wh
 
 ### Testing this page locally
 
-To test this page locally checkout the `gh-pages` branch and run `make`. This should open (http://localhost:3000/)[localhost:3000]
+To test this page locally checkout the `gh-pages` branch and run `make`. This should open [localhost:3000](http://localhost:3000/)
 
 Contributing
 ==============
