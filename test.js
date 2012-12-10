@@ -1,6 +1,6 @@
 "use strict";
 
-var zeroClipboard = require("./zeroclipboard.min")
+var zeroClipboard = require("./ZeroClipboard")
 
 exports.client = {
   "simple": function (test) {

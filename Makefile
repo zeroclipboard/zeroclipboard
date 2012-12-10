@@ -5,7 +5,7 @@ JS_TEST = $(NODE_PATH)/nodeunit/bin/nodeunit
 
 all: \
 	node_modules \
-	zeroclipboard.min.js \
+	ZeroClipboard.min.js \
 	LICENSE \
 	test \
 
@@ -17,17 +17,17 @@ LICENSE: Makefile
 	@node src/build.js ./src/license.js $@
 	@chmod a-w $@
 
-zeroclipboard.js: Makefile
+ZeroClipboard.js: Makefile
 	@rm -f $@
-	@node src/build.js ./src/javascript/zeroclipboard.js $@
+	@node src/build.js ./src/javascript/ZeroClipboard.js $@
 	@chmod a-w $@
 
-zeroclipboard.min.js: zeroclipboard.js
+ZeroClipboard.min.js: ZeroClipboard.js
 	@rm -f $@
-	$(JS_COMPILER) ./zeroclipboard.js > $@
+	$(JS_COMPILER) ./ZeroClipboard.js > $@
 	@chmod a-w $@
 
-test: zeroclipboard.min.js
+test: ZeroClipboard.min.js
 	$(JS_TEST) ./test.js
 
 testpage:
