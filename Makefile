@@ -5,8 +5,10 @@ JS_BEAUTIFIER = $(NODE_PATH)/uglify-js/bin/uglifyjs -b -i 2 -nm -ns
 all: \
 	ZeroClipboard.min.js \
 
-ZeroClipboard.min.js: Makefile
+ZeroClipboard.*.js: Makefile
+	@rm -f $@
 	$(JS_COMPILER) ./src/javascript/ZeroClipboard.js > $@
+	@chmod a-w $@
 
 testpage:
 	git stash
