@@ -9,15 +9,9 @@ See the [Instructions](https://github.com/jonrohan/ZeroClipboard/blob/master/doc
 
 Here is a working [Test Page](http://jonrohan.github.com/ZeroClipboard/#demo) where you can try out ZeroClipboard in your browser.
 
-### Zero Clipboard Does Not Work From Local Disk
+### Testing this page locally
 
-This is a security restriction by Adobe Flash Player. Unfortunately, since we are utilizing the `JavaScript-to-Flash` interface ("`ExternalInterface`") this only works while truly online (if the page URL starts with "http://" or "https://"). It won't work running from a local file on disk.
-
-However, there is a way for you to edit your local Flash Player security settings and allow this. Go to this website:
-
-http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04a.html
-
-And add the path to your local "ZeroClipboard.swf" file to the trusted files list, or try the "allow all" option.
+To test this page locally checkout the `gh-pages` branch and run `make`. This should open [localhost:3000](http://localhost:3000/)
 
 Contributing
 ==============
