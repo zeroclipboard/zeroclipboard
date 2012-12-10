@@ -45,6 +45,6 @@ ZeroClipboard.swf: clean
 
 test: ZeroClipboard.min.js
 	$(JS_HINT) ./ZeroClipboard.js
-	$(JS_TEST) ./tests
+	$(JS_TEST) ./test
 
 .PHONY: all test clean
