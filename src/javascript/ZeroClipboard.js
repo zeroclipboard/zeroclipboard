@@ -1,7 +1,8 @@
 // {{name}}
 // {{description}}
-{{#each contributors}}// Author: {{name}}{{/each}}
-// License: {{license}}
+//
+{{#each contributors}}// Author: {{name}}
+{{/each}}// License: {{license}}
 window.ZeroClipboard = {
 
   version: "{{version}}",

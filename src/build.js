@@ -10,14 +10,6 @@ var FILE_ENCODING = 'utf-8',
 var _handlebars = require('Handlebars'),
     _fs = require('fs');
 
-// will generate a CSV if package.json contains multiple licenses
-_handlebars.registerHelper('license', function(items){
-    items = items.map(function(val){
-        return val.type;
-    });
-    return items.join(', ');
-});
-
 var distContent = _fs.readFileSync(SRC_PATH, FILE_ENCODING);
 var template = _handlebars.compile(distContent);
 
