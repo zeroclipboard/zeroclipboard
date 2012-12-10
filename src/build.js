@@ -7,7 +7,7 @@ var FILE_ENCODING = 'utf-8',
     SRC_PATH = process.argv[2]
     DIST_PATH = process.argv[3];
 
-var _handlebars = require('Handlebars'),
+var _handlebars = require('handlebars'),
     _fs = require('fs');
 
 var distContent = _fs.readFileSync(SRC_PATH, FILE_ENCODING);
