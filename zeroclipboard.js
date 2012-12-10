@@ -2,7 +2,7 @@
 // Author: Joseph Huckaby
 window.ZeroClipboard = {
 
-  version: "{{version}}",
+  version: "1.0.8",
   clients: {}, // registered upload clients on page, indexed by id
   moviePath: 'ZeroClipboard.swf', // URL to movie
   nextId: 1, // ID of next movie

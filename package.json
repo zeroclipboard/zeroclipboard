@@ -21,7 +21,8 @@
     "send": "0"
   },
   "devDependencies": {
-    "uglify-js": "1.2.3"
+    "uglify-js": "1.2.3",
+    "handlebars": "latest"
   },
   "component": {
     "scripts": {
