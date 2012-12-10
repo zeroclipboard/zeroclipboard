@@ -16,8 +16,9 @@ node_modules: Makefile
 
 clean: Makefile
 	@rm -f ./ZeroClipboard*.js
+	@rm -f ./LICENSE
 
-LICENSE: Makefile
+LICENSE: clean
 	@node src/build.js ./src/license.js $@
 	@chmod a-w $@
 
