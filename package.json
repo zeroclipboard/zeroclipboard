@@ -32,6 +32,7 @@
   "devDependencies": {
     "uglify-js": "1.2.3",
     "nodeunit": "latest",
+    "jshint": "latest",
     "handlebars": "latest"
   },
   "component": {
