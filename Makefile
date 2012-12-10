@@ -8,12 +8,13 @@ all: \
 	zeroclipboard.min.js \
 	test \
 
-node_modules:
+node_modules: Makefile
 	npm install
 
-zeroclipboard.min.js: Makefile
+zeroclipboard.min.js: node_modules
 	@rm -f $@
-	$(JS_COMPILER) ./src/javascript/zeroclipboard.js > $@
+	$(JS_COMPILER) ./src/javascript/ZeroClipboard.js > $@
+	@chmod a-w $@
 
 test: zeroclipboard.min.js
 	$(JS_TEST) ./test.js
