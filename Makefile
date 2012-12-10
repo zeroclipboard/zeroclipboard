@@ -48,16 +48,4 @@ test: ZeroClipboard.min.js
 	$(JS_HINT) ./ZeroClipboard.js
 	$(JS_TEST) ./test.js
 
-testpage:
-	git stash
-	git checkout gh-pages
-	git checkout master ZeroClipboard.min.js ZeroClipboard.swf
-	rm -f javascript/ZeroClipboard*
-	mv ZeroClipboard.* javascripts/
-	git add .
-	git commit -a -m "Update demo files to latest changes."
-	git push
-	git checkout master
-	git stash pop
-
 .PHONY: all test clean
