@@ -11,6 +11,7 @@ all: \
 	clean \
 	ZeroClipboard.swf \
 	ZeroClipboard.min.js \
+	component.json \
 	LICENSE \
 	test \
 
@@ -18,6 +19,7 @@ node_modules: Makefile
 	npm install
 
 clean: Makefile
+	@rm -f ./component.json
 	@rm -f ./ZeroClipboard*.js
 	@rm -f ./ZeroClipboard.swf
 	@rm -f ./LICENSE
@@ -28,6 +30,10 @@ LICENSE: clean
 
 ZeroClipboard.js: clean
 	@node src/build.js ./src/javascript/ZeroClipboard.js $@
+	@chmod a-w $@
+
+component.json: clean
+	@node src/build.js ./src/component.js $@
 	@chmod a-w $@
 
 ZeroClipboard.min.js: ZeroClipboard.js

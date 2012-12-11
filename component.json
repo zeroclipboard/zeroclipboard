@@ -1,0 +1,5 @@
+{
+  "name": "zeroclipboard",
+  "version": "1.0.8",
+  "main": ["./ZeroClipboard.min.js", "./ZeroClipboard.swf"]
+}
