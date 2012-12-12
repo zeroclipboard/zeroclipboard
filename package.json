@@ -33,7 +33,8 @@
     "uglify-js": "1.2.3",
     "nodeunit": "0.7.4",
     "jshint": "0.9.1",
-    "handlebars": "1.0.7"
+    "handlebars": "1.0.7",
+    "jsdom": "0.2.14"
   },
   "component": {
     "scripts": {

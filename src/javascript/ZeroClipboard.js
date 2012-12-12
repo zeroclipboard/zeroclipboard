@@ -125,8 +125,13 @@
       }
 
       // check if the element has a title
-      if (!this.title && this.domElement.getAttribute("title") !== null) {
+      if (!this.title && this.domElement.getAttribute("title")) {
         this.title = this.domElement.getAttribute("title");
+      }
+
+      // If the dom element contains data-clipboard-text set a default
+      if (!this.clipText && this.domElement.getAttribute("data-clipboard-text")) {
+        this.clipText = this.domElement.getAttribute("data-clipboard-text");
       }
 
       if (typeof(appendElem) == 'string') {
