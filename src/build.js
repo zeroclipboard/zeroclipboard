@@ -1,11 +1,10 @@
-if(process.argv.length != 4) {
+if(process.argv.length != 3) {
   console.error("ERROR: Wrong number of arguments");
   return false;
 }
 
 var FILE_ENCODING = 'utf-8',
-    SRC_PATH = process.argv[2]
-    DIST_PATH = process.argv[3];
+    SRC_PATH = process.argv[2];
 
 var _handlebars = require('handlebars'),
     _fs = require('fs');
@@ -17,4 +16,4 @@ var template = _handlebars.compile(distContent);
 var data = JSON.parse( _fs.readFileSync('package.json', FILE_ENCODING) );
 data.build_date = (new Date()).toUTCString();
 
-_fs.writeFileSync(DIST_PATH, template(data), FILE_ENCODING);
+console.log(template(data));
