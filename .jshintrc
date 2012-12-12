@@ -1,7 +1,7 @@
 {
   "camelcase": true,
   "indent": 2,
-  "strict": true,
+  "strict": false,
   "trailing": true,
   "boss": true,
   "browser": true,

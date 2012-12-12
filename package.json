@@ -38,7 +38,7 @@
   },
   "component": {
     "scripts": {
-      "zeroclipboard": "src/javascript/ZeroClipboard.js"
+      "zeroclipboard": "ZeroClipboard.js"
     }
   },
   "scripts": {

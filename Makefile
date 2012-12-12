@@ -18,9 +18,15 @@ all: \
 node_modules: Makefile
 	npm install
 
-ZeroClipboard.js: Makefile
+.INTERMEDIATE ZeroClipboard.js: \
+	src/javascript/start.js \
+	src/javascript/zc.core.js \
+	src/javascript/zc.client.js \
+	src/javascript/end.js
+
+ZeroClipboard.js:
 	@rm -f $@
-	@node src/build.js ./src/javascript/ZeroClipboard.js > $@
+	cat $^ | node src/build.js > $@
 	@chmod a-w $@
 
 ZeroClipboard.min.js: ZeroClipboard.js
@@ -40,16 +46,16 @@ ZeroClipboard.swf: src/flash/ZeroClipboard.as
 
 LICENSE: Makefile
 	@rm -f $@
-	@node src/build.js ./src/license.js > $@
+	cat ./src/license.js | node src/build.js > $@
 	@chmod a-w $@
 
 component.json: Makefile
 	@rm -f $@
-	@node src/build.js ./src/component.js > $@
+	cat ./src/component.js | node src/build.js > $@
 	@chmod a-w $@
 
 test: ZeroClipboard.min.js
-	$(JS_HINT) ./ZeroClipboard.js
+	$(JS_HINT) ./src/javascript/zc.*.js
 	$(JS_TEST) ./test
 
 clean:

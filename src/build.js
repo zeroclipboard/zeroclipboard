@@ -1,15 +1,9 @@
-if(process.argv.length != 3) {
-  console.error("ERROR: Wrong number of arguments");
-  return false;
-}
-
-var FILE_ENCODING = 'utf-8',
-    SRC_PATH = process.argv[2];
+var FILE_ENCODING = 'utf-8';
 
 var _handlebars = require('handlebars'),
     _fs = require('fs');
 
-var distContent = _fs.readFileSync(SRC_PATH, FILE_ENCODING);
+var distContent = _fs.readFileSync('/dev/stdin', FILE_ENCODING);
 var template = _handlebars.compile(distContent);
 
 //reuse package.json data and add build date
