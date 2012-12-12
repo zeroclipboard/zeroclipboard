@@ -28,14 +28,14 @@ ZeroClipboard.min.js: ZeroClipboard.js
 	$(JS_COMPILER) ./ZeroClipboard.js > $@
 	@chmod a-w $@
 
-ZeroClipboard10.swf: Makefile
+ZeroClipboard10.swf: src/flash/ZeroClipboard10.as
 	@rm -f $@
-	$(SWF_COMPILER) -output $@ src/flash/ZeroClipboard10.as -source-path src/flash
+	$(SWF_COMPILER) -output $@ $^ -source-path src/flash
 	@chmod a-w $@
 
-ZeroClipboard.swf: Makefile
+ZeroClipboard.swf: src/flash/ZeroClipboard.as
 	@rm -f $@
-	$(SWF_COMPILER) -output $@ src/flash/ZeroClipboard.as -source-path src/flash
+	$(SWF_COMPILER) -output $@ $^ -source-path src/flash
 	@chmod a-w $@
 
 LICENSE: Makefile
