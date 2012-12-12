@@ -129,6 +129,10 @@
         this.title = this.domElement.getAttribute("title");
       }
 
+      if (!this.clipText && this.domElement.getAttribute("data-clipboard-text") !== null) {
+        this.clipText = this.domElement.getAttribute("data-clipboard-text");
+      }
+
       if (typeof(appendElem) == 'string') {
         appendElem = ZeroClipboard.$(appendElem);
       }
