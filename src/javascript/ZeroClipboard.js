@@ -4,7 +4,7 @@
  * Copyright 2012 {{#each contributors}}{{name}}, {{/each}}.
  * Released under the {{license}} license
  * {{homepage}}
- * v{{version}} ({{build_date}})
+ * v{{version}}
  */
 (function () {
   "use strict";
