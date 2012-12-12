@@ -197,6 +197,37 @@
   ZeroClipboard.clients = {};
   ZeroClipboard.moviePath = "ZeroClipboard.swf";
   ZeroClipboard.nextId = 1;
+  ZeroClipboard.setMoviePath = function(path) {
+    this.moviePath = path;
+  };
+  ZeroClipboard.newClient = function() {
+    return new ZeroClipboard.Client;
+  };
+  ZeroClipboard.dispatch = function(id, eventName, args) {
+    var client = this.clients[id];
+    if (client) {
+      client.receiveEvent(eventName, args);
+    }
+  };
+  ZeroClipboard.register = function(id, client) {
+    this.clients[id] = client;
+  };
+  ZeroClipboard.getDOMObjectPosition = function(obj, stopObj) {
+    var info = {
+      left: 0,
+      top: 0,
+      width: obj.width ? obj.width : obj.offsetWidth,
+      height: obj.height ? obj.height : obj.offsetHeight
+    };
+    while (obj && obj != stopObj) {
+      info.left += obj.offsetLeft;
+      info.left += obj.style.borderLeftWidth ? parseInt(obj.style.borderLeftWidth, 10) : 0;
+      info.top += obj.offsetTop;
+      info.top += obj.style.borderTopWidth ? parseInt(obj.style.borderTopWidth, 10) : 0;
+      obj = obj.offsetParent;
+    }
+    return info;
+  };
   ZeroClipboard.$ = function(thingy) {
     if (typeof thingy == "string") thingy = document.getElementById(thingy);
     if (!thingy.addClass) {
@@ -230,37 +261,6 @@
       };
     }
     return thingy;
-  };
-  ZeroClipboard.setMoviePath = function(path) {
-    this.moviePath = path;
-  };
-  ZeroClipboard.newClient = function() {
-    return new ZeroClipboard.Client;
-  };
-  ZeroClipboard.dispatch = function(id, eventName, args) {
-    var client = this.clients[id];
-    if (client) {
-      client.receiveEvent(eventName, args);
-    }
-  };
-  ZeroClipboard.register = function(id, client) {
-    this.clients[id] = client;
-  };
-  ZeroClipboard.getDOMObjectPosition = function(obj, stopObj) {
-    var info = {
-      left: 0,
-      top: 0,
-      width: obj.width ? obj.width : obj.offsetWidth,
-      height: obj.height ? obj.height : obj.offsetHeight
-    };
-    while (obj && obj != stopObj) {
-      info.left += obj.offsetLeft;
-      info.left += obj.style.borderLeftWidth ? parseInt(obj.style.borderLeftWidth, 10) : 0;
-      info.top += obj.offsetTop;
-      info.top += obj.style.borderTopWidth ? parseInt(obj.style.borderTopWidth, 10) : 0;
-      obj = obj.offsetParent;
-    }
-    return info;
   };
   if (typeof module !== "undefined") {
     module.exports = ZeroClipboard;
