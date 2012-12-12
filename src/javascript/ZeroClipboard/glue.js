@@ -31,10 +31,6 @@ ZeroClipboard.Client.prototype.glue = function (elem, appendElem, stylesToAdd) {
   // create floating DIV above element
   this.div = document.createElement('div');
 
-  // to add custom handlers and styles
-  this.div.className = "zeroClipboard";
-  this.div.id = "zeroClipboard-" + this.movieId;
-
   var style = this.div.style;
   style.position = 'absolute';
   style.left = '' + box.left + 'px';
@@ -47,13 +43,6 @@ ZeroClipboard.Client.prototype.glue = function (elem, appendElem, stylesToAdd) {
     for (var addedStyle in stylesToAdd) {
       style[addedStyle] = stylesToAdd[addedStyle];
     }
-  }
-
-  // style.backgroundColor = '#f00'; // debug
-
-  // if the current element is a (valid) td and thus the parent is a tr, we can not just append a div to that!
-  if (appendElem.tagName.toLowerCase() == "tr" && elem.tagName.toLowerCase() == "td") {
-    appendElem = elem;
   }
 
   // first create entire div before appending to the DOM

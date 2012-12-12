@@ -175,8 +175,6 @@
     }
     var box = ZeroClipboard.getDOMObjectPosition(this.domElement, appendElem);
     this.div = document.createElement("div");
-    this.div.className = "zeroClipboard";
-    this.div.id = "zeroClipboard-" + this.movieId;
     var style = this.div.style;
     style.position = "absolute";
     style.left = "" + box.left + "px";
@@ -188,9 +186,6 @@
       for (var addedStyle in stylesToAdd) {
         style[addedStyle] = stylesToAdd[addedStyle];
       }
-    }
-    if (appendElem.tagName.toLowerCase() == "tr" && elem.tagName.toLowerCase() == "td") {
-      appendElem = elem;
     }
     this.div.innerHTML = this.getHTML(box.width, box.height);
     appendElem.appendChild(this.div);
