@@ -4,14 +4,14 @@
  * Copyright 2012 Jon Rohan, James M. Greene, .
  * Released under the MIT license
  * http://jonrohan.github.com/ZeroClipboard/
- * v1.0.8 (Wed, 12 Dec 2012 02:14:33 GMT)
+ * v1.0.9 (Wed, 12 Dec 2012 04:25:26 GMT)
  */
 (function () {
   "use strict";
   var ZeroClipboard;
   ZeroClipboard = {
 
-    version: "1.0.8",
+    version: "1.0.9",
     clients: {}, // registered upload clients on page, indexed by id
     moviePath: 'ZeroClipboard.swf', // URL to movie
     nextId: 1, // ID of next movie
