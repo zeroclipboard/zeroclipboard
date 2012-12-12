@@ -20,13 +20,12 @@ node_modules: Makefile
 
 .INTERMEDIATE ZeroClipboard.js: \
 	src/javascript/start.js \
-	src/javascript/zc.core.js \
-	src/javascript/zc.client.js \
+	src/javascript/ZeroClipboard/*.js \
 	src/javascript/end.js
 
 ZeroClipboard.js:
 	@rm -f $@
-	cat $^ | node src/build.js > $@
+	cat $^ | node src/build.js | $(JS_BEAUTIFIER) > $@
 	@chmod a-w $@
 
 ZeroClipboard.min.js: ZeroClipboard.js
@@ -55,7 +54,7 @@ component.json: Makefile
 	@chmod a-w $@
 
 test: ZeroClipboard.min.js
-	$(JS_HINT) ./src/javascript/zc.*.js
+	$(JS_HINT) ./src/javascript/ZeroClipboard/*.js
 	$(JS_TEST) ./test
 
 clean:

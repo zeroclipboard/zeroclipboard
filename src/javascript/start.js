@@ -8,3 +8,4 @@
  */
 (function () {
   "use strict";
+  var ZeroClipboard = {};
