@@ -4,7 +4,7 @@
  * Copyright 2012 Jon Rohan, James M. Greene, .
  * Released under the MIT license
  * http://jonrohan.github.com/ZeroClipboard/
- * v1.0.8 (Wed, 12 Dec 2012 00:26:02 GMT)
+ * v1.0.8 (Wed, 12 Dec 2012 00:39:19 GMT)
  */
 (function () {
   "use strict";
@@ -129,6 +129,7 @@
         this.title = this.domElement.getAttribute("title");
       }
 
+      // If the dom element contains data-clipboard-text set a default
       if (!this.clipText && this.domElement.getAttribute("data-clipboard-text") !== null) {
         this.clipText = this.domElement.getAttribute("data-clipboard-text");
       }
