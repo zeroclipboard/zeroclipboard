@@ -4,36 +4,25 @@ require("./env")
 
 exports.selector = {
 
-  setUp: function (callback) {
-    var p = document.createElement("p");
-    p.id = "d_clip_container";
-
-    var node = document.createElement("span");
-    node.id = "d_clip_button";
-
-    node.setAttribute("data-clipboard-text", "This is text");
-    node.setAttribute("title", "This is title");
-    p.appendChild(node);
-
-    document.body.appendChild(p);
-
-    callback();
-  },
-
-  tearDown: function (callback) {
-      document.body.innerHTML = "";
-
-      // clean up
-      callback();
-  },
-
-  "$ returns an element": function (test) {
+  "$ backwards compatibility test": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard")
     var elm = zeroClipboard.$("d_clip_button")
 
     // element isn't null
-    test.ok(elm)
+    test.equal(elm.id, "d_clip_button")
+
+    test.done();
+  },
+
+  "$ returns an element": function (test) {
+
+    var zeroClipboard = require("../ZeroClipboard")
+    var elm = zeroClipboard.$("#d_clip_button")
+    var b = zeroClipboard.$("body")
+    // element isn't null
+    test.equal(elm.id, "d_clip_button")
+    test.ok(b)
 
     test.done();
   },
@@ -41,7 +30,7 @@ exports.selector = {
   "$.hide works as expected": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard")
-    var elm = zeroClipboard.$("d_clip_button")
+    var elm = zeroClipboard.$("#d_clip_button")
 
     // element isn't null
     test.ok(elm)
@@ -56,7 +45,7 @@ exports.selector = {
   "$.show works as expected": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard")
-    var elm = zeroClipboard.$("d_clip_button")
+    var elm = zeroClipboard.$("#d_clip_button")
 
     // element isn't null
     test.ok(elm)
@@ -71,7 +60,7 @@ exports.selector = {
   "$.addClass works as expected": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard")
-    var elm = zeroClipboard.$("d_clip_button")
+    var elm = zeroClipboard.$("#d_clip_button")
 
     // element isn't null
     test.ok(elm)
@@ -86,7 +75,7 @@ exports.selector = {
   "$.removeClass works as expected": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard")
-    var elm = zeroClipboard.$("d_clip_button")
+    var elm = zeroClipboard.$("#d_clip_button")
 
     // element isn't null
     test.ok(elm)
@@ -106,7 +95,7 @@ exports.selector = {
   "$.hasClass works as expected": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard")
-    var elm = zeroClipboard.$("d_clip_button")
+    var elm = zeroClipboard.$("#d_clip_button")
 
     // element isn't null
     test.ok(elm)
