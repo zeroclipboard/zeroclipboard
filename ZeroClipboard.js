@@ -15,50 +15,15 @@
     ZeroClipboard.register(this.id, this);
     if (elem) this.glue(elem);
   };
-  ZeroClipboard.Client.prototype = {
-    id: 0,
-    title: "",
-    ready: false,
-    movie: null,
-    clipText: "",
-    handCursorEnabled: true,
-    cssEffects: true,
-    handlers: null,
-    zIndex: 99
-  };
-  ZeroClipboard.Client.prototype.glue = function(elem, appendElem, stylesToAdd) {
-    this.domElement = ZeroClipboard.$(elem);
-    if (this.domElement.style.zIndex) {
-      this.zIndex = parseInt(this.domElement.style.zIndex, 10) + 1;
-    }
-    if (!this.title && this.domElement.getAttribute("title")) {
-      this.title = this.domElement.getAttribute("title");
-    }
-    if (!this.clipText && this.domElement.getAttribute("data-clipboard-text")) {
-      this.clipText = this.domElement.getAttribute("data-clipboard-text");
-    }
-    if (typeof appendElem == "string") {
-      appendElem = ZeroClipboard.$(appendElem);
-    } else if (typeof appendElem == "undefined") {
-      appendElem = document.getElementsByTagName("body")[0];
-    }
-    var box = ZeroClipboard.getDOMObjectPosition(this.domElement, appendElem);
-    this.div = document.createElement("div");
-    var style = this.div.style;
-    style.position = "absolute";
-    style.left = "" + box.left + "px";
-    style.top = "" + box.top + "px";
-    style.width = "" + box.width + "px";
-    style.height = "" + box.height + "px";
-    style.zIndex = this.zIndex;
-    if (typeof stylesToAdd == "object") {
-      for (var addedStyle in stylesToAdd) {
-        style[addedStyle] = stylesToAdd[addedStyle];
-      }
-    }
-    appendElem.appendChild(this.div);
-    this.div.innerHTML = this.getHTML(box.width, box.height);
-  };
+  ZeroClipboard.Client.prototype.id = 0;
+  ZeroClipboard.Client.prototype.title = "";
+  ZeroClipboard.Client.prototype.ready = false;
+  ZeroClipboard.Client.prototype.movie = null;
+  ZeroClipboard.Client.prototype.clipText = "";
+  ZeroClipboard.Client.prototype.handCursorEnabled = true;
+  ZeroClipboard.Client.prototype.cssEffects = true;
+  ZeroClipboard.Client.prototype.handlers = null;
+  ZeroClipboard.Client.prototype.zIndex = 99;
   ZeroClipboard.Client.prototype.getHTML = function(width, height) {
     var html = "";
     var flashvars = "id=" + this.id + "&width=" + width + "&height=" + height, title = this.title ? ' title="' + this.title + '"' : "";
@@ -69,14 +34,6 @@
       html += "<embed" + title + ' id="' + this.movieId + '" src="' + ZeroClipboard.moviePath + '" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="' + width + '" height="' + height + '" name="' + this.movieId + '" allowScriptAccess="always" allowFullScreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="' + flashvars + '" wmode="transparent" />';
     }
     return html;
-  };
-  ZeroClipboard.Client.prototype.hide = function() {
-    if (this.div) {
-      this.div.style.left = "-2000px";
-    }
-  };
-  ZeroClipboard.Client.prototype.show = function() {
-    this.reposition();
   };
   ZeroClipboard.Client.prototype.destroy = function() {
     if (this.domElement && this.div) {
@@ -200,6 +157,39 @@
       }
     }
   };
+  ZeroClipboard.Client.prototype.glue = function(elem, appendElem, stylesToAdd) {
+    this.domElement = ZeroClipboard.$(elem);
+    if (this.domElement.style.zIndex) {
+      this.zIndex = parseInt(this.domElement.style.zIndex, 10) + 1;
+    }
+    if (!this.title && this.domElement.getAttribute("title")) {
+      this.title = this.domElement.getAttribute("title");
+    }
+    if (!this.clipText && this.domElement.getAttribute("data-clipboard-text")) {
+      this.clipText = this.domElement.getAttribute("data-clipboard-text");
+    }
+    if (typeof appendElem == "string") {
+      appendElem = ZeroClipboard.$(appendElem);
+    } else if (typeof appendElem == "undefined") {
+      appendElem = document.getElementsByTagName("body")[0];
+    }
+    var box = ZeroClipboard.getDOMObjectPosition(this.domElement, appendElem);
+    this.div = document.createElement("div");
+    var style = this.div.style;
+    style.position = "absolute";
+    style.left = "" + box.left + "px";
+    style.top = "" + box.top + "px";
+    style.width = "" + box.width + "px";
+    style.height = "" + box.height + "px";
+    style.zIndex = this.zIndex;
+    if (typeof stylesToAdd == "object") {
+      for (var addedStyle in stylesToAdd) {
+        style[addedStyle] = stylesToAdd[addedStyle];
+      }
+    }
+    appendElem.appendChild(this.div);
+    this.div.innerHTML = this.getHTML(box.width, box.height);
+  };
   ZeroClipboard.getDOMObjectPosition = function(obj, stopObj) {
     var info = {
       left: 0,
@@ -227,6 +217,14 @@
       style.left = "" + box.left + "px";
       style.top = "" + box.top + "px";
     }
+  };
+  ZeroClipboard.Client.prototype.hide = function() {
+    if (this.div) {
+      this.div.style.left = "-2000px";
+    }
+  };
+  ZeroClipboard.Client.prototype.show = function() {
+    this.reposition();
   };
   ZeroClipboard.$ = function(thingy) {
     if (typeof thingy == "string") thingy = document.getElementById(thingy);

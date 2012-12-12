@@ -33,3 +33,15 @@ ZeroClipboard.Client.prototype.reposition = function (elem) {
     style.top = '' + box.top + 'px';
   }
 };
+
+ZeroClipboard.Client.prototype.hide = function () {
+  // temporarily hide floater offscreen
+  if (this.div) {
+    this.div.style.left = '-2000px';
+  }
+};
+
+ZeroClipboard.Client.prototype.show = function () {
+  // show ourselves after a call to hide()
+  this.reposition();
+};
