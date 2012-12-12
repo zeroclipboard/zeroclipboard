@@ -66,6 +66,7 @@ exports.domtests = {
     node.id = "d_clip_button";
 
     node.setAttribute("data-clipboard-text", "This is text");
+    node.setAttribute("title", "This is title");
     p.appendChild(node);
 
     document.body.appendChild(p);
@@ -87,12 +88,46 @@ exports.domtests = {
     test.done();
   },
 
-  "Use data-attr for clipbaord text as default": function (test) {
+  "Object has a title": function (test) {
+    var clip = new zeroClipboard.Client()
+
+    clip.glue('d_clip_button', 'd_clip_container')
+
+    test.equal(clip.title, "This is title")
+
+    test.done();
+  },
+
+  "Object has no title": function (test) {
+    var clip = new zeroClipboard.Client()
+
+    zeroClipboard.$("d_clip_button").removeAttribute("title")
+
+    clip.glue('d_clip_button', 'd_clip_container')
+
+    test.equal(clip.title, "")
+
+    test.done();
+  },
+
+  "Object has data-clipboard-text": function (test) {
     var clip = new zeroClipboard.Client()
 
     clip.glue('d_clip_button', 'd_clip_container')
 
     test.equal(clip.clipText, "This is text")
+
+    test.done();
+  },
+
+  "Object doesn't have data-clipboard-text": function (test) {
+    var clip = new zeroClipboard.Client()
+
+    zeroClipboard.$("d_clip_button").removeAttribute("data-clipboard-text")
+
+    clip.glue('d_clip_button', 'd_clip_container')
+
+    test.equal(clip.clipText, "")
 
     test.done();
   }
