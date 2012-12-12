@@ -13,70 +13,17 @@ ZeroClipboard.Client = function (elem) {
   if (elem) this.glue(elem);
 };
 
-ZeroClipboard.Client.prototype = {
-  id: 0, // unique ID for us
-  title: "",  // tooltip for the flash element
-  ready: false, // whether movie is ready to receive events or not
-  movie: null, // reference to movie object
-  clipText: '', // text to copy to clipboard
-  handCursorEnabled: true, // whether to show hand cursor, or default pointer cursor
-  cssEffects: true, // enable CSS mouse effects on dom container
-  handlers: null, // user event handlers
-  zIndex: 99 // default zIndex of the movie object
-};
-
-ZeroClipboard.Client.prototype.glue = function (elem, appendElem, stylesToAdd) {
-  // glue to DOM element
-  // elem can be ID or actual DOM element object
-  this.domElement = ZeroClipboard.$(elem);
-
-  // float just above object, or default zIndex if dom element isn't set
-  if (this.domElement.style.zIndex) {
-    this.zIndex = parseInt(this.domElement.style.zIndex, 10) + 1;
-  }
-
-  // check if the element has a title
-  if (!this.title && this.domElement.getAttribute("title")) {
-    this.title = this.domElement.getAttribute("title");
-  }
-
-  // If the dom element contains data-clipboard-text set a default
-  if (!this.clipText && this.domElement.getAttribute("data-clipboard-text")) {
-    this.clipText = this.domElement.getAttribute("data-clipboard-text");
-  }
-
-  if (typeof(appendElem) == 'string') {
-    appendElem = ZeroClipboard.$(appendElem);
-  }
-  else if (typeof(appendElem) == 'undefined') {
-    appendElem = document.getElementsByTagName('body')[0];
-  }
-
-  // find X/Y position of domElement
-  var box = ZeroClipboard.getDOMObjectPosition(this.domElement, appendElem);
-
-  // create floating DIV above element
-  this.div = document.createElement('div');
-  var style = this.div.style;
-  style.position = 'absolute';
-  style.left = '' + box.left + 'px';
-  style.top = '' + box.top + 'px';
-  style.width = '' + box.width + 'px';
-  style.height = '' + box.height + 'px';
-  style.zIndex = this.zIndex;
-
-  if (typeof(stylesToAdd) == 'object') {
-    for (var addedStyle in stylesToAdd) {
-      style[addedStyle] = stylesToAdd[addedStyle];
-    }
-  }
-
-  // style.backgroundColor = '#f00'; // debug
-
-  appendElem.appendChild(this.div);
-
-  this.div.innerHTML = this.getHTML(box.width, box.height);
-};
+// setting these objects like this since ZeroClipboard.Client.prototype = {}
+// has a chance of overwriting things.
+ZeroClipboard.Client.prototype.id = 0; // unique ID for us
+ZeroClipboard.Client.prototype.title = "";  // tooltip for the flash element
+ZeroClipboard.Client.prototype.ready = false; // whether movie is ready to receive events or not
+ZeroClipboard.Client.prototype.movie = null; // reference to movie object
+ZeroClipboard.Client.prototype.clipText = ''; // text to copy to clipboard
+ZeroClipboard.Client.prototype.handCursorEnabled = true; // whether to show hand cursor, or default pointer cursor
+ZeroClipboard.Client.prototype.cssEffects = true; // enable CSS mouse effects on dom container
+ZeroClipboard.Client.prototype.handlers = null; // user event handlers
+ZeroClipboard.Client.prototype.zIndex = 99; // default zIndex of the movie object
 
 ZeroClipboard.Client.prototype.getHTML = function (width, height) {
   // return HTML for movie
@@ -96,18 +43,6 @@ ZeroClipboard.Client.prototype.getHTML = function (width, height) {
     html += '<embed' + title + ' id="' + this.movieId + '" src="' + ZeroClipboard.moviePath + '" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="' + width + '" height="' + height + '" name="' + this.movieId + '" allowScriptAccess="always" allowFullScreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="' + flashvars + '" wmode="transparent" />';
   }
   return html;
-};
-
-ZeroClipboard.Client.prototype.hide = function () {
-  // temporarily hide floater offscreen
-  if (this.div) {
-    this.div.style.left = '-2000px';
-  }
-};
-
-ZeroClipboard.Client.prototype.show = function () {
-  // show ourselves after a call to hide()
-  this.reposition();
 };
 
 ZeroClipboard.Client.prototype.destroy = function () {
