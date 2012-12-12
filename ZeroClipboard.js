@@ -4,7 +4,7 @@
  * Copyright 2012 Jon Rohan, James M. Greene, .
  * Released under the MIT license
  * http://jonrohan.github.com/ZeroClipboard/
- * v1.0.8 (Wed, 12 Dec 2012 00:39:19 GMT)
+ * v1.0.8 (Wed, 12 Dec 2012 01:55:53 GMT)
  */
 (function () {
   "use strict";
