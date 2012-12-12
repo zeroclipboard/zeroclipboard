@@ -30,6 +30,7 @@ ZeroClipboard.Client.prototype.glue = function (elem, appendElem, stylesToAdd) {
 
   // create floating DIV above element
   this.div = document.createElement('div');
+
   var style = this.div.style;
   style.position = 'absolute';
   style.left = '' + box.left + 'px';
@@ -44,9 +45,7 @@ ZeroClipboard.Client.prototype.glue = function (elem, appendElem, stylesToAdd) {
     }
   }
 
-  // style.backgroundColor = '#f00'; // debug
-
-  appendElem.appendChild(this.div);
-
+  // first create entire div before appending to the DOM
   this.div.innerHTML = this.getHTML(box.width, box.height);
+  appendElem.appendChild(this.div);
 };

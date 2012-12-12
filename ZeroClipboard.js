@@ -187,8 +187,8 @@
         style[addedStyle] = stylesToAdd[addedStyle];
       }
     }
-    appendElem.appendChild(this.div);
     this.div.innerHTML = this.getHTML(box.width, box.height);
+    appendElem.appendChild(this.div);
   };
   ZeroClipboard.getDOMObjectPosition = function(obj, stopObj) {
     var info = {
