@@ -86,6 +86,10 @@ Works in IE8+. Works in IE7 but requires Sizzle/jQuery. (And of course works in 
 
 see [CONTRIBUTING.md](ZeroClipboard/blob/master/CONTRIBUTING.md)
 
+## Releases
+
+see [releases.md](ZeroClipboard/blob/master/docs/releases.md)
+
 ## Last Build
 
 [![Build Status](https://secure.travis-ci.org/jonrohan/ZeroClipboard.png?branch=master)](https://travis-ci.org/jonrohan/ZeroClipboard)
