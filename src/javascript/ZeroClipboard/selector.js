@@ -2,7 +2,7 @@
 function elementWrapper(element) {
 
   // don't wrap twice
-  if (element.addClass) return element;
+  if (!element || element.addClass) return element;
 
   // extend element with a few useful methods
   element.hide = function () { this.style.display = 'none'; };

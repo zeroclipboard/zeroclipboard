@@ -227,7 +227,7 @@
     this.reposition();
   };
   function elementWrapper(element) {
-    if (element.addClass) return element;
+    if (!element || element.addClass) return element;
     element.hide = function() {
       this.style.display = "none";
     };

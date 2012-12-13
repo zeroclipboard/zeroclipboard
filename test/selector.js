@@ -18,14 +18,18 @@ exports.selector = {
   "$ returns an element": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard")
-    var elm = zeroClipboard.$("#d_clip_button")
-    var b = zeroClipboard.$("body")
-    var buttons = zeroClipboard.$(".my_clip_button")
 
-    // element isn't null
-    test.equal(elm.id, "d_clip_button")
-    test.equal(buttons.length, 3)
-    test.ok(b)
+    // grabbed the right id
+    test.equal(zeroClipboard.$("#d_clip_button").id, "d_clip_button")
+
+    // grabbed 3 buttons
+    test.equal(zeroClipboard.$(".my_clip_button").length, 3)
+
+    // found the body
+    test.ok(zeroClipboard.$("body"))
+
+    // didn't find anything
+    test.equal(zeroClipboard.$("bodyd"), null)
 
     test.done();
   },
