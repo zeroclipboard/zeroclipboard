@@ -228,9 +228,6 @@
   };
   function elementWrapper(element) {
     if (!element || element.addClass) return element;
-    element.hide = function() {
-      this.style.display = "none";
-    };
     element.addClass = function(name) {
       this.removeClass(name);
       this.className += " " + name;

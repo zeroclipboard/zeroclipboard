@@ -34,21 +34,6 @@ exports.selector = {
     test.done();
   },
 
-  "$.hide works as expected": function (test) {
-
-    var zeroClipboard = require("../ZeroClipboard")
-    var elm = zeroClipboard.$("#d_clip_button")
-
-    // element isn't null
-    test.ok(elm)
-
-    test.equal(typeof elm.hide, "function")
-    elm.hide()
-    test.equal(elm.style.display, "none")
-
-    test.done();
-  },
-
   "$.addClass works as expected": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard")
