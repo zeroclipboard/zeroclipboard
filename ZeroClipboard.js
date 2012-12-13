@@ -159,6 +159,7 @@
   };
   ZeroClipboard.Client.prototype.glue = function(elem, appendElem, stylesToAdd) {
     this.domElement = ZeroClipboard.$(elem);
+    if (this.domElement.length) this.domElement = this.domElement[0];
     if (this.domElement.style.zIndex) {
       this.zIndex = parseInt(this.domElement.style.zIndex, 10) + 1;
     }

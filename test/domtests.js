@@ -54,5 +54,17 @@ exports.domtests = {
     test.equal(clip.clipText, "")
 
     test.done();
+  },
+
+  "Glue multiple elements": function (test) {
+
+    var zeroClipboard = require("../ZeroClipboard"),
+    clip = new zeroClipboard.Client();
+
+    clip.glue('.my_clip_button')
+
+    test.equal(clip.domElement.id, "d_clip_button")
+
+    test.done();
   }
 }
