@@ -20,8 +20,11 @@ exports.selector = {
     var zeroClipboard = require("../ZeroClipboard")
     var elm = zeroClipboard.$("#d_clip_button")
     var b = zeroClipboard.$("body")
+    var buttons = zeroClipboard.$(".my_clip_button")
+
     // element isn't null
     test.equal(elm.id, "d_clip_button")
+    test.equal(buttons.length, 3)
     test.ok(b)
 
     test.done();
