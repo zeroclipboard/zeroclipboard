@@ -271,9 +271,9 @@
       result = ZeroClipboardSelect(query, document);
       if (result.length === 0) result = [ document.getElementById(query) ];
     }
-    result.map(function(elm) {
-      return elementWrapper(elm);
-    });
+    for (var i in result) {
+      result[i] = elementWrapper(result[i]);
+    }
     if (result.length === 1) return result[0];
     return result;
   };
