@@ -4,6 +4,11 @@ require("./env")
 
 exports.client = {
 
+  tearDown: function (callback) {
+    navigator.mimeTypes["application/x-shockwave-flash"] = undefined;
+    callback();
+  },
+
   "Clip is created properly": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard"),
@@ -25,6 +30,31 @@ exports.client = {
     // change the path
     zeroClipboard.setMoviePath("new/movie/path.swf");
     test.equal(zeroClipboard.moviePath, "new/movie/path.swf");
+
+    test.done();
+  },
+
+  "Detecting no flash": function (test) {
+
+    var zeroClipboard = require("../ZeroClipboard"),
+        clip = new zeroClipboard.Client();
+
+    // Test that we don't have flash
+    test.equal(zeroClipboard.detectFlashSupport(), false);
+
+    test.done();
+  },
+
+  "Detecting has flash mimetype": function (test) {
+
+    var zeroClipboard = require("../ZeroClipboard"),
+        clip = new zeroClipboard.Client();
+
+    // We're faking it here.
+    navigator.mimeTypes["application/x-shockwave-flash"] = true;
+
+    // Test that we don't have flash
+    test.equal(zeroClipboard.detectFlashSupport(), true);
 
     test.done();
   },

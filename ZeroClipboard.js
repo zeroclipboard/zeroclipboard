@@ -80,6 +80,24 @@
   ZeroClipboard.register = function(id, client) {
     this.clients[id] = client;
   };
+  ZeroClipboard.detectFlashSupport = function() {
+    this.hasFlash = false;
+    try {
+      if (new ActiveXObject("ShockwaveFlash.ShockwaveFlash")) {
+        this.hasFlash = true;
+      }
+    } catch (error) {
+      if (navigator.mimeTypes["application/x-shockwave-flash"] !== undefined) {
+        this.hasFlash = true;
+      }
+    }
+    if (!this.hasFlash) {
+      for (var id in this.clients) {
+        this.dispatch(id, "onNoFlash", null);
+      }
+    }
+    return this.hasFlash;
+  };
   ZeroClipboard.dispatch = function(id, eventName, args) {
     var client = this.clients[id];
     if (client) {
