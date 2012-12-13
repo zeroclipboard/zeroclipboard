@@ -228,27 +228,50 @@
   };
   function elementWrapper(element) {
     if (!element || element.addClass) return element;
-    element.addClass = function(name) {
-      this.removeClass(name);
-      this.className += " " + name;
-    };
-    element.removeClass = function(name) {
-      var classes = this.className.split(/\s+/);
-      var idx = -1;
-      for (var k = 0; k < classes.length; k++) {
-        if (classes[k] == name) {
-          idx = k;
-          k = classes.length;
+    element.addClass = function(value) {
+      if (value && typeof value === "string") {
+        var classNames = (value || "").split(/\s+/);
+        var elem = this;
+        if (elem.nodeType === 1) {
+          if (!elem.className) {
+            elem.className = value;
+          } else {
+            var className = " " + elem.className + " ", setClass = elem.className;
+            for (var c = 0, cl = classNames.length; c < cl; c++) {
+              if (className.indexOf(" " + classNames[c] + " ") < 0) {
+                setClass += " " + classNames[c];
+              }
+            }
+            elem.className = setClass.replace(/^\s+|\s+$/g, "");
+          }
         }
-      }
-      if (idx > -1) {
-        classes.splice(idx, 1);
-        this.className = classes.join(" ");
       }
       return this;
     };
-    element.hasClass = function(name) {
-      return !!this.className.match(new RegExp("\\s*" + name + "\\s*"));
+    element.removeClass = function(value) {
+      if (value && typeof value === "string" || value === undefined) {
+        var classNames = (value || "").split(/\s+/);
+        var elem = this;
+        if (elem.nodeType === 1 && elem.className) {
+          if (value) {
+            var className = (" " + elem.className + " ").replace(/[\n\t]/g, " ");
+            for (var c = 0, cl = classNames.length; c < cl; c++) {
+              className = className.replace(" " + classNames[c] + " ", " ");
+            }
+            elem.className = className.replace(/^\s+|\s+$/g, "");
+          } else {
+            elem.className = "";
+          }
+        }
+      }
+      return this;
+    };
+    element.hasClass = function(selector) {
+      var className = " " + selector + " ";
+      if ((" " + this.className + " ").replace(/[\n\t]/g, " ").indexOf(className) > -1) {
+        return true;
+      }
+      return false;
     };
     return element;
   }
