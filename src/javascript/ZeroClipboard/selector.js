@@ -1,29 +1,3 @@
-ZeroClipboard.$ = function (query) {
-
-  var ZeroClipboardSelect = function (s, n) { return n.querySelectorAll(s); },
-    result;
-
-  // Prefer Sizzle, if available.
-  if (typeof Sizzle === "function") {
-    ZeroClipboardSelect = function (s, n) { return Sizzle.uniqueSort(Sizzle(s, n)); };
-  }
-
-  if (typeof query === "string") {
-    result = ZeroClipboardSelect(query, document);
-    // last ditch effort for backwards compatibility
-    if (result.length === 0) result = [document.getElementById(query)];
-  }
-
-  result.map(function (elm) {
-    return elementWrapper(elm);
-  });
-
-  // for single matches
-  if (result.length === 1) return result[0];
-
-  return result;
-};
-
 // This wraps the returned element with some basic functions needed for ZeroClipboard
 function elementWrapper(element) {
 
@@ -51,3 +25,29 @@ function elementWrapper(element) {
   };
   return element;
 }
+
+ZeroClipboard.$ = function (query) {
+
+  var ZeroClipboardSelect = function (s, n) { return n.querySelectorAll(s); },
+    result;
+
+  // Prefer Sizzle, if available.
+  if (typeof Sizzle === "function") {
+    ZeroClipboardSelect = function (s, n) { return Sizzle.uniqueSort(Sizzle(s, n)); };
+  }
+
+  if (typeof query === "string") {
+    result = ZeroClipboardSelect(query, document);
+    // last ditch effort for backwards compatibility
+    if (result.length === 0) result = [document.getElementById(query)];
+  }
+
+  result.map(function (elm) {
+    return elementWrapper(elm);
+  });
+
+  // for single matches
+  if (result.length === 1) return result[0];
+
+  return result;
+};
