@@ -6,7 +6,6 @@ function elementWrapper(element) {
 
   // extend element with a few useful methods
   element.hide = function () { this.style.display = 'none'; };
-  element.show = function () { this.style.display = ''; };
   element.addClass = function (name) { this.removeClass(name); this.className += ' ' + name; };
   element.removeClass = function (name) {
     var classes = this.className.split(/\s+/);

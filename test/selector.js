@@ -49,21 +49,6 @@ exports.selector = {
     test.done();
   },
 
-  "$.show works as expected": function (test) {
-
-    var zeroClipboard = require("../ZeroClipboard")
-    var elm = zeroClipboard.$("#d_clip_button")
-
-    // element isn't null
-    test.ok(elm)
-
-    test.equal(typeof elm.show, "function")
-    elm.show()
-    test.equal(elm.style.display, "")
-
-    test.done();
-  },
-
   "$.addClass works as expected": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard")

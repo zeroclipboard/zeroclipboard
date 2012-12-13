@@ -231,9 +231,6 @@
     element.hide = function() {
       this.style.display = "none";
     };
-    element.show = function() {
-      this.style.display = "";
-    };
     element.addClass = function(name) {
       this.removeClass(name);
       this.className += " " + name;
