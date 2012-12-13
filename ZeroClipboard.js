@@ -226,39 +226,56 @@
   ZeroClipboard.Client.prototype.show = function() {
     this.reposition();
   };
-  ZeroClipboard.$ = function(thingy) {
-    if (typeof thingy == "string") thingy = document.getElementById(thingy);
-    if (!thingy.addClass) {
-      thingy.hide = function() {
-        this.style.display = "none";
-      };
-      thingy.show = function() {
-        this.style.display = "";
-      };
-      thingy.addClass = function(name) {
-        this.removeClass(name);
-        this.className += " " + name;
-      };
-      thingy.removeClass = function(name) {
-        var classes = this.className.split(/\s+/);
-        var idx = -1;
-        for (var k = 0; k < classes.length; k++) {
-          if (classes[k] == name) {
-            idx = k;
-            k = classes.length;
-          }
+  function elementWrapper(element) {
+    if (element.addClass) return element;
+    element.hide = function() {
+      this.style.display = "none";
+    };
+    element.show = function() {
+      this.style.display = "";
+    };
+    element.addClass = function(name) {
+      this.removeClass(name);
+      this.className += " " + name;
+    };
+    element.removeClass = function(name) {
+      var classes = this.className.split(/\s+/);
+      var idx = -1;
+      for (var k = 0; k < classes.length; k++) {
+        if (classes[k] == name) {
+          idx = k;
+          k = classes.length;
         }
-        if (idx > -1) {
-          classes.splice(idx, 1);
-          this.className = classes.join(" ");
-        }
-        return this;
-      };
-      thingy.hasClass = function(name) {
-        return !!this.className.match(new RegExp("\\s*" + name + "\\s*"));
+      }
+      if (idx > -1) {
+        classes.splice(idx, 1);
+        this.className = classes.join(" ");
+      }
+      return this;
+    };
+    element.hasClass = function(name) {
+      return !!this.className.match(new RegExp("\\s*" + name + "\\s*"));
+    };
+    return element;
+  }
+  ZeroClipboard.$ = function(query) {
+    var ZeroClipboardSelect = function(s, n) {
+      return n.querySelectorAll(s);
+    }, result;
+    if (typeof Sizzle === "function") {
+      ZeroClipboardSelect = function(s, n) {
+        return Sizzle.uniqueSort(Sizzle(s, n));
       };
     }
-    return thingy;
+    if (typeof query === "string") {
+      result = ZeroClipboardSelect(query, document);
+      if (result.length === 0) result = [ document.getElementById(query) ];
+    }
+    result.map(function(elm) {
+      return elementWrapper(elm);
+    });
+    if (result.length === 1) return result[0];
+    return result;
   };
   if (typeof module !== "undefined") {
     module.exports = ZeroClipboard;
