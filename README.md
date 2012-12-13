@@ -45,7 +45,7 @@ clip.addEventListener( 'onMouseOut', function(client) {
 
 clip.addEventListener( 'onMouseDown', function(client) {
   // set text to copy here
-  clip.setText( document.getElementById('clip_text').value );
+  clip.setText( "This was copied." );
 
   // alert("mouse down");
 } );
