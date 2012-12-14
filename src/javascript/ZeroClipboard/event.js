@@ -21,6 +21,11 @@ ZeroClipboard.Client.prototype.receiveEvent = function (eventName, args) {
   // special behavior for certain events
   switch (eventName) {
   case 'load':
+    // If the flash version is less than 10, throw event.
+    if (args && parseFloat(args.flashVersion.replace(",", ".").replace(/[^0-9\.]/gi, '')) < 10) {
+      this.receiveEvent("onWrongFlash", { flashVersion: args.flashVersion });
+      return;
+    }
     // movie claims it is ready, but in IE this isn't always the case...
     // bug fix: Cannot extend EMBED DOM elements in Firefox, must use traditional function
     this.movie = document.getElementById(this.movieId);

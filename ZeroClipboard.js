@@ -113,6 +113,12 @@
     eventName = eventName.toString().toLowerCase().replace(/^on/, "");
     switch (eventName) {
      case "load":
+      if (args && parseFloat(args.flashVersion.replace(",", ".").replace(/[^0-9\.]/gi, "")) < 10) {
+        this.receiveEvent("onWrongFlash", {
+          flashVersion: args.flashVersion
+        });
+        return;
+      }
       this.movie = document.getElementById(this.movieId);
       var self;
       if (!this.movie) {
