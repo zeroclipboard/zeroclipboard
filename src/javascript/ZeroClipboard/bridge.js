@@ -3,7 +3,7 @@ ZeroClipboard.Client.prototype.bridge = function () {
   // try and find the current global bridge
   this.flashBridge = ZeroClipboard.$('#global-zeroclipboard-flash-bridge');
 
-  if (this.flashBridge.length == 0) {
+  if (this.flashBridge.length === 0) {
 
     /*jshint multistr:true */
     var html = "\
