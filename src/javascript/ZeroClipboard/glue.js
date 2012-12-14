@@ -3,6 +3,9 @@ ZeroClipboard.Client.prototype.glue = function (elem, appendElem, stylesToAdd) {
   // elem can be ID or actual DOM element object
   this.domElement = ZeroClipboard.$(elem);
 
+  // don't support multiple glues, yet
+  if (this.domElement.length) this.domElement = this.domElement[0];
+
   // float just above object, or default zIndex if dom element isn't set
   if (this.domElement.style.zIndex) {
     this.zIndex = parseInt(this.domElement.style.zIndex, 10) + 1;

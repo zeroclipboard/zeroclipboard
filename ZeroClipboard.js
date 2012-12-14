@@ -159,6 +159,7 @@
   };
   ZeroClipboard.Client.prototype.glue = function(elem, appendElem, stylesToAdd) {
     this.domElement = ZeroClipboard.$(elem);
+    if (this.domElement.length) this.domElement = this.domElement[0];
     if (this.domElement.style.zIndex) {
       this.zIndex = parseInt(this.domElement.style.zIndex, 10) + 1;
     }
@@ -226,39 +227,73 @@
   ZeroClipboard.Client.prototype.show = function() {
     this.reposition();
   };
-  ZeroClipboard.$ = function(thingy) {
-    if (typeof thingy == "string") thingy = document.getElementById(thingy);
-    if (!thingy.addClass) {
-      thingy.hide = function() {
-        this.style.display = "none";
-      };
-      thingy.show = function() {
-        this.style.display = "";
-      };
-      thingy.addClass = function(name) {
-        this.removeClass(name);
-        this.className += " " + name;
-      };
-      thingy.removeClass = function(name) {
-        var classes = this.className.split(/\s+/);
-        var idx = -1;
-        for (var k = 0; k < classes.length; k++) {
-          if (classes[k] == name) {
-            idx = k;
-            k = classes.length;
+  function elementWrapper(element) {
+    if (!element || element.addClass) return element;
+    element.addClass = function(value) {
+      if (value && typeof value === "string") {
+        var classNames = (value || "").split(/\s+/);
+        var elem = this;
+        if (elem.nodeType === 1) {
+          if (!elem.className) {
+            elem.className = value;
+          } else {
+            var className = " " + elem.className + " ", setClass = elem.className;
+            for (var c = 0, cl = classNames.length; c < cl; c++) {
+              if (className.indexOf(" " + classNames[c] + " ") < 0) {
+                setClass += " " + classNames[c];
+              }
+            }
+            elem.className = setClass.replace(/^\s+|\s+$/g, "");
           }
         }
-        if (idx > -1) {
-          classes.splice(idx, 1);
-          this.className = classes.join(" ");
+      }
+      return this;
+    };
+    element.removeClass = function(value) {
+      if (value && typeof value === "string" || value === undefined) {
+        var classNames = (value || "").split(/\s+/);
+        var elem = this;
+        if (elem.nodeType === 1 && elem.className) {
+          if (value) {
+            var className = (" " + elem.className + " ").replace(/[\n\t]/g, " ");
+            for (var c = 0, cl = classNames.length; c < cl; c++) {
+              className = className.replace(" " + classNames[c] + " ", " ");
+            }
+            elem.className = className.replace(/^\s+|\s+$/g, "");
+          } else {
+            elem.className = "";
+          }
         }
-        return this;
-      };
-      thingy.hasClass = function(name) {
-        return !!this.className.match(new RegExp("\\s*" + name + "\\s*"));
+      }
+      return this;
+    };
+    element.hasClass = function(selector) {
+      var className = " " + selector + " ";
+      if ((" " + this.className + " ").replace(/[\n\t]/g, " ").indexOf(className) > -1) {
+        return true;
+      }
+      return false;
+    };
+    return element;
+  }
+  ZeroClipboard.$ = function(query) {
+    var ZeroClipboardSelect = function(s, n) {
+      return n.querySelectorAll(s);
+    }, result;
+    if (typeof Sizzle === "function") {
+      ZeroClipboardSelect = function(s, n) {
+        return Sizzle.uniqueSort(Sizzle(s, n));
       };
     }
-    return thingy;
+    if (typeof query === "string") {
+      result = ZeroClipboardSelect(query, document);
+      if (result.length === 0) result = [ document.getElementById(query) ];
+    }
+    for (var i in result) {
+      result[i] = elementWrapper(result[i]);
+    }
+    if (result.length === 1) return result[0];
+    return result;
   };
   if (typeof module !== "undefined") {
     module.exports = ZeroClipboard;
