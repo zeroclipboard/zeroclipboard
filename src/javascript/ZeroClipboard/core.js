@@ -1,6 +1,5 @@
 ZeroClipboard.version = "{{version}}";
 ZeroClipboard.moviePath = 'ZeroClipboard.swf'; // URL to movie
-ZeroClipboard.handCursorEnabled = true; // whether to show hand cursor, or default pointer cursor
 ZeroClipboard.currentClient = null; // The current html object
 
 ZeroClipboard.setMoviePath = function (path) {
@@ -11,9 +10,4 @@ ZeroClipboard.setMoviePath = function (path) {
 // use this method in JSNI calls to obtain a new Client instance
 ZeroClipboard.newClient = function () {
   return new ZeroClipboard.Client();
-};
-
-ZeroClipboard.setHandCursor = function (enabled) {
-  // enable hand cursor (true), or default arrow cursor (false)
-  this.handCursorEnabled = enabled;
 };

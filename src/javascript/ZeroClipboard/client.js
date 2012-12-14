@@ -88,6 +88,15 @@ ZeroClipboard.Client.prototype.ready = function () {
   return this.htmlBridge.getAttribute("data-clipboard-ready");
 };
 
+function getStyle(el, styleProp) {
+  var y = el.style[styleProp];
+  if (el.currentStyle)
+    y = el.currentStyle[styleProp];
+  else if (window.getComputedStyle)
+    y = document.defaultView.getComputedStyle(el, null).getPropertyValue(styleProp);
+  return y;
+}
+
 ZeroClipboard.Client.prototype.setCurrent = function (element) {
 
   // What client is current
@@ -113,6 +122,13 @@ ZeroClipboard.Client.prototype.setCurrent = function (element) {
   if (element.getAttribute("title")) {
     this.setTitle(element.getAttribute("title"));
   }
+
+  // If the element has a pointer style, set to hand cursor
+  if (getStyle(element, "cursor") == "pointer") {
+    this.setHandCursor(true);
+  } else {
+    this.setHandCursor(false);
+  }
 };
 
 ZeroClipboard.Client.prototype.setText = function (newText) {
@@ -126,4 +142,8 @@ ZeroClipboard.Client.prototype.setTitle = function (newTitle) {
 
 ZeroClipboard.Client.prototype.setSize = function (width, height) {
   if (this.ready()) this.flashBridge.setSize(width, height);
+};
+
+ZeroClipboard.Client.prototype.setHandCursor = function (enabled) {
+  if (this.ready()) this.flashBridge.setHandCursor(enabled);
 };
