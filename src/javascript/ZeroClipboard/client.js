@@ -1,22 +1,26 @@
 ZeroClipboard.Client = function (elem) {
-  // constructor for new simple upload client
 
   // event handlers
   this.handlers = {};
 
-  // store the element from the page
-  this.element = ZeroClipboard.$(elem);
-
   // setup the flash->Javascript bridge
   this.bridge();
 
-  var self = this;
-  this.element.addEventListener("mouseover", function (obj) {
-    self.setCurrent(this);
-  });
+  if (elem) this.glue(elem);
 
   // set currentClient to the last created
   ZeroClipboard.currentClient = this;
+};
+
+ZeroClipboard.Client.prototype.glue = function (query) {
+  var self = this;
+
+  // store the element from the page
+  this.element = ZeroClipboard.$(query);
+
+  this.element.addEventListener("mouseover", function (obj) {
+    self.setCurrent(this);
+  });
 };
 
 ZeroClipboard.Client.prototype.bridge = function () {
@@ -82,6 +86,7 @@ ZeroClipboard.Client.prototype.resetBridge = function () {
   this.htmlBridge.style.left = "-9999px";
   this.htmlBridge.style.top = "-9999px";
   this.htmlBridge.removeAttribute("title");
+  this.htmlBridge.removeAttribute("data-clipboard-text");
 };
 
 ZeroClipboard.Client.prototype.ready = function () {
@@ -132,12 +137,15 @@ ZeroClipboard.Client.prototype.setCurrent = function (element) {
 };
 
 ZeroClipboard.Client.prototype.setText = function (newText) {
-  if (this.ready()) this.flashBridge.setText(newText);
+  if (newText && newText !== "") {
+    this.htmlBridge.setAttribute("data-clipboard-text", newText);
+    if (this.ready()) this.flashBridge.setText(newText);
+  }
 };
 
 ZeroClipboard.Client.prototype.setTitle = function (newTitle) {
   // set title of flash element
-  this.htmlBridge.setAttribute("title", newTitle);
+  if (newTitle && newTitle !== "") this.htmlBridge.setAttribute("title", newTitle);
 };
 
 ZeroClipboard.Client.prototype.setSize = function (width, height) {

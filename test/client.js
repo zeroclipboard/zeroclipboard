@@ -30,6 +30,21 @@ exports.client = {
     test.done();
   },
 
+  "Glue element after new client": function (test) {
+
+    var zeroClipboard = require("../ZeroClipboard"),
+    clip = new zeroClipboard.Client();
+
+    clip.glue("#d_clip_button")
+
+    // Test the client was created properly
+    test.ok(clip.element);
+    test.ok(clip.htmlBridge);
+    test.ok(clip.handlers);
+
+    test.done();
+  },
+
   "Changing movie path works": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard");

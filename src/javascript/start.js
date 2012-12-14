@@ -8,4 +8,4 @@
  */
 (function () {
   "use strict";
-  var ZeroClipboard = { "Client": null };
+  var ZeroClipboard = {};

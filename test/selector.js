@@ -23,7 +23,7 @@ exports.selector = {
     test.equal(zeroClipboard.$("#d_clip_button").id, "d_clip_button")
 
     // grabbed 3 buttons
-    test.equal(zeroClipboard.$(".my_clip_button").length, 3)
+    test.equal(zeroClipboard.$(".my_clip_button").length, 5)
 
     // found the body
     test.ok(zeroClipboard.$("body"))
