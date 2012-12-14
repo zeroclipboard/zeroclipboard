@@ -104,6 +104,22 @@
   ZeroClipboard.newClient = function() {
     return new ZeroClipboard.Client;
   };
+  ZeroClipboard.detectFlashSupport = function() {
+    this.hasFlash = false;
+    try {
+      if (new ActiveXObject("ShockwaveFlash.ShockwaveFlash")) {
+        this.hasFlash = true;
+      }
+    } catch (error) {
+      if (navigator.mimeTypes["application/x-shockwave-flash"] !== undefined) {
+        this.hasFlash = true;
+      }
+    }
+    if (!this.hasFlash) {
+      this.dispatch("onNoFlash", null);
+    }
+    return this.hasFlash;
+  };
   ZeroClipboard.dispatch = function(eventName, args) {
     ZeroClipboard.currentClient.receiveEvent(eventName, args);
   };
@@ -116,6 +132,12 @@
     eventName = eventName.toString().toLowerCase().replace(/^on/, "");
     switch (eventName) {
      case "load":
+      if (args && parseFloat(args.flashVersion.replace(",", ".").replace(/[^0-9\.]/gi, "")) < 10) {
+        this.receiveEvent("onWrongFlash", {
+          flashVersion: args.flashVersion
+        });
+        return;
+      }
       this.htmlBridge.setAttribute("data-clipboard-ready", true);
       break;
      case "mouseover":
