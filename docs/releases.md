@@ -1,3 +1,7 @@
+### ZeroClipboard 1.1.0
+
+* [FEATURE] Replace dom selector with simple sizzler query selector
+
 ### ZeroClipboard 1.0.9
 
 * [FEATURE] Use `data-clipboard-text` as default text #35

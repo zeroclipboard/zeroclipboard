@@ -1,4 +1,9 @@
-document = require("jsdom").jsdom("<html><head></head><body></body></html>");
+var _fs = require('fs');
+
+document = require("jsdom").jsdom(_fs.readFileSync('./test/test_template.html', 'utf-8'),
+  null,
+  { features: { QuerySelector: true } });
+
 window = document.createWindow();
 navigator = window.navigator;
 navigator.mimeTypes = {};
