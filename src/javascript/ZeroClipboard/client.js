@@ -1,16 +1,24 @@
 ZeroClipboard.Client = function (elem) {
   // constructor for new simple upload client
+
+  // event handlers
   this.handlers = {};
 
+  // store the element from the page
+  this.element = ZeroClipboard.$(elem);
+
+  // setup the flash->Javascript bridge
+  this.bridge();
+
   // unique ID
-  this.id = ZeroClipboard.nextId++;
-  this.movieId = 'ZeroClipboardMovie_' + this.id;
+  // this.id = ZeroClipboard.nextId++;
+  // this.movieId = 'ZeroClipboardMovie_' + this.id;
 
   // register client with singleton to receive flash events
-  ZeroClipboard.register(this.id, this);
+  // ZeroClipboard.register(this.id, this);
 
   // create movie
-  if (elem) this.glue(elem);
+  // if (elem) this.glue(elem);
 };
 
 // setting these objects like this since ZeroClipboard.Client.prototype = {}

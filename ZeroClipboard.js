@@ -8,12 +8,32 @@
  */(function() {
   "use strict";
   var ZeroClipboard = {};
+  ZeroClipboard.Client.prototype.bridge = function() {
+    this.flashBridge = ZeroClipboard.$("global-zeroclipboard-flash-bridge");
+    if (!this.flashBridge) {
+      var html = '      <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" id="global-zeroclipboard-object-tag" width="100%" height="100%">         <param name="movie" value="' + ZeroClipboard.moviePath + '"/>         <param name="allowScriptAccess" value="always" />         <param name="scale" value="exactfit">         <embed src="' + ZeroClipboard.moviePath + '"           width="100%" height="100%"           name="global-zeroclipboard-object-tag"           allowScriptAccess="always"           scale="exactfit">         </embed>       </object>';
+      this.flashBridge = document.createElement("div");
+      this.flashBridge.id = "global-zeroclipboard-flash-bridge";
+      this.flashBridge.style.position = "absolute";
+      this.flashBridge.style.left = "-9999px";
+      this.flashBridge.style.top = "-9999px";
+      this.flashBridge.style.width = "15px";
+      this.flashBridge.style.height = "15px";
+      this.flashBridge.style.border = "1px solid red";
+      this.flashBridge.innerHTML = html;
+      if (this.element.getAttribute("title")) {
+        this.flashBridge.setAttribute("title", this.element.getAttribute("title"));
+      }
+      if (!this.clipText && this.domElement.getAttribute("data-clipboard-text")) {
+        this.clipText = this.domElement.getAttribute("data-clipboard-text");
+      }
+      document.body.appendChild(this.flashBridge);
+    }
+  };
   ZeroClipboard.Client = function(elem) {
     this.handlers = {};
-    this.id = ZeroClipboard.nextId++;
-    this.movieId = "ZeroClipboardMovie_" + this.id;
-    ZeroClipboard.register(this.id, this);
-    if (elem) this.glue(elem);
+    this.element = ZeroClipboard.$(elem);
+    this.bridge();
   };
   ZeroClipboard.Client.prototype.id = 0;
   ZeroClipboard.Client.prototype.title = "";
@@ -156,40 +176,6 @@
         }
       }
     }
-  };
-  ZeroClipboard.Client.prototype.glue = function(elem, appendElem, stylesToAdd) {
-    this.domElement = ZeroClipboard.$(elem);
-    if (this.domElement.length) this.domElement = this.domElement[0];
-    if (this.domElement.style.zIndex) {
-      this.zIndex = parseInt(this.domElement.style.zIndex, 10) + 1;
-    }
-    if (!this.title && this.domElement.getAttribute("title")) {
-      this.title = this.domElement.getAttribute("title");
-    }
-    if (!this.clipText && this.domElement.getAttribute("data-clipboard-text")) {
-      this.clipText = this.domElement.getAttribute("data-clipboard-text");
-    }
-    if (typeof appendElem == "string") {
-      appendElem = ZeroClipboard.$(appendElem);
-    } else if (typeof appendElem == "undefined") {
-      appendElem = document.getElementsByTagName("body")[0];
-    }
-    var box = ZeroClipboard.getDOMObjectPosition(this.domElement, appendElem);
-    this.div = document.createElement("div");
-    var style = this.div.style;
-    style.position = "absolute";
-    style.left = "" + box.left + "px";
-    style.top = "" + box.top + "px";
-    style.width = "" + box.width + "px";
-    style.height = "" + box.height + "px";
-    style.zIndex = this.zIndex;
-    if (typeof stylesToAdd == "object") {
-      for (var addedStyle in stylesToAdd) {
-        style[addedStyle] = stylesToAdd[addedStyle];
-      }
-    }
-    this.div.innerHTML = this.getHTML(box.width, box.height);
-    appendElem.appendChild(this.div);
   };
   ZeroClipboard.getDOMObjectPosition = function(obj, stopObj) {
     var info = {
