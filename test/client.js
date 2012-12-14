@@ -4,13 +4,28 @@ require("./env")
 
 exports.client = {
 
+  "Client without selector doesn't have element": function (test) {
+
+    var zeroClipboard = require("../ZeroClipboard"),
+    clip = new zeroClipboard.Client();
+
+    // Test the client is null
+    test.equal(clip.element, null);
+    test.ok(clip.htmlBridge);
+    test.ok(clip.handlers);
+
+    test.done();
+  },
+
   "Clip is created properly": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard"),
     clip = new zeroClipboard.Client("#d_clip_button");
 
     // Test the client was created properly
+    test.ok(clip.element);
     test.ok(clip.htmlBridge);
+    test.ok(clip.handlers);
 
     test.done();
   },
@@ -29,29 +44,14 @@ exports.client = {
     test.done();
   },
 
-  "Clip sets text properly": function (test) {
+  "Clip sets title properly": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard"),
     clip = new zeroClipboard.Client("#d_clip_button");
 
-    clip.setText("Tambourine");
-
-    test.equal(clip.clipText, "Tambourine");
-
-    test.done();
-  },
-
-  "Clip sets title properly": function (test) {
-
-    var zeroClipboard = require("../ZeroClipboard"),
-    clip = new zeroClipboard.Client();
-
-    // Test the client has no text
-    test.equal(clip.title, "");
-
     clip.setTitle("Click Me");
 
-    test.equal(clip.title, "Click Me");
+    test.equal(clip.htmlBridge.getAttribute("title"), "Click Me");
 
     test.done();
   }
