@@ -80,6 +80,24 @@
   ZeroClipboard.register = function(id, client) {
     this.clients[id] = client;
   };
+  ZeroClipboard.detectFlashSupport = function() {
+    this.hasFlash = false;
+    try {
+      if (new ActiveXObject("ShockwaveFlash.ShockwaveFlash")) {
+        this.hasFlash = true;
+      }
+    } catch (error) {
+      if (navigator.mimeTypes["application/x-shockwave-flash"] !== undefined) {
+        this.hasFlash = true;
+      }
+    }
+    if (!this.hasFlash) {
+      for (var id in this.clients) {
+        this.dispatch(id, "onNoFlash", null);
+      }
+    }
+    return this.hasFlash;
+  };
   ZeroClipboard.dispatch = function(id, eventName, args) {
     var client = this.clients[id];
     if (client) {
@@ -95,6 +113,12 @@
     eventName = eventName.toString().toLowerCase().replace(/^on/, "");
     switch (eventName) {
      case "load":
+      if (args && parseFloat(args.flashVersion.replace(",", ".").replace(/[^0-9\.]/gi, "")) < 10) {
+        this.receiveEvent("onWrongFlash", {
+          flashVersion: args.flashVersion
+        });
+        return;
+      }
       this.movie = document.getElementById(this.movieId);
       var self;
       if (!this.movie) {

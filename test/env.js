@@ -6,3 +6,4 @@ document = require("jsdom").jsdom(_fs.readFileSync('./test/test_template.html', 
 
 window = document.createWindow();
 navigator = window.navigator;
+navigator.mimeTypes = {};

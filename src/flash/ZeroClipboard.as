@@ -11,6 +11,7 @@
   import flash.system.Security;
   import flash.utils.*;
   import flash.system.System;
+  import flash.system.Capabilities;
 
   public class ZeroClipboard extends Sprite {
 
@@ -40,20 +41,31 @@
         // user click copies text to clipboard
         // as of flash player 10, this MUST happen from an in-movie flash click event
         System.setClipboard( clipText );
-        ExternalInterface.call( 'ZeroClipboard.dispatch', id, 'complete', clipText );
+        ExternalInterface.call( 'ZeroClipboard.dispatch', id, 'complete',  {
+          flashVersion : Capabilities.version,
+          text: clipText
+        } );
       });
 
       button.addEventListener(MouseEvent.MOUSE_OVER, function(event:Event): void {
-        ExternalInterface.call( 'ZeroClipboard.dispatch', id, 'mouseOver', null );
+        ExternalInterface.call( 'ZeroClipboard.dispatch', id, 'mouseOver', {
+          flashVersion : Capabilities.version
+        } );
       } );
       button.addEventListener(MouseEvent.MOUSE_OUT, function(event:Event): void {
-        ExternalInterface.call( 'ZeroClipboard.dispatch', id, 'mouseOut', null );
+        ExternalInterface.call( 'ZeroClipboard.dispatch', id, 'mouseOut', {
+          flashVersion : Capabilities.version
+        } );
       } );
       button.addEventListener(MouseEvent.MOUSE_DOWN, function(event:Event): void {
-        ExternalInterface.call( 'ZeroClipboard.dispatch', id, 'mouseDown', null );
+        ExternalInterface.call( 'ZeroClipboard.dispatch', id, 'mouseDown', {
+          flashVersion : Capabilities.version
+        } );
       } );
       button.addEventListener(MouseEvent.MOUSE_UP, function(event:Event): void {
-        ExternalInterface.call( 'ZeroClipboard.dispatch', id, 'mouseUp', null );
+        ExternalInterface.call( 'ZeroClipboard.dispatch', id, 'mouseUp', {
+          flashVersion : Capabilities.version
+        } );
       } );
 
       // external functions
@@ -61,7 +73,9 @@
       ExternalInterface.addCallback("setText", setText);
 
       // signal to the browser that we are ready
-      ExternalInterface.call( 'ZeroClipboard.dispatch', id, 'load', null );
+      ExternalInterface.call( 'ZeroClipboard.dispatch', id, 'load', {
+        flashVersion : Capabilities.version
+      } );
     }
 
     public function setText(newText:String): void {
