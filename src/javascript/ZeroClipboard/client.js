@@ -15,6 +15,8 @@ ZeroClipboard.Client = function (elem) {
     self.setCurrent(this);
   });
 
+  // set currentClient to the last created
+  ZeroClipboard.currentClient = this;
 };
 
 ZeroClipboard.Client.prototype.bridge = function () {
