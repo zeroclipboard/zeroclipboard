@@ -9,7 +9,7 @@ ZeroClipboard.getDOMObjectPosition = function (obj) {
   };
 
   // float just above object, or default zIndex if dom element isn't set
-  if (object.style.zIndex) {
+  if (obj.style.zIndex) {
     info.zIndex = parseInt(element.style.zIndex, 10);
   }
 
