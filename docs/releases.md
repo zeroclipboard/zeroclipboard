@@ -1,3 +1,5 @@
+### ZeroClipboard 1.1.0
+
 ### ZeroClipboard 1.0.9
 
 * [FEATURE] Use `data-clipboard-text` as default text #35
