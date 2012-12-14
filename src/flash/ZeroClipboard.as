@@ -28,7 +28,7 @@
       // invisible button covers entire stage
       button = new Sprite();
       button.buttonMode = true;
-      button.useHandCursor = true;
+      button.useHandCursor = false;
       button.graphics.beginFill(0xCCFF00);
       button.graphics.drawRect(0, 0, stage.stageWidth, stage.stageHeight);
       button.alpha = 0.0;
