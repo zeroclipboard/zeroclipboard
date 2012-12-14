@@ -72,5 +72,10 @@
       // or the default arrow cursor (false)
       button.useHandCursor = enabled;
     }
+
+    public function setSize(width:Number, height:Number): void {
+      button.width = width;
+      button.height = height;
+    }
   }
 }
