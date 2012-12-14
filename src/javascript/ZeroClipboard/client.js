@@ -1,10 +1,11 @@
 ZeroClipboard.Client = function (elem) {
 
+
   // event handlers
   this.handlers = {};
 
   // setup the flash->Javascript bridge
-  this.bridge();
+  if (ZeroClipboard.detectFlashSupport()) this.bridge();
 
   if (elem) this.glue(elem);
 

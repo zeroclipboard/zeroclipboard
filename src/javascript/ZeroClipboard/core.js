@@ -16,26 +16,26 @@ ZeroClipboard.newClient = function () {
 ZeroClipboard.detectFlashSupport = function () {
 
   // Assume we don't have it
-  this.hasFlash = false;
+  var hasFlash = false;
 
   try {
 
     // If we can create an ActiveXObject
     if (new ActiveXObject('ShockwaveFlash.ShockwaveFlash')) {
-      this.hasFlash = true;
+      hasFlash = true;
     }
   } catch (error) {
 
     // If the navigator knows what to do with the flash mimetype
     if (navigator.mimeTypes["application/x-shockwave-flash"] !== undefined) {
-      this.hasFlash = true;
+      hasFlash = true;
     }
   }
 
   // If we don't have flash, tell an adult
-  if (!this.hasFlash) {
+  if (!hasFlash) {
     this.dispatch("onNoFlash", null);
   }
 
-  return this.hasFlash;
+  return hasFlash;
 };

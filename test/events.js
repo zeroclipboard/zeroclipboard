@@ -5,6 +5,7 @@ require("./env")
 exports.zevents = {
 
   "Test onNoFlash Event": function (test) {
+    navigator.mimeTypes["application/x-shockwave-flash"] = undefined;
 
     var zeroClipboard = require("../ZeroClipboard"),
         clip = new zeroClipboard.Client();
@@ -12,6 +13,7 @@ exports.zevents = {
 
     clip.addEventListener( 'onNoFlash', function(client, text) {
       test.equal(client.id, id);
+      navigator.mimeTypes["application/x-shockwave-flash"] = true;
       test.done();
     } );
 

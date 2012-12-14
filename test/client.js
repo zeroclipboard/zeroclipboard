@@ -4,11 +4,6 @@ require("./env")
 
 exports.client = {
 
-  tearDown: function (callback) {
-    navigator.mimeTypes["application/x-shockwave-flash"] = undefined;
-    callback();
-  },
-
   "Client without selector doesn't have element": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard"),
@@ -36,6 +31,7 @@ exports.client = {
   },
 
   "Detecting no flash": function (test) {
+    navigator.mimeTypes["application/x-shockwave-flash"] = undefined;
 
     var zeroClipboard = require("../ZeroClipboard"),
         clip = new zeroClipboard.Client();
@@ -43,6 +39,7 @@ exports.client = {
     // Test that we don't have flash
     test.equal(zeroClipboard.detectFlashSupport(), false);
 
+    navigator.mimeTypes["application/x-shockwave-flash"] = true;
     test.done();
   },
 
@@ -50,9 +47,6 @@ exports.client = {
 
     var zeroClipboard = require("../ZeroClipboard"),
         clip = new zeroClipboard.Client();
-
-    // We're faking it here.
-    navigator.mimeTypes["application/x-shockwave-flash"] = true;
 
     // Test that we don't have flash
     test.equal(zeroClipboard.detectFlashSupport(), true);

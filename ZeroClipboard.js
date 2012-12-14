@@ -10,7 +10,7 @@
   var ZeroClipboard = {};
   ZeroClipboard.Client = function(elem) {
     this.handlers = {};
-    this.bridge();
+    if (ZeroClipboard.detectFlashSupport()) this.bridge();
     if (elem) this.glue(elem);
     ZeroClipboard.currentClient = this;
   };
@@ -105,20 +105,20 @@
     return new ZeroClipboard.Client;
   };
   ZeroClipboard.detectFlashSupport = function() {
-    this.hasFlash = false;
+    var hasFlash = false;
     try {
       if (new ActiveXObject("ShockwaveFlash.ShockwaveFlash")) {
-        this.hasFlash = true;
+        hasFlash = true;
       }
     } catch (error) {
       if (navigator.mimeTypes["application/x-shockwave-flash"] !== undefined) {
-        this.hasFlash = true;
+        hasFlash = true;
       }
     }
-    if (!this.hasFlash) {
+    if (!hasFlash) {
       this.dispatch("onNoFlash", null);
     }
-    return this.hasFlash;
+    return hasFlash;
   };
   ZeroClipboard.dispatch = function(eventName, args) {
     ZeroClipboard.currentClient.receiveEvent(eventName, args);
