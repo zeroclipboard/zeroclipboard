@@ -64,26 +64,6 @@ exports.selector = {
     elm.removeClass("test-class")
     test.equal(elm.className.indexOf("test-class"), -1)
 
-    test.equal(typeof elm.hasClass, "function")
-
-    test.done();
-  },
-
-  "$.hasClass works as expected": function (test) {
-
-    var zeroClipboard = require("../ZeroClipboard")
-    var elm = zeroClipboard.$("#d_clip_button")
-
-    // element isn't null
-    test.ok(elm)
-
-    test.equal(typeof elm.hasClass, "function")
-
-    elm.addClass("test-class")
-    test.notEqual(elm.className.indexOf("test-class"), -1)
-    test.ok(elm.hasClass("test-class"))
-
     test.done();
   }
-
 };
