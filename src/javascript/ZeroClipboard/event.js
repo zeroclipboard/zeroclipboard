@@ -1,6 +1,6 @@
 ZeroClipboard.dispatch = function (eventName, args) {
   // receive event from flash movie, send to client
-  ZeroClipboard.currentElement.receiveEvent(eventName, args);
+  ZeroClipboard.currentClient.receiveEvent(eventName, args);
 };
 
 ZeroClipboard.Client.prototype.addEventListener = function (eventName, func) {
@@ -22,19 +22,19 @@ ZeroClipboard.Client.prototype.receiveEvent = function (eventName, args) {
     break;
 
   case 'mouseover':
-    ZeroClipboard.currentElement.element.addClass('zeroclipboard-is-hovered');
+    ZeroClipboard.currentClient.element.addClass('zeroclipboard-is-hovered');
     break;
 
   case 'mouseout':
-    ZeroClipboard.currentElement.element.removeClass('zeroclipboard-is-hovered');
+    ZeroClipboard.currentClient.element.removeClass('zeroclipboard-is-hovered');
     break;
 
   case 'mousedown':
-    ZeroClipboard.currentElement.element.addClass('zeroclipboard-is-active');
+    ZeroClipboard.currentClient.element.addClass('zeroclipboard-is-active');
     break;
 
   case 'mouseup':
-    ZeroClipboard.currentElement.element.removeClass('zeroclipboard-is-active');
+    ZeroClipboard.currentClient.element.removeClass('zeroclipboard-is-active');
     break;
   } // switch eventName
 

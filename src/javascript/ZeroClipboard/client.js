@@ -90,8 +90,8 @@ ZeroClipboard.Client.prototype.ready = function () {
 
 ZeroClipboard.Client.prototype.setCurrent = function (element) {
 
-  // What element is current
-  ZeroClipboard.currentElement = this;
+  // What client is current
+  ZeroClipboard.currentClient = this;
 
   var pos = ZeroClipboard.getDOMObjectPosition(element);
 

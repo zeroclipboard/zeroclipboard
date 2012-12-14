@@ -1,7 +1,7 @@
 ZeroClipboard.version = "{{version}}";
 ZeroClipboard.moviePath = 'ZeroClipboard.swf'; // URL to movie
-ZeroClipboard.currentElement = null; // The current html object
 ZeroClipboard.handCursorEnabled = true; // whether to show hand cursor, or default pointer cursor
+ZeroClipboard.currentClient = null; // The current html object
 
 ZeroClipboard.setMoviePath = function (path) {
   // set path to ZeroClipboard.swf
