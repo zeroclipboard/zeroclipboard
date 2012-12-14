@@ -34,7 +34,6 @@ ZeroClipboard.Client.prototype.bridge = function () {
     return;
   }
 
-  /*jshint multistr:true */
   var html = "\
     <object classid=\"clsid:d27cdb6e-ae6d-11cf-96b8-444553540000\" id=\"global-zeroclipboard-flash-bridge\" width=\"100%\" height=\"100%\"> \
       <param name=\"movie\" value=\"" + ZeroClipboard.moviePath + "\"/> \
