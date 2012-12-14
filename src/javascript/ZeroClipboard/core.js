@@ -1,7 +1,7 @@
 ZeroClipboard.version = "{{version}}";
-ZeroClipboard.clients = {}; // registered upload clients on page, indexed by id
 ZeroClipboard.moviePath = 'ZeroClipboard.swf'; // URL to movie
-ZeroClipboard.nextId = 1; // ID of next movie
+ZeroClipboard.currentElement = null; // The current html object
+ZeroClipboard.handCursorEnabled = true; // whether to show hand cursor, or default pointer cursor
 
 ZeroClipboard.setMoviePath = function (path) {
   // set path to ZeroClipboard.swf
@@ -13,7 +13,7 @@ ZeroClipboard.newClient = function () {
   return new ZeroClipboard.Client();
 };
 
-ZeroClipboard.register = function (id, client) {
-  // register new client to receive events
-  this.clients[id] = client;
+ZeroClipboard.setHandCursor = function (enabled) {
+  // enable hand cursor (true), or default arrow cursor (false)
+  this.handCursorEnabled = enabled;
 };

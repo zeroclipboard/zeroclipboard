@@ -1,13 +1,19 @@
-ZeroClipboard.getDOMObjectPosition = function (obj, stopObj) {
+ZeroClipboard.getDOMObjectPosition = function (obj) {
   // get absolute coordinates for dom element
   var info = {
     left: 0,
     top: 0,
     width: obj.width ? obj.width : obj.offsetWidth,
-    height: obj.height ? obj.height : obj.offsetHeight
+    height: obj.height ? obj.height : obj.offsetHeight,
+    zIndex: 9999
   };
 
-  while (obj && (obj != stopObj)) {
+  // float just above object, or default zIndex if dom element isn't set
+  if (object.style.zIndex) {
+    info.zIndex = parseInt(element.style.zIndex, 10);
+  }
+
+  while (obj) {
     info.left += obj.offsetLeft;
     info.left += obj.style.borderLeftWidth ? parseInt(obj.style.borderLeftWidth, 10) : 0;
     info.top += obj.offsetTop;

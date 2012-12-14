@@ -7,10 +7,10 @@ exports.client = {
   "Clip is created properly": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard"),
-    clip = new zeroClipboard.Client();
+    clip = new zeroClipboard.Client("#d_clip_button");
 
     // Test the client was created properly
-    test.ok(clip.movieId);
+    test.ok(clip.htmlBridge);
 
     test.done();
   },
@@ -32,10 +32,7 @@ exports.client = {
   "Clip sets text properly": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard"),
-    clip = new zeroClipboard.Client();
-
-    // Test the client has no text
-    test.equal(clip.clipText, "");
+    clip = new zeroClipboard.Client("#d_clip_button");
 
     clip.setText("Tambourine");
 
