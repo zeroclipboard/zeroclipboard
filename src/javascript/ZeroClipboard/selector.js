@@ -58,15 +58,6 @@ function elementWrapper(element) {
     return this;
   };
 
-  // paired down version of hasClass from jQuery https://github.com/jquery/jquery/blob/master/speed/jquery-basis.js#L1328
-  element.hasClass = function (selector) {
-    var className = " " + selector + " ";
-    if ((" " + this.className + " ").replace(/[\n\t]/g, " ").indexOf(className) > -1) {
-      return true;
-    }
-    return false;
-  };
-
   return element;
 }
 
