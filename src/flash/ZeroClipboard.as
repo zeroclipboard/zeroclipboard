@@ -14,7 +14,6 @@
 
   public class ZeroClipboard extends Sprite {
 
-    private var id:String = '';
     private var button:Sprite;
     private var clipText:String = '';
 
@@ -26,8 +25,6 @@
 
       // import flashvars
       var flashvars:Object = LoaderInfo( this.root.loaderInfo ).parameters;
-      id = flashvars.id;
-      id = id.split("\\").join("\\\\");
       // invisible button covers entire stage
       button = new Sprite();
       button.buttonMode = true;
@@ -40,28 +37,29 @@
         // user click copies text to clipboard
         // as of flash player 10, this MUST happen from an in-movie flash click event
         System.setClipboard( clipText );
-        ExternalInterface.call( 'ZeroClipboard.dispatch', id, 'complete', clipText );
+        ExternalInterface.call( 'ZeroClipboard.dispatch', 'complete', clipText );
       });
 
       button.addEventListener(MouseEvent.MOUSE_OVER, function(event:Event): void {
-        ExternalInterface.call( 'ZeroClipboard.dispatch', id, 'mouseOver', null );
+        ExternalInterface.call( 'ZeroClipboard.dispatch', 'mouseOver', null );
       } );
       button.addEventListener(MouseEvent.MOUSE_OUT, function(event:Event): void {
-        ExternalInterface.call( 'ZeroClipboard.dispatch', id, 'mouseOut', null );
+        ExternalInterface.call( 'ZeroClipboard.dispatch', 'mouseOut', null );
       } );
       button.addEventListener(MouseEvent.MOUSE_DOWN, function(event:Event): void {
-        ExternalInterface.call( 'ZeroClipboard.dispatch', id, 'mouseDown', null );
+        ExternalInterface.call( 'ZeroClipboard.dispatch', 'mouseDown', null );
       } );
       button.addEventListener(MouseEvent.MOUSE_UP, function(event:Event): void {
-        ExternalInterface.call( 'ZeroClipboard.dispatch', id, 'mouseUp', null );
+        ExternalInterface.call( 'ZeroClipboard.dispatch', 'mouseUp', null );
       } );
 
       // external functions
       ExternalInterface.addCallback("setHandCursor", setHandCursor);
       ExternalInterface.addCallback("setText", setText);
+      ExternalInterface.addCallback("setSize", setSize);
 
       // signal to the browser that we are ready
-      ExternalInterface.call( 'ZeroClipboard.dispatch', id, 'load', null );
+      ExternalInterface.call( 'ZeroClipboard.dispatch', 'load', null );
     }
 
     public function setText(newText:String): void {
