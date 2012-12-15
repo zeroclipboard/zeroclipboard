@@ -1,7 +1,10 @@
 ### ZeroClipboard 1.1.0
 
+This release re-writes a lot of how zeroclipboard client works. Check the docs for more details.
+
 * [FEATURE] Replace dom selector with simple sizzler query selector
 * [FEATURE] Indicate via an event when there is no flash or flash is wrong version
+* [FEATURE] More meta info passed with each flash event.
 
 ### ZeroClipboard 1.0.9
 
