@@ -33,11 +33,6 @@ ZeroClipboard.min.js: ZeroClipboard.js
 	$(JS_COMPILER) ./ZeroClipboard.js > $@
 	@chmod a-w $@
 
-ZeroClipboard10.swf: src/flash/ZeroClipboard10.as
-	@rm -f $@
-	$(SWF_COMPILER) -output $@ $^ -source-path src/flash
-	@chmod a-w $@
-
 ZeroClipboard.swf: src/flash/ZeroClipboard.as
 	@rm -f $@
 	$(SWF_COMPILER) -output $@ $^ -source-path src/flash
@@ -58,6 +53,6 @@ test: ZeroClipboard.min.js
 	$(JS_TEST) ./test
 
 clean:
-	rm -f ./component.json ./ZeroClipboard*.js ./ZeroClipboard.swf ./LICENSE
+	rm -f ./component.json ./ZeroClipboard* ./LICENSE
 
 .PHONY: all test clean
