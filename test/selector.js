@@ -29,7 +29,7 @@ exports.selector = {
     test.ok(zeroClipboard.$("body"))
 
     // didn't find anything
-    test.equal(zeroClipboard.$("bodyd"), null)
+    test.ok(!zeroClipboard.$("bodyd").length)
 
     test.done();
   },

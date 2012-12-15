@@ -86,12 +86,13 @@ ZeroClipboard.$ = function (query) {
     if (result.length === 0) result = [document.getElementById(query)];
   }
 
-  for (var i in result) {
-    result[i] = elementWrapper(result[i]);
+  var newresult = [];
+  for (var i = 0; i < result.length; i++) {
+    if (result[i] !== null) newresult.push(elementWrapper(result[i]));
   }
 
   // for single matches
-  if (result.length === 1) return result[0];
+  if (newresult.length === 1) return newresult[0];
 
-  return result;
+  return newresult;
 };
