@@ -30,35 +30,26 @@
       button.graphics.drawRect(0, 0, stage.stageWidth, stage.stageHeight);
       button.alpha = 0.0;
       addChild(button);
-      button.addEventListener(MouseEvent.CLICK, function(event:Event): void {
+      button.addEventListener(MouseEvent.CLICK, function(event:MouseEvent): void {
         // user click copies text to clipboard
         // as of flash player 10, this MUST happen from an in-movie flash click event
         System.setClipboard( clipText );
-        ExternalInterface.call( 'ZeroClipboard.dispatch', 'complete',  {
-          flashVersion : Capabilities.version,
+        ExternalInterface.call( 'ZeroClipboard.dispatch', 'complete',  metaData(event, {
           text: clipText
-        } );
+        }));
       });
 
-      button.addEventListener(MouseEvent.MOUSE_OVER, function(event:Event): void {
-        ExternalInterface.call( 'ZeroClipboard.dispatch', 'mouseOver', {
-          flashVersion : Capabilities.version
-        } );
+      button.addEventListener(MouseEvent.MOUSE_OVER, function(event:MouseEvent): void {
+        ExternalInterface.call( 'ZeroClipboard.dispatch', 'mouseOver', metaData(event) );
       } );
-      button.addEventListener(MouseEvent.MOUSE_OUT, function(event:Event): void {
-        ExternalInterface.call( 'ZeroClipboard.dispatch', 'mouseOut', {
-          flashVersion : Capabilities.version
-        } );
+      button.addEventListener(MouseEvent.MOUSE_OUT, function(event:MouseEvent): void {
+        ExternalInterface.call( 'ZeroClipboard.dispatch', 'mouseOut', metaData(event) );
       } );
-      button.addEventListener(MouseEvent.MOUSE_DOWN, function(event:Event): void {
-        ExternalInterface.call( 'ZeroClipboard.dispatch', 'mouseDown', {
-          flashVersion : Capabilities.version
-        } );
+      button.addEventListener(MouseEvent.MOUSE_DOWN, function(event:MouseEvent): void {
+        ExternalInterface.call( 'ZeroClipboard.dispatch', 'mouseDown', metaData(event) );
       } );
-      button.addEventListener(MouseEvent.MOUSE_UP, function(event:Event): void {
-        ExternalInterface.call( 'ZeroClipboard.dispatch', 'mouseUp', {
-          flashVersion : Capabilities.version
-        } );
+      button.addEventListener(MouseEvent.MOUSE_UP, function(event:MouseEvent): void {
+        ExternalInterface.call( 'ZeroClipboard.dispatch', 'mouseUp', metaData(event) );
       } );
 
       // external functions
@@ -67,9 +58,25 @@
       ExternalInterface.addCallback("setSize", setSize);
 
       // signal to the browser that we are ready
-      ExternalInterface.call( 'ZeroClipboard.dispatch', 'load', {
+      ExternalInterface.call( 'ZeroClipboard.dispatch', 'load', metaData() );
+    }
+
+    private function metaData(event:MouseEvent = void, extra:Object = void):Object {
+      var normalOptions:Object = {
         flashVersion : Capabilities.version
-      } );
+      }
+
+      if (event) {
+        normalOptions.altKey = event.altKey;
+        normalOptions.ctrlKey = event.ctrlKey;
+        normalOptions.shiftKey = event.shiftKey;
+      }
+
+      for(var i:String in extra) {
+        normalOptions[i] = extra[i];
+      }
+
+      return normalOptions;
     }
 
     public function setText(newText:String): void {
