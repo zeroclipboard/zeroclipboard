@@ -59,7 +59,7 @@
   ZeroClipboard.Client.prototype.ready = function() {
     return this.htmlBridge.getAttribute("data-clipboard-ready");
   };
-  function _getStyle(el) {
+  function _getCursor(el) {
     var y = el.style.cursor;
     if (el.currentStyle) y = el.currentStyle.cursor; else if (window.getComputedStyle) y = document.defaultView.getComputedStyle(el, null).getPropertyValue("cursor");
     if (y == "auto") {
@@ -88,7 +88,7 @@
     if (element.getAttribute("title")) {
       this.setTitle(element.getAttribute("title"));
     }
-    if (_getStyle(element, "cursor") == "pointer") {
+    if (_getCursor(element) == "pointer") {
       this.setHandCursor(true);
     } else {
       this.setHandCursor(false);

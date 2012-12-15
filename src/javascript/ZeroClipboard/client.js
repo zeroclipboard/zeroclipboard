@@ -128,7 +128,7 @@ ZeroClipboard.Client.prototype.ready = function () {
  *
  * returns the computed cursor
  */
-function _getStyle(el) {
+function _getCursor(el) {
   var y = el.style.cursor;
   if (el.currentStyle)
     y = el.currentStyle.cursor;
@@ -182,7 +182,7 @@ ZeroClipboard.Client.prototype.setCurrent = function (element) {
   }
 
   // If the element has a pointer style, set to hand cursor
-  if (_getStyle(element, "cursor") == "pointer") {
+  if (_getCursor(element) == "pointer") {
     this.setHandCursor(true);
   } else {
     this.setHandCursor(false);
