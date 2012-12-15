@@ -137,10 +137,13 @@
   ZeroClipboard.dispatch = function(eventName, args) {
     ZeroClipboard.currentClient.receiveEvent(eventName, args);
   };
-  ZeroClipboard.Client.prototype.addEventListener = function(eventName, func) {
+  ZeroClipboard.Client.prototype.on = function(eventName, func) {
     eventName = eventName.toString().toLowerCase().replace(/^on/, "");
     if (!this.handlers[eventName]) this.handlers[eventName] = [];
     this.handlers[eventName].push(func);
+  };
+  ZeroClipboard.Client.prototype.addEventListener = function(eventName, func) {
+    this.on(eventName, func);
   };
   ZeroClipboard.Client.prototype.receiveEvent = function(eventName, args) {
     eventName = eventName.toString().toLowerCase().replace(/^on/, "");

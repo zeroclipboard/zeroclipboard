@@ -13,12 +13,16 @@ ZeroClipboard.dispatch = function (eventName, args) {
  *
  * returns nothing
  */
-ZeroClipboard.Client.prototype.addEventListener = function (eventName, func) {
+ZeroClipboard.Client.prototype.on = function (eventName, func) {
   // add user event listener for event
   // event types: load, queueStart, fileStart, fileComplete, queueComplete, progress, error, cancel
   eventName = eventName.toString().toLowerCase().replace(/^on/, '');
   if (!this.handlers[eventName]) this.handlers[eventName] = [];
   this.handlers[eventName].push(func);
+};
+// shortcut to old stuff
+ZeroClipboard.Client.prototype.addEventListener = function (eventName, func) {
+  this.on(eventName, func);
 };
 
 /*
