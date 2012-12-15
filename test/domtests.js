@@ -8,7 +8,7 @@ exports.domtests = {
 
     var zeroClipboard = require("../ZeroClipboard"),
       clip = new zeroClipboard.Client("#d_clip_button"),
-      element = zeroClipboard.$("#d_clip_button");
+      element = zeroClipboard.$("#d_clip_button")[0];
 
     clip.setCurrent(element);
 
@@ -23,7 +23,7 @@ exports.domtests = {
 
     var zeroClipboard = require("../ZeroClipboard"),
       clip = new zeroClipboard.Client("#d_clip_button_no_title"),
-      element = zeroClipboard.$("#d_clip_button_no_title");
+      element = zeroClipboard.$("#d_clip_button_no_title")[0];
 
     clip.setCurrent(element);
 
@@ -36,7 +36,7 @@ exports.domtests = {
 
     var zeroClipboard = require("../ZeroClipboard"),
       clip = new zeroClipboard.Client('#d_clip_button'),
-      element = zeroClipboard.$("#d_clip_button");
+      element = zeroClipboard.$("#d_clip_button")[0];
 
     clip.setCurrent(element);
 
@@ -51,7 +51,7 @@ exports.domtests = {
 
     var zeroClipboard = require("../ZeroClipboard"),
       clip = new zeroClipboard.Client("#d_clip_button_no_text"),
-      element = zeroClipboard.$("#d_clip_button_no_text");
+      element = zeroClipboard.$("#d_clip_button_no_text")[0];
 
     clip.setCurrent(element);
 

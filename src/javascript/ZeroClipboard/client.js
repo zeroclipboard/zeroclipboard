@@ -13,7 +13,6 @@ ZeroClipboard.Client = function (query) {
 
   if (query) this.glue(query);
 
-  // set currentClient to the last created
   ZeroClipboard.currentClient = this;
 };
 
@@ -23,14 +22,19 @@ ZeroClipboard.Client = function (query) {
  * returns nothing
  */
 ZeroClipboard.Client.prototype.glue = function (query) {
-  var self = this;
 
   // store the element from the page
-  this.element = ZeroClipboard.$(query);
+  var elements = ZeroClipboard.$(query);
 
-  this.element.addEventListener("mouseover", function (obj) {
-    self.setCurrent(this);
-  });
+  var mouseover = (function (self) {
+    return function (obj) {
+      self.setCurrent(this);
+    };
+  })(this);
+
+  for (var i = 0; i < elements.length ; i++) {
+    elements[i].addEventListener("mouseover", mouseover);
+  }
 };
 
 /*
@@ -43,7 +47,8 @@ ZeroClipboard.Client.prototype.bridge = function () {
   // try and find the current global bridge
   this.htmlBridge = ZeroClipboard.$('#global-zeroclipboard-html-bridge');
 
-  if (this.htmlBridge) {
+  if (this.htmlBridge.length) {
+    this.htmlBridge = this.htmlBridge[0];
     this.flashBridge = document["global-zeroclipboard-flash-bridge"];
     return;
   }
@@ -87,9 +92,6 @@ ZeroClipboard.Client.prototype.bridge = function () {
   this.htmlBridge.innerHTML = html;
 
   var self = this;
-  this.htmlBridge.addEventListener("mouseout", function (event) {
-    self.resetBridge();
-  });
 
   document.body.appendChild(this.htmlBridge);
   this.flashBridge = document["global-zeroclipboard-flash-bridge"];
@@ -106,6 +108,9 @@ ZeroClipboard.Client.prototype.resetBridge = function () {
   this.htmlBridge.style.top = "-9999px";
   this.htmlBridge.removeAttribute("title");
   this.htmlBridge.removeAttribute("data-clipboard-text");
+  ZeroClipboard.currentElement.removeClass('zeroclipboard-is-active');
+  ZeroClipboard.currentElement = undefined;
+  ZeroClipboard.currentClient = undefined;
 };
 
 /*
@@ -119,16 +124,26 @@ ZeroClipboard.Client.prototype.ready = function () {
 };
 
 /*
- * Private function _getStyle is used to compute a styleProp of the given element.
+ * Private function _getCursor is used to try and guess the element cursor;
  *
- * returns the computed style
+ * returns the computed cursor
  */
-function _getStyle(el, styleProp) {
-  var y = el.style[styleProp];
+function _getStyle(el) {
+  var y = el.style.cursor;
   if (el.currentStyle)
-    y = el.currentStyle[styleProp];
+    y = el.currentStyle.cursor;
   else if (window.getComputedStyle)
-    y = document.defaultView.getComputedStyle(el, null).getPropertyValue(styleProp);
+    y = document.defaultView.getComputedStyle(el, null).getPropertyValue("cursor");
+
+  if (y == "auto") {
+    var possiblePointers = ["a"];
+    for (var i = 0; i < possiblePointers.length; i++) {
+      if (el.tagName.toLowerCase() == possiblePointers[i]) {
+        return "pointer";
+      }
+    }
+  }
+
   return y;
 }
 
@@ -141,7 +156,8 @@ function _getStyle(el, styleProp) {
  */
 ZeroClipboard.Client.prototype.setCurrent = function (element) {
 
-  // What client is current
+  // What element is current
+  ZeroClipboard.currentElement = element;
   ZeroClipboard.currentClient = this;
 
   var pos = ZeroClipboard.getDOMObjectPosition(element);

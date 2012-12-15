@@ -15,15 +15,20 @@
     ZeroClipboard.currentClient = this;
   };
   ZeroClipboard.Client.prototype.glue = function(query) {
-    var self = this;
-    this.element = ZeroClipboard.$(query);
-    this.element.addEventListener("mouseover", function(obj) {
-      self.setCurrent(this);
-    });
+    var elements = ZeroClipboard.$(query);
+    var mouseover = function(self) {
+      return function(obj) {
+        self.setCurrent(this);
+      };
+    }(this);
+    for (var i = 0; i < elements.length; i++) {
+      elements[i].addEventListener("mouseover", mouseover);
+    }
   };
   ZeroClipboard.Client.prototype.bridge = function() {
     this.htmlBridge = ZeroClipboard.$("#global-zeroclipboard-html-bridge");
-    if (this.htmlBridge) {
+    if (this.htmlBridge.length) {
+      this.htmlBridge = this.htmlBridge[0];
       this.flashBridge = document["global-zeroclipboard-flash-bridge"];
       return;
     }
@@ -39,9 +44,6 @@
     this.htmlBridge.style.zIndex = "9999";
     this.htmlBridge.innerHTML = html;
     var self = this;
-    this.htmlBridge.addEventListener("mouseout", function(event) {
-      self.resetBridge();
-    });
     document.body.appendChild(this.htmlBridge);
     this.flashBridge = document["global-zeroclipboard-flash-bridge"];
   };
@@ -50,16 +52,28 @@
     this.htmlBridge.style.top = "-9999px";
     this.htmlBridge.removeAttribute("title");
     this.htmlBridge.removeAttribute("data-clipboard-text");
+    ZeroClipboard.currentElement.removeClass("zeroclipboard-is-active");
+    ZeroClipboard.currentElement = undefined;
+    ZeroClipboard.currentClient = undefined;
   };
   ZeroClipboard.Client.prototype.ready = function() {
     return this.htmlBridge.getAttribute("data-clipboard-ready");
   };
-  function _getStyle(el, styleProp) {
-    var y = el.style[styleProp];
-    if (el.currentStyle) y = el.currentStyle[styleProp]; else if (window.getComputedStyle) y = document.defaultView.getComputedStyle(el, null).getPropertyValue(styleProp);
+  function _getStyle(el) {
+    var y = el.style.cursor;
+    if (el.currentStyle) y = el.currentStyle.cursor; else if (window.getComputedStyle) y = document.defaultView.getComputedStyle(el, null).getPropertyValue("cursor");
+    if (y == "auto") {
+      var possiblePointers = [ "a" ];
+      for (var i = 0; i < possiblePointers.length; i++) {
+        if (el.tagName.toLowerCase() == possiblePointers[i]) {
+          return "pointer";
+        }
+      }
+    }
     return y;
   }
   ZeroClipboard.Client.prototype.setCurrent = function(element) {
+    ZeroClipboard.currentElement = element;
     ZeroClipboard.currentClient = this;
     var pos = ZeroClipboard.getDOMObjectPosition(element);
     this.htmlBridge.style.top = pos.top + "px";
@@ -141,16 +155,17 @@
       this.htmlBridge.setAttribute("data-clipboard-ready", true);
       break;
      case "mouseover":
-      ZeroClipboard.currentClient.element.addClass("zeroclipboard-is-hovered");
+      ZeroClipboard.currentElement.addClass("zeroclipboard-is-hovered");
       break;
      case "mouseout":
-      ZeroClipboard.currentClient.element.removeClass("zeroclipboard-is-hovered");
+      ZeroClipboard.currentElement.removeClass("zeroclipboard-is-hovered");
+      this.resetBridge();
       break;
      case "mousedown":
-      ZeroClipboard.currentClient.element.addClass("zeroclipboard-is-active");
+      ZeroClipboard.currentElement.addClass("zeroclipboard-is-active");
       break;
      case "mouseup":
-      ZeroClipboard.currentClient.element.removeClass("zeroclipboard-is-active");
+      ZeroClipboard.currentElement.removeClass("zeroclipboard-is-active");
       break;
     }
     if (this.handlers[eventName]) {
@@ -239,13 +254,12 @@
     }
     if (typeof query === "string") {
       result = ZeroClipboardSelect(query, document);
-      if (result.length === 0) result = [ document.getElementById(query) ];
     }
-    for (var i in result) {
-      result[i] = elementWrapper(result[i]);
+    var newresult = [];
+    for (var i = 0; i < result.length; i++) {
+      if (result[i] !== null) newresult.push(elementWrapper(result[i]));
     }
-    if (result.length === 1) return result[0];
-    return result;
+    return newresult;
   };
   if (typeof module !== "undefined") {
     module.exports = ZeroClipboard;

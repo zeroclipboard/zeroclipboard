@@ -4,32 +4,21 @@ require("./env")
 
 exports.selector = {
 
-  "$ backwards compatibility test": function (test) {
-
-    var zeroClipboard = require("../ZeroClipboard")
-    var elm = zeroClipboard.$("d_clip_button")
-
-    // element isn't null
-    test.equal(elm.id, "d_clip_button")
-
-    test.done();
-  },
-
   "$ returns an element": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard")
 
     // grabbed the right id
-    test.equal(zeroClipboard.$("#d_clip_button").id, "d_clip_button")
+    test.equal(zeroClipboard.$("#d_clip_button")[0].id, "d_clip_button")
 
     // grabbed 3 buttons
     test.equal(zeroClipboard.$(".my_clip_button").length, 5)
 
     // found the body
-    test.ok(zeroClipboard.$("body"))
+    test.ok(zeroClipboard.$("body").length)
 
     // didn't find anything
-    test.equal(zeroClipboard.$("bodyd"), null)
+    test.ok(!zeroClipboard.$("bodyd").length)
 
     test.done();
   },
@@ -37,7 +26,7 @@ exports.selector = {
   "$.addClass works as expected": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard")
-    var elm = zeroClipboard.$("#d_clip_button")
+    var elm = zeroClipboard.$("#d_clip_button")[0]
 
     // element isn't null
     test.ok(elm)
@@ -52,7 +41,7 @@ exports.selector = {
   "$.removeClass works as expected": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard")
-    var elm = zeroClipboard.$("#d_clip_button")
+    var elm = zeroClipboard.$("#d_clip_button")[0]
 
     // element isn't null
     test.ok(elm)

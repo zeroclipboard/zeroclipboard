@@ -25,7 +25,7 @@ exports.zevents = {
     var zeroClipboard = require("../ZeroClipboard"),
         clip = new zeroClipboard.Client();
 
-    clip.glue('#d_clip_button', '#d_clip_container')
+    clip.glue('#d_clip_button')
 
     var id = clip.id;
 

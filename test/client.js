@@ -10,7 +10,6 @@ exports.client = {
     clip = new zeroClipboard.Client();
 
     // Test the client is null
-    test.equal(clip.element, null);
     test.ok(clip.htmlBridge);
     test.ok(clip.handlers);
 
@@ -23,7 +22,6 @@ exports.client = {
     clip = new zeroClipboard.Client("#d_clip_button");
 
     // Test the client was created properly
-    test.ok(clip.element);
     test.ok(clip.htmlBridge);
     test.ok(clip.handlers);
 
@@ -62,7 +60,6 @@ exports.client = {
     clip.glue("#d_clip_button")
 
     // Test the client was created properly
-    test.ok(clip.element);
     test.ok(clip.htmlBridge);
     test.ok(clip.handlers);
 

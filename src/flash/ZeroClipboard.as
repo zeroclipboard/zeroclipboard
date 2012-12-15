@@ -3,12 +3,8 @@
   import flash.display.Stage;
   import flash.display.Sprite;
   import flash.display.LoaderInfo;
-  import flash.display.StageScaleMode;
   import flash.events.*;
-  import flash.display.StageAlign;
-  import flash.display.StageScaleMode;
   import flash.external.ExternalInterface;
-  import flash.system.Security;
   import flash.utils.*;
   import flash.system.System;
   import flash.system.Capabilities;

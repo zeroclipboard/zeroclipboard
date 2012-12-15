@@ -43,19 +43,20 @@ ZeroClipboard.Client.prototype.receiveEvent = function (eventName, args) {
     break;
 
   case 'mouseover':
-    ZeroClipboard.currentClient.element.addClass('zeroclipboard-is-hovered');
+    ZeroClipboard.currentElement.addClass('zeroclipboard-is-hovered');
     break;
 
   case 'mouseout':
-    ZeroClipboard.currentClient.element.removeClass('zeroclipboard-is-hovered');
+    ZeroClipboard.currentElement.removeClass('zeroclipboard-is-hovered');
+    this.resetBridge();
     break;
 
   case 'mousedown':
-    ZeroClipboard.currentClient.element.addClass('zeroclipboard-is-active');
+    ZeroClipboard.currentElement.addClass('zeroclipboard-is-active');
     break;
 
   case 'mouseup':
-    ZeroClipboard.currentClient.element.removeClass('zeroclipboard-is-active');
+    ZeroClipboard.currentElement.removeClass('zeroclipboard-is-active');
     break;
   } // switch eventName
 
