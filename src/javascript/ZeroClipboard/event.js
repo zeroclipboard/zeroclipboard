@@ -13,12 +13,16 @@ ZeroClipboard.dispatch = function (eventName, args) {
  *
  * returns nothing
  */
-ZeroClipboard.Client.prototype.addEventListener = function (eventName, func) {
+ZeroClipboard.Client.prototype.on = function (eventName, func) {
   // add user event listener for event
   // event types: load, queueStart, fileStart, fileComplete, queueComplete, progress, error, cancel
   eventName = eventName.toString().toLowerCase().replace(/^on/, '');
   if (!this.handlers[eventName]) this.handlers[eventName] = [];
   this.handlers[eventName].push(func);
+};
+// shortcut to old stuff
+ZeroClipboard.Client.prototype.addEventListener = function (eventName, func) {
+  this.on(eventName, func);
 };
 
 /*
@@ -43,11 +47,11 @@ ZeroClipboard.Client.prototype.receiveEvent = function (eventName, args) {
     break;
 
   case 'mouseover':
-    ZeroClipboard.currentElement.addClass('zeroclipboard-is-hovered');
+    ZeroClipboard.currentElement.addClass('zeroclipboard-is-hover');
     break;
 
   case 'mouseout':
-    ZeroClipboard.currentElement.removeClass('zeroclipboard-is-hovered');
+    ZeroClipboard.currentElement.removeClass('zeroclipboard-is-hover');
     this.resetBridge();
     break;
 
@@ -67,10 +71,6 @@ ZeroClipboard.Client.prototype.receiveEvent = function (eventName, args) {
       if (typeof(func) == 'function') {
         // actual function reference
         func(this, args);
-      }
-      else if ((typeof(func) == 'object') && (func.length == 2)) {
-        // PHP style object + method, i.e. [myObject, 'myMethod']
-        func[0][func[1]](this, args);
       }
       else if (typeof(func) == 'string') {
         // name of function

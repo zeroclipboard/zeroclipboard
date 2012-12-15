@@ -160,16 +160,7 @@ ZeroClipboard.Client.prototype.setCurrent = function (element) {
   ZeroClipboard.currentElement = element;
   ZeroClipboard.currentClient = this;
 
-  var pos = ZeroClipboard.getDOMObjectPosition(element);
-
-  // new css
-  this.htmlBridge.style.top = pos.top + "px";
-  this.htmlBridge.style.left = pos.left + "px";
-  this.htmlBridge.style.width = pos.width + "px";
-  this.htmlBridge.style.height = pos.height + "px";
-  this.htmlBridge.style.zIndex = pos.zIndex + 1;
-
-  this.setSize(pos.width, pos.height);
+  this.reposition();
 
   // If the dom element contains data-clipboard-text set text
   if (element.getAttribute("data-clipboard-text")) {
@@ -187,6 +178,24 @@ ZeroClipboard.Client.prototype.setCurrent = function (element) {
   } else {
     this.setHandCursor(false);
   }
+};
+
+/*
+ * Reposition the flash object, if the page size changes.
+ *
+ * returns nothing
+ */
+ZeroClipboard.Client.prototype.reposition = function () {
+  var pos = ZeroClipboard.getDOMObjectPosition(ZeroClipboard.currentElement);
+
+  // new css
+  this.htmlBridge.style.top = pos.top + "px";
+  this.htmlBridge.style.left = pos.left + "px";
+  this.htmlBridge.style.width = pos.width + "px";
+  this.htmlBridge.style.height = pos.height + "px";
+  this.htmlBridge.style.zIndex = pos.zIndex + 1;
+
+  this.setSize(pos.width, pos.height);
 };
 
 /*

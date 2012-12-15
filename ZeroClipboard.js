@@ -75,13 +75,7 @@
   ZeroClipboard.Client.prototype.setCurrent = function(element) {
     ZeroClipboard.currentElement = element;
     ZeroClipboard.currentClient = this;
-    var pos = ZeroClipboard.getDOMObjectPosition(element);
-    this.htmlBridge.style.top = pos.top + "px";
-    this.htmlBridge.style.left = pos.left + "px";
-    this.htmlBridge.style.width = pos.width + "px";
-    this.htmlBridge.style.height = pos.height + "px";
-    this.htmlBridge.style.zIndex = pos.zIndex + 1;
-    this.setSize(pos.width, pos.height);
+    this.reposition();
     if (element.getAttribute("data-clipboard-text")) {
       this.setText(element.getAttribute("data-clipboard-text"));
     }
@@ -93,6 +87,15 @@
     } else {
       this.setHandCursor(false);
     }
+  };
+  ZeroClipboard.Client.prototype.reposition = function() {
+    var pos = ZeroClipboard.getDOMObjectPosition(ZeroClipboard.currentElement);
+    this.htmlBridge.style.top = pos.top + "px";
+    this.htmlBridge.style.left = pos.left + "px";
+    this.htmlBridge.style.width = pos.width + "px";
+    this.htmlBridge.style.height = pos.height + "px";
+    this.htmlBridge.style.zIndex = pos.zIndex + 1;
+    this.setSize(pos.width, pos.height);
   };
   ZeroClipboard.Client.prototype.setText = function(newText) {
     if (newText && newText !== "") {
@@ -137,10 +140,13 @@
   ZeroClipboard.dispatch = function(eventName, args) {
     ZeroClipboard.currentClient.receiveEvent(eventName, args);
   };
-  ZeroClipboard.Client.prototype.addEventListener = function(eventName, func) {
+  ZeroClipboard.Client.prototype.on = function(eventName, func) {
     eventName = eventName.toString().toLowerCase().replace(/^on/, "");
     if (!this.handlers[eventName]) this.handlers[eventName] = [];
     this.handlers[eventName].push(func);
+  };
+  ZeroClipboard.Client.prototype.addEventListener = function(eventName, func) {
+    this.on(eventName, func);
   };
   ZeroClipboard.Client.prototype.receiveEvent = function(eventName, args) {
     eventName = eventName.toString().toLowerCase().replace(/^on/, "");
@@ -254,6 +260,7 @@
     }
     if (typeof query === "string") {
       result = ZeroClipboardSelect(query, document);
+      if (result.length === 0) result = [ document.getElementById(query) ];
     }
     var newresult = [];
     for (var i = 0; i < result.length; i++) {
