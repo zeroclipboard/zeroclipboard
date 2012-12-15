@@ -257,6 +257,7 @@
     }
     if (typeof query === "string") {
       result = ZeroClipboardSelect(query, document);
+      if (result.length === 0) result = [ document.getElementById(query) ];
     }
     var newresult = [];
     for (var i = 0; i < result.length; i++) {

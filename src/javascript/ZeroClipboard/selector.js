@@ -81,6 +81,8 @@ ZeroClipboard.$ = function (query) {
 
   if (typeof query === "string") {
     result = ZeroClipboardSelect(query, document);
+    // last ditch effort for backwards compatibility
+    if (result.length === 0) result = [document.getElementById(query)];
   }
 
   var newresult = [];
