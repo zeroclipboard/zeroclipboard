@@ -75,13 +75,7 @@
   ZeroClipboard.Client.prototype.setCurrent = function(element) {
     ZeroClipboard.currentElement = element;
     ZeroClipboard.currentClient = this;
-    var pos = ZeroClipboard.getDOMObjectPosition(element);
-    this.htmlBridge.style.top = pos.top + "px";
-    this.htmlBridge.style.left = pos.left + "px";
-    this.htmlBridge.style.width = pos.width + "px";
-    this.htmlBridge.style.height = pos.height + "px";
-    this.htmlBridge.style.zIndex = pos.zIndex + 1;
-    this.setSize(pos.width, pos.height);
+    this.reposition();
     if (element.getAttribute("data-clipboard-text")) {
       this.setText(element.getAttribute("data-clipboard-text"));
     }
@@ -93,6 +87,15 @@
     } else {
       this.setHandCursor(false);
     }
+  };
+  ZeroClipboard.Client.prototype.reposition = function() {
+    var pos = ZeroClipboard.getDOMObjectPosition(ZeroClipboard.currentElement);
+    this.htmlBridge.style.top = pos.top + "px";
+    this.htmlBridge.style.left = pos.left + "px";
+    this.htmlBridge.style.width = pos.width + "px";
+    this.htmlBridge.style.height = pos.height + "px";
+    this.htmlBridge.style.zIndex = pos.zIndex + 1;
+    this.setSize(pos.width, pos.height);
   };
   ZeroClipboard.Client.prototype.setText = function(newText) {
     if (newText && newText !== "") {
