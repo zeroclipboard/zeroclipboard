@@ -161,10 +161,10 @@
       this.htmlBridge.setAttribute("data-clipboard-ready", true);
       break;
      case "mouseover":
-      ZeroClipboard.currentElement.addClass("zeroclipboard-is-hovered");
+      ZeroClipboard.currentElement.addClass("zeroclipboard-is-hover");
       break;
      case "mouseout":
-      ZeroClipboard.currentElement.removeClass("zeroclipboard-is-hovered");
+      ZeroClipboard.currentElement.removeClass("zeroclipboard-is-hover");
       this.resetBridge();
       break;
      case "mousedown":
@@ -179,8 +179,6 @@
         var func = this.handlers[eventName][idx];
         if (typeof func == "function") {
           func(this, args);
-        } else if (typeof func == "object" && func.length == 2) {
-          func[0][func[1]](this, args);
         } else if (typeof func == "string") {
           window[func](this, args);
         }
