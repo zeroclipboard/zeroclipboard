@@ -1,4 +1,8 @@
-// This wraps the returned element with some basic functions needed for ZeroClipboard
+/*
+ * This wraps the returned element with some basic functions needed for ZeroClipboard
+ *
+ * returns element with new functions
+ */
 function elementWrapper(element) {
 
   // don't wrap twice
@@ -61,6 +65,10 @@ function elementWrapper(element) {
   return element;
 }
 
+/*
+ *
+ * returns the found elements
+ */
 ZeroClipboard.$ = function (query) {
 
   var ZeroClipboardSelect = function (s, n) { return n.querySelectorAll(s); },

@@ -1,5 +1,9 @@
-ZeroClipboard.Client = function (elem) {
-
+/*
+ * Creates a new ZeroClipboard client. from an selector query.
+ *
+ * returns nothing
+ */
+ZeroClipboard.Client = function (query) {
 
   // event handlers
   this.handlers = {};
@@ -7,12 +11,17 @@ ZeroClipboard.Client = function (elem) {
   // setup the flash->Javascript bridge
   if (ZeroClipboard.detectFlashSupport()) this.bridge();
 
-  if (elem) this.glue(elem);
+  if (query) this.glue(query);
 
   // set currentClient to the last created
   ZeroClipboard.currentClient = this;
 };
 
+/*
+ * Glue a new query of objects to the client.
+ *
+ * returns nothing
+ */
 ZeroClipboard.Client.prototype.glue = function (query) {
   var self = this;
 
@@ -24,6 +33,11 @@ ZeroClipboard.Client.prototype.glue = function (query) {
   });
 };
 
+/*
+ * Find or create an htmlBridge and flashBridge for the client.
+ *
+ * returns nothing
+ */
 ZeroClipboard.Client.prototype.bridge = function () {
 
   // try and find the current global bridge
@@ -82,6 +96,11 @@ ZeroClipboard.Client.prototype.bridge = function () {
 
 };
 
+/*
+ * Reset the html bridge to be hidden off screen and not have title or text.
+ *
+ * returns nothing
+ */
 ZeroClipboard.Client.prototype.resetBridge = function () {
   this.htmlBridge.style.left = "-9999px";
   this.htmlBridge.style.top = "-9999px";
@@ -89,11 +108,22 @@ ZeroClipboard.Client.prototype.resetBridge = function () {
   this.htmlBridge.removeAttribute("data-clipboard-text");
 };
 
+/*
+ * Helper function to determine if the flash bridge is ready. Gets this info from
+ * a data-clipboard-ready attribute on the global html element.
+ *
+ * returns true if the flash bridge is ready
+ */
 ZeroClipboard.Client.prototype.ready = function () {
   return this.htmlBridge.getAttribute("data-clipboard-ready");
 };
 
-function getStyle(el, styleProp) {
+/*
+ * Private function _getStyle is used to compute a styleProp of the given element.
+ *
+ * returns the computed style
+ */
+function _getStyle(el, styleProp) {
   var y = el.style[styleProp];
   if (el.currentStyle)
     y = el.currentStyle[styleProp];
@@ -102,6 +132,13 @@ function getStyle(el, styleProp) {
   return y;
 }
 
+/*
+ * Sets the current html object that the flash object should overlay.
+ * This will put the global flash object on top of the current object and set
+ * the text and title from the html object.
+ *
+ * returns nothing
+ */
 ZeroClipboard.Client.prototype.setCurrent = function (element) {
 
   // What client is current
@@ -129,13 +166,18 @@ ZeroClipboard.Client.prototype.setCurrent = function (element) {
   }
 
   // If the element has a pointer style, set to hand cursor
-  if (getStyle(element, "cursor") == "pointer") {
+  if (_getStyle(element, "cursor") == "pointer") {
     this.setHandCursor(true);
   } else {
     this.setHandCursor(false);
   }
 };
 
+/*
+ * Sends a signal to the flash object to set the clipboard text.
+ *
+ * returns nothing
+ */
 ZeroClipboard.Client.prototype.setText = function (newText) {
   if (newText && newText !== "") {
     this.htmlBridge.setAttribute("data-clipboard-text", newText);
@@ -143,15 +185,29 @@ ZeroClipboard.Client.prototype.setText = function (newText) {
   }
 };
 
+/*
+ * Adds a title="" attribute to the htmlBridge to give it tooltip capabiities
+ *
+ * returns nothing
+ */
 ZeroClipboard.Client.prototype.setTitle = function (newTitle) {
-  // set title of flash element
   if (newTitle && newTitle !== "") this.htmlBridge.setAttribute("title", newTitle);
 };
 
+/*
+ * Sends a signal to the flash object to change the stage size.
+ *
+ * returns nothing
+ */
 ZeroClipboard.Client.prototype.setSize = function (width, height) {
   if (this.ready()) this.flashBridge.setSize(width, height);
 };
 
+/*
+ * Sends a signal to the flash object to display the hand cursor if true
+ *
+ * returns nothing
+ */
 ZeroClipboard.Client.prototype.setHandCursor = function (enabled) {
   if (this.ready()) this.flashBridge.setHandCursor(enabled);
 };

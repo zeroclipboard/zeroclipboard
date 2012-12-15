@@ -8,10 +8,10 @@
  */(function() {
   "use strict";
   var ZeroClipboard = {};
-  ZeroClipboard.Client = function(elem) {
+  ZeroClipboard.Client = function(query) {
     this.handlers = {};
     if (ZeroClipboard.detectFlashSupport()) this.bridge();
-    if (elem) this.glue(elem);
+    if (query) this.glue(query);
     ZeroClipboard.currentClient = this;
   };
   ZeroClipboard.Client.prototype.glue = function(query) {
@@ -54,7 +54,7 @@
   ZeroClipboard.Client.prototype.ready = function() {
     return this.htmlBridge.getAttribute("data-clipboard-ready");
   };
-  function getStyle(el, styleProp) {
+  function _getStyle(el, styleProp) {
     var y = el.style[styleProp];
     if (el.currentStyle) y = el.currentStyle[styleProp]; else if (window.getComputedStyle) y = document.defaultView.getComputedStyle(el, null).getPropertyValue(styleProp);
     return y;
@@ -74,7 +74,7 @@
     if (element.getAttribute("title")) {
       this.setTitle(element.getAttribute("title"));
     }
-    if (getStyle(element, "cursor") == "pointer") {
+    if (_getStyle(element, "cursor") == "pointer") {
       this.setHandCursor(true);
     } else {
       this.setHandCursor(false);

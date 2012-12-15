@@ -1,8 +1,18 @@
+/*
+ * Bridge from the flash object back to the javascript
+ *
+ * returns nothing
+ */
 ZeroClipboard.dispatch = function (eventName, args) {
   // receive event from flash movie, send to client
   ZeroClipboard.currentClient.receiveEvent(eventName, args);
 };
 
+/*
+ * Add an event to the client.
+ *
+ * returns nothing
+ */
 ZeroClipboard.Client.prototype.addEventListener = function (eventName, func) {
   // add user event listener for event
   // event types: load, queueStart, fileStart, fileComplete, queueComplete, progress, error, cancel
@@ -11,6 +21,11 @@ ZeroClipboard.Client.prototype.addEventListener = function (eventName, func) {
   this.handlers[eventName].push(func);
 };
 
+/*
+ * Receive an event for a specific client.
+ *
+ * returns nothing
+ */
 ZeroClipboard.Client.prototype.receiveEvent = function (eventName, args) {
   // receive event from flash
   eventName = eventName.toString().toLowerCase().replace(/^on/, '');

@@ -2,17 +2,30 @@ ZeroClipboard.version = "{{version}}";
 ZeroClipboard.moviePath = 'ZeroClipboard.swf'; // URL to movie
 ZeroClipboard.currentClient = null; // The current html object
 
+/*
+ * Set the movie path for the flash file.
+ *
+ * returns nothing
+ */
 ZeroClipboard.setMoviePath = function (path) {
   // set path to ZeroClipboard.swf
   this.moviePath = path;
 };
 
-// use this method in JSNI calls to obtain a new Client instance
+/*
+ * use this method in JSNI calls to obtain a new Client instance
+ *
+ * returns a new client
+ */
 ZeroClipboard.newClient = function () {
   return new ZeroClipboard.Client();
 };
 
-// Simple Flash Detection
+/*
+ * Simple Flash Detection
+ *
+ * returns true if flash is detected
+ */
 ZeroClipboard.detectFlashSupport = function () {
 
   // Assume we don't have it

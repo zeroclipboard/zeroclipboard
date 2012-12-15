@@ -1,3 +1,8 @@
+/*
+ * Get the dom position of an object.
+ *
+ * returns json of objects position, height, width, and zindex
+ */
 ZeroClipboard.getDOMObjectPosition = function (obj) {
   // get absolute coordinates for dom element
   var info = {
