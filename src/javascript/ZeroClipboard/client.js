@@ -53,9 +53,14 @@ ZeroClipboard.Client.prototype.bridge = function () {
     return;
   }
 
+  // because externalenterface craps out when flash is cached.
+  function noCache(path) {
+    return ((path.indexOf("?") >= 0) ? "&" : "?") + "nocache=" + (new Date().getTime());
+  }
+
   var html = "\
     <object classid=\"clsid:d27cdb6e-ae6d-11cf-96b8-444553540000\" id=\"global-zeroclipboard-flash-bridge\" width=\"100%\" height=\"100%\"> \
-      <param name=\"movie\" value=\"" + ZeroClipboard.moviePath + "\"/> \
+      <param name=\"movie\" value=\"" + ZeroClipboard.moviePath + noCache(ZeroClipboard.moviePath) + "\"/> \
       <param name=\"allowScriptAccess\" value=\"always\" /> \
       <param name=\"scale\" value=\"exactfit\"> \
       <param name=\"loop\" value=\"false\" /> \
@@ -64,7 +69,7 @@ ZeroClipboard.Client.prototype.bridge = function () {
       <param name=\"bgcolor\" value=\"#ffffff\" /> \
       <param name=\"wmode\" value=\"transparent\"/> \
       <param name=\"flashvars\" value=\"id=1\"/> \
-      <embed src=\"" + ZeroClipboard.moviePath + "\" \
+      <embed src=\"" + ZeroClipboard.moviePath + noCache(ZeroClipboard.moviePath) + "\" \
         loop=\"false\" menu=\"false\" \
         quality=\"best\" bgcolor=\"#ffffff\" \
         width=\"100%\" height=\"100%\" \
