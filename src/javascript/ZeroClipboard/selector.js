@@ -1,4 +1,8 @@
-// This wraps the returned element with some basic functions needed for ZeroClipboard
+/*
+ * This wraps the returned element with some basic functions needed for ZeroClipboard
+ *
+ * returns element with new functions
+ */
 function elementWrapper(element) {
 
   // don't wrap twice
@@ -58,18 +62,13 @@ function elementWrapper(element) {
     return this;
   };
 
-  // paired down version of hasClass from jQuery https://github.com/jquery/jquery/blob/master/speed/jquery-basis.js#L1328
-  element.hasClass = function (selector) {
-    var className = " " + selector + " ";
-    if ((" " + this.className + " ").replace(/[\n\t]/g, " ").indexOf(className) > -1) {
-      return true;
-    }
-    return false;
-  };
-
   return element;
 }
 
+/*
+ *
+ * returns the found elements
+ */
 ZeroClipboard.$ = function (query) {
 
   var ZeroClipboardSelect = function (s, n) { return n.querySelectorAll(s); },
@@ -90,9 +89,6 @@ ZeroClipboard.$ = function (query) {
   for (var i = 0; i < result.length; i++) {
     if (result[i] !== null) newresult.push(elementWrapper(result[i]));
   }
-
-  // for single matches
-  if (newresult.length === 1) return newresult[0];
 
   return newresult;
 };

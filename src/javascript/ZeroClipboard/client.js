@@ -1,89 +1,238 @@
-ZeroClipboard.Client = function (elem) {
-  // constructor for new simple upload client
+/*
+ * Creates a new ZeroClipboard client. from an selector query.
+ *
+ * returns nothing
+ */
+ZeroClipboard.Client = function (query) {
+
+  // event handlers
   this.handlers = {};
 
-  // unique ID
-  this.id = ZeroClipboard.nextId++;
-  this.movieId = 'ZeroClipboardMovie_' + this.id;
+  // setup the flash->Javascript bridge
+  if (ZeroClipboard.detectFlashSupport()) this.bridge();
 
-  // register client with singleton to receive flash events
-  ZeroClipboard.register(this.id, this);
+  if (query) this.glue(query);
 
-  // create movie
-  if (elem) this.glue(elem);
+  ZeroClipboard.currentClient = this;
 };
 
-// setting these objects like this since ZeroClipboard.Client.prototype = {}
-// has a chance of overwriting things.
-ZeroClipboard.Client.prototype.id = 0; // unique ID for us
-ZeroClipboard.Client.prototype.title = "";  // tooltip for the flash element
-ZeroClipboard.Client.prototype.ready = false; // whether movie is ready to receive events or not
-ZeroClipboard.Client.prototype.movie = null; // reference to movie object
-ZeroClipboard.Client.prototype.clipText = ''; // text to copy to clipboard
-ZeroClipboard.Client.prototype.handCursorEnabled = true; // whether to show hand cursor, or default pointer cursor
-ZeroClipboard.Client.prototype.cssEffects = true; // enable CSS mouse effects on dom container
-ZeroClipboard.Client.prototype.handlers = null; // user event handlers
-ZeroClipboard.Client.prototype.zIndex = 99; // default zIndex of the movie object
+/*
+ * Glue a new query of objects to the client.
+ *
+ * returns nothing
+ */
+ZeroClipboard.Client.prototype.glue = function (query) {
 
-ZeroClipboard.Client.prototype.getHTML = function (width, height) {
-  // return HTML for movie
-  var html = '';
-  var flashvars = 'id=' + this.id +
-    '&width=' + width +
-    '&height=' + height,
-          title = this.title ? ' title="' + this.title + '"' : '';
+  // store the element from the page
+  var elements = ZeroClipboard.$(query);
 
-  if (navigator.userAgent.match(/MSIE/)) {
-    // IE gets an OBJECT tag
-    var protocol = location.href.match(/^https/i) ? 'https://' : 'http://';
-    html += '<object' + title + ' classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="' + protocol + 'download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="' + width + '" height="' + height + '" id="' + this.movieId + '"><param name="allowScriptAccess" value="always" /><param name="allowFullScreen" value="false" /><param name="movie" value="' + ZeroClipboard.moviePath + '" /><param name="loop" value="false" /><param name="menu" value="false" /><param name="quality" value="best" /><param name="bgcolor" value="#ffffff" /><param name="flashvars" value="' + flashvars + '"/><param name="wmode" value="transparent"/></object>';
-  }
-  else {
-    // all other browsers get an EMBED tag
-    html += '<embed' + title + ' id="' + this.movieId + '" src="' + ZeroClipboard.moviePath + '" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="' + width + '" height="' + height + '" name="' + this.movieId + '" allowScriptAccess="always" allowFullScreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="' + flashvars + '" wmode="transparent" />';
-  }
-  return html;
-};
+  var mouseover = (function (self) {
+    return function (obj) {
+      self.setCurrent(this);
+    };
+  })(this);
 
-ZeroClipboard.Client.prototype.destroy = function () {
-  // destroy control and floater
-  if (this.domElement && this.div) {
-    this.hide();
-    this.div.innerHTML = '';
-
-    var body = document.getElementsByTagName('body')[0];
-    try { body.removeChild(this.div); } catch (e) {}
-
-    this.domElement = null;
-    this.div = null;
+  for (var i = 0; i < elements.length ; i++) {
+    elements[i].addEventListener("mouseover", mouseover);
   }
 };
 
-ZeroClipboard.Client.prototype.setText = function (newText) {
-  // set text to be copied to clipboard
-  this.clipText = newText;
-  if (this.ready) this.movie.setText(newText);
+/*
+ * Find or create an htmlBridge and flashBridge for the client.
+ *
+ * returns nothing
+ */
+ZeroClipboard.Client.prototype.bridge = function () {
+
+  // try and find the current global bridge
+  this.htmlBridge = ZeroClipboard.$('#global-zeroclipboard-html-bridge');
+
+  if (this.htmlBridge.length) {
+    this.htmlBridge = this.htmlBridge[0];
+    this.flashBridge = document["global-zeroclipboard-flash-bridge"];
+    return;
+  }
+
+  var html = "\
+    <object classid=\"clsid:d27cdb6e-ae6d-11cf-96b8-444553540000\" id=\"global-zeroclipboard-flash-bridge\" width=\"100%\" height=\"100%\"> \
+      <param name=\"movie\" value=\"" + ZeroClipboard.moviePath + "\"/> \
+      <param name=\"allowScriptAccess\" value=\"always\" /> \
+      <param name=\"scale\" value=\"exactfit\"> \
+      <param name=\"loop\" value=\"false\" /> \
+      <param name=\"menu\" value=\"false\" /> \
+      <param name=\"quality\" value=\"best\" /> \
+      <param name=\"bgcolor\" value=\"#ffffff\" /> \
+      <param name=\"wmode\" value=\"transparent\"/> \
+      <param name=\"flashvars\" value=\"id=1\"/> \
+      <embed src=\"" + ZeroClipboard.moviePath + "\" \
+        loop=\"false\" menu=\"false\" \
+        quality=\"best\" bgcolor=\"#ffffff\" \
+        width=\"100%\" height=\"100%\" \
+        name=\"global-zeroclipboard-flash-bridge\" \
+        allowScriptAccess=\"always\" \
+        allowFullScreen=\"false\" \
+        type=\"application/x-shockwave-flash\" \
+        wmode=\"transparent\" \
+        pluginspage=\"http://www.macromedia.com/go/getflashplayer\" \
+        flashvars=\"id=1&width=100&height=100\" \
+        scale=\"exactfit\"> \
+      </embed> \
+    </object>";
+
+  this.htmlBridge = document.createElement('div');
+  this.htmlBridge.id = "global-zeroclipboard-html-bridge";
+  this.htmlBridge.setAttribute("data-clipboard-ready", false);
+  this.htmlBridge.style.position = "absolute";
+  this.htmlBridge.style.left = "-9999px";
+  this.htmlBridge.style.top = "-9999px";
+  this.htmlBridge.style.width = "15px";
+  this.htmlBridge.style.height = "15px";
+  this.htmlBridge.style.zIndex = "9999";
+
+  this.htmlBridge.innerHTML = html;
+
+  var self = this;
+
+  document.body.appendChild(this.htmlBridge);
+  this.flashBridge = document["global-zeroclipboard-flash-bridge"];
+
 };
 
-ZeroClipboard.Client.prototype.setTitle = function (newTitle) {
-  // set title of flash element
-  this.title = newTitle;
-  // Update the already glued object if it exists.
-  if (this.div) {
-    var flashElems = this.div.children;
-    if (flashElems.length) {
-      flashElems[0].setAttribute('title', this.title);
+/*
+ * Reset the html bridge to be hidden off screen and not have title or text.
+ *
+ * returns nothing
+ */
+ZeroClipboard.Client.prototype.resetBridge = function () {
+  this.htmlBridge.style.left = "-9999px";
+  this.htmlBridge.style.top = "-9999px";
+  this.htmlBridge.removeAttribute("title");
+  this.htmlBridge.removeAttribute("data-clipboard-text");
+  ZeroClipboard.currentElement.removeClass('zeroclipboard-is-active');
+  ZeroClipboard.currentElement = undefined;
+  ZeroClipboard.currentClient = undefined;
+};
+
+/*
+ * Helper function to determine if the flash bridge is ready. Gets this info from
+ * a data-clipboard-ready attribute on the global html element.
+ *
+ * returns true if the flash bridge is ready
+ */
+ZeroClipboard.Client.prototype.ready = function () {
+  return this.htmlBridge.getAttribute("data-clipboard-ready");
+};
+
+/*
+ * Private function _getCursor is used to try and guess the element cursor;
+ *
+ * returns the computed cursor
+ */
+function _getCursor(el) {
+  var y = el.style.cursor;
+  if (el.currentStyle)
+    y = el.currentStyle.cursor;
+  else if (window.getComputedStyle)
+    y = document.defaultView.getComputedStyle(el, null).getPropertyValue("cursor");
+
+  if (y == "auto") {
+    var possiblePointers = ["a"];
+    for (var i = 0; i < possiblePointers.length; i++) {
+      if (el.tagName.toLowerCase() == possiblePointers[i]) {
+        return "pointer";
+      }
     }
   }
+
+  return y;
+}
+
+/*
+ * Sets the current html object that the flash object should overlay.
+ * This will put the global flash object on top of the current object and set
+ * the text and title from the html object.
+ *
+ * returns nothing
+ */
+ZeroClipboard.Client.prototype.setCurrent = function (element) {
+
+  // What element is current
+  ZeroClipboard.currentElement = element;
+  ZeroClipboard.currentClient = this;
+
+  this.reposition();
+
+  // If the dom element contains data-clipboard-text set text
+  if (element.getAttribute("data-clipboard-text")) {
+    this.setText(element.getAttribute("data-clipboard-text"));
+  }
+
+  // If the dom element has a title
+  if (element.getAttribute("title")) {
+    this.setTitle(element.getAttribute("title"));
+  }
+
+  // If the element has a pointer style, set to hand cursor
+  if (_getCursor(element) == "pointer") {
+    this.setHandCursor(true);
+  } else {
+    this.setHandCursor(false);
+  }
 };
 
+/*
+ * Reposition the flash object, if the page size changes.
+ *
+ * returns nothing
+ */
+ZeroClipboard.Client.prototype.reposition = function () {
+  var pos = ZeroClipboard.getDOMObjectPosition(ZeroClipboard.currentElement);
+
+  // new css
+  this.htmlBridge.style.top = pos.top + "px";
+  this.htmlBridge.style.left = pos.left + "px";
+  this.htmlBridge.style.width = pos.width + "px";
+  this.htmlBridge.style.height = pos.height + "px";
+  this.htmlBridge.style.zIndex = pos.zIndex + 1;
+
+  this.setSize(pos.width, pos.height);
+};
+
+/*
+ * Sends a signal to the flash object to set the clipboard text.
+ *
+ * returns nothing
+ */
+ZeroClipboard.Client.prototype.setText = function (newText) {
+  if (newText && newText !== "") {
+    this.htmlBridge.setAttribute("data-clipboard-text", newText);
+    if (this.ready()) this.flashBridge.setText(newText);
+  }
+};
+
+/*
+ * Adds a title="" attribute to the htmlBridge to give it tooltip capabiities
+ *
+ * returns nothing
+ */
+ZeroClipboard.Client.prototype.setTitle = function (newTitle) {
+  if (newTitle && newTitle !== "") this.htmlBridge.setAttribute("title", newTitle);
+};
+
+/*
+ * Sends a signal to the flash object to change the stage size.
+ *
+ * returns nothing
+ */
+ZeroClipboard.Client.prototype.setSize = function (width, height) {
+  if (this.ready()) this.flashBridge.setSize(width, height);
+};
+
+/*
+ * Sends a signal to the flash object to display the hand cursor if true
+ *
+ * returns nothing
+ */
 ZeroClipboard.Client.prototype.setHandCursor = function (enabled) {
-  // enable hand cursor (true), or default arrow cursor (false)
-  this.handCursorEnabled = enabled;
-  if (this.ready) this.movie.setHandCursor(enabled);
-};
-
-ZeroClipboard.Client.prototype.setCSSEffects = function (enabled) {
-  // enable or disable CSS effects on DOM container
-  this.cssEffects = !!enabled;
+  if (this.ready()) this.flashBridge.setHandCursor(enabled);
 };

@@ -4,18 +4,64 @@ require("./env")
 
 exports.client = {
 
-  tearDown: function (callback) {
-    navigator.mimeTypes["application/x-shockwave-flash"] = undefined;
-    callback();
+  "Client without selector doesn't have element": function (test) {
+
+    var zeroClipboard = require("../ZeroClipboard"),
+    clip = new zeroClipboard.Client();
+
+    // Test the client is null
+    test.ok(clip.htmlBridge);
+    test.ok(clip.handlers);
+
+    test.done();
   },
 
   "Clip is created properly": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard"),
-    clip = new zeroClipboard.Client();
+    clip = new zeroClipboard.Client("#d_clip_button");
 
     // Test the client was created properly
-    test.ok(clip.movieId);
+    test.ok(clip.htmlBridge);
+    test.ok(clip.handlers);
+
+    test.done();
+  },
+
+  "Detecting no flash": function (test) {
+    navigator.mimeTypes["application/x-shockwave-flash"] = undefined;
+
+    var zeroClipboard = require("../ZeroClipboard"),
+        clip = new zeroClipboard.Client();
+
+    // Test that we don't have flash
+    test.equal(zeroClipboard.detectFlashSupport(), false);
+
+    navigator.mimeTypes["application/x-shockwave-flash"] = true;
+    test.done();
+  },
+
+  "Detecting has flash mimetype": function (test) {
+
+    var zeroClipboard = require("../ZeroClipboard"),
+        clip = new zeroClipboard.Client();
+
+    // Test that we don't have flash
+    test.equal(zeroClipboard.detectFlashSupport(), true);
+
+    test.done();
+  },
+
+  "Glue element after new client": function (test) {
+
+    var zeroClipboard = require("../ZeroClipboard"),
+    clip = new zeroClipboard.Client();
+
+    clip.glue("#d_clip_button")
+
+    // Test the client was created properly
+    test.ok(clip.htmlBridge);
+    test.ok(clip.handlers);
 
     test.done();
   },
@@ -34,57 +80,14 @@ exports.client = {
     test.done();
   },
 
-  "Detecting no flash": function (test) {
-
-    var zeroClipboard = require("../ZeroClipboard"),
-        clip = new zeroClipboard.Client();
-
-    // Test that we don't have flash
-    test.equal(zeroClipboard.detectFlashSupport(), false);
-
-    test.done();
-  },
-
-  "Detecting has flash mimetype": function (test) {
-
-    var zeroClipboard = require("../ZeroClipboard"),
-        clip = new zeroClipboard.Client();
-
-    // We're faking it here.
-    navigator.mimeTypes["application/x-shockwave-flash"] = true;
-
-    // Test that we don't have flash
-    test.equal(zeroClipboard.detectFlashSupport(), true);
-
-    test.done();
-  },
-
-  "Clip sets text properly": function (test) {
-
-    var zeroClipboard = require("../ZeroClipboard"),
-    clip = new zeroClipboard.Client();
-
-    // Test the client has no text
-    test.equal(clip.clipText, "");
-
-    clip.setText("Tambourine");
-
-    test.equal(clip.clipText, "Tambourine");
-
-    test.done();
-  },
-
   "Clip sets title properly": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard"),
-    clip = new zeroClipboard.Client();
-
-    // Test the client has no text
-    test.equal(clip.title, "");
+    clip = new zeroClipboard.Client("#d_clip_button");
 
     clip.setTitle("Click Me");
 
-    test.equal(clip.title, "Click Me");
+    test.equal(clip.htmlBridge.getAttribute("title"), "Click Me");
 
     test.done();
   }

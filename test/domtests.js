@@ -7,11 +7,14 @@ exports.domtests = {
   "Object has a title": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard"),
-    clip = new zeroClipboard.Client();
+      clip = new zeroClipboard.Client("#d_clip_button"),
+      element = zeroClipboard.$("#d_clip_button")[0];
 
-    clip.glue('#d_clip_button', '#d_clip_container')
+    clip.setCurrent(element);
 
-    test.equal(clip.title, "Click me to copy to clipboard.")
+    test.equal(clip.htmlBridge.getAttribute("title"), "Click me to copy to clipboard.")
+
+    clip.resetBridge();
 
     test.done();
   },
@@ -19,13 +22,12 @@ exports.domtests = {
   "Object has no title": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard"),
-    clip = new zeroClipboard.Client();
+      clip = new zeroClipboard.Client("#d_clip_button_no_title"),
+      element = zeroClipboard.$("#d_clip_button_no_title")[0];
 
-    zeroClipboard.$("#d_clip_button").removeAttribute("title")
+    clip.setCurrent(element);
 
-    clip.glue('#d_clip_button', '#d_clip_container')
-
-    test.equal(clip.title, "")
+    test.ok(!clip.htmlBridge.getAttribute("title"));
 
     test.done();
   },
@@ -33,11 +35,14 @@ exports.domtests = {
   "Object has data-clipboard-text": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard"),
-    clip = new zeroClipboard.Client();
+      clip = new zeroClipboard.Client('#d_clip_button'),
+      element = zeroClipboard.$("#d_clip_button")[0];
 
-    clip.glue('#d_clip_button', '#d_clip_container')
+    clip.setCurrent(element);
 
-    test.equal(clip.clipText, "Copy me!")
+    test.equal(clip.htmlBridge.getAttribute("data-clipboard-text"), "Copy me!")
+
+    clip.resetBridge();
 
     test.done();
   },
@@ -45,26 +50,14 @@ exports.domtests = {
   "Object doesn't have data-clipboard-text": function (test) {
 
     var zeroClipboard = require("../ZeroClipboard"),
-    clip = new zeroClipboard.Client();
+      clip = new zeroClipboard.Client("#d_clip_button_no_text"),
+      element = zeroClipboard.$("#d_clip_button_no_text")[0];
 
-    zeroClipboard.$("#d_clip_button").removeAttribute("data-clipboard-text")
+    clip.setCurrent(element);
 
-    clip.glue('#d_clip_button', '#d_clip_container')
-
-    test.equal(clip.clipText, "")
-
-    test.done();
-  },
-
-  "Glue multiple elements": function (test) {
-
-    var zeroClipboard = require("../ZeroClipboard"),
-    clip = new zeroClipboard.Client();
-
-    clip.glue('.my_clip_button')
-
-    test.equal(clip.domElement.id, "d_clip_button")
+    test.ok(!clip.htmlBridge.getAttribute("data-clipboard-text"));
 
     test.done();
   }
+
 }

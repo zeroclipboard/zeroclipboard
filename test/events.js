@@ -5,6 +5,7 @@ require("./env")
 exports.zevents = {
 
   "Test onNoFlash Event": function (test) {
+    navigator.mimeTypes["application/x-shockwave-flash"] = undefined;
 
     var zeroClipboard = require("../ZeroClipboard"),
         clip = new zeroClipboard.Client();
@@ -12,6 +13,7 @@ exports.zevents = {
 
     clip.addEventListener( 'onNoFlash', function(client, text) {
       test.equal(client.id, id);
+      navigator.mimeTypes["application/x-shockwave-flash"] = true;
       test.done();
     } );
 
@@ -23,7 +25,7 @@ exports.zevents = {
     var zeroClipboard = require("../ZeroClipboard"),
         clip = new zeroClipboard.Client();
 
-    clip.glue('#d_clip_button', '#d_clip_container')
+    clip.glue('#d_clip_button')
 
     var id = clip.id;
 
@@ -33,7 +35,7 @@ exports.zevents = {
     } );
 
     // fake load event
-    zeroClipboard.dispatch(id, "load", { flashVersion: "MAC 9.0.0" });
+    zeroClipboard.dispatch("load", { flashVersion: "MAC 9,0,0" });
   }
 
 }
