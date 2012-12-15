@@ -11,7 +11,7 @@ The Zero Clipboard library provides an easy way to copy text to the clipboard us
     <!-- The "copy-button" *should* be inside a div with "position: relative"
          or something else that "has layout". -->
     <div style="position: relative;">
-      <button id="copy-button">Copy to Clipboard</button>
+      <button id="copy-button" data-clipboard-text="Copy Me!" title="Click to copy me.">Copy to Clipboard</button>
     </div>
     <script src="ZeroClipboard.js"></script>
     <script src="main.js"></script>
@@ -21,40 +21,33 @@ The Zero Clipboard library provides an easy way to copy text to the clipboard us
 
 ``` js
 // main.js
-var clip = new ZeroClipboard.Client();
+ZeroClipboard.setMovePath("/path/to/ZeroClipboard.swf");
+var clip = new ZeroClipboard.Client("#copy-button");
 
-clip.setText( '' ); // will be set later on mouseDown
-clip.setHandCursor( true );
-clip.setCSSEffects( true );
-
-clip.addEventListener( 'onLoad', function(client) {
+clip.on( 'load', function(client) {
   // alert( "movie is loaded" );
 } );
 
-clip.addEventListener( 'onComplete', function(client, text) {
-  alert("Copied text to clipboard: " + text );
+clip.on( 'complete', function(client, args) {
+  alert("Copied text to clipboard: " + args.text );
 } );
 
-clip.addEventListener( 'onMouseOver', function(client) {
+clip.on( 'mouseover', function(client) {
   // alert("mouse over");
 } );
 
-clip.addEventListener( 'onMouseOut', function(client) {
+clip.on( 'mouseout', function(client) {
   // alert("mouse out");
 } );
 
-clip.addEventListener( 'onMouseDown', function(client) {
-  // set text to copy here
-  clip.setText( "This was copied." );
+clip.on( 'mousedown', function(client) {
 
   // alert("mouse down");
 } );
 
-clip.addEventListener( 'onMouseUp', function(client) {
+clip.on( 'mouseup', function(client) {
   // alert("mouse up");
 } );
-
-clip.glue( 'copy-button' );
 ```
 
 See the [instructions](ZeroClipboard/blob/master/docs/instructions.md) for advanced instructions on how to use the library on your site.
