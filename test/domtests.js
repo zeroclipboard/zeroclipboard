@@ -1,14 +1,27 @@
 "use strict";
 
 require("./env")
-
+var zeroClipboard, clip;
 exports.domtests = {
+
+  setUp: function (callback) {
+    zeroClipboard = require("../ZeroClipboard");
+    clip = new zeroClipboard.Client();
+    callback();
+  },
+
+  tearDown: function (callback) {
+    clip = null; // have better cleanup
+    zeroClipboard = null;
+    $("#global-zeroclipboard-html-bridge").remove();
+    callback();
+  },
 
   "Object has a title": function (test) {
 
-    var zeroClipboard = require("../ZeroClipboard"),
-      clip = new zeroClipboard.Client("#d_clip_button"),
-      element = zeroClipboard.$("#d_clip_button")[0];
+    clip.glue("#d_clip_button");
+
+    var element = $("#d_clip_button")[0];
 
     clip.setCurrent(element);
 
@@ -21,9 +34,9 @@ exports.domtests = {
 
   "Object has no title": function (test) {
 
-    var zeroClipboard = require("../ZeroClipboard"),
-      clip = new zeroClipboard.Client("#d_clip_button_no_title"),
-      element = zeroClipboard.$("#d_clip_button_no_title")[0];
+    clip.glue("#d_clip_button_no_title");
+
+    var element = $("#d_clip_button_no_title")[0];
 
     clip.setCurrent(element);
 
@@ -34,9 +47,8 @@ exports.domtests = {
 
   "Object has data-clipboard-text": function (test) {
 
-    var zeroClipboard = require("../ZeroClipboard"),
-      clip = new zeroClipboard.Client('#d_clip_button'),
-      element = zeroClipboard.$("#d_clip_button")[0];
+    clip.glue('#d_clip_button');
+    var element = $("#d_clip_button")[0];
 
     clip.setCurrent(element);
 
@@ -49,13 +61,36 @@ exports.domtests = {
 
   "Object doesn't have data-clipboard-text": function (test) {
 
-    var zeroClipboard = require("../ZeroClipboard"),
-      clip = new zeroClipboard.Client("#d_clip_button_no_text"),
-      element = zeroClipboard.$("#d_clip_button_no_text")[0];
+    clip.glue("#d_clip_button_no_text");
+    var element = $("#d_clip_button_no_text")[0];
 
     clip.setCurrent(element);
 
     test.ok(!clip.htmlBridge.getAttribute("data-clipboard-text"));
+
+    test.done();
+  },
+
+  "Bridge is ready": function (test) {
+
+    zeroClipboard.dispatch("load", { flashVersion: "MAC 11,0,0" });
+
+    test.ok(clip.ready());
+
+    test.done();
+  },
+
+  "We only have one bridge": function (test) {
+
+    test.ok(clip.htmlBridge);
+
+    test.equal($(".global-zeroclipboard-container").length, 1);
+
+    var clip2 = new zeroClipboard.Client();
+
+    test.equal($(".global-zeroclipboard-container").length, 1);
+
+    test.equal(clip.htmlBridge, clip2.htmlBridge);
 
     test.done();
   }

@@ -38,6 +38,7 @@
     var html = '    <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" id="global-zeroclipboard-flash-bridge" width="100%" height="100%">       <param name="movie" value="' + ZeroClipboard.moviePath + noCache(ZeroClipboard.moviePath) + '"/>       <param name="allowScriptAccess" value="always" />       <param name="scale" value="exactfit">       <param name="loop" value="false" />       <param name="menu" value="false" />       <param name="quality" value="best" />       <param name="bgcolor" value="#ffffff" />       <param name="wmode" value="transparent"/>       <param name="flashvars" value="id=1"/>       <embed src="' + ZeroClipboard.moviePath + noCache(ZeroClipboard.moviePath) + '"         loop="false" menu="false"         quality="best" bgcolor="#ffffff"         width="100%" height="100%"         name="global-zeroclipboard-flash-bridge"         allowScriptAccess="always"         allowFullScreen="false"         type="application/x-shockwave-flash"         wmode="transparent"         pluginspage="http://www.macromedia.com/go/getflashplayer"         flashvars="id=1&width=100&height=100"         scale="exactfit">       </embed>     </object>';
     this.htmlBridge = document.createElement("div");
     this.htmlBridge.id = "global-zeroclipboard-html-bridge";
+    this.htmlBridge.setAttribute("class", "global-zeroclipboard-container");
     this.htmlBridge.setAttribute("data-clipboard-ready", false);
     this.htmlBridge.style.position = "absolute";
     this.htmlBridge.style.left = "-9999px";
@@ -60,7 +61,7 @@
     ZeroClipboard.currentClient = undefined;
   };
   ZeroClipboard.Client.prototype.ready = function() {
-    return this.htmlBridge.getAttribute("data-clipboard-ready");
+    return !!this.htmlBridge.getAttribute("data-clipboard-ready");
   };
   function _getCursor(el) {
     var y = el.style.cursor;
