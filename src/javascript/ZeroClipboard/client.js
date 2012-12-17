@@ -14,14 +14,23 @@ ZeroClipboard.Client = function (query) {
   // setup the flash->Javascript bridge
   if (ZeroClipboard.detectFlashSupport()) this.bridge();
 
-  // If we're query now, then glue
+  // If we're query now, then register
   if (query) this.glue(query);
 
   ZeroClipboard._client = this;
 };
 
 /*
- * Glue a new query of objects to the client.
+ * The private mouseOver function for an element
+ *
+ * returns nothing
+ */
+function _elementMouseOver() {
+  ZeroClipboard._client.setCurrent(this);
+}
+
+/*
+ * Register a new query of objects to the client.
  *
  * returns nothing
  */
@@ -39,23 +48,17 @@ ZeroClipboard.Client.prototype.glue = function (query) {
   // store the element from the page
   var elements = ZeroClipboard.$(query);
 
-  var mouseover = (function (self) {
-    return function () {
-      self.setCurrent(this);
-    };
-  })(this);
-
   for (var i = 0; i < elements.length ; i++) {
-    _addEventHandler(elements[i], "mouseover", mouseover);
+    _addEventHandler(elements[i], "mouseover", _elementMouseOver);
   }
 };
 
 /*
- * Remove the glue from an element on the page.
+ * Unregister the clipboard actions of an element on the page
  *
  * returns nothing
  */
-ZeroClipboard.Client.prototype.dissolve = function (query) {
+ZeroClipboard.Client.prototype.unglue = function (query) {
 
   // private function for removing events from the dom, IE before 9 is suckage
   function _removeEventHandler(element, method, func) {
@@ -69,14 +72,8 @@ ZeroClipboard.Client.prototype.dissolve = function (query) {
   // store the element from the page
   var elements = ZeroClipboard.$(query);
 
-  var mouseover = (function (self) {
-    return function () {
-      self.setCurrent(this);
-    };
-  })(this);
-
   for (var i = 0; i < elements.length ; i++) {
-    _removeEventHandler(elements[i], "mouseover", mouseover);
+    _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
   }
 };
 

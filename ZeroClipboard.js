@@ -15,6 +15,9 @@
     if (query) this.glue(query);
     ZeroClipboard._client = this;
   };
+  function _elementMouseOver() {
+    ZeroClipboard._client.setCurrent(this);
+  }
   ZeroClipboard.Client.prototype.glue = function(query) {
     function _addEventHandler(element, method, func) {
       if (element.addEventListener) {
@@ -24,16 +27,11 @@
       }
     }
     var elements = ZeroClipboard.$(query);
-    var mouseover = function(self) {
-      return function() {
-        self.setCurrent(this);
-      };
-    }(this);
     for (var i = 0; i < elements.length; i++) {
-      _addEventHandler(elements[i], "mouseover", mouseover);
+      _addEventHandler(elements[i], "mouseover", _elementMouseOver);
     }
   };
-  ZeroClipboard.Client.prototype.dissolve = function(query) {
+  ZeroClipboard.Client.prototype.unglue = function(query) {
     function _removeEventHandler(element, method, func) {
       if (element.removeEventListener) {
         element.removeEventListener(method, func, false);
@@ -42,13 +40,8 @@
       }
     }
     var elements = ZeroClipboard.$(query);
-    var mouseover = function(self) {
-      return function() {
-        self.setCurrent(this);
-      };
-    }(this);
     for (var i = 0; i < elements.length; i++) {
-      _removeEventHandler(elements[i], "mouseover", mouseover);
+      _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
     }
   };
   ZeroClipboard.Client.prototype.bridge = function() {
