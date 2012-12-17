@@ -144,9 +144,12 @@
     ZeroClipboard.currentClient.receiveEvent(eventName, args);
   };
   ZeroClipboard.Client.prototype.on = function(eventName, func) {
-    eventName = eventName.toString().toLowerCase().replace(/^on/, "");
-    if (!this.handlers[eventName]) this.handlers[eventName] = [];
-    this.handlers[eventName].push(func);
+    var events = eventName.toString().split(/\s/g);
+    for (var i = 0; i < events.length; i++) {
+      eventName = events[i].toLowerCase().replace(/^on/, "");
+      if (!this.handlers[eventName]) this.handlers[eventName] = [];
+      this.handlers[eventName].push(func);
+    }
   };
   ZeroClipboard.Client.prototype.addEventListener = function(eventName, func) {
     this.on(eventName, func);

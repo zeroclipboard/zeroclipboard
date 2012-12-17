@@ -5,6 +5,7 @@ This release re-writes a lot of how zeroclipboard client works. Check the docs f
 * [FEATURE] Replace dom selector with simple sizzler query selector
 * [FEATURE] Indicate via an event when there is no flash or flash is wrong version
 * [FEATURE] More meta info passed with each flash event.
+* [FEATURE] Register more than one event `.on("load complete", function() {})`
 
 ### ZeroClipboard 1.0.9
 
