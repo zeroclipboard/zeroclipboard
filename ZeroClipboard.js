@@ -131,12 +131,9 @@
         hasFlash = true;
       }
     } catch (error) {
-      if (navigator.mimeTypes["application/x-shockwave-flash"] !== undefined) {
+      if (navigator.mimeTypes["application/x-shockwave-flash"]) {
         hasFlash = true;
       }
-    }
-    if (!hasFlash) {
-      this.dispatch("onNoFlash", null);
     }
     return hasFlash;
   };
@@ -149,6 +146,9 @@
       eventName = events[i].toLowerCase().replace(/^on/, "");
       if (!this.handlers[eventName]) this.handlers[eventName] = [];
       this.handlers[eventName].push(func);
+    }
+    if (this.handlers.noflash && !ZeroClipboard.detectFlashSupport()) {
+      this.receiveEvent("onNoFlash", null);
     }
   };
   ZeroClipboard.Client.prototype.addEventListener = function(eventName, func) {

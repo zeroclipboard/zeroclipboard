@@ -54,8 +54,6 @@ exports.zevents = {
       navigator.mimeTypes["application/x-shockwave-flash"] = true;
       test.done();
     } );
-
-    test.equal(zeroClipboard.detectFlashSupport(), false);
   },
 
   "Test onWrongFlash Event": function (test) {

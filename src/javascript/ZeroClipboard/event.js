@@ -22,6 +22,11 @@ ZeroClipboard.Client.prototype.on = function (eventName, func) {
     if (!this.handlers[eventName]) this.handlers[eventName] = [];
     this.handlers[eventName].push(func);
   }
+
+  // If we don't have flash, tell an adult
+  if (this.handlers.noflash && !ZeroClipboard.detectFlashSupport()) {
+    this.receiveEvent("onNoFlash", null);
+  }
 };
 // shortcut to old stuff
 ZeroClipboard.Client.prototype.addEventListener = function (eventName, func) {
