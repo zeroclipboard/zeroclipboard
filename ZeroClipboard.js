@@ -16,6 +16,13 @@
     ZeroClipboard._client = this;
   };
   ZeroClipboard.Client.prototype.glue = function(query) {
+    function _addEventHandler(element, method, func) {
+      if (element.addEventListener) {
+        element.addEventListener(method, func, false);
+      } else if (element.attachEvent) {
+        element.attachEvent(method, func);
+      }
+    }
     var elements = ZeroClipboard.$(query);
     var mouseover = function(self) {
       return function() {
@@ -23,7 +30,25 @@
       };
     }(this);
     for (var i = 0; i < elements.length; i++) {
-      elements[i].addEventListener("mouseover", mouseover);
+      _addEventHandler(elements[i], "mouseover", mouseover);
+    }
+  };
+  ZeroClipboard.Client.prototype.dissolve = function(query) {
+    function _removeEventHandler(element, method, func) {
+      if (element.removeEventListener) {
+        element.removeEventListener(method, func, false);
+      } else if (element.detachEvent) {
+        element.detachEvent(method, func);
+      }
+    }
+    var elements = ZeroClipboard.$(query);
+    var mouseover = function(self) {
+      return function() {
+        self.setCurrent(this);
+      };
+    }(this);
+    for (var i = 0; i < elements.length; i++) {
+      _removeEventHandler(elements[i], "mouseover", mouseover);
     }
   };
   ZeroClipboard.Client.prototype.bridge = function() {
