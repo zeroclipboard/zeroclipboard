@@ -34,7 +34,8 @@
     "nodeunit": "0.7.4",
     "jshint": "0.9.1",
     "handlebars": "1.0.7",
-    "jsdom": "0.2.14"
+    "jsdom": "0.2.14",
+    "jquery": "latest"
   },
   "component": {
     "scripts": {

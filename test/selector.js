@@ -2,11 +2,23 @@
 
 require("./env")
 
+var zeroClipboard, clip;
 exports.selector = {
 
-  "$ returns an element": function (test) {
+  setUp: function (callback) {
+    zeroClipboard = require("../ZeroClipboard");
+    clip = new zeroClipboard.Client();
+    callback();
+  },
 
-    var zeroClipboard = require("../ZeroClipboard")
+  tearDown: function (callback) {
+    clip = null; // have better cleanup
+    zeroClipboard = null;
+    $("#global-zeroclipboard-html-bridge").remove();
+    callback();
+  },
+
+  "$ returns an element": function (test) {
 
     // grabbed the right id
     test.equal(zeroClipboard.$("#d_clip_button")[0].id, "d_clip_button")
@@ -25,7 +37,6 @@ exports.selector = {
 
   "$.addClass works as expected": function (test) {
 
-    var zeroClipboard = require("../ZeroClipboard")
     var elm = zeroClipboard.$("#d_clip_button")[0]
 
     // element isn't null
@@ -33,14 +44,15 @@ exports.selector = {
 
     test.equal(typeof elm.addClass, "function")
     elm.addClass("test-class")
+    elm.addClass("test-class")
     test.notEqual(elm.className.indexOf("test-class"), -1)
+    test.equal(elm.className.indexOf("test-class test-class"), -1)
 
     test.done();
   },
 
   "$.removeClass works as expected": function (test) {
 
-    var zeroClipboard = require("../ZeroClipboard")
     var elm = zeroClipboard.$("#d_clip_button")[0]
 
     // element isn't null

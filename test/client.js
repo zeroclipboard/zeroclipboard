@@ -1,13 +1,23 @@
 "use strict";
 
 require("./env")
-
+var zeroClipboard, clip;
 exports.client = {
 
-  "Client without selector doesn't have element": function (test) {
-
-    var zeroClipboard = require("../ZeroClipboard"),
+  setUp: function (callback) {
+    zeroClipboard = require("../ZeroClipboard");
     clip = new zeroClipboard.Client();
+    callback();
+  },
+
+  tearDown: function (callback) {
+    clip = null; // have better cleanup
+    zeroClipboard = null;
+    $("#global-zeroclipboard-html-bridge").remove();
+    callback();
+  },
+
+  "Client without selector doesn't have element": function (test) {
 
     // Test the client is null
     test.ok(clip.htmlBridge);
@@ -18,8 +28,7 @@ exports.client = {
 
   "Clip is created properly": function (test) {
 
-    var zeroClipboard = require("../ZeroClipboard"),
-    clip = new zeroClipboard.Client("#d_clip_button");
+    clip.glue("#d_clip_button");
 
     // Test the client was created properly
     test.ok(clip.htmlBridge);
@@ -31,9 +40,6 @@ exports.client = {
   "Detecting no flash": function (test) {
     navigator.mimeTypes["application/x-shockwave-flash"] = undefined;
 
-    var zeroClipboard = require("../ZeroClipboard"),
-        clip = new zeroClipboard.Client();
-
     // Test that we don't have flash
     test.equal(zeroClipboard.detectFlashSupport(), false);
 
@@ -43,9 +49,6 @@ exports.client = {
 
   "Detecting has flash mimetype": function (test) {
 
-    var zeroClipboard = require("../ZeroClipboard"),
-        clip = new zeroClipboard.Client();
-
     // Test that we don't have flash
     test.equal(zeroClipboard.detectFlashSupport(), true);
 
@@ -53,9 +56,6 @@ exports.client = {
   },
 
   "Glue element after new client": function (test) {
-
-    var zeroClipboard = require("../ZeroClipboard"),
-    clip = new zeroClipboard.Client();
 
     clip.glue("#d_clip_button")
 
@@ -67,8 +67,6 @@ exports.client = {
   },
 
   "Changing movie path works": function (test) {
-
-    var zeroClipboard = require("../ZeroClipboard");
 
     // Test the client has default path
     test.equal(zeroClipboard.moviePath, "ZeroClipboard.swf");
@@ -82,8 +80,7 @@ exports.client = {
 
   "Clip sets title properly": function (test) {
 
-    var zeroClipboard = require("../ZeroClipboard"),
-    clip = new zeroClipboard.Client("#d_clip_button");
+    clip.glue("#d_clip_button");
 
     clip.setTitle("Click Me");
 

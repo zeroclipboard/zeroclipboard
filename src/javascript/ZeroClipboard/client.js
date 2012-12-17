@@ -86,6 +86,7 @@ ZeroClipboard.Client.prototype.bridge = function () {
 
   this.htmlBridge = document.createElement('div');
   this.htmlBridge.id = "global-zeroclipboard-html-bridge";
+  this.htmlBridge.setAttribute("class", "global-zeroclipboard-container");
   this.htmlBridge.setAttribute("data-clipboard-ready", false);
   this.htmlBridge.style.position = "absolute";
   this.htmlBridge.style.left = "-9999px";
@@ -125,7 +126,7 @@ ZeroClipboard.Client.prototype.resetBridge = function () {
  * returns true if the flash bridge is ready
  */
 ZeroClipboard.Client.prototype.ready = function () {
-  return this.htmlBridge.getAttribute("data-clipboard-ready");
+  return !!this.htmlBridge.getAttribute("data-clipboard-ready");
 };
 
 /*
