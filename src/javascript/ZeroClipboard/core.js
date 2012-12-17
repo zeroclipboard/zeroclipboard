@@ -40,14 +40,9 @@ ZeroClipboard.detectFlashSupport = function () {
   } catch (error) {
 
     // If the navigator knows what to do with the flash mimetype
-    if (navigator.mimeTypes["application/x-shockwave-flash"] !== undefined) {
+    if (navigator.mimeTypes["application/x-shockwave-flash"]) {
       hasFlash = true;
     }
-  }
-
-  // If we don't have flash, tell an adult
-  if (!hasFlash) {
-    this.dispatch("onNoFlash", null);
   }
 
   return hasFlash;

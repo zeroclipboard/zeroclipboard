@@ -40,6 +40,18 @@ exports.zevents = {
     test.done();
   },
 
+  "Registering two events works": function (test) {
+    var zeroClipboard = require("../ZeroClipboard"),
+        clip = new zeroClipboard.Client();
+
+    clip.on("load oncomplete",function(){});
+
+    test.ok(clip.handlers.load);
+    test.ok(clip.handlers.complete);
+
+    test.done();
+  },
+
   "Test onNoFlash Event": function (test) {
     navigator.mimeTypes["application/x-shockwave-flash"] = undefined;
 
@@ -50,8 +62,6 @@ exports.zevents = {
       navigator.mimeTypes["application/x-shockwave-flash"] = true;
       test.done();
     } );
-
-    test.equal(zeroClipboard.detectFlashSupport(), false);
   },
 
   "Test onWrongFlash Event": function (test) {
