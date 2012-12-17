@@ -12,9 +12,7 @@ exports.selector = {
   },
 
   tearDown: function (callback) {
-    clip = null; // have better cleanup
-    zeroClipboard = null;
-    $("#global-zeroclipboard-html-bridge").remove();
+    zeroClipboard.destroy();
     callback();
   },
 

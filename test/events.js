@@ -12,9 +12,7 @@ exports.zevents = {
   },
 
   tearDown: function (callback) {
-    clip = null; // have better cleanup
-    zeroClipboard = null;
-    $("#global-zeroclipboard-html-bridge").remove();
+    zeroClipboard.destroy();
     callback();
   },
 
@@ -41,8 +39,6 @@ exports.zevents = {
   },
 
   "Registering two events works": function (test) {
-    var zeroClipboard = require("../ZeroClipboard"),
-        clip = new zeroClipboard.Client();
 
     clip.on("load oncomplete",function(){});
 

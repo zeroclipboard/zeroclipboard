@@ -1,6 +1,6 @@
 ZeroClipboard.version = "{{version}}";
 ZeroClipboard.moviePath = 'ZeroClipboard.swf'; // URL to movie
-ZeroClipboard.currentClient = null; // The current html object
+ZeroClipboard._client = null; // The client
 
 /*
  * Set the movie path for the flash file.
@@ -13,12 +13,13 @@ ZeroClipboard.setMoviePath = function (path) {
 };
 
 /*
- * use this method in JSNI calls to obtain a new Client instance
+ * Self-destruction and clean up everything
  *
- * returns a new client
+ * returns nothing
  */
-ZeroClipboard.newClient = function () {
-  return new ZeroClipboard.Client();
+ZeroClipboard.destroy = function () {
+  delete ZeroClipboard._client;
+  $("#global-zeroclipboard-html-bridge").remove();
 };
 
 /*

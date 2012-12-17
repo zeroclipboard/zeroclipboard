@@ -5,15 +5,19 @@
  */
 ZeroClipboard.Client = function (query) {
 
+  // If there's a client already, return null
+  if (ZeroClipboard._client) return;
+
   // event handlers
   this.handlers = {};
 
   // setup the flash->Javascript bridge
   if (ZeroClipboard.detectFlashSupport()) this.bridge();
 
+  // If we're query now, then glue
   if (query) this.glue(query);
 
-  ZeroClipboard.currentClient = this;
+  ZeroClipboard._client = this;
 };
 
 /*
@@ -116,7 +120,6 @@ ZeroClipboard.Client.prototype.resetBridge = function () {
   this.htmlBridge.removeAttribute("data-clipboard-text");
   ZeroClipboard.currentElement.removeClass('zeroclipboard-is-active');
   ZeroClipboard.currentElement = undefined;
-  ZeroClipboard.currentClient = undefined;
 };
 
 /*
@@ -164,7 +167,6 @@ ZeroClipboard.Client.prototype.setCurrent = function (element) {
 
   // What element is current
   ZeroClipboard.currentElement = element;
-  ZeroClipboard.currentClient = this;
 
   this.reposition();
 

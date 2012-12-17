@@ -9,10 +9,11 @@
   "use strict";
   var ZeroClipboard = {};
   ZeroClipboard.Client = function(query) {
+    if (ZeroClipboard._client) return;
     this.handlers = {};
     if (ZeroClipboard.detectFlashSupport()) this.bridge();
     if (query) this.glue(query);
-    ZeroClipboard.currentClient = this;
+    ZeroClipboard._client = this;
   };
   ZeroClipboard.Client.prototype.glue = function(query) {
     var elements = ZeroClipboard.$(query);
@@ -58,7 +59,6 @@
     this.htmlBridge.removeAttribute("data-clipboard-text");
     ZeroClipboard.currentElement.removeClass("zeroclipboard-is-active");
     ZeroClipboard.currentElement = undefined;
-    ZeroClipboard.currentClient = undefined;
   };
   ZeroClipboard.Client.prototype.ready = function() {
     return !!this.htmlBridge.getAttribute("data-clipboard-ready");
@@ -78,7 +78,6 @@
   }
   ZeroClipboard.Client.prototype.setCurrent = function(element) {
     ZeroClipboard.currentElement = element;
-    ZeroClipboard.currentClient = this;
     this.reposition();
     if (element.getAttribute("data-clipboard-text")) {
       this.setText(element.getAttribute("data-clipboard-text"));
@@ -118,12 +117,13 @@
   };
   ZeroClipboard.version = "1.1.0";
   ZeroClipboard.moviePath = "ZeroClipboard.swf";
-  ZeroClipboard.currentClient = null;
+  ZeroClipboard._client = null;
   ZeroClipboard.setMoviePath = function(path) {
     this.moviePath = path;
   };
-  ZeroClipboard.newClient = function() {
-    return new ZeroClipboard.Client;
+  ZeroClipboard.destroy = function() {
+    delete ZeroClipboard._client;
+    $("#global-zeroclipboard-html-bridge").remove();
   };
   ZeroClipboard.detectFlashSupport = function() {
     var hasFlash = false;
@@ -139,7 +139,7 @@
     return hasFlash;
   };
   ZeroClipboard.dispatch = function(eventName, args) {
-    ZeroClipboard.currentClient.receiveEvent(eventName, args);
+    ZeroClipboard._client.receiveEvent(eventName, args);
   };
   ZeroClipboard.Client.prototype.on = function(eventName, func) {
     var events = eventName.toString().split(/\s/g);
