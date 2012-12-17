@@ -58,7 +58,7 @@
     this.htmlBridge.removeAttribute("title");
     this.htmlBridge.removeAttribute("data-clipboard-text");
     ZeroClipboard.currentElement.removeClass("zeroclipboard-is-active");
-    ZeroClipboard.currentElement = undefined;
+    delete ZeroClipboard.currentElement;
   };
   ZeroClipboard.Client.prototype.ready = function() {
     return !!this.htmlBridge.getAttribute("data-clipboard-ready");
@@ -122,8 +122,11 @@
     this.moviePath = path;
   };
   ZeroClipboard.destroy = function() {
+    var query = ZeroClipboard.$("#global-zeroclipboard-html-bridge");
+    if (!query.length) return;
     delete ZeroClipboard._client;
-    $("#global-zeroclipboard-html-bridge").remove();
+    var bridge = query[0];
+    bridge.parentNode.removeChild(bridge);
   };
   ZeroClipboard.detectFlashSupport = function() {
     var hasFlash = false;

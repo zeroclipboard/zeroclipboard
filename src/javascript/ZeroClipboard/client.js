@@ -119,7 +119,7 @@ ZeroClipboard.Client.prototype.resetBridge = function () {
   this.htmlBridge.removeAttribute("title");
   this.htmlBridge.removeAttribute("data-clipboard-text");
   ZeroClipboard.currentElement.removeClass('zeroclipboard-is-active');
-  ZeroClipboard.currentElement = undefined;
+  delete ZeroClipboard.currentElement;
 };
 
 /*

@@ -18,8 +18,12 @@ ZeroClipboard.setMoviePath = function (path) {
  * returns nothing
  */
 ZeroClipboard.destroy = function () {
+  var query = ZeroClipboard.$("#global-zeroclipboard-html-bridge");
+  if (!query.length) return;
+
   delete ZeroClipboard._client;
-  $("#global-zeroclipboard-html-bridge").remove();
+  var bridge = query[0];
+  bridge.parentNode.removeChild(bridge);
 };
 
 /*
