@@ -1,12 +1,12 @@
 /*
  * Creates a new ZeroClipboard client. from an selector query.
  *
- * returns nothing
+ * returns _client instance if it's already created
  */
 ZeroClipboard.Client = function (query) {
 
   // If there's a client already, return null
-  if (ZeroClipboard._client) return;
+  if (ZeroClipboard._client) return ZeroClipboard._client;
 
   // event handlers
   this.handlers = {};
@@ -31,7 +31,7 @@ ZeroClipboard.Client.prototype.glue = function (query) {
   var elements = ZeroClipboard.$(query);
 
   var mouseover = (function (self) {
-    return function (obj) {
+    return function () {
       self.setCurrent(this);
     };
   })(this);
@@ -100,8 +100,6 @@ ZeroClipboard.Client.prototype.bridge = function () {
   this.htmlBridge.style.zIndex = "9999";
 
   this.htmlBridge.innerHTML = html;
-
-  var self = this;
 
   document.body.appendChild(this.htmlBridge);
   this.flashBridge = document["global-zeroclipboard-flash-bridge"];

@@ -78,7 +78,7 @@ exports.domtests = {
     test.done();
   },
 
-  "Trying a new client is null": function (test) {
+  "Trying a new client is same client": function (test) {
 
     test.ok(clip.htmlBridge);
 
@@ -88,7 +88,7 @@ exports.domtests = {
 
     test.equal($(".global-zeroclipboard-container").length, 1);
 
-    test.ok(!clip2.htmlBridge);
+    test.equal(clip2, clip);
 
     test.done();
   }
