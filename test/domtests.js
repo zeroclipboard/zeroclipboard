@@ -11,9 +11,7 @@ exports.domtests = {
   },
 
   tearDown: function (callback) {
-    clip = null; // have better cleanup
-    zeroClipboard = null;
-    $("#global-zeroclipboard-html-bridge").remove();
+    zeroClipboard.destroy();
     callback();
   },
 
@@ -80,7 +78,7 @@ exports.domtests = {
     test.done();
   },
 
-  "We only have one bridge": function (test) {
+  "Trying a new client is same client": function (test) {
 
     test.ok(clip.htmlBridge);
 
@@ -90,7 +88,7 @@ exports.domtests = {
 
     test.equal($(".global-zeroclipboard-container").length, 1);
 
-    test.equal(clip.htmlBridge, clip2.htmlBridge);
+    test.equal(clip2, clip);
 
     test.done();
   }

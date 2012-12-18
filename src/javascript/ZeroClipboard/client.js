@@ -1,9 +1,12 @@
 /*
  * Creates a new ZeroClipboard client. from an selector query.
  *
- * returns nothing
+ * returns _client instance if it's already created
  */
 ZeroClipboard.Client = function (query) {
+
+  // If there's a client already, return null
+  if (ZeroClipboard._client) return ZeroClipboard._client;
 
   // event handlers
   this.handlers = {};
@@ -11,29 +14,66 @@ ZeroClipboard.Client = function (query) {
   // setup the flash->Javascript bridge
   if (ZeroClipboard.detectFlashSupport()) this.bridge();
 
+  // If we're query now, then register
   if (query) this.glue(query);
 
-  ZeroClipboard.currentClient = this;
+  ZeroClipboard._client = this;
 };
 
 /*
- * Glue a new query of objects to the client.
+ * The private mouseOver function for an element
+ *
+ * returns nothing
+ */
+function _elementMouseOver() {
+  ZeroClipboard._client.setCurrent(this);
+}
+
+/*
+ * Register a new query of objects to the client.
  *
  * returns nothing
  */
 ZeroClipboard.Client.prototype.glue = function (query) {
 
+  // private function for adding events to the dom, IE before 9 is suckage
+  function _addEventHandler(element, method, func) {
+    if (element.addEventListener) { // all browsers except IE before version 9
+      element.addEventListener(method, func, false);
+    } else if (element.attachEvent) { // IE before version 9
+      element.attachEvent(method, func);
+    }
+  }
+
   // store the element from the page
   var elements = ZeroClipboard.$(query);
 
-  var mouseover = (function (self) {
-    return function (obj) {
-      self.setCurrent(this);
-    };
-  })(this);
+  for (var i = 0; i < elements.length ; i++) {
+    _addEventHandler(elements[i], "mouseover", _elementMouseOver);
+  }
+};
+
+/*
+ * Unregister the clipboard actions of an element on the page
+ *
+ * returns nothing
+ */
+ZeroClipboard.Client.prototype.unglue = function (query) {
+
+  // private function for removing events from the dom, IE before 9 is suckage
+  function _removeEventHandler(element, method, func) {
+    if (element.removeEventListener) { // all browsers except IE before version 9
+      element.removeEventListener(method, func, false);
+    } else if (element.detachEvent) { // IE before version 9
+      element.detachEvent(method, func);
+    }
+  }
+
+  // store the element from the page
+  var elements = ZeroClipboard.$(query);
 
   for (var i = 0; i < elements.length ; i++) {
-    elements[i].addEventListener("mouseover", mouseover);
+    _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
   }
 };
 
@@ -97,8 +137,6 @@ ZeroClipboard.Client.prototype.bridge = function () {
 
   this.htmlBridge.innerHTML = html;
 
-  var self = this;
-
   document.body.appendChild(this.htmlBridge);
   this.flashBridge = document["global-zeroclipboard-flash-bridge"];
 
@@ -115,8 +153,7 @@ ZeroClipboard.Client.prototype.resetBridge = function () {
   this.htmlBridge.removeAttribute("title");
   this.htmlBridge.removeAttribute("data-clipboard-text");
   ZeroClipboard.currentElement.removeClass('zeroclipboard-is-active');
-  ZeroClipboard.currentElement = undefined;
-  ZeroClipboard.currentClient = undefined;
+  delete ZeroClipboard.currentElement;
 };
 
 /*
@@ -164,7 +201,6 @@ ZeroClipboard.Client.prototype.setCurrent = function (element) {
 
   // What element is current
   ZeroClipboard.currentElement = element;
-  ZeroClipboard.currentClient = this;
 
   this.reposition();
 

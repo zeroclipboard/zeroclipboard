@@ -11,9 +11,7 @@ exports.client = {
   },
 
   tearDown: function (callback) {
-    clip = null; // have better cleanup
-    zeroClipboard = null;
-    $("#global-zeroclipboard-html-bridge").remove();
+    zeroClipboard.destroy();
     callback();
   },
 
@@ -27,8 +25,6 @@ exports.client = {
   },
 
   "Clip is created properly": function (test) {
-
-    clip.glue("#d_clip_button");
 
     // Test the client was created properly
     test.ok(clip.htmlBridge);
