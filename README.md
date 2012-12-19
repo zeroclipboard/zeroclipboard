@@ -8,11 +8,7 @@ The ZeroClipboard library provides an easy way to copy text to the clipboard usi
 ``` html
 <html>
   <body>
-    <!-- The "copy-button" *should* be inside a div with "position: relative"
-         or something else that "has layout". -->
-    <div style="position: relative;">
-      <button id="copy-button" data-clipboard-text="Copy Me!" title="Click to copy me.">Copy to Clipboard</button>
-    </div>
+    <button id="copy-button" data-clipboard-text="Copy Me!" title="Click to copy me.">Copy to Clipboard</button>
     <script src="ZeroClipboard.js"></script>
     <script src="main.js"></script>
   </body>
