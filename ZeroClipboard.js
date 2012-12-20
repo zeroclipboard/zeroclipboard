@@ -11,6 +11,7 @@
   ZeroClipboard.Client = function(query) {
     if (ZeroClipboard._client) return ZeroClipboard._client;
     this.handlers = {};
+    this._text = null;
     if (ZeroClipboard.detectFlashSupport()) this.bridge();
     if (query) this.glue(query);
     ZeroClipboard._client = this;
@@ -96,7 +97,7 @@
   ZeroClipboard.Client.prototype.setCurrent = function(element) {
     ZeroClipboard.currentElement = element;
     this.reposition();
-    if (element.getAttribute("data-clipboard-text")) {
+    if (element.getAttribute("data-clipboard-text") && !this._text) {
       this.setText(element.getAttribute("data-clipboard-text"));
     }
     if (element.getAttribute("title")) {
@@ -119,9 +120,13 @@
   };
   ZeroClipboard.Client.prototype.setText = function(newText) {
     if (newText && newText !== "") {
+      this._text = newText;
       this.htmlBridge.setAttribute("data-clipboard-text", newText);
       if (this.ready()) this.flashBridge.setText(newText);
     }
+  };
+  ZeroClipboard.Client.prototype.resetText = function() {
+    this._text = null;
   };
   ZeroClipboard.Client.prototype.setTitle = function(newTitle) {
     if (newTitle && newTitle !== "") this.htmlBridge.setAttribute("title", newTitle);

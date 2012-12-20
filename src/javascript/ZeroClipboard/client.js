@@ -11,6 +11,9 @@ ZeroClipboard.Client = function (query) {
   // event handlers
   this.handlers = {};
 
+  // text
+  this._text = null;
+
   // setup the flash->Javascript bridge
   if (ZeroClipboard.detectFlashSupport()) this.bridge();
 
@@ -205,7 +208,7 @@ ZeroClipboard.Client.prototype.setCurrent = function (element) {
   this.reposition();
 
   // If the dom element contains data-clipboard-text set text
-  if (element.getAttribute("data-clipboard-text")) {
+  if (element.getAttribute("data-clipboard-text") && !this._text) {
     this.setText(element.getAttribute("data-clipboard-text"));
   }
 
@@ -247,9 +250,19 @@ ZeroClipboard.Client.prototype.reposition = function () {
  */
 ZeroClipboard.Client.prototype.setText = function (newText) {
   if (newText && newText !== "") {
+    this._text = newText;
     this.htmlBridge.setAttribute("data-clipboard-text", newText);
     if (this.ready()) this.flashBridge.setText(newText);
   }
+};
+
+/*
+ * Sets the object's _text to null
+ *
+ * returns nothing
+ */
+ZeroClipboard.Client.prototype.resetText = function () {
+  this._text = null;
 };
 
 /*
