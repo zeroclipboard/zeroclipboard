@@ -25,6 +25,7 @@ clip.on( 'load', function(client) {
 } );
 
 clip.on( 'complete', function(client, args) {
+  this.style.display = 'none'; // "this" is the element that was clicked
   alert("Copied text to clipboard: " + args.text );
 } );
 

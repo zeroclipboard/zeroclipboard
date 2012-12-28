@@ -143,6 +143,8 @@ clip.on( 'load', function ( client, args ) {
 The handler is passed these options to the `args`
 
 <dl>
+<dt>this</dt>
+<dd>The current element that is being provoked. if null this will be the window</dd>
 <dt>flashVersion</dt>
 <dd>This property contains the users' flash version</dd>
 </dl>
@@ -160,6 +162,8 @@ clip.on( 'mouseover', function ( client, args ) {
 The handler is passed these options to the `args`
 
 <dl>
+<dt>this</dt>
+<dd>The current element that is being provoked. if null this will be the window</dd>
 <dt>flashVersion</dt>
 <dd>This property contains the users' flash version</dd>
 <dt>altKey</dt>
@@ -178,12 +182,14 @@ The `mouseout` event is fired when the user's mouse pointer leaves the Flash mov
 ```
 clip.on( 'mouseout', function ( client, args ) {
   alert( "mouse has left movie" );
-} );  
+} );
 ```
 
 The handler is passed these options to the `args`
 
 <dl>
+<dt>this</dt>
+<dd>The current element that is being provoked. if null this will be the window</dd>
 <dt>flashVersion</dt>
 <dd>This property contains the users' flash version</dd>
 <dt>altKey</dt>
@@ -201,12 +207,14 @@ The `mousedown` event is fired when the user clicks on the Flash movie.  Please 
 ```
 clip.on( 'mousedown', function ( client, args ) {
   alert( "mouse button is down" );
-} );  
+} );
 ```
 
 The handler is passed these options to the `args`
 
 <dl>
+<dt>this</dt>
+<dd>The current element that is being provoked. if null this will be the window</dd>
 <dt>flashVersion</dt>
 <dd>This property contains the users' flash version</dd>
 <dt>altKey</dt>
@@ -224,12 +232,14 @@ The `mouseup` event is fired when the user releases the mouse button (having fir
 ```
 clip.on( 'mouseup', function ( client, args ) {
   alert( "mouse button is up" );
-} );  
+} );
 ```
 
 The handler is passed these options to the `args`
 
 <dl>
+<dt>this</dt>
+<dd>The current element that is being provoked. if null this will be the window</dd>
 <dt>flashVersion</dt>
 <dd>This property contains the users' flash version</dd>
 <dt>altKey</dt>
@@ -247,12 +257,14 @@ The `complete` event is fired when the text is successfully copied to the clipbo
 ```
 clip.on( 'complete', function ( client, args ) {
   alert("Copied text to clipboard: " + args.text );
-} );  
+} );
 ```
 
 The handler is passed these options to the `args`
 
 <dl>
+<dt>this</dt>
+<dd>The current element that is being provoked. if null this will be the window</dd>
 <dt>flashVersion</dt>
 <dd>This property contains the users' flash version</dd>
 <dt>altKey</dt>
@@ -263,6 +275,44 @@ The handler is passed these options to the `args`
 <dd>`true` if the Shift key is active; `false` if it is inactive.</dd>
 <dt>text</dt>
 <dd>The copied text.</dd>
+</dl>
+
+#### noflash
+
+The `noflash` event is fired when the user doesn't have flash installed on their system
+
+```
+clip.on( 'noflash', function ( client, args ) {
+  alert("You don't support flash");
+} );
+```
+
+The handler is passed these options to the `args`
+
+<dl>
+<dt>this</dt>
+<dd>The current element that is being provoked. if null this will be the window</dd>
+<dt>flashVersion</dt>
+<dd>This property contains the users' flash version</dd>
+</dl>
+
+#### wrongflash
+
+The `wrongflash` event is fired when the user has the wrong version of flash. ZeroClipboard supports version 10 and up.
+
+```
+clip.on( 'wrongflash', function ( client, args ) {
+  alert("Your flash is too old " + args.flashVersion);
+} );
+```
+
+The handler is passed these options to the `args`
+
+<dl>
+<dt>this</dt>
+<dd>The current element that is being provoked. if null this will be the window</dd>
+<dt>flashVersion</dt>
+<dd>This property contains the users' flash version</dd>
 </dl>
 
 ## Examples
