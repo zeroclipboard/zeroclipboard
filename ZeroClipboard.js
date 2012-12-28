@@ -9,7 +9,11 @@
   "use strict";
   var ZeroClipboard = {};
   ZeroClipboard.Client = function(query) {
-    if (ZeroClipboard._client) return ZeroClipboard._client;
+    var singleton = ZeroClipboard._client;
+    if (singleton) {
+      if (query) singleton.glue(query);
+      return singleton;
+    }
     this.handlers = {};
     if (ZeroClipboard.detectFlashSupport()) this.bridge();
     if (query) this.glue(query);
