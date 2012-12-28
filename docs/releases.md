@@ -10,6 +10,7 @@ This release re-writes a lot of how zeroclipboard client works. Check the docs f
 * [BUG] setText doesn't override the default data-clipboard-text attribute.
 * [BUG] When creating more than one clip, the second clip doesn't glue.
 * [BUG] If there is no currentElement return from reposition #51
+* [BUG] ready() wasn't returning false when bridge wasn't ready.
 
 ### ZeroClipboard 1.0.9
 
