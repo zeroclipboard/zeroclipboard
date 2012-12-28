@@ -113,4 +113,33 @@ exports.zevents = {
 
   },
 
+  "Test that the current Element is passed back to event handler": function (test) {
+    clip.glue('#d_clip_button');
+
+    clip.setCurrent($("#d_clip_button")[0]);
+
+    clip.on( 'load mousedown mouseover mouseup wrongflash noflash', function(client, args) {
+      test.equal(this.id, "d_clip_button");
+    } );
+
+    clip.on( 'complete', function(client, args) {
+      test.equal(this.id, "d_clip_button");
+      test.ok(!client._text);
+    } );
+
+    clip.on( 'mouseout', function(client, args) {
+      test.equal(this.id, "d_clip_button");
+      test.done();
+    } );
+
+    zeroClipboard.dispatch("load", { flashVersion: "MAC 11,0,0" });
+    zeroClipboard.dispatch("wrongflash", { flashVersion: "MAC 11,0,0" });
+    zeroClipboard.dispatch("noflash", { flashVersion: "MAC 11,0,0" });
+    zeroClipboard.dispatch("mousedown", { flashVersion: "MAC 11,0,0" });
+    zeroClipboard.dispatch("mouseover", { flashVersion: "MAC 11,0,0" });
+    zeroClipboard.dispatch("mouseup", { flashVersion: "MAC 11,0,0" });
+    zeroClipboard.dispatch("complete", { flashVersion: "MAC 11,0,0" });
+    zeroClipboard.dispatch("mouseout", { flashVersion: "MAC 11,0,0" });
+  }
+
 }

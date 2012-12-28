@@ -184,6 +184,7 @@
   };
   ZeroClipboard.Client.prototype.receiveEvent = function(eventName, args) {
     eventName = eventName.toString().toLowerCase().replace(/^on/, "");
+    var currentElement = ZeroClipboard.currentElement;
     switch (eventName) {
      case "load":
       if (args && parseFloat(args.flashVersion.replace(",", ".").replace(/[^0-9\.]/gi, "")) < 10) {
@@ -195,17 +196,17 @@
       this.htmlBridge.setAttribute("data-clipboard-ready", true);
       break;
      case "mouseover":
-      ZeroClipboard.currentElement.addClass("zeroclipboard-is-hover");
+      currentElement.addClass("zeroclipboard-is-hover");
       break;
      case "mouseout":
-      ZeroClipboard.currentElement.removeClass("zeroclipboard-is-hover");
+      currentElement.removeClass("zeroclipboard-is-hover");
       this.resetBridge();
       break;
      case "mousedown":
-      ZeroClipboard.currentElement.addClass("zeroclipboard-is-active");
+      currentElement.addClass("zeroclipboard-is-active");
       break;
      case "mouseup":
-      ZeroClipboard.currentElement.removeClass("zeroclipboard-is-active");
+      currentElement.removeClass("zeroclipboard-is-active");
       break;
      case "complete":
       this.resetText();
@@ -215,9 +216,9 @@
       for (var idx = 0, len = this.handlers[eventName].length; idx < len; idx++) {
         var func = this.handlers[eventName][idx];
         if (typeof func == "function") {
-          func.call(ZeroClipboard.currentElement, this, args);
+          func.call(currentElement, this, args);
         } else if (typeof func == "string") {
-          window[func].call(ZeroClipboard.currentElement, this, args);
+          window[func].call(currentElement, this, args);
         }
       }
     }
