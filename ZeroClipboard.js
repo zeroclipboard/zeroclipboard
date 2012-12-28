@@ -9,7 +9,11 @@
   "use strict";
   var ZeroClipboard = {};
   ZeroClipboard.Client = function(query) {
-    if (ZeroClipboard._client) return ZeroClipboard._client;
+    var singleton = ZeroClipboard._client;
+    if (singleton) {
+      if (query) singleton.glue(query);
+      return singleton;
+    }
     this.handlers = {};
     this._text = null;
     if (ZeroClipboard.detectFlashSupport()) this.bridge();
@@ -110,6 +114,7 @@
     }
   };
   ZeroClipboard.Client.prototype.reposition = function() {
+    if (!ZeroClipboard.currentElement) return false;
     var pos = ZeroClipboard.getDOMObjectPosition(ZeroClipboard.currentElement);
     this.htmlBridge.style.top = pos.top + "px";
     this.htmlBridge.style.left = pos.left + "px";
@@ -212,9 +217,9 @@
       for (var idx = 0, len = this.handlers[eventName].length; idx < len; idx++) {
         var func = this.handlers[eventName][idx];
         if (typeof func == "function") {
-          func(this, args);
+          func.call(ZeroClipboard.currentElement, this, args);
         } else if (typeof func == "string") {
-          window[func](this, args);
+          window[func].call(ZeroClipboard.currentElement, this, args);
         }
       }
     }

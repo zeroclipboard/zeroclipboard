@@ -5,8 +5,13 @@
  */
 ZeroClipboard.Client = function (query) {
 
-  // If there's a client already, return null
-  if (ZeroClipboard._client) return ZeroClipboard._client;
+  var singleton = ZeroClipboard._client;
+
+  // If there's a client already, return the singleton
+  if (singleton) {
+    if (query) singleton.glue(query);
+    return singleton;
+  }
 
   // event handlers
   this.handlers = {};
@@ -231,6 +236,10 @@ ZeroClipboard.Client.prototype.setCurrent = function (element) {
  * returns nothing
  */
 ZeroClipboard.Client.prototype.reposition = function () {
+
+  // If there is no currentElement return
+  if (!ZeroClipboard.currentElement) return false;
+
   var pos = ZeroClipboard.getDOMObjectPosition(ZeroClipboard.currentElement);
 
   // new css

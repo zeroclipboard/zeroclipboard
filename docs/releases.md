@@ -6,7 +6,10 @@ This release re-writes a lot of how zeroclipboard client works. Check the docs f
 * [FEATURE] Indicate via an event when there is no flash or flash is wrong version
 * [FEATURE] More meta info passed with each flash event.
 * [FEATURE] Register more than one event `.on("load complete", function() {})`
+* [FEATURE] Event handlers can now access the clicked element via `this`
 * [BUG] setText doesn't override the default data-clipboard-text attribute.
+* [BUG] When creating more than one clip, the second clip doesn't glue.
+* [BUG] If there is no currentElement return from reposition #51
 
 ### ZeroClipboard 1.0.9
 

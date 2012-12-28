@@ -82,11 +82,11 @@ ZeroClipboard.Client.prototype.receiveEvent = function (eventName, args) {
 
       if (typeof(func) == 'function') {
         // actual function reference
-        func(this, args);
+        func.call(ZeroClipboard.currentElement, this, args);
       }
       else if (typeof(func) == 'string') {
         // name of function
-        window[func](this, args);
+        window[func].call(ZeroClipboard.currentElement, this, args);
       }
     } // foreach event handler defined
   } // user defined handler for event
