@@ -6,6 +6,7 @@ This release re-writes a lot of how zeroclipboard client works. Check the docs f
 * [FEATURE] Indicate via an event when there is no flash or flash is wrong version
 * [FEATURE] More meta info passed with each flash event.
 * [FEATURE] Register more than one event `.on("load complete", function() {})`
+* [BUG] setText doesn't override the default data-clipboard-text attribute.
 
 ### ZeroClipboard 1.0.9
 

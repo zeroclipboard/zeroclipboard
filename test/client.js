@@ -90,7 +90,7 @@ exports.client = {
 
     clip.setCurrent($("#d_clip_button")[0]);
 
-    test.equal(clip.htmlBridge.getAttribute("data-clipboard-text"), "Copy me!");
+    test.equal(clip._text, "Copy me!");
 
     test.ok(clip._text);
 
@@ -109,7 +109,7 @@ exports.client = {
 
     clip.setCurrent($("#d_clip_button")[0]);
 
-    test.equal(clip.htmlBridge.getAttribute("data-clipboard-text"), "This is the new text");
+    test.equal(clip._text, "This is the new text");
 
     test.done();
   },
@@ -121,13 +121,13 @@ exports.client = {
 
     clip.setCurrent($("#d_clip_button")[0]);
 
-    test.equal(clip.htmlBridge.getAttribute("data-clipboard-text"), "This is the new text");
+    test.equal(clip._text, "This is the new text");
 
     clip.resetText();
 
     clip.setCurrent($("#d_clip_button")[0]);
 
-    test.equal(clip.htmlBridge.getAttribute("data-clipboard-text"), "Copy me!");
+    test.equal(clip._text, "Copy me!");
 
     test.done();
   }

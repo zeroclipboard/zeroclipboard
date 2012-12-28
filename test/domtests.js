@@ -50,7 +50,7 @@ exports.domtests = {
 
     clip.setCurrent(element);
 
-    test.equal(clip.htmlBridge.getAttribute("data-clipboard-text"), "Copy me!")
+    test.equal(clip._text, "Copy me!")
 
     clip.resetBridge();
 

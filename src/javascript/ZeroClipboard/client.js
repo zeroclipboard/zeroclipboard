@@ -251,7 +251,6 @@ ZeroClipboard.Client.prototype.reposition = function () {
 ZeroClipboard.Client.prototype.setText = function (newText) {
   if (newText && newText !== "") {
     this._text = newText;
-    this.htmlBridge.setAttribute("data-clipboard-text", newText);
     if (this.ready()) this.flashBridge.setText(newText);
   }
 };
