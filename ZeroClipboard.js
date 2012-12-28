@@ -205,9 +205,9 @@
       for (var idx = 0, len = this.handlers[eventName].length; idx < len; idx++) {
         var func = this.handlers[eventName][idx];
         if (typeof func == "function") {
-          func.call(ZeroClipboard.currentElement || window, this, args);
+          func.call(ZeroClipboard.currentElement, this, args);
         } else if (typeof func == "string") {
-          window[func].call(ZeroClipboard.currentElement || window, this, args);
+          window[func].call(ZeroClipboard.currentElement, this, args);
         }
       }
     }
