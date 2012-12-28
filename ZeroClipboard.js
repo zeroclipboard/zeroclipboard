@@ -83,7 +83,7 @@
     delete ZeroClipboard.currentElement;
   };
   ZeroClipboard.Client.prototype.ready = function() {
-    return !!this.htmlBridge.getAttribute("data-clipboard-ready");
+    return this.htmlBridge.getAttribute("data-clipboard-ready") === "true";
   };
   function _getCursor(el) {
     var y = el.style.cursor;
@@ -101,9 +101,7 @@
   ZeroClipboard.Client.prototype.setCurrent = function(element) {
     ZeroClipboard.currentElement = element;
     this.reposition();
-    if (element.getAttribute("data-clipboard-text") && !this._text) {
-      this.setText(element.getAttribute("data-clipboard-text"));
-    }
+    this.setText(this._text || element.getAttribute("data-clipboard-text"));
     if (element.getAttribute("title")) {
       this.setTitle(element.getAttribute("title"));
     }

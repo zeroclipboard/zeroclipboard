@@ -171,7 +171,7 @@ ZeroClipboard.Client.prototype.resetBridge = function () {
  * returns true if the flash bridge is ready
  */
 ZeroClipboard.Client.prototype.ready = function () {
-  return !!this.htmlBridge.getAttribute("data-clipboard-ready");
+  return this.htmlBridge.getAttribute("data-clipboard-ready") === "true";
 };
 
 /*
@@ -212,10 +212,7 @@ ZeroClipboard.Client.prototype.setCurrent = function (element) {
 
   this.reposition();
 
-  // If the dom element contains data-clipboard-text set text
-  if (element.getAttribute("data-clipboard-text") && !this._text) {
-    this.setText(element.getAttribute("data-clipboard-text"));
-  }
+  this.setText(this._text || element.getAttribute("data-clipboard-text"));
 
   // If the dom element has a title
   if (element.getAttribute("title")) {
