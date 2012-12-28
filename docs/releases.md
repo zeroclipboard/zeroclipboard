@@ -8,6 +8,7 @@ This release re-writes a lot of how zeroclipboard client works. Check the docs f
 * [FEATURE] Register more than one event `.on("load complete", function() {})`
 * [FEATURE] Event handlers can now access the clicked element via `this`
 * [BUG] When creating more than one clip, the second clip doesn't glue.
+* [BUG] If there is no currentElement return from reposition #51
 
 ### ZeroClipboard 1.0.9
 

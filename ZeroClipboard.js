@@ -113,6 +113,7 @@
     }
   };
   ZeroClipboard.Client.prototype.reposition = function() {
+    if (!ZeroClipboard.currentElement) return false;
     var pos = ZeroClipboard.getDOMObjectPosition(ZeroClipboard.currentElement);
     this.htmlBridge.style.top = pos.top + "px";
     this.htmlBridge.style.left = pos.left + "px";

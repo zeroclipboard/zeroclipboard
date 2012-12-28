@@ -233,6 +233,10 @@ ZeroClipboard.Client.prototype.setCurrent = function (element) {
  * returns nothing
  */
 ZeroClipboard.Client.prototype.reposition = function () {
+
+  // If there is no currentElement return
+  if (!ZeroClipboard.currentElement) return false;
+
   var pos = ZeroClipboard.getDOMObjectPosition(ZeroClipboard.currentElement);
 
   // new css
