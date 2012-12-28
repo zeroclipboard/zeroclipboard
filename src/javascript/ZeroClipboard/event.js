@@ -70,6 +70,10 @@ ZeroClipboard.Client.prototype.receiveEvent = function (eventName, args) {
   case 'mouseup':
     ZeroClipboard.currentElement.removeClass('zeroclipboard-is-active');
     break;
+
+  case 'complete':
+    this.resetText();
+    break;
   } // switch eventName
 
   if (this.handlers[eventName]) {
