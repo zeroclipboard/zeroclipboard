@@ -1,3 +1,7 @@
+### ZeroClipboard 1.1.1
+
+To the future, 1.1.1 will address any bugs from the previous release.
+
 ### ZeroClipboard 1.1.0
 
 This release re-writes a lot of how zeroclipboard client works. Check the docs for more details.
