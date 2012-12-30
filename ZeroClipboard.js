@@ -295,7 +295,7 @@
       };
     } else if (typeof jQuery === "function") {
       ZeroClipboardSelect = function(s, n) {
-        return jQuery.uniqueSort(jQuery.find(s, n));
+        return jQuery.unique(jQuery.find(s, n));
       };
     }
     if (typeof query === "string") {
