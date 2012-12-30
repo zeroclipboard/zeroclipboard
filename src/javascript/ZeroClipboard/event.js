@@ -93,3 +93,60 @@ ZeroClipboard.Client.prototype.receiveEvent = function (eventName, args) {
     } // foreach event handler defined
   } // user defined handler for event
 };
+
+/*
+ * The private mouseOver function for an element
+ *
+ * returns nothing
+ */
+function _elementMouseOver() {
+  ZeroClipboard._client.setCurrent(this);
+}
+
+/*
+ * Register a new query of objects to the client.
+ *
+ * returns nothing
+ */
+ZeroClipboard.Client.prototype.glue = function (query) {
+
+  // private function for adding events to the dom, IE before 9 is suckage
+  function _addEventHandler(element, method, func) {
+    if (element.addEventListener) { // all browsers except IE before version 9
+      element.addEventListener(method, func, false);
+    } else if (element.attachEvent) { // IE before version 9
+      element.attachEvent(method, func);
+    }
+  }
+
+  // store the element from the page
+  var elements = ZeroClipboard.$(query);
+
+  for (var i = 0; i < elements.length ; i++) {
+    _addEventHandler(elements[i], "mouseover", _elementMouseOver);
+  }
+};
+
+/*
+ * Unregister the clipboard actions of an element on the page
+ *
+ * returns nothing
+ */
+ZeroClipboard.Client.prototype.unglue = function (query) {
+
+  // private function for removing events from the dom, IE before 9 is suckage
+  function _removeEventHandler(element, method, func) {
+    if (element.removeEventListener) { // all browsers except IE before version 9
+      element.removeEventListener(method, func, false);
+    } else if (element.detachEvent) { // IE before version 9
+      element.detachEvent(method, func);
+    }
+  }
+
+  // store the element from the page
+  var elements = ZeroClipboard.$(query);
+
+  for (var i = 0; i < elements.length ; i++) {
+    _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
+  }
+};

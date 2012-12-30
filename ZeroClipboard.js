@@ -20,35 +20,6 @@
     if (query) this.glue(query);
     ZeroClipboard._client = this;
   };
-  function _elementMouseOver() {
-    ZeroClipboard._client.setCurrent(this);
-  }
-  ZeroClipboard.Client.prototype.glue = function(query) {
-    function _addEventHandler(element, method, func) {
-      if (element.addEventListener) {
-        element.addEventListener(method, func, false);
-      } else if (element.attachEvent) {
-        element.attachEvent(method, func);
-      }
-    }
-    var elements = ZeroClipboard.$(query);
-    for (var i = 0; i < elements.length; i++) {
-      _addEventHandler(elements[i], "mouseover", _elementMouseOver);
-    }
-  };
-  ZeroClipboard.Client.prototype.unglue = function(query) {
-    function _removeEventHandler(element, method, func) {
-      if (element.removeEventListener) {
-        element.removeEventListener(method, func, false);
-      } else if (element.detachEvent) {
-        element.detachEvent(method, func);
-      }
-    }
-    var elements = ZeroClipboard.$(query);
-    for (var i = 0; i < elements.length; i++) {
-      _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
-    }
-  };
   ZeroClipboard.Client.prototype.bridge = function() {
     this.htmlBridge = ZeroClipboard.$("#global-zeroclipboard-html-bridge");
     if (this.htmlBridge.length) {
@@ -221,6 +192,35 @@
           window[func].call(currentElement, this, args);
         }
       }
+    }
+  };
+  function _elementMouseOver() {
+    ZeroClipboard._client.setCurrent(this);
+  }
+  ZeroClipboard.Client.prototype.glue = function(query) {
+    function _addEventHandler(element, method, func) {
+      if (element.addEventListener) {
+        element.addEventListener(method, func, false);
+      } else if (element.attachEvent) {
+        element.attachEvent(method, func);
+      }
+    }
+    var elements = ZeroClipboard.$(query);
+    for (var i = 0; i < elements.length; i++) {
+      _addEventHandler(elements[i], "mouseover", _elementMouseOver);
+    }
+  };
+  ZeroClipboard.Client.prototype.unglue = function(query) {
+    function _removeEventHandler(element, method, func) {
+      if (element.removeEventListener) {
+        element.removeEventListener(method, func, false);
+      } else if (element.detachEvent) {
+        element.detachEvent(method, func);
+      }
+    }
+    var elements = ZeroClipboard.$(query);
+    for (var i = 0; i < elements.length; i++) {
+      _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
     }
   };
   ZeroClipboard.getDOMObjectPosition = function(obj) {
