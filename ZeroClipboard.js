@@ -293,6 +293,10 @@
       ZeroClipboardSelect = function(s, n) {
         return Sizzle.uniqueSort(Sizzle(s, n));
       };
+    } else if (typeof jQuery === "function") {
+      ZeroClipboardSelect = function(s, n) {
+        return jQuery.uniqueSort(jQuery.find(s, n));
+      };
     }
     if (typeof query === "string") {
       result = ZeroClipboardSelect(query, document);
