@@ -56,10 +56,10 @@
   ZeroClipboard.Client.prototype.ready = function() {
     return this.htmlBridge.getAttribute("data-clipboard-ready") === "true";
   };
-  function _getCursor(el) {
-    var y = el.style.cursor;
-    if (el.currentStyle) y = el.currentStyle.cursor; else if (window.getComputedStyle) y = document.defaultView.getComputedStyle(el, null).getPropertyValue("cursor");
-    if (y == "auto") {
+  function _getStyle(el, prop) {
+    var y = el.style[prop];
+    if (el.currentStyle) y = el.currentStyle[prop]; else if (window.getComputedStyle) y = document.defaultView.getComputedStyle(el, null).getPropertyValue(prop);
+    if (y == "auto" && prop == "cursor") {
       var possiblePointers = [ "a" ];
       for (var i = 0; i < possiblePointers.length; i++) {
         if (el.tagName.toLowerCase() == possiblePointers[i]) {
@@ -76,7 +76,7 @@
     if (element.getAttribute("title")) {
       this.setTitle(element.getAttribute("title"));
     }
-    if (_getCursor(element) == "pointer") {
+    if (_getStyle(element, "cursor") == "pointer") {
       this.setHandCursor(true);
     } else {
       this.setHandCursor(false);
@@ -215,7 +215,7 @@
       if (element.removeEventListener) {
         element.removeEventListener(method, func, false);
       } else if (element.detachEvent) {
-        element.detachEvent(method, func);
+        element.detachEvent("on" + method, func);
       }
     }
     var elements = ZeroClipboard.$(query);
@@ -231,14 +231,15 @@
       height: obj.height ? obj.height : obj.offsetHeight,
       zIndex: 9999
     };
-    if (obj.style.zIndex) {
-      info.zIndex = parseInt(element.style.zIndex, 10);
+    var zi = _getStyle(obj, "zIndex");
+    if (zi) {
+      info.zIndex = parseInt(zi, 10);
     }
     while (obj) {
       info.left += obj.offsetLeft;
-      info.left += obj.style.borderLeftWidth ? parseInt(obj.style.borderLeftWidth, 10) : 0;
+      info.left += _getStyle(obj, "borderLeftWidth") ? parseInt(_getStyle(obj, "borderLeftWidth"), 10) : 0;
       info.top += obj.offsetTop;
-      info.top += obj.style.borderTopWidth ? parseInt(obj.style.borderTopWidth, 10) : 0;
+      info.top += _getStyle(obj, "borderTopWidth") ? parseInt(_getStyle(obj, "borderTopWidth"), 10) : 0;
       obj = obj.offsetParent;
     }
     return info;

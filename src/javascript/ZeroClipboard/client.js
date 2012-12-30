@@ -118,18 +118,19 @@ ZeroClipboard.Client.prototype.ready = function () {
 };
 
 /*
- * Private function _getCursor is used to try and guess the element cursor;
+ * Private function _getStyle is used to try and guess the element style; If
+ * if we're looking for cursor, then we make a guess for <a>.
  *
- * returns the computed cursor
+ * returns the computed style
  */
-function _getCursor(el) {
-  var y = el.style.cursor;
+function _getStyle(el, prop) {
+  var y = el.style[prop];
   if (el.currentStyle)
-    y = el.currentStyle.cursor;
+    y = el.currentStyle[prop];
   else if (window.getComputedStyle)
-    y = document.defaultView.getComputedStyle(el, null).getPropertyValue("cursor");
+    y = document.defaultView.getComputedStyle(el, null).getPropertyValue(prop);
 
-  if (y == "auto") {
+  if (y == "auto" && prop == "cursor") {
     var possiblePointers = ["a"];
     for (var i = 0; i < possiblePointers.length; i++) {
       if (el.tagName.toLowerCase() == possiblePointers[i]) {
@@ -163,7 +164,7 @@ ZeroClipboard.Client.prototype.setCurrent = function (element) {
   }
 
   // If the element has a pointer style, set to hand cursor
-  if (_getCursor(element) == "pointer") {
+  if (_getStyle(element, "cursor") == "pointer") {
     this.setHandCursor(true);
   } else {
     this.setHandCursor(false);

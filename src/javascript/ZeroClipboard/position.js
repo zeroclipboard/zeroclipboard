@@ -13,16 +13,18 @@ var _getDOMObjectPosition = function (obj) {
     zIndex: 9999
   };
 
+
+  var zi = _getStyle(obj, "zIndex");
   // float just above object, or default zIndex if dom element isn't set
-  if (obj.style.zIndex) {
-    info.zIndex = parseInt(element.style.zIndex, 10);
+  if (zi) {
+    info.zIndex = parseInt(zi, 10);
   }
 
   while (obj) {
     info.left += obj.offsetLeft;
-    info.left += obj.style.borderLeftWidth ? parseInt(obj.style.borderLeftWidth, 10) : 0;
+    info.left += _getStyle(obj, "borderLeftWidth") ? parseInt(_getStyle(obj, "borderLeftWidth"), 10) : 0;
     info.top += obj.offsetTop;
-    info.top += obj.style.borderTopWidth ? parseInt(obj.style.borderTopWidth, 10) : 0;
+    info.top += _getStyle(obj, "borderTopWidth") ? parseInt(_getStyle(obj, "borderTopWidth"), 10) : 0;
     obj = obj.offsetParent;
   }
 

@@ -139,7 +139,7 @@ ZeroClipboard.Client.prototype.unglue = function (query) {
     if (element.removeEventListener) { // all browsers except IE before version 9
       element.removeEventListener(method, func, false);
     } else if (element.detachEvent) { // IE before version 9
-      element.detachEvent(method, func);
+      element.detachEvent("on" + method, func);
     }
   }
 
