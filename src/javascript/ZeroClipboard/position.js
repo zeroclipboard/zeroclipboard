@@ -16,7 +16,7 @@ var _getDOMObjectPosition = function (obj) {
 
   var zi = _getStyle(obj, "zIndex");
   // float just above object, or default zIndex if dom element isn't set
-  if (zi) {
+  if (zi && zi != "auto") {
     info.zIndex = parseInt(zi, 10);
   }
 

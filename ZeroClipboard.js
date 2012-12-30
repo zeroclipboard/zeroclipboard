@@ -242,7 +242,7 @@
       zIndex: 9999
     };
     var zi = _getStyle(obj, "zIndex");
-    if (zi) {
+    if (zi && zi != "auto") {
       info.zIndex = parseInt(zi, 10);
     }
     while (obj) {
