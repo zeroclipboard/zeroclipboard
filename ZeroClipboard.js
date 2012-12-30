@@ -54,7 +54,8 @@
     delete ZeroClipboard.currentElement;
   };
   ZeroClipboard.Client.prototype.ready = function() {
-    return this.htmlBridge.getAttribute("data-clipboard-ready") === "true";
+    var ready = this.htmlBridge.getAttribute("data-clipboard-ready");
+    return ready === "true" || ready === true;
   };
   function _getStyle(el, prop) {
     var y = el.style[prop];

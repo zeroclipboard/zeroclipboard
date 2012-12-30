@@ -114,7 +114,9 @@ ZeroClipboard.Client.prototype.resetBridge = function () {
  * returns true if the flash bridge is ready
  */
 ZeroClipboard.Client.prototype.ready = function () {
-  return this.htmlBridge.getAttribute("data-clipboard-ready") === "true";
+  // I don't want to eval() here
+  var ready = this.htmlBridge.getAttribute("data-clipboard-ready");
+  return ready === "true" || ready === true;
 };
 
 /*
