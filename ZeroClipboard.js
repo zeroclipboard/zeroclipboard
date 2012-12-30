@@ -194,8 +194,17 @@
       }
     }
   };
-  function _elementMouseOver() {
-    ZeroClipboard._client.setCurrent(this);
+  function _elementMouseOver(event) {
+    if (!event) {
+      event = window.event;
+    }
+    var target;
+    if (event.target) {
+      target = event.target;
+    } else if (event.srcElement) {
+      target = event.srcElement;
+    }
+    ZeroClipboard._client.setCurrent(target);
   }
   ZeroClipboard.Client.prototype.glue = function(query) {
     function _addEventHandler(element, method, func) {
