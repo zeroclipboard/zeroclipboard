@@ -180,7 +180,7 @@ ZeroClipboard.Client.prototype.reposition = function () {
   // If there is no currentElement return
   if (!ZeroClipboard.currentElement) return false;
 
-  var pos = ZeroClipboard.getDOMObjectPosition(ZeroClipboard.currentElement);
+  var pos = _getDOMObjectPosition(ZeroClipboard.currentElement);
 
   // new css
   this.htmlBridge.style.top = pos.top + "px";

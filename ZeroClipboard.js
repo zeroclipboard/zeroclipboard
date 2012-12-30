@@ -84,7 +84,7 @@
   };
   ZeroClipboard.Client.prototype.reposition = function() {
     if (!ZeroClipboard.currentElement) return false;
-    var pos = ZeroClipboard.getDOMObjectPosition(ZeroClipboard.currentElement);
+    var pos = _getDOMObjectPosition(ZeroClipboard.currentElement);
     this.htmlBridge.style.top = pos.top + "px";
     this.htmlBridge.style.left = pos.left + "px";
     this.htmlBridge.style.width = pos.width + "px";
@@ -223,7 +223,7 @@
       _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
     }
   };
-  ZeroClipboard.getDOMObjectPosition = function(obj) {
+  var _getDOMObjectPosition = function(obj) {
     var info = {
       left: 0,
       top: 0,
