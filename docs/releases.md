@@ -2,6 +2,8 @@
 
 To the future, 1.1.1 will address any bugs from the previous release.
 
+* [BUG] IE6/7/8 mouseup and mousedown bug. Events weren't being registered properly #55
+
 ### ZeroClipboard 1.1.0
 
 This release re-writes a lot of how zeroclipboard client works. Check the docs for more details.
