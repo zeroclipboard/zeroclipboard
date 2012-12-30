@@ -202,7 +202,7 @@
       if (element.addEventListener) {
         element.addEventListener(method, func, false);
       } else if (element.attachEvent) {
-        element.attachEvent(method, func);
+        element.attachEvent("on" + method, func);
       }
     }
     var elements = ZeroClipboard.$(query);

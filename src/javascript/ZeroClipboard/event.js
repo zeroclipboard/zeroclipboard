@@ -115,7 +115,7 @@ ZeroClipboard.Client.prototype.glue = function (query) {
     if (element.addEventListener) { // all browsers except IE before version 9
       element.addEventListener(method, func, false);
     } else if (element.attachEvent) { // IE before version 9
-      element.attachEvent(method, func);
+      element.attachEvent("on" + method, func);
     }
   }
 
