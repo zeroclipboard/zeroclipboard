@@ -52,7 +52,7 @@ component.json: Makefile
 test: ZeroClipboard.min.js
 	$(JS_HINT) ./src/javascript/ZeroClipboard/*.js
 	$(JS_TEST) ./test
-	$(JS_TEST_HTML) ./test > test.html
+	$(JS_TEST_HTML) ./test > t.html
 
 clean:
 	rm -f ./component.json ./ZeroClipboard* ./LICENSE
