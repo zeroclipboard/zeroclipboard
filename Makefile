@@ -9,6 +9,7 @@ JS_TEST_HTML = $(NODE_PATH)/nodeunit/bin/nodeunit --reporter html
 JS_HINT = $(NODE_PATH)/jshint/bin/hint
 
 all: \
+	setup \
 	node_modules \
 	ZeroClipboard.min.js \
 	ZeroClipboard.swf \
@@ -16,7 +17,10 @@ all: \
 	LICENSE \
 	test \
 
-node_modules: Makefile
+setup: Makefile
+	mkdir -p bin
+
+node_modules: setup
 	npm install
 
 .INTERMEDIATE ZeroClipboard.js: \
@@ -52,9 +56,9 @@ component.json: Makefile
 test: ZeroClipboard.min.js
 	$(JS_HINT) ./src/javascript/ZeroClipboard/*.js
 	$(JS_TEST) ./test
-	$(JS_TEST_HTML) ./test > t.html
+	$(JS_TEST_HTML) ./test > ./bin/test.html
 
 clean:
-	rm -f ./component.json ./ZeroClipboard* ./LICENSE
+	rm -rf ./component.json ./ZeroClipboard* ./LICENSE ./bin
 
 .PHONY: all test clean

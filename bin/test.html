@@ -1,0 +1,57 @@
+<html>
+<head>
+<title></title>
+<style type="text/css">
+body { font: 12px Helvetica Neue }
+h2 { margin:0 ; padding:0 }
+pre { font: 11px Andale Mono; margin-left: 1em; padding-left: 1em; margin-top:0; font-size:smaller;}
+.assertion_message { margin-left: 1em; }
+  ol {	list-style: none;	margin-left: 1em;	padding-left: 1em;	text-indent: -1em;}
+  ol li.pass:before { content: "\2714 \0020"; }
+  ol li.fail:before { content: "\2716 \0020"; }
+</style>
+</head>
+<body>
+<h2>client</h2>
+<ol>
+<li class="pass">client - Client without selector doesn't have element</li>
+<li class="pass">client - Clip is created properly</li>
+<li class="pass">client - Detecting no flash</li>
+<li class="pass">client - Detecting has flash mimetype</li>
+<li class="pass">client - Glue element after new client</li>
+<li class="pass">client - Changing movie path works</li>
+<li class="pass">client - Clip sets title properly</li>
+<li class="pass">client - resetText clears the title</li>
+<li class="pass">client - setText overrides the data-clipboard-text attribute</li>
+<li class="pass">client - resetText turns things back to normal</li>
+</ol>
+<h2>domtests</h2>
+<ol>
+<li class="pass">domtests - Object has a title</li>
+<li class="pass">domtests - Object has no title</li>
+<li class="pass">domtests - Object has data-clipboard-text</li>
+<li class="pass">domtests - Object doesn't have data-clipboard-text</li>
+<li class="pass">domtests - Bridge is ready</li>
+<li class="pass">domtests - Trying a new client is same client</li>
+</ol>
+</ol>
+<h2>events</h2>
+<ol>
+<li class="pass">zevents - Registering Events</li>
+<li class="pass">zevents - Registering Events the old way</li>
+<li class="pass">zevents - Registering two events works</li>
+<li class="pass">zevents - Test onNoFlash Event</li>
+<li class="pass">zevents - Test onWrongFlash Event</li>
+<li class="pass">zevents - Test mouseover and mouseout event</li>
+<li class="pass">zevents - Test mousedown and mouseup event</li>
+<li class="pass">zevents - Test that the current Element is passed back to event handler</li>
+</ol>
+<h2>selector</h2>
+<ol>
+<li class="pass">selector - $ returns an element</li>
+<li class="pass">selector - $.addClass works as expected</li>
+<li class="pass">selector - $.removeClass works as expected</li>
+</ol>
+<h3>OK: 60 assertions (298ms)</h3>
+</body>
+</html>
