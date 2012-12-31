@@ -5,11 +5,9 @@ NODE_PATH ?= ./node_modules
 JS_COMPILER = $(NODE_PATH)/uglify-js/bin/uglifyjs
 JS_BEAUTIFIER = $(NODE_PATH)/uglify-js/bin/uglifyjs -b -i 2 -nm -ns
 JS_TEST = $(NODE_PATH)/nodeunit/bin/nodeunit
-JS_TEST_HTML = $(NODE_PATH)/nodeunit/bin/nodeunit --reporter html
 JS_HINT = $(NODE_PATH)/jshint/bin/hint
 
 all: \
-	setup \
 	node_modules \
 	ZeroClipboard.min.js \
 	ZeroClipboard.swf \
@@ -17,10 +15,7 @@ all: \
 	LICENSE \
 	test \
 
-setup: Makefile
-	mkdir -p bin
-
-node_modules: setup
+node_modules: Makefile
 	npm install
 
 .INTERMEDIATE ZeroClipboard.js: \
@@ -53,12 +48,11 @@ component.json: Makefile
 	cat ./src/component.js | node src/build.js > $@
 	@chmod a-w $@
 
-test: setup ZeroClipboard.min.js
+test: ZeroClipboard.min.js
 	$(JS_HINT) ./src/javascript/ZeroClipboard/*.js
 	$(JS_TEST) ./test
-	$(JS_TEST_HTML) ./test > ./bin/test.html
 
 clean:
-	rm -rf ./component.json ./ZeroClipboard* ./LICENSE ./bin
+	rm -rf ./component.json ./ZeroClipboard* ./LICENSE
 
 .PHONY: all test clean
