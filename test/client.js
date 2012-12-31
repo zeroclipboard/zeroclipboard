@@ -65,11 +65,11 @@ exports.client = {
   "Changing movie path works": function (test) {
 
     // Test the client has default path
-    test.equal(zeroClipboard.moviePath, "ZeroClipboard.swf");
+    test.equal(zeroClipboard._moviePath, "ZeroClipboard.swf");
 
     // change the path
     zeroClipboard.setMoviePath("new/movie/path.swf");
-    test.equal(zeroClipboard.moviePath, "new/movie/path.swf");
+    test.equal(zeroClipboard._moviePath, "new/movie/path.swf");
 
     test.done();
   },

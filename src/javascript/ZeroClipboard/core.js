@@ -1,5 +1,5 @@
 ZeroClipboard.version = "{{version}}";
-ZeroClipboard.moviePath = 'ZeroClipboard.swf'; // URL to movie
+ZeroClipboard._moviePath = 'ZeroClipboard.swf'; // URL to movie
 ZeroClipboard._client = null; // The client
 
 /*
@@ -9,7 +9,7 @@ ZeroClipboard._client = null; // The client
  */
 ZeroClipboard.setMoviePath = function (path) {
   // set path to ZeroClipboard.swf
-  this.moviePath = path;
+  this._moviePath = path;
 };
 
 /*
