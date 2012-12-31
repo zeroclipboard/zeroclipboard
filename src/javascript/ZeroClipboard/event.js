@@ -106,6 +106,7 @@ function _elementMouseOver(event) {
   }
 
   var target;
+  // in IE7 this === window
   if (this !== window) {
     target = this;
   } else if (event.target) {
