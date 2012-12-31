@@ -53,7 +53,7 @@ component.json: Makefile
 	cat ./src/component.js | node src/build.js > $@
 	@chmod a-w $@
 
-test: ZeroClipboard.min.js
+test: setup ZeroClipboard.min.js
 	$(JS_HINT) ./src/javascript/ZeroClipboard/*.js
 	$(JS_TEST) ./test
 	$(JS_TEST_HTML) ./test > ./bin/test.html
