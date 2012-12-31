@@ -83,3 +83,7 @@ see [releases.md](ZeroClipboard/blob/master/docs/releases.md)
 ## Last Build
 
 [![Build Status](https://secure.travis-ci.org/jonrohan/ZeroClipboard.png?branch=master)](https://travis-ci.org/jonrohan/ZeroClipboard)
+
+## Tests
+
+[Release tests](http://jonrohan.github.com/ZeroClipboard/test.html)
