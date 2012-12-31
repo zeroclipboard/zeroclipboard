@@ -2,6 +2,9 @@
 
 To the future, 1.1.4 will address any bugs from the previous release.
 
+* [SECURITY] Removing `flash.system.Security.allowDomain("*");` default. now should be set via flashvars.
+* [SECURITY] XSS Vunerability, the clipText returned from the flash object needs to be escaped.
+
 ### ZeroClipboard 1.1.1, 1.1.2, 1.1.3
 
 Emergency bug release.

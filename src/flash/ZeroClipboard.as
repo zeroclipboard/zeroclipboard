@@ -35,8 +35,13 @@
       stage.align = "TL";
       stage.scaleMode = "noScale";
 
-      // Allow the swf object to be run on any domain
-      flash.system.Security.allowDomain("*");
+      // Get the flashvars
+      var flashvars:Object = LoaderInfo( this.root.loaderInfo ).parameters;
+
+      // Allow the swf object to be run on any domain, for when the site hosts the file on a separate server
+      if (flashvars.trustedDomain) {
+        flash.system.Security.allowDomain(flashvars.trustedDomain.split("\\").join("\\\\"));
+      }
 
       // invisible button covers entire stage
       button = new Sprite();
@@ -81,7 +86,7 @@
 
       // signal to the page it is done
       ExternalInterface.call( 'ZeroClipboard.dispatch', 'complete',  metaData(event, {
-        text: clipText,
+        text: clipText.split("\\").join("\\\\"),
         format: clipFormat
       }));
     }

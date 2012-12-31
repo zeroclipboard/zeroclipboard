@@ -13,6 +13,15 @@ ZeroClipboard.setMoviePath = function (path) {
 };
 
 /*
+ * Sets trusted domain to configure the flash file with.
+ *
+ * returns nothing
+ */
+ZeroClipboard.setTrustedDomain = function (obj) {
+  this._trustedDomain = obj;
+};
+
+/*
  * Self-destruction and clean up everything
  *
  * returns nothing
