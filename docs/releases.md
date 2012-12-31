@@ -1,6 +1,6 @@
 ### ZeroClipboard 1.1.1
 
-To the future, 1.1.1 will address any bugs from the previous release.
+Emergency bug release.
 
 * [BUG] IE6/7/8 mouseup and mousedown bug. Events weren't being registered properly #55
 
