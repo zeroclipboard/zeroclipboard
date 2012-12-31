@@ -13,6 +13,15 @@ ZeroClipboard.setMoviePath = function (path) {
 };
 
 /*
+ * Set flashvars for the swf object.
+ *
+ * returns nothing
+ */
+ZeroClipboard.setVars = function (obj) {
+  this._vars = obj;
+};
+
+/*
  * Self-destruction and clean up everything
  *
  * returns nothing

@@ -35,8 +35,13 @@
       stage.align = "TL";
       stage.scaleMode = "noScale";
 
-      // Allow the swf object to be run on any domain
-      flash.system.Security.allowDomain("*");
+      // Get the flashvars
+      var flashvars:Object = LoaderInfo( this.root.loaderInfo ).parameters;
+
+      // Allow the swf object to be run on any domain, for when the site hosts the file on a separate server
+      if (flashvars.trustedDomains) {
+        flash.system.Security.allowDomain(flashvars.trustedDomains);
+      }
 
       // invisible button covers entire stage
       button = new Sprite();
