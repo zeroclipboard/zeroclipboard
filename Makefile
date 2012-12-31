@@ -5,6 +5,7 @@ NODE_PATH ?= ./node_modules
 JS_COMPILER = $(NODE_PATH)/uglify-js/bin/uglifyjs
 JS_BEAUTIFIER = $(NODE_PATH)/uglify-js/bin/uglifyjs -b -i 2 -nm -ns
 JS_TEST = $(NODE_PATH)/nodeunit/bin/nodeunit
+JS_TEST_HTML = $(NODE_PATH)/nodeunit/bin/nodeunit --reporter html
 JS_HINT = $(NODE_PATH)/jshint/bin/hint
 
 all: \
@@ -51,6 +52,7 @@ component.json: Makefile
 test: ZeroClipboard.min.js
 	$(JS_HINT) ./src/javascript/ZeroClipboard/*.js
 	$(JS_TEST) ./test
+	$(JS_TEST_HTML) ./test > test.html
 
 clean:
 	rm -f ./component.json ./ZeroClipboard* ./LICENSE
