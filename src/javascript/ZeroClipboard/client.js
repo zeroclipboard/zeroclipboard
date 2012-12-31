@@ -49,14 +49,14 @@ ZeroClipboard.Client.prototype.bridge = function () {
     return ((path.indexOf("?") >= 0) ? "&" : "?") + "nocache=" + (new Date().getTime());
   }
 
-  // Serializes the _vars object into a string
+  // creates a query string for the flasvars
   function vars() {
-    // if vars is null return empty string
-    if (!ZeroClipboard._vars) return "";
     var str = [];
-    for (var k in ZeroClipboard._vars) {
-      str.push(k + "=" + ZeroClipboard._vars[k]);
-    }
+
+    // if trusted domain is set
+    if (ZeroClipboard._trustedDomain) str.push("trustedDomain=" + ZeroClipboard._trustedDomain);
+
+    // join the str by &
     return str.join("&");
   }
 

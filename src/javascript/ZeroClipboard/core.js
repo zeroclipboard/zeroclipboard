@@ -13,12 +13,12 @@ ZeroClipboard.setMoviePath = function (path) {
 };
 
 /*
- * Set flashvars for the swf object.
+ * Sets trusted domain to configure the flash file with.
  *
  * returns nothing
  */
-ZeroClipboard.setVars = function (obj) {
-  this._vars = obj;
+ZeroClipboard.setTrustedDomain = function (obj) {
+  this._trustedDomain = obj;
 };
 
 /*
