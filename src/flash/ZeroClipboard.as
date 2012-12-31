@@ -86,7 +86,7 @@
 
       // signal to the page it is done
       ExternalInterface.call( 'ZeroClipboard.dispatch', 'complete',  metaData(event, {
-        text: clipText,
+        text: clipText.split("\\").join("\\\\"),
         format: clipFormat
       }));
     }
