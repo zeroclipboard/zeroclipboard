@@ -4,7 +4,7 @@
  * Copyright 2012 Jon Rohan, James M. Greene, .
  * Released under the MIT license
  * http://jonrohan.github.com/ZeroClipboard/
- * v1.1.2
+ * v1.1.3
  */(function() {
   "use strict";
   var ZeroClipboard = {};
@@ -111,7 +111,7 @@
   ZeroClipboard.Client.prototype.setHandCursor = function(enabled) {
     if (this.ready()) this.flashBridge.setHandCursor(enabled);
   };
-  ZeroClipboard.version = "1.1.2";
+  ZeroClipboard.version = "1.1.3";
   ZeroClipboard.moviePath = "ZeroClipboard.swf";
   ZeroClipboard._client = null;
   ZeroClipboard.setMoviePath = function(path) {
