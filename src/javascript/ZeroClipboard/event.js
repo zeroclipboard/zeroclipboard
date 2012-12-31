@@ -106,13 +106,14 @@ function _elementMouseOver(event) {
   }
 
   var target;
-  if (event.target) {
+  if (this !== window) {
+    target = this;
+  } else if (event.target) {
     target = event.target;
   } else if (event.srcElement) {
     target = event.srcElement;
   }
-
-  ZeroClipboard._client.setCurrent(target);
+  ZeroClipboard._client.setCurrent(elementWrapper(target));
 }
 
 /*
