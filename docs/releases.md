@@ -1,3 +1,7 @@
+### ZeroClipboard 1.1.2
+
+To the future, 1.1.2 will address any bugs from the previous release.
+
 ### ZeroClipboard 1.1.1
 
 Emergency bug release.
