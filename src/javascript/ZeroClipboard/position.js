@@ -6,10 +6,10 @@
 var _getDOMObjectPosition = function (obj) {
   // get absolute coordinates for dom element
   var info = {
-    left: 0,
-    top: 0,
-    width: obj.width ? obj.width : obj.offsetWidth,
-    height: obj.height ? obj.height : obj.offsetHeight,
+    left:   0,
+    top:    0,
+    width:  obj.width  || obj.offsetWidth  || 0,
+    height: obj.height || obj.offsetHeight || 0,
     zIndex: 9999
   };
 
@@ -21,10 +21,15 @@ var _getDOMObjectPosition = function (obj) {
   }
 
   while (obj) {
-    info.left += obj.offsetLeft;
-    info.left += _getStyle(obj, "borderLeftWidth") ? parseInt(_getStyle(obj, "borderLeftWidth"), 10) : 0;
-    info.top += obj.offsetTop;
-    info.top += _getStyle(obj, "borderTopWidth") ? parseInt(_getStyle(obj, "borderTopWidth"), 10) : 0;
+
+    var borderLeftWidth = parseInt(_getStyle(obj, "borderLeftWidth"), 10);
+    var borderTopWidth  = parseInt(_getStyle(obj, "borderTopWidth"), 10);
+
+    info.left += isNaN(obj.offsetLeft)  ? 0 : obj.offsetLeft;
+    info.left += isNaN(borderLeftWidth) ? 0 : borderLeftWidth;
+    info.top  += isNaN(obj.offsetTop)   ? 0 : obj.offsetTop;
+    info.top  += isNaN(borderTopWidth)  ? 0 : borderTopWidth;
+
     obj = obj.offsetParent;
   }
 
