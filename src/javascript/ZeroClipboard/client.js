@@ -197,9 +197,9 @@ ZeroClipboard.Client.prototype.reposition = function () {
   var pos = _getDOMObjectPosition(ZeroClipboard.currentElement);
 
   // new css
-  this.htmlBridge.style.top = pos.top + "px";
-  this.htmlBridge.style.left = pos.left + "px";
-  this.htmlBridge.style.width = pos.width + "px";
+  this.htmlBridge.style.top    = pos.top + "px";
+  this.htmlBridge.style.left   = pos.left + "px";
+  this.htmlBridge.style.width  = pos.width + "px";
   this.htmlBridge.style.height = pos.height + "px";
   this.htmlBridge.style.zIndex = pos.zIndex + 1;
 
