@@ -1,6 +1,7 @@
 ### ZeroClipboard 1.1.5
 
 * [BUG] When the border is NaN, IE will throw errors. #57
+* [CHORE] Bower component.json is now pointing at non-minified zeroclipboard src
 
 ### ZeroClipboard 1.1.4
 
