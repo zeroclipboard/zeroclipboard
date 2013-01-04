@@ -1,3 +1,5 @@
+### ZeroClipboard 1.1.6
+
 ### ZeroClipboard 1.1.5
 
 * [BUG] When the border is NaN, IE will throw errors. #57
