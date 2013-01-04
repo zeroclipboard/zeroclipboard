@@ -51,7 +51,7 @@ Setting the clipboard text happens 2 ways.
 Set the text via `data-clipboard-text` attribute on the button. Doing this will let ZeroClipboard take care of the rest.
 
 ```
-<button id="my-button" data-clipboard-text="Copy me!">Copy to Clipboard</div>
+<button id="my-button" data-clipboard-text="Copy me!">Copy to Clipboard</button>
 ```
 
 Set the text via `clip.setText` property.  You can call this function at any time; when the page first loads, or later in an `onMouseOver` or `onMouseDown` handler.  Example:
@@ -76,10 +76,8 @@ You can pass in a DOM element ID (as shown above), or a reference to the actual 
 
 ### Recommended Implementation
 
-It is highly recommended you create a "container" DIV element around your button, set its CSS "position" to "relative", and place your button just inside.  Then, pass *two* arguments to `glue()`, your button DOM element or ID, and the container DOM element or ID.  This way Zero Clipboard can position the floating Flash movie relative to the container DIV (not the page body), resulting in much more exact positioning.  Example (HTML):
-
 ```
-<button id="my-button" data-clipboard-text="Copy me!" title="Click to copy to clipboard.">Copy to Clipboard</div>
+<button id="my-button" data-clipboard-text="Copy me!" title="Click to copy to clipboard.">Copy to Clipboard</button>
 ```
 
 And the code:
