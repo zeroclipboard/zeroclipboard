@@ -10,4 +10,7 @@ These are things that we have expressed interest in, but haven't implemented yet
   <dt>actionscript tests</dt>
   <dd>We want to setup a unit test suite for the flash file.</dd>
 
+  <dt>HTML5 Clipboard API</dt>
+  <dd>In a perfect world we wouldn't need ZeroClipboard, and the browsers would just take care of it. I would like to write ZeroClipboard to use the browser clipboard api when available.</dd>
+
 </dl>
