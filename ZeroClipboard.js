@@ -185,7 +185,7 @@
         }
       }
     }
-    return this;
+    return element;
   };
   ZeroClipboard.dispatch = function(eventName, args) {
     ZeroClipboard._client.receiveEvent(eventName, args);
@@ -309,71 +309,6 @@
       obj = obj.offsetParent;
     }
     return info;
-  };
-  function elementWrapper(element) {
-    if (!element || element.addClass) return element;
-    element.addClass = function(value) {
-      if (value && typeof value === "string") {
-        var classNames = (value || "").split(/\s+/);
-        var elem = this;
-        if (elem.nodeType === 1) {
-          if (!elem.className) {
-            elem.className = value;
-          } else {
-            var className = " " + elem.className + " ", setClass = elem.className;
-            for (var c = 0, cl = classNames.length; c < cl; c++) {
-              if (className.indexOf(" " + classNames[c] + " ") < 0) {
-                setClass += " " + classNames[c];
-              }
-            }
-            elem.className = setClass.replace(/^\s+|\s+$/g, "");
-          }
-        }
-      }
-      return this;
-    };
-    element.removeClass = function(value) {
-      if (value && typeof value === "string" || value === undefined) {
-        var classNames = (value || "").split(/\s+/);
-        var elem = this;
-        if (elem.nodeType === 1 && elem.className) {
-          if (value) {
-            var className = (" " + elem.className + " ").replace(/[\n\t]/g, " ");
-            for (var c = 0, cl = classNames.length; c < cl; c++) {
-              className = className.replace(" " + classNames[c] + " ", " ");
-            }
-            elem.className = className.replace(/^\s+|\s+$/g, "");
-          } else {
-            elem.className = "";
-          }
-        }
-      }
-      return this;
-    };
-    return element;
-  }
-  ZeroClipboard.$ = function(query) {
-    var ZeroClipboardSelect = function(s, n) {
-      return n.querySelectorAll(s);
-    }, result;
-    if (typeof Sizzle === "function") {
-      ZeroClipboardSelect = function(s, n) {
-        return Sizzle.uniqueSort(Sizzle(s, n));
-      };
-    } else if (typeof jQuery === "function") {
-      ZeroClipboardSelect = function(s, n) {
-        return jQuery.unique(jQuery.find(s, n));
-      };
-    }
-    if (typeof query === "string") {
-      result = ZeroClipboardSelect(query, document);
-      if (result.length === 0) result = [ document.getElementById(query) ];
-    }
-    var newresult = [];
-    for (var i = 0; i < result.length; i++) {
-      if (result[i] !== null) newresult.push(elementWrapper(result[i]));
-    }
-    return newresult;
   };
   if (typeof module !== "undefined") {
     module.exports = ZeroClipboard;
