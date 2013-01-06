@@ -95,27 +95,6 @@ ZeroClipboard.Client.prototype.receiveEvent = function (eventName, args) {
 };
 
 /*
- * The private mouseOver function for an element
- *
- * returns nothing
- */
-function _elementMouseOver(event) {
-  // IE won't have event
-  if (!event) {
-    event = window.event;
-  }
-
-  var target;
-  // in IE7 this === window
-  if (this !== window) {
-    target = this;
-  } else if (event.target) {
-    target = event.target;
-  } else if (event.srcElement) {
-    target = event.srcElement;
-  }
-  ZeroClipboard._client.setCurrent(elementWrapper(target));
-}
 
 /*
  * Register new element(s) to the object.
@@ -123,15 +102,6 @@ function _elementMouseOver(event) {
  * returns nothing
  */
 ZeroClipboard.Client.prototype.glue = function (elements) {
-
-  // private function for adding events to the dom, IE before 9 is suckage
-  function _addEventHandler(element, method, func) {
-    if (element.addEventListener) { // all browsers except IE before version 9
-      element.addEventListener(method, func, false);
-    } else if (element.attachEvent) { // IE before version 9
-      element.attachEvent("on" + method, func);
-    }
-  }
 
   // if elements is a string
   if (typeof elements === "string") throw new TypeError("ZeroClipboard doesn't accept query strings.");
@@ -150,15 +120,6 @@ ZeroClipboard.Client.prototype.glue = function (elements) {
  * returns nothing
  */
 ZeroClipboard.Client.prototype.unglue = function (elements) {
-
-  // private function for removing events from the dom, IE before 9 is suckage
-  function _removeEventHandler(element, method, func) {
-    if (element.removeEventListener) { // all browsers except IE before version 9
-      element.removeEventListener(method, func, false);
-    } else if (element.detachEvent) { // IE before version 9
-      element.detachEvent("on" + method, func);
-    }
-  }
 
   // if elements is a string
   if (typeof elements === "string") throw new TypeError("ZeroClipboard doesn't accept query strings.");

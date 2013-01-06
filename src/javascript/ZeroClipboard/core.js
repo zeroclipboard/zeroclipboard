@@ -17,8 +17,8 @@ ZeroClipboard.setMoviePath = function (path) {
  *
  * returns nothing
  */
-ZeroClipboard.setTrustedDomain = function (obj) {
-  this._trustedDomain = obj;
+ZeroClipboard.setTrustedDomain = function (domain) {
+  this._trustedDomain = domain;
 };
 
 /*
@@ -35,6 +35,8 @@ ZeroClipboard.destroy = function () {
 
   // delete the client object
   delete ZeroClipboard._client;
+  delete ZeroClipboard._trustedDomain;
+  ZeroClipboard._moviePath = 'ZeroClipboard.swf';
 
   // remove the bridge
   bridge.parentNode.removeChild(bridge);

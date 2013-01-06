@@ -1,9 +1,9 @@
 "use strict";
 
-require("./env")
+require("./fixtures/env")
 
 var zeroClipboard, clip;
-exports.zevents = {
+exports.event = {
 
   setUp: function (callback) {
     zeroClipboard = require("../ZeroClipboard");
@@ -14,6 +14,26 @@ exports.zevents = {
   tearDown: function (callback) {
     zeroClipboard.destroy();
     callback();
+  },
+
+  "Glue element after new client": function (test) {
+
+    clip.glue($("#d_clip_button"))
+
+    // Test the client was created properly
+    test.ok(clip.htmlBridge);
+    test.ok(clip.handlers);
+
+    test.done();
+  },
+
+  "Glue element with query string throws TypeError": function (test) {
+
+    test.throws(function(){
+      clip.glue("#d_clip_button")
+    }, TypeError);
+
+    test.done();
   },
 
   "Registering Events": function (test) {
@@ -140,6 +160,6 @@ exports.zevents = {
     zeroClipboard.dispatch("mouseup", { flashVersion: "MAC 11,0,0" });
     zeroClipboard.dispatch("complete", { flashVersion: "MAC 11,0,0" });
     zeroClipboard.dispatch("mouseout", { flashVersion: "MAC 11,0,0" });
-  }
+  },
 
 }
