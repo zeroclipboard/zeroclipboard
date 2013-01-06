@@ -68,5 +68,5 @@ var _removeClass = function (element, value) {
 
   }
 
-  return this;
+  return element;
 };
