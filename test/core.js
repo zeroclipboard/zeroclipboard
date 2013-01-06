@@ -3,7 +3,7 @@
 require("./fixtures/env")
 var zeroClipboard, clip;
 
-exports.dom = {
+exports.core = {
   setUp: function (callback) {
     zeroClipboard = require("../ZeroClipboard");
     clip = new zeroClipboard.Client();
