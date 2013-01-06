@@ -17,7 +17,7 @@ exports.domtests = {
 
   "Object has a title": function (test) {
 
-    clip.glue("#d_clip_button");
+    clip.glue($("#d_clip_button"));
 
     var element = $("#d_clip_button")[0];
 
@@ -32,7 +32,7 @@ exports.domtests = {
 
   "Object has no title": function (test) {
 
-    clip.glue("#d_clip_button_no_title");
+    clip.glue($("#d_clip_button_no_title"));
 
     var element = $("#d_clip_button_no_title")[0];
 
@@ -45,7 +45,7 @@ exports.domtests = {
 
   "Object has data-clipboard-text": function (test) {
 
-    clip.glue('#d_clip_button');
+    clip.glue($("#d_clip_button"));
     var element = $("#d_clip_button")[0];
 
     clip.setCurrent(element);
@@ -59,7 +59,7 @@ exports.domtests = {
 
   "Object doesn't have data-clipboard-text": function (test) {
 
-    clip.glue("#d_clip_button_no_text");
+    clip.glue($("#d_clip_button_no_text"));
     var element = $("#d_clip_button_no_text")[0];
 
     clip.setCurrent(element);

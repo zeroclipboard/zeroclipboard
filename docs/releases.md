@@ -1,5 +1,9 @@
 ### ZeroClipboard 1.1.6
 
+** IMPORTANT: WE NO LONGER ACCEPT QUERY STRINGS. INSTEAD PASS AN ELEMENT OR ARRAY OF ELEMENTS **
+
+* [FEATURE] The selector `ZeroClipboard.$` was removed in favor of leaving it up to the user. #63
+
 ### ZeroClipboard 1.1.5
 
 * [BUG] When the border is NaN, IE will throw errors. #57
