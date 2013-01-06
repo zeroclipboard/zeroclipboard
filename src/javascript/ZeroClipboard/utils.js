@@ -175,3 +175,30 @@ var _getDOMObjectPosition = function (obj) {
 
   return info;
 };
+
+/*
+ * private _noCache function.
+ * Will look at a path, and will append ?nocache=date or &nocache=date to path.
+ * because externalenterface craps out when flash is cached. (IE)
+ *
+ * returns path with noncache param added
+ */
+var _noCache = function (path) {
+  return ((path.indexOf("?") >= 0) ? "&" : "?") + "nocache=" + (new Date().getTime());
+};
+
+/*
+ * private _vars function.
+ * creates a query string for the flasvars
+ *
+ * returns flashvars separated by &
+ */
+var _vars = function () {
+  var str = [];
+
+  // if trusted domain is set
+  if (ZeroClipboard._trustedDomain) str.push("trustedDomain=" + ZeroClipboard._trustedDomain);
+
+  // join the str by &
+  return str.join("&");
+};
