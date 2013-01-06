@@ -53,11 +53,20 @@ exports.client = {
 
   "Glue element after new client": function (test) {
 
-    clip.glue("#d_clip_button")
+    clip.glue($("#d_clip_button"))
 
     // Test the client was created properly
     test.ok(clip.htmlBridge);
     test.ok(clip.handlers);
+
+    test.done();
+  },
+
+  "Glue element with query string throws TypeError": function (test) {
+
+    test.throws(function(){
+      clip.glue("#d_clip_button")
+    }, TypeError);
 
     test.done();
   },
@@ -76,7 +85,7 @@ exports.client = {
 
   "Clip sets title properly": function (test) {
 
-    clip.glue("#d_clip_button");
+    clip.glue($("#d_clip_button"));
 
     clip.setTitle("Click Me");
 
@@ -86,7 +95,7 @@ exports.client = {
   },
 
   "resetText clears the title": function (test) {
-    clip.glue("#d_clip_button");
+    clip.glue($("#d_clip_button"));
 
     clip.setCurrent($("#d_clip_button")[0]);
 
@@ -103,7 +112,7 @@ exports.client = {
   },
 
   "setText overrides the data-clipboard-text attribute": function (test) {
-    clip.glue("#d_clip_button");
+    clip.glue($("#d_clip_button"));
 
     clip.setText("This is the new text");
 
@@ -115,7 +124,7 @@ exports.client = {
   },
 
   "resetText turns things back to normal": function (test) {
-    clip.glue("#d_clip_button");
+    clip.glue($("#d_clip_button"));
 
     clip.setText("This is the new text");
 

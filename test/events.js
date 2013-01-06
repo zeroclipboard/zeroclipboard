@@ -62,7 +62,7 @@ exports.zevents = {
 
   "Test onWrongFlash Event": function (test) {
 
-    clip.glue('#d_clip_button')
+    clip.glue($("#d_clip_button"));
 
     var id = clip.id;
 
@@ -77,7 +77,7 @@ exports.zevents = {
 
   "Test mouseover and mouseout event": function (test) {
 
-    clip.glue('#d_clip_button');
+    clip.glue($("#d_clip_button"));
 
     clip.setCurrent($("#d_clip_button")[0]);
 
@@ -97,7 +97,7 @@ exports.zevents = {
 
   "Test mousedown and mouseup event": function (test) {
 
-    clip.glue('#d_clip_button');
+    clip.glue($("#d_clip_button"));
 
     clip.setCurrent($("#d_clip_button")[0]);
 
@@ -114,7 +114,7 @@ exports.zevents = {
   },
 
   "Test that the current Element is passed back to event handler": function (test) {
-    clip.glue('#d_clip_button');
+    clip.glue($("#d_clip_button"));
 
     clip.setCurrent($("#d_clip_button")[0]);
 
