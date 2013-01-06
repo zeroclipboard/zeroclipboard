@@ -221,7 +221,7 @@
     } else if (event.srcElement) {
       target = event.srcElement;
     }
-    ZeroClipboard._client.setCurrent(elementWrapper(target));
+    ZeroClipboard._client.setCurrent(target);
   };
   var _addEventHandler = function(element, method, func) {
     if (element.addEventListener) {
