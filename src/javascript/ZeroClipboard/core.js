@@ -35,6 +35,8 @@ ZeroClipboard.destroy = function () {
 
   // delete the client object
   delete ZeroClipboard._client;
+  delete ZeroClipboard._trustedDomain;
+  ZeroClipboard._moviePath = 'ZeroClipboard.swf';
 
   // remove the bridge
   bridge.parentNode.removeChild(bridge);

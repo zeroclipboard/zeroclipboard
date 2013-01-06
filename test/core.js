@@ -45,6 +45,8 @@ exports.core = {
 
     test.equal($("#global-zeroclipboard-html-bridge").length, 0);
     test.ok(!zeroClipboard._client);
+    test.ok(!zeroClipboard._trustedDomain);
+    test.equal(zeroClipboard._moviePath, 'ZeroClipboard.swf');
 
     test.done();
   },

@@ -64,6 +64,8 @@
     var bridge = document.getElementById("global-zeroclipboard-html-bridge");
     if (!bridge) return;
     delete ZeroClipboard._client;
+    delete ZeroClipboard._trustedDomain;
+    ZeroClipboard._moviePath = "ZeroClipboard.swf";
     bridge.parentNode.removeChild(bridge);
   };
   ZeroClipboard.detectFlashSupport = function() {

@@ -2,23 +2,24 @@
 
 require("./fixtures/env")
 var sandbox = require('nodeunit').utils.sandbox;
-var _utils = sandbox("./src/javascript/ZeroClipboard/utils.js", {
-  window: window,
-  document: document,
-  navigator: navigator
-});
 
-var zeroClipboard, clip;
+var ZeroClipboard, clip, _utils;
 exports.utils = {
 
   setUp: function (callback) {
-    zeroClipboard = require("../ZeroClipboard");
-    clip = new zeroClipboard.Client();
+    ZeroClipboard = require("../ZeroClipboard");
+    _utils = sandbox("./src/javascript/ZeroClipboard/utils.js", {
+      window: window,
+      document: document,
+      navigator: navigator,
+      ZeroClipboard: ZeroClipboard
+    });
+    clip = new ZeroClipboard.Client();
     callback();
   },
 
   tearDown: function (callback) {
-    zeroClipboard.destroy();
+    ZeroClipboard.destroy();
     callback();
   },
 
@@ -119,5 +120,26 @@ exports.utils = {
     test.equal(clip.htmlBridge.style.height, "0px");
 
     test.done();
-  }
+  },
+
+  "_vars builds flashvars": function (test) {
+
+    test.equal(_utils._vars(), "");
+
+    ZeroClipboard.setTrustedDomain("*");
+
+    test.equal(_utils._vars(), "trustedDomain=*");
+
+    test.done();
+  },
+
+  "_noCache adds cache properly": function (test) {
+
+    test.equal(_utils._noCache("path.com/z.swf").indexOf("?nocache="), 0);
+
+    test.equal(_utils._noCache("path.com/z.swf?q=jon").indexOf("&nocache="), 0);
+
+    test.done();
+  },
+
 };

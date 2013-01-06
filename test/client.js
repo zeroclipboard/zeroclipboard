@@ -33,26 +33,6 @@ exports.client = {
     test.done();
   },
 
-  "Glue element after new client": function (test) {
-
-    clip.glue($("#d_clip_button"))
-
-    // Test the client was created properly
-    test.ok(clip.htmlBridge);
-    test.ok(clip.handlers);
-
-    test.done();
-  },
-
-  "Glue element with query string throws TypeError": function (test) {
-
-    test.throws(function(){
-      clip.glue("#d_clip_button")
-    }, TypeError);
-
-    test.done();
-  },
-
   "Clip sets title properly": function (test) {
 
     clip.glue($("#d_clip_button"));
