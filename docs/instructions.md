@@ -32,10 +32,10 @@ Now you are ready to create one or more *Clients*.  A client is a single instanc
 var clip = new ZeroClipboard.Client();
 ```
 
-You can also include a selector in the new client.
+You can also include an element or array of elements in the new client. * This example uses jQuery to find the button.
 
 ```
-var clip = new ZeroClipboard.Client("#my-button");
+var clip = new ZeroClipboard.Client($("#my-button"));
 ```
 
 Next, you can set some options.
@@ -66,13 +66,15 @@ Gluing refers to the process of "linking" the Flash movie to a DOM element on th
 
 The Flash movie receives the click event and copies the textto the clipboard.  Also, mouse actions like hovering and mouse-down generate events that you can capture (see *Event Handlers* below).
 
+To glue elements, you must pass an element, or array of elements to the glue function.
+
 Here is how to glue your clip library instance to a DOM element:
 
 ```
-clip.glue( '#d_clip_button' );
+clip.glue( document.getElementById('d_clip_button') );
 ```
 
-You can pass in a DOM element ID (as shown above), or a reference to the actual DOM element object itself.  The rest all happens automatically -- the movie is created, all your options set, and it is floated above the element, awaiting clicks from the user.
+You can pass in a reference to the actual DOM element object itself or an array of DOM objects.  The rest all happens automatically -- the movie is created, all your options set, and it is floated above the element, awaiting clicks from the user.
 
 ### Recommended Implementation
 
@@ -83,7 +85,7 @@ You can pass in a DOM element ID (as shown above), or a reference to the actual 
 And the code:
 
 ```
-var clip = new ZeroClipboard.Client("#my-button");
+var clip = new ZeroClipboard.Client( $("button#my-button") );
 ```
 
 ### Page Resizing
@@ -329,7 +331,7 @@ Here is a quick example using as few calls as possible:
 
     <script type="text/javascript" src="ZeroClipboard.js"></script>
     <script language="JavaScript">
-      var clip = new ZeroClipboard.Client('#d_clip_button');
+      var clip = new ZeroClipboard.Client( document.getElementById('d_clip_button') );
     </script>
   </body>
   </html>
@@ -361,7 +363,7 @@ Here is a complete example which exercises every option and event handler:
     <div id="d_clip_button" data-clipboard-text="Copy Me!">Copy To Clipboard</div>
 
     <script language="JavaScript">
-      var clip = new ZeroClipboard.Client('#d_clip_button');
+      var clip = new ZeroClipboard.Client( $('#d_clip_button') );
 
       clip.on( 'load', function(client) {
         // alert( "movie is loaded" );
