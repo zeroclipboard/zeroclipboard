@@ -1,9 +1,9 @@
 "use strict";
 
-require("./env")
+require("./fixtures/env")
 
 var zeroClipboard, clip;
-exports.zevents = {
+exports.event = {
 
   setUp: function (callback) {
     zeroClipboard = require("../ZeroClipboard");

@@ -1,110 +1,122 @@
 /*
- * This private function adds a class to the passed in element.
- * paired down version of addClass from jQuery https://github.com/jquery/jquery/blob/master/speed/jquery-basis.js#L1227
+ * Find or create an htmlBridge and flashBridge for the client.
  *
- * returns the element with a new class
+ * returns nothing
  */
-var _addClass = function (element, value) {
+ZeroClipboard.Client.prototype.bridge = function () {
 
-  // If the element has addClass already
-  if (element.addClass) {
-    element.addClass(value);
-    return element;
+  // try and find the current global bridge
+  this.htmlBridge = document.getElementById('global-zeroclipboard-html-bridge');
+
+  if (this.htmlBridge) {
+    this.flashBridge = document["global-zeroclipboard-flash-bridge"];
+    return;
   }
 
-  if (value && typeof value === "string") {
-    var classNames = (value || "").split(/\s+/);
-
-    if (element.nodeType === 1) {
-      if (!element.className) {
-        element.className = value;
-      } else {
-        var className = " " + element.className + " ", setClass = element.className;
-        for (var c = 0, cl = classNames.length; c < cl; c++) {
-          if (className.indexOf(" " + classNames[c] + " ") < 0) {
-            setClass += " " + classNames[c];
-          }
-        }
-        // jank trim
-        element.className = setClass.replace(/^\s+|\s+$/g, '');
-      }
-    }
-
+  // because externalenterface craps out when flash is cached.
+  function noCache(path) {
+    return ((path.indexOf("?") >= 0) ? "&" : "?") + "nocache=" + (new Date().getTime());
   }
 
-  return element;
+  // creates a query string for the flasvars
+  function vars() {
+    var str = [];
+
+    // if trusted domain is set
+    if (ZeroClipboard._trustedDomain) str.push("trustedDomain=" + ZeroClipboard._trustedDomain);
+
+    // join the str by &
+    return str.join("&");
+  }
+
+  var html = "\
+    <object classid=\"clsid:d27cdb6e-ae6d-11cf-96b8-444553540000\" id=\"global-zeroclipboard-flash-bridge\" width=\"100%\" height=\"100%\"> \
+      <param name=\"movie\" value=\"" + ZeroClipboard._moviePath + noCache(ZeroClipboard._moviePath) + "\"/> \
+      <param name=\"allowScriptAccess\" value=\"always\" /> \
+      <param name=\"scale\" value=\"exactfit\"> \
+      <param name=\"loop\" value=\"false\" /> \
+      <param name=\"menu\" value=\"false\" /> \
+      <param name=\"quality\" value=\"best\" /> \
+      <param name=\"bgcolor\" value=\"#ffffff\" /> \
+      <param name=\"wmode\" value=\"transparent\"/> \
+      <param name=\"flashvars\" value=\"" + vars() + "\"/> \
+      <embed src=\"" + ZeroClipboard._moviePath + noCache(ZeroClipboard._moviePath) + "\" \
+        loop=\"false\" menu=\"false\" \
+        quality=\"best\" bgcolor=\"#ffffff\" \
+        width=\"100%\" height=\"100%\" \
+        name=\"global-zeroclipboard-flash-bridge\" \
+        allowScriptAccess=\"always\" \
+        allowFullScreen=\"false\" \
+        type=\"application/x-shockwave-flash\" \
+        wmode=\"transparent\" \
+        pluginspage=\"http://www.macromedia.com/go/getflashplayer\" \
+        flashvars=\"" + vars() + "\" \
+        scale=\"exactfit\"> \
+      </embed> \
+    </object>";
+
+  this.htmlBridge = document.createElement('div');
+  this.htmlBridge.id = "global-zeroclipboard-html-bridge";
+  this.htmlBridge.setAttribute("class", "global-zeroclipboard-container");
+  this.htmlBridge.setAttribute("data-clipboard-ready", false);
+  this.htmlBridge.style.position = "absolute";
+  this.htmlBridge.style.left = "-9999px";
+  this.htmlBridge.style.top = "-9999px";
+  this.htmlBridge.style.width = "15px";
+  this.htmlBridge.style.height = "15px";
+  this.htmlBridge.style.zIndex = "9999";
+
+  this.htmlBridge.innerHTML = html;
+
+  document.body.appendChild(this.htmlBridge);
+  this.flashBridge = document["global-zeroclipboard-flash-bridge"];
+
 };
 
 /*
- * This private function removes a class from the provided elment
- * paired down version of removeClass from jQuery https://github.com/jquery/jquery/blob/master/speed/jquery-basis.js#L1261
+ * Reset the html bridge to be hidden off screen and not have title or text.
  *
- * returns the element without the class
+ * returns nothing
  */
-var _removeClass = function (element, value) {
-
-  // If the element has removeClass already
-  if (element.removeClass) {
-    element.removeClass(value);
-    return element;
-  }
-
-  if ((value && typeof value === "string") || value === undefined) {
-    var classNames = (value || "").split(/\s+/);
-
-    if (element.nodeType === 1 && element.className) {
-      if (value) {
-        var className = (" " + element.className + " ").replace(/[\n\t]/g, " ");
-        for (var c = 0, cl = classNames.length; c < cl; c++) {
-          className = className.replace(" " + classNames[c] + " ", " ");
-        }
-        // jank trim
-        element.className = className.replace(/^\s+|\s+$/g, '');
-
-      } else {
-        element.className = "";
-      }
-    }
-
-  }
-
-  return element;
+ZeroClipboard.Client.prototype.resetBridge = function () {
+  this.htmlBridge.style.left = "-9999px";
+  this.htmlBridge.style.top = "-9999px";
+  this.htmlBridge.removeAttribute("title");
+  this.htmlBridge.removeAttribute("data-clipboard-text");
+  _removeClass(ZeroClipboard.currentElement, 'zeroclipboard-is-active');
+  delete ZeroClipboard.currentElement;
 };
 
 /*
- * private get the dom position of an object.
+ * Helper function to determine if the flash bridge is ready. Gets this info from
+ * a data-clipboard-ready attribute on the global html element.
  *
- * returns json of objects position, height, width, and zindex
+ * returns true if the flash bridge is ready
  */
-var _getDOMObjectPosition = function (obj) {
-  // get absolute coordinates for dom element
-  var info = {
-    left:   0,
-    top:    0,
-    width:  obj.width  || obj.offsetWidth  || 0,
-    height: obj.height || obj.offsetHeight || 0,
-    zIndex: 9999
-  };
+ZeroClipboard.Client.prototype.ready = function () {
+  // I don't want to eval() here
+  var ready = this.htmlBridge.getAttribute("data-clipboard-ready");
+  return ready === "true" || ready === true;
+};
 
+/*
+ * Reposition the flash object, if the page size changes.
+ *
+ * returns nothing
+ */
+ZeroClipboard.Client.prototype.reposition = function () {
 
-  var zi = _getStyle(obj, "zIndex");
-  // float just above object, or default zIndex if dom element isn't set
-  if (zi && zi != "auto") {
-    info.zIndex = parseInt(zi, 10);
-  }
+  // If there is no currentElement return
+  if (!ZeroClipboard.currentElement) return false;
 
-  while (obj) {
+  var pos = _getDOMObjectPosition(ZeroClipboard.currentElement);
 
-    var borderLeftWidth = parseInt(_getStyle(obj, "borderLeftWidth"), 10);
-    var borderTopWidth  = parseInt(_getStyle(obj, "borderTopWidth"), 10);
+  // new css
+  this.htmlBridge.style.top    = pos.top + "px";
+  this.htmlBridge.style.left   = pos.left + "px";
+  this.htmlBridge.style.width  = pos.width + "px";
+  this.htmlBridge.style.height = pos.height + "px";
+  this.htmlBridge.style.zIndex = pos.zIndex + 1;
 
-    info.left += isNaN(obj.offsetLeft)  ? 0 : obj.offsetLeft;
-    info.left += isNaN(borderLeftWidth) ? 0 : borderLeftWidth;
-    info.top  += isNaN(obj.offsetTop)   ? 0 : obj.offsetTop;
-    info.top  += isNaN(borderTopWidth)  ? 0 : borderTopWidth;
-
-    obj = obj.offsetParent;
-  }
-
-  return info;
+  this.setSize(pos.width, pos.height);
 };

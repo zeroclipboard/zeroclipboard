@@ -20,6 +20,65 @@
     if (elements) this.glue(elements);
     ZeroClipboard._client = this;
   };
+  ZeroClipboard.Client.prototype.setCurrent = function(element) {
+    ZeroClipboard.currentElement = element;
+    this.reposition();
+    this.setText(this._text || element.getAttribute("data-clipboard-text"));
+    if (element.getAttribute("title")) {
+      this.setTitle(element.getAttribute("title"));
+    }
+    if (_getStyle(element, "cursor") == "pointer") {
+      this.setHandCursor(true);
+    } else {
+      this.setHandCursor(false);
+    }
+  };
+  ZeroClipboard.Client.prototype.setText = function(newText) {
+    if (newText && newText !== "") {
+      this._text = newText;
+      if (this.ready()) this.flashBridge.setText(newText);
+    }
+  };
+  ZeroClipboard.Client.prototype.resetText = function() {
+    this._text = null;
+  };
+  ZeroClipboard.Client.prototype.setTitle = function(newTitle) {
+    if (newTitle && newTitle !== "") this.htmlBridge.setAttribute("title", newTitle);
+  };
+  ZeroClipboard.Client.prototype.setSize = function(width, height) {
+    if (this.ready()) this.flashBridge.setSize(width, height);
+  };
+  ZeroClipboard.Client.prototype.setHandCursor = function(enabled) {
+    if (this.ready()) this.flashBridge.setHandCursor(enabled);
+  };
+  ZeroClipboard.version = "1.1.6";
+  ZeroClipboard._moviePath = "ZeroClipboard.swf";
+  ZeroClipboard._client = null;
+  ZeroClipboard.setMoviePath = function(path) {
+    this._moviePath = path;
+  };
+  ZeroClipboard.setTrustedDomain = function(domain) {
+    this._trustedDomain = domain;
+  };
+  ZeroClipboard.destroy = function() {
+    var bridge = document.getElementById("global-zeroclipboard-html-bridge");
+    if (!bridge) return;
+    delete ZeroClipboard._client;
+    bridge.parentNode.removeChild(bridge);
+  };
+  ZeroClipboard.detectFlashSupport = function() {
+    var hasFlash = false;
+    try {
+      if (new ActiveXObject("ShockwaveFlash.ShockwaveFlash")) {
+        hasFlash = true;
+      }
+    } catch (error) {
+      if (navigator.mimeTypes["application/x-shockwave-flash"]) {
+        hasFlash = true;
+      }
+    }
+    return hasFlash;
+  };
   ZeroClipboard.Client.prototype.bridge = function() {
     this.htmlBridge = document.getElementById("global-zeroclipboard-html-bridge");
     if (this.htmlBridge) {
@@ -61,19 +120,6 @@
     var ready = this.htmlBridge.getAttribute("data-clipboard-ready");
     return ready === "true" || ready === true;
   };
-  ZeroClipboard.Client.prototype.setCurrent = function(element) {
-    ZeroClipboard.currentElement = element;
-    this.reposition();
-    this.setText(this._text || element.getAttribute("data-clipboard-text"));
-    if (element.getAttribute("title")) {
-      this.setTitle(element.getAttribute("title"));
-    }
-    if (_getStyle(element, "cursor") == "pointer") {
-      this.setHandCursor(true);
-    } else {
-      this.setHandCursor(false);
-    }
-  };
   ZeroClipboard.Client.prototype.reposition = function() {
     if (!ZeroClipboard.currentElement) return false;
     var pos = _getDOMObjectPosition(ZeroClipboard.currentElement);
@@ -83,119 +129,6 @@
     this.htmlBridge.style.height = pos.height + "px";
     this.htmlBridge.style.zIndex = pos.zIndex + 1;
     this.setSize(pos.width, pos.height);
-  };
-  ZeroClipboard.Client.prototype.setText = function(newText) {
-    if (newText && newText !== "") {
-      this._text = newText;
-      if (this.ready()) this.flashBridge.setText(newText);
-    }
-  };
-  ZeroClipboard.Client.prototype.resetText = function() {
-    this._text = null;
-  };
-  ZeroClipboard.Client.prototype.setTitle = function(newTitle) {
-    if (newTitle && newTitle !== "") this.htmlBridge.setAttribute("title", newTitle);
-  };
-  ZeroClipboard.Client.prototype.setSize = function(width, height) {
-    if (this.ready()) this.flashBridge.setSize(width, height);
-  };
-  ZeroClipboard.Client.prototype.setHandCursor = function(enabled) {
-    if (this.ready()) this.flashBridge.setHandCursor(enabled);
-  };
-  ZeroClipboard.version = "1.1.6";
-  ZeroClipboard._moviePath = "ZeroClipboard.swf";
-  ZeroClipboard._client = null;
-  ZeroClipboard.setMoviePath = function(path) {
-    this._moviePath = path;
-  };
-  ZeroClipboard.setTrustedDomain = function(obj) {
-    this._trustedDomain = obj;
-  };
-  ZeroClipboard.destroy = function() {
-    var bridge = document.getElementById("global-zeroclipboard-html-bridge");
-    if (!bridge) return;
-    delete ZeroClipboard._client;
-    bridge.parentNode.removeChild(bridge);
-  };
-  ZeroClipboard.detectFlashSupport = function() {
-    var hasFlash = false;
-    try {
-      if (new ActiveXObject("ShockwaveFlash.ShockwaveFlash")) {
-        hasFlash = true;
-      }
-    } catch (error) {
-      if (navigator.mimeTypes["application/x-shockwave-flash"]) {
-        hasFlash = true;
-      }
-    }
-    return hasFlash;
-  };
-  var _addClass = function(element, value) {
-    if (element.addClass) {
-      element.addClass(value);
-      return element;
-    }
-    if (value && typeof value === "string") {
-      var classNames = (value || "").split(/\s+/);
-      if (element.nodeType === 1) {
-        if (!element.className) {
-          element.className = value;
-        } else {
-          var className = " " + element.className + " ", setClass = element.className;
-          for (var c = 0, cl = classNames.length; c < cl; c++) {
-            if (className.indexOf(" " + classNames[c] + " ") < 0) {
-              setClass += " " + classNames[c];
-            }
-          }
-          element.className = setClass.replace(/^\s+|\s+$/g, "");
-        }
-      }
-    }
-    return element;
-  };
-  var _removeClass = function(element, value) {
-    if (element.removeClass) {
-      element.removeClass(value);
-      return element;
-    }
-    if (value && typeof value === "string" || value === undefined) {
-      var classNames = (value || "").split(/\s+/);
-      if (element.nodeType === 1 && element.className) {
-        if (value) {
-          var className = (" " + element.className + " ").replace(/[\n\t]/g, " ");
-          for (var c = 0, cl = classNames.length; c < cl; c++) {
-            className = className.replace(" " + classNames[c] + " ", " ");
-          }
-          element.className = className.replace(/^\s+|\s+$/g, "");
-        } else {
-          element.className = "";
-        }
-      }
-    }
-    return element;
-  };
-  var _getDOMObjectPosition = function(obj) {
-    var info = {
-      left: 0,
-      top: 0,
-      width: obj.width || obj.offsetWidth || 0,
-      height: obj.height || obj.offsetHeight || 0,
-      zIndex: 9999
-    };
-    var zi = _getStyle(obj, "zIndex");
-    if (zi && zi != "auto") {
-      info.zIndex = parseInt(zi, 10);
-    }
-    while (obj) {
-      var borderLeftWidth = parseInt(_getStyle(obj, "borderLeftWidth"), 10);
-      var borderTopWidth = parseInt(_getStyle(obj, "borderTopWidth"), 10);
-      info.left += isNaN(obj.offsetLeft) ? 0 : obj.offsetLeft;
-      info.left += isNaN(borderLeftWidth) ? 0 : borderLeftWidth;
-      info.top += isNaN(obj.offsetTop) ? 0 : obj.offsetTop;
-      info.top += isNaN(borderTopWidth) ? 0 : borderTopWidth;
-      obj = obj.offsetParent;
-    }
-    return info;
   };
   ZeroClipboard.dispatch = function(eventName, args) {
     ZeroClipboard._client.receiveEvent(eventName, args);
@@ -309,6 +242,73 @@
     } else if (element.detachEvent) {
       element.detachEvent("on" + method, func);
     }
+  };
+  var _addClass = function(element, value) {
+    if (element.addClass) {
+      element.addClass(value);
+      return element;
+    }
+    if (value && typeof value === "string") {
+      var classNames = (value || "").split(/\s+/);
+      if (element.nodeType === 1) {
+        if (!element.className) {
+          element.className = value;
+        } else {
+          var className = " " + element.className + " ", setClass = element.className;
+          for (var c = 0, cl = classNames.length; c < cl; c++) {
+            if (className.indexOf(" " + classNames[c] + " ") < 0) {
+              setClass += " " + classNames[c];
+            }
+          }
+          element.className = setClass.replace(/^\s+|\s+$/g, "");
+        }
+      }
+    }
+    return element;
+  };
+  var _removeClass = function(element, value) {
+    if (element.removeClass) {
+      element.removeClass(value);
+      return element;
+    }
+    if (value && typeof value === "string" || value === undefined) {
+      var classNames = (value || "").split(/\s+/);
+      if (element.nodeType === 1 && element.className) {
+        if (value) {
+          var className = (" " + element.className + " ").replace(/[\n\t]/g, " ");
+          for (var c = 0, cl = classNames.length; c < cl; c++) {
+            className = className.replace(" " + classNames[c] + " ", " ");
+          }
+          element.className = className.replace(/^\s+|\s+$/g, "");
+        } else {
+          element.className = "";
+        }
+      }
+    }
+    return element;
+  };
+  var _getDOMObjectPosition = function(obj) {
+    var info = {
+      left: 0,
+      top: 0,
+      width: obj.width || obj.offsetWidth || 0,
+      height: obj.height || obj.offsetHeight || 0,
+      zIndex: 9999
+    };
+    var zi = _getStyle(obj, "zIndex");
+    if (zi && zi != "auto") {
+      info.zIndex = parseInt(zi, 10);
+    }
+    while (obj) {
+      var borderLeftWidth = parseInt(_getStyle(obj, "borderLeftWidth"), 10);
+      var borderTopWidth = parseInt(_getStyle(obj, "borderTopWidth"), 10);
+      info.left += isNaN(obj.offsetLeft) ? 0 : obj.offsetLeft;
+      info.left += isNaN(borderLeftWidth) ? 0 : borderLeftWidth;
+      info.top += isNaN(obj.offsetTop) ? 0 : obj.offsetTop;
+      info.top += isNaN(borderTopWidth) ? 0 : borderTopWidth;
+      obj = obj.offsetParent;
+    }
+    return info;
   };
   if (typeof module !== "undefined") {
     module.exports = ZeroClipboard;

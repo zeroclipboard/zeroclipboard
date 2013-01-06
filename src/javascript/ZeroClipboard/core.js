@@ -17,8 +17,8 @@ ZeroClipboard.setMoviePath = function (path) {
  *
  * returns nothing
  */
-ZeroClipboard.setTrustedDomain = function (obj) {
-  this._trustedDomain = obj;
+ZeroClipboard.setTrustedDomain = function (domain) {
+  this._trustedDomain = domain;
 };
 
 /*

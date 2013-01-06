@@ -1,6 +1,6 @@
 "use strict";
 
-require("./env")
+require("./fixtures/env")
 var zeroClipboard, clip;
 exports.client = {
 
@@ -33,24 +33,6 @@ exports.client = {
     test.done();
   },
 
-  "Detecting no flash": function (test) {
-    navigator.mimeTypes["application/x-shockwave-flash"] = undefined;
-
-    // Test that we don't have flash
-    test.equal(zeroClipboard.detectFlashSupport(), false);
-
-    navigator.mimeTypes["application/x-shockwave-flash"] = true;
-    test.done();
-  },
-
-  "Detecting has flash mimetype": function (test) {
-
-    // Test that we don't have flash
-    test.equal(zeroClipboard.detectFlashSupport(), true);
-
-    test.done();
-  },
-
   "Glue element after new client": function (test) {
 
     clip.glue($("#d_clip_button"))
@@ -67,18 +49,6 @@ exports.client = {
     test.throws(function(){
       clip.glue("#d_clip_button")
     }, TypeError);
-
-    test.done();
-  },
-
-  "Changing movie path works": function (test) {
-
-    // Test the client has default path
-    test.equal(zeroClipboard._moviePath, "ZeroClipboard.swf");
-
-    // change the path
-    zeroClipboard.setMoviePath("new/movie/path.swf");
-    test.equal(zeroClipboard._moviePath, "new/movie/path.swf");
 
     test.done();
   },
@@ -191,15 +161,6 @@ exports.client = {
     clip.setCurrent(element);
 
     test.ok(!clip.htmlBridge.getAttribute("data-clipboard-text"));
-
-    test.done();
-  },
-
-  "Bridge is ready": function (test) {
-
-    zeroClipboard.dispatch("load", { flashVersion: "MAC 11,0,0" });
-
-    test.ok(clip.ready());
 
     test.done();
   },
