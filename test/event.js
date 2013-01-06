@@ -7,7 +7,7 @@ exports.event = {
 
   setUp: function (callback) {
     zeroClipboard = require("../ZeroClipboard");
-    clip = new zeroClipboard.Client();
+    clip = new zeroClipboard();
     callback();
   },
 
