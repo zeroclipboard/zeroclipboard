@@ -80,6 +80,10 @@ see [CONTRIBUTING.md](ZeroClipboard/blob/master/CONTRIBUTING.md)
 
 see [releases.md](ZeroClipboard/blob/master/docs/releases.md)
 
+## Roadmap
+
+see [roadmap.md](ZeroClipboard/blob/master/docs/roadmap.md)
+
 ## Last Build
 
 [![Build Status](https://secure.travis-ci.org/jonrohan/ZeroClipboard.png?branch=master)](https://travis-ci.org/jonrohan/ZeroClipboard)
