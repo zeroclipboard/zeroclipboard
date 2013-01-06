@@ -131,31 +131,6 @@ ZeroClipboard.Client.prototype.ready = function () {
 };
 
 /*
- * Private function _getStyle is used to try and guess the element style; If
- * if we're looking for cursor, then we make a guess for <a>.
- *
- * returns the computed style
- */
-function _getStyle(el, prop) {
-  var y = el.style[prop];
-  if (el.currentStyle)
-    y = el.currentStyle[prop];
-  else if (window.getComputedStyle)
-    y = document.defaultView.getComputedStyle(el, null).getPropertyValue(prop);
-
-  if (y == "auto" && prop == "cursor") {
-    var possiblePointers = ["a"];
-    for (var i = 0; i < possiblePointers.length; i++) {
-      if (el.tagName.toLowerCase() == possiblePointers[i]) {
-        return "pointer";
-      }
-    }
-  }
-
-  return y;
-}
-
-/*
  * Sets the current html object that the flash object should overlay.
  * This will put the global flash object on top of the current object and set
  * the text and title from the html object.

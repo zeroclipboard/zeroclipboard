@@ -1,8 +1,12 @@
 var _fs = require('fs');
+var path = require('path');
 
-document = require("jsdom").jsdom(_fs.readFileSync('./test/test_template.html', 'utf-8'),
+document = require("jsdom").jsdom(_fs.readFileSync(path.normalize(__dirname + "/fixtures/test_template.html", 'utf-8')),
   null,
-  { features: { QuerySelector: true } });
+  { features: {
+    QuerySelector: true,
+    FetchExternalResources: ["script", "css"],
+  } });
 
 window = document.createWindow();
 

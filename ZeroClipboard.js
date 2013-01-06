@@ -62,19 +62,6 @@
     var ready = this.htmlBridge.getAttribute("data-clipboard-ready");
     return ready === "true" || ready === true;
   };
-  function _getStyle(el, prop) {
-    var y = el.style[prop];
-    if (el.currentStyle) y = el.currentStyle[prop]; else if (window.getComputedStyle) y = document.defaultView.getComputedStyle(el, null).getPropertyValue(prop);
-    if (y == "auto" && prop == "cursor") {
-      var possiblePointers = [ "a" ];
-      for (var i = 0; i < possiblePointers.length; i++) {
-        if (el.tagName.toLowerCase() == possiblePointers[i]) {
-          return "pointer";
-        }
-      }
-    }
-    return y;
-  }
   ZeroClipboard.Client.prototype.setCurrent = function(element) {
     ZeroClipboard.currentElement = element;
     this.reposition();
@@ -203,7 +190,32 @@
       }
     }
   };
-  function _elementMouseOver(event) {
+  ZeroClipboard.Client.prototype.glue = function(query) {
+    var elements = ZeroClipboard.$(query);
+    for (var i = 0; i < elements.length; i++) {
+      _addEventHandler(elements[i], "mouseover", _elementMouseOver);
+    }
+  };
+  ZeroClipboard.Client.prototype.unglue = function(query) {
+    var elements = ZeroClipboard.$(query);
+    for (var i = 0; i < elements.length; i++) {
+      _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
+    }
+  };
+  var _getStyle = function(el, prop) {
+    var y = el.style[prop];
+    if (el.currentStyle) y = el.currentStyle[prop]; else if (window.getComputedStyle) y = document.defaultView.getComputedStyle(el, null).getPropertyValue(prop);
+    if (y == "auto" && prop == "cursor") {
+      var possiblePointers = [ "a" ];
+      for (var i = 0; i < possiblePointers.length; i++) {
+        if (el.tagName.toLowerCase() == possiblePointers[i]) {
+          return "pointer";
+        }
+      }
+    }
+    return y;
+  };
+  var _elementMouseOver = function(event) {
     if (!event) {
       event = window.event;
     }
@@ -216,31 +228,19 @@
       target = event.srcElement;
     }
     ZeroClipboard._client.setCurrent(elementWrapper(target));
-  }
-  ZeroClipboard.Client.prototype.glue = function(query) {
-    function _addEventHandler(element, method, func) {
-      if (element.addEventListener) {
-        element.addEventListener(method, func, false);
-      } else if (element.attachEvent) {
-        element.attachEvent("on" + method, func);
-      }
-    }
-    var elements = ZeroClipboard.$(query);
-    for (var i = 0; i < elements.length; i++) {
-      _addEventHandler(elements[i], "mouseover", _elementMouseOver);
+  };
+  var _addEventHandler = function(element, method, func) {
+    if (element.addEventListener) {
+      element.addEventListener(method, func, false);
+    } else if (element.attachEvent) {
+      element.attachEvent("on" + method, func);
     }
   };
-  ZeroClipboard.Client.prototype.unglue = function(query) {
-    function _removeEventHandler(element, method, func) {
-      if (element.removeEventListener) {
-        element.removeEventListener(method, func, false);
-      } else if (element.detachEvent) {
-        element.detachEvent("on" + method, func);
-      }
-    }
-    var elements = ZeroClipboard.$(query);
-    for (var i = 0; i < elements.length; i++) {
-      _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
+  var _removeEventHandler = function(element, method, func) {
+    if (element.removeEventListener) {
+      element.removeEventListener(method, func, false);
+    } else if (element.detachEvent) {
+      element.detachEvent("on" + method, func);
     }
   };
   var _getDOMObjectPosition = function(obj) {
