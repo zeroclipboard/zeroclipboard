@@ -3,7 +3,7 @@
  *
  * returns _client instance if it's already created
  */
-ZeroClipboard = function (elements) {
+var ZeroClipboard = function (elements) {
 
   var singleton = ZeroClipboard._client;
 

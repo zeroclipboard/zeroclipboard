@@ -7,8 +7,123 @@
  * v1.1.6
  */(function() {
   "use strict";
-  var ZeroClipboard;
-  ZeroClipboard = function(elements) {
+  var _getStyle = function(el, prop) {
+    var y = el.style[prop];
+    if (el.currentStyle) y = el.currentStyle[prop]; else if (window.getComputedStyle) y = document.defaultView.getComputedStyle(el, null).getPropertyValue(prop);
+    if (y == "auto" && prop == "cursor") {
+      var possiblePointers = [ "a" ];
+      for (var i = 0; i < possiblePointers.length; i++) {
+        if (el.tagName.toLowerCase() == possiblePointers[i]) {
+          return "pointer";
+        }
+      }
+    }
+    return y;
+  };
+  var _elementMouseOver = function(event) {
+    if (!event) {
+      event = window.event;
+    }
+    var target;
+    if (this !== window) {
+      target = this;
+    } else if (event.target) {
+      target = event.target;
+    } else if (event.srcElement) {
+      target = event.srcElement;
+    }
+    ZeroClipboard._client.setCurrent(target);
+  };
+  var _addEventHandler = function(element, method, func) {
+    if (element.addEventListener) {
+      element.addEventListener(method, func, false);
+    } else if (element.attachEvent) {
+      element.attachEvent("on" + method, func);
+    }
+  };
+  var _removeEventHandler = function(element, method, func) {
+    if (element.removeEventListener) {
+      element.removeEventListener(method, func, false);
+    } else if (element.detachEvent) {
+      element.detachEvent("on" + method, func);
+    }
+  };
+  var _addClass = function(element, value) {
+    if (element.addClass) {
+      element.addClass(value);
+      return element;
+    }
+    if (value && typeof value === "string") {
+      var classNames = (value || "").split(/\s+/);
+      if (element.nodeType === 1) {
+        if (!element.className) {
+          element.className = value;
+        } else {
+          var className = " " + element.className + " ", setClass = element.className;
+          for (var c = 0, cl = classNames.length; c < cl; c++) {
+            if (className.indexOf(" " + classNames[c] + " ") < 0) {
+              setClass += " " + classNames[c];
+            }
+          }
+          element.className = setClass.replace(/^\s+|\s+$/g, "");
+        }
+      }
+    }
+    return element;
+  };
+  var _removeClass = function(element, value) {
+    if (element.removeClass) {
+      element.removeClass(value);
+      return element;
+    }
+    if (value && typeof value === "string" || value === undefined) {
+      var classNames = (value || "").split(/\s+/);
+      if (element.nodeType === 1 && element.className) {
+        if (value) {
+          var className = (" " + element.className + " ").replace(/[\n\t]/g, " ");
+          for (var c = 0, cl = classNames.length; c < cl; c++) {
+            className = className.replace(" " + classNames[c] + " ", " ");
+          }
+          element.className = className.replace(/^\s+|\s+$/g, "");
+        } else {
+          element.className = "";
+        }
+      }
+    }
+    return element;
+  };
+  var _getDOMObjectPosition = function(obj) {
+    var info = {
+      left: 0,
+      top: 0,
+      width: obj.width || obj.offsetWidth || 0,
+      height: obj.height || obj.offsetHeight || 0,
+      zIndex: 9999
+    };
+    var zi = _getStyle(obj, "zIndex");
+    if (zi && zi != "auto") {
+      info.zIndex = parseInt(zi, 10);
+    }
+    while (obj) {
+      var borderLeftWidth = parseInt(_getStyle(obj, "borderLeftWidth"), 10);
+      var borderTopWidth = parseInt(_getStyle(obj, "borderTopWidth"), 10);
+      info.left += isNaN(obj.offsetLeft) ? 0 : obj.offsetLeft;
+      info.left += isNaN(borderLeftWidth) ? 0 : borderLeftWidth;
+      info.top += isNaN(obj.offsetTop) ? 0 : obj.offsetTop;
+      info.top += isNaN(borderTopWidth) ? 0 : borderTopWidth;
+      obj = obj.offsetParent;
+    }
+    return info;
+  };
+  var _noCache = function(path) {
+    return (path.indexOf("?") >= 0 ? "&" : "?") + "nocache=" + (new Date).getTime();
+  };
+  var _vars = function() {
+    var str = [];
+    if (ZeroClipboard._trustedDomain) str.push("trustedDomain=" + ZeroClipboard._trustedDomain);
+    return str.join("&");
+  };
+  var ZeroClipboard = function(elements) {
     var singleton = ZeroClipboard._client;
     if (singleton) {
       if (elements) singleton.glue(elements);
@@ -195,122 +310,6 @@
     for (var i = 0; i < elements.length; i++) {
       _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
     }
-  };
-  var _getStyle = function(el, prop) {
-    var y = el.style[prop];
-    if (el.currentStyle) y = el.currentStyle[prop]; else if (window.getComputedStyle) y = document.defaultView.getComputedStyle(el, null).getPropertyValue(prop);
-    if (y == "auto" && prop == "cursor") {
-      var possiblePointers = [ "a" ];
-      for (var i = 0; i < possiblePointers.length; i++) {
-        if (el.tagName.toLowerCase() == possiblePointers[i]) {
-          return "pointer";
-        }
-      }
-    }
-    return y;
-  };
-  var _elementMouseOver = function(event) {
-    if (!event) {
-      event = window.event;
-    }
-    var target;
-    if (this !== window) {
-      target = this;
-    } else if (event.target) {
-      target = event.target;
-    } else if (event.srcElement) {
-      target = event.srcElement;
-    }
-    ZeroClipboard._client.setCurrent(target);
-  };
-  var _addEventHandler = function(element, method, func) {
-    if (element.addEventListener) {
-      element.addEventListener(method, func, false);
-    } else if (element.attachEvent) {
-      element.attachEvent("on" + method, func);
-    }
-  };
-  var _removeEventHandler = function(element, method, func) {
-    if (element.removeEventListener) {
-      element.removeEventListener(method, func, false);
-    } else if (element.detachEvent) {
-      element.detachEvent("on" + method, func);
-    }
-  };
-  var _addClass = function(element, value) {
-    if (element.addClass) {
-      element.addClass(value);
-      return element;
-    }
-    if (value && typeof value === "string") {
-      var classNames = (value || "").split(/\s+/);
-      if (element.nodeType === 1) {
-        if (!element.className) {
-          element.className = value;
-        } else {
-          var className = " " + element.className + " ", setClass = element.className;
-          for (var c = 0, cl = classNames.length; c < cl; c++) {
-            if (className.indexOf(" " + classNames[c] + " ") < 0) {
-              setClass += " " + classNames[c];
-            }
-          }
-          element.className = setClass.replace(/^\s+|\s+$/g, "");
-        }
-      }
-    }
-    return element;
-  };
-  var _removeClass = function(element, value) {
-    if (element.removeClass) {
-      element.removeClass(value);
-      return element;
-    }
-    if (value && typeof value === "string" || value === undefined) {
-      var classNames = (value || "").split(/\s+/);
-      if (element.nodeType === 1 && element.className) {
-        if (value) {
-          var className = (" " + element.className + " ").replace(/[\n\t]/g, " ");
-          for (var c = 0, cl = classNames.length; c < cl; c++) {
-            className = className.replace(" " + classNames[c] + " ", " ");
-          }
-          element.className = className.replace(/^\s+|\s+$/g, "");
-        } else {
-          element.className = "";
-        }
-      }
-    }
-    return element;
-  };
-  var _getDOMObjectPosition = function(obj) {
-    var info = {
-      left: 0,
-      top: 0,
-      width: obj.width || obj.offsetWidth || 0,
-      height: obj.height || obj.offsetHeight || 0,
-      zIndex: 9999
-    };
-    var zi = _getStyle(obj, "zIndex");
-    if (zi && zi != "auto") {
-      info.zIndex = parseInt(zi, 10);
-    }
-    while (obj) {
-      var borderLeftWidth = parseInt(_getStyle(obj, "borderLeftWidth"), 10);
-      var borderTopWidth = parseInt(_getStyle(obj, "borderTopWidth"), 10);
-      info.left += isNaN(obj.offsetLeft) ? 0 : obj.offsetLeft;
-      info.left += isNaN(borderLeftWidth) ? 0 : borderLeftWidth;
-      info.top += isNaN(obj.offsetTop) ? 0 : obj.offsetTop;
-      info.top += isNaN(borderTopWidth) ? 0 : borderTopWidth;
-      obj = obj.offsetParent;
-    }
-    return info;
-  };
-  var _noCache = function(path) {
-    return (path.indexOf("?") >= 0 ? "&" : "?") + "nocache=" + (new Date).getTime();
-  };
-  var _vars = function() {
-    var str = [];
-    if (ZeroClipboard._trustedDomain) str.push("trustedDomain=" + ZeroClipboard._trustedDomain);
-    return str.join("&");
   };
   if (typeof module !== "undefined") {
     module.exports = ZeroClipboard;
