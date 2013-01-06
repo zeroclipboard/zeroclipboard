@@ -1,15 +1,15 @@
 /*
- * Creates a new ZeroClipboard client. from an selector query.
+ * Creates a new ZeroClipboard client. from an element, or array of elements.
  *
  * returns _client instance if it's already created
  */
-ZeroClipboard.Client = function (query) {
+ZeroClipboard.Client = function (elements) {
 
   var singleton = ZeroClipboard._client;
 
   // If there's a client already, return the singleton
   if (singleton) {
-    if (query) singleton.glue(query);
+    if (elements) singleton.glue(elements);
     return singleton;
   }
 
@@ -22,8 +22,8 @@ ZeroClipboard.Client = function (query) {
   // setup the flash->Javascript bridge
   if (ZeroClipboard.detectFlashSupport()) this.bridge();
 
-  // If we're query now, then register
-  if (query) this.glue(query);
+  // If the elements exist glue
+  if (elements) this.glue(elements);
 
   ZeroClipboard._client = this;
 };
@@ -36,10 +36,9 @@ ZeroClipboard.Client = function (query) {
 ZeroClipboard.Client.prototype.bridge = function () {
 
   // try and find the current global bridge
-  this.htmlBridge = ZeroClipboard.$('#global-zeroclipboard-html-bridge');
+  this.htmlBridge = document.getElementById('global-zeroclipboard-html-bridge');
 
-  if (this.htmlBridge.length) {
-    this.htmlBridge = this.htmlBridge[0];
+  if (this.htmlBridge) {
     this.flashBridge = document["global-zeroclipboard-flash-bridge"];
     return;
   }
@@ -114,7 +113,7 @@ ZeroClipboard.Client.prototype.resetBridge = function () {
   this.htmlBridge.style.top = "-9999px";
   this.htmlBridge.removeAttribute("title");
   this.htmlBridge.removeAttribute("data-clipboard-text");
-  ZeroClipboard.currentElement.removeClass('zeroclipboard-is-active');
+  _removeClass(ZeroClipboard.currentElement, 'zeroclipboard-is-active');
   delete ZeroClipboard.currentElement;
 };
 

@@ -57,20 +57,20 @@ ZeroClipboard.Client.prototype.receiveEvent = function (eventName, args) {
     break;
 
   case 'mouseover':
-    currentElement.addClass('zeroclipboard-is-hover');
+    _addClass(currentElement, 'zeroclipboard-is-hover');
     break;
 
   case 'mouseout':
-    currentElement.removeClass('zeroclipboard-is-hover');
+    _removeClass(currentElement, 'zeroclipboard-is-hover');
     this.resetBridge();
     break;
 
   case 'mousedown':
-    currentElement.addClass('zeroclipboard-is-active');
+    _addClass(currentElement, 'zeroclipboard-is-active');
     break;
 
   case 'mouseup':
-    currentElement.removeClass('zeroclipboard-is-active');
+    _removeClass(currentElement, 'zeroclipboard-is-active');
     break;
 
   case 'complete':
@@ -118,11 +118,11 @@ function _elementMouseOver(event) {
 }
 
 /*
- * Register a new query of objects to the client.
+ * Register new element(s) to the object.
  *
  * returns nothing
  */
-ZeroClipboard.Client.prototype.glue = function (query) {
+ZeroClipboard.Client.prototype.glue = function (elements) {
 
   // private function for adding events to the dom, IE before 9 is suckage
   function _addEventHandler(element, method, func) {
@@ -133,8 +133,11 @@ ZeroClipboard.Client.prototype.glue = function (query) {
     }
   }
 
-  // store the element from the page
-  var elements = ZeroClipboard.$(query);
+  // if elements is a string
+  if (typeof elements === "string") throw new TypeError("ZeroClipboard doesn't accept query strings.");
+
+  // if the elements isn't an array
+  if (!elements.length) elements = [elements];
 
   for (var i = 0; i < elements.length ; i++) {
     _addEventHandler(elements[i], "mouseover", _elementMouseOver);
@@ -146,7 +149,7 @@ ZeroClipboard.Client.prototype.glue = function (query) {
  *
  * returns nothing
  */
-ZeroClipboard.Client.prototype.unglue = function (query) {
+ZeroClipboard.Client.prototype.unglue = function (elements) {
 
   // private function for removing events from the dom, IE before 9 is suckage
   function _removeEventHandler(element, method, func) {
@@ -157,8 +160,11 @@ ZeroClipboard.Client.prototype.unglue = function (query) {
     }
   }
 
-  // store the element from the page
-  var elements = ZeroClipboard.$(query);
+  // if elements is a string
+  if (typeof elements === "string") throw new TypeError("ZeroClipboard doesn't accept query strings.");
+
+  // if the elements isn't an array
+  if (!elements.length) elements = [elements];
 
   for (var i = 0; i < elements.length ; i++) {
     _removeEventHandler(elements[i], "mouseover", _elementMouseOver);

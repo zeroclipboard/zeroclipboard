@@ -18,7 +18,7 @@ exports.position = {
 
   "when object borderWidth isNaN don't fail": function (test) {
 
-    clip.glue("#d_clip_button");
+    clip.glue($("#d_clip_button"));
 
     clip.setCurrent($("#d_clip_button")[0]);
 

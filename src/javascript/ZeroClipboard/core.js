@@ -27,11 +27,16 @@ ZeroClipboard.setTrustedDomain = function (obj) {
  * returns nothing
  */
 ZeroClipboard.destroy = function () {
-  var query = ZeroClipboard.$("#global-zeroclipboard-html-bridge");
-  if (!query.length) return;
+  // get the bridge
+  var bridge = document.getElementById("global-zeroclipboard-html-bridge");
 
+  // if no bridge exists return
+  if (!bridge) return;
+
+  // delete the client object
   delete ZeroClipboard._client;
-  var bridge = query[0];
+
+  // remove the bridge
   bridge.parentNode.removeChild(bridge);
 };
 

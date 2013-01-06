@@ -8,22 +8,21 @@
  */(function() {
   "use strict";
   var ZeroClipboard = {};
-  ZeroClipboard.Client = function(query) {
+  ZeroClipboard.Client = function(elements) {
     var singleton = ZeroClipboard._client;
     if (singleton) {
-      if (query) singleton.glue(query);
+      if (elements) singleton.glue(elements);
       return singleton;
     }
     this.handlers = {};
     this._text = null;
     if (ZeroClipboard.detectFlashSupport()) this.bridge();
-    if (query) this.glue(query);
+    if (elements) this.glue(elements);
     ZeroClipboard._client = this;
   };
   ZeroClipboard.Client.prototype.bridge = function() {
-    this.htmlBridge = ZeroClipboard.$("#global-zeroclipboard-html-bridge");
-    if (this.htmlBridge.length) {
-      this.htmlBridge = this.htmlBridge[0];
+    this.htmlBridge = document.getElementById("global-zeroclipboard-html-bridge");
+    if (this.htmlBridge) {
       this.flashBridge = document["global-zeroclipboard-flash-bridge"];
       return;
     }
@@ -55,7 +54,7 @@
     this.htmlBridge.style.top = "-9999px";
     this.htmlBridge.removeAttribute("title");
     this.htmlBridge.removeAttribute("data-clipboard-text");
-    ZeroClipboard.currentElement.removeClass("zeroclipboard-is-active");
+    _removeClass(ZeroClipboard.currentElement, "zeroclipboard-is-active");
     delete ZeroClipboard.currentElement;
   };
   ZeroClipboard.Client.prototype.ready = function() {
@@ -126,10 +125,9 @@
     this._trustedDomain = obj;
   };
   ZeroClipboard.destroy = function() {
-    var query = ZeroClipboard.$("#global-zeroclipboard-html-bridge");
-    if (!query.length) return;
+    var bridge = document.getElementById("global-zeroclipboard-html-bridge");
+    if (!bridge) return;
     delete ZeroClipboard._client;
-    var bridge = query[0];
     bridge.parentNode.removeChild(bridge);
   };
   ZeroClipboard.detectFlashSupport = function() {
@@ -144,6 +142,50 @@
       }
     }
     return hasFlash;
+  };
+  var _addClass = function(element, value) {
+    if (element.addClass) {
+      element.addClass(value);
+      return element;
+    }
+    if (value && typeof value === "string") {
+      var classNames = (value || "").split(/\s+/);
+      if (element.nodeType === 1) {
+        if (!element.className) {
+          element.className = value;
+        } else {
+          var className = " " + element.className + " ", setClass = element.className;
+          for (var c = 0, cl = classNames.length; c < cl; c++) {
+            if (className.indexOf(" " + classNames[c] + " ") < 0) {
+              setClass += " " + classNames[c];
+            }
+          }
+          element.className = setClass.replace(/^\s+|\s+$/g, "");
+        }
+      }
+    }
+    return element;
+  };
+  var _removeClass = function(element, value) {
+    if (element.removeClass) {
+      element.removeClass(value);
+      return element;
+    }
+    if (value && typeof value === "string" || value === undefined) {
+      var classNames = (value || "").split(/\s+/);
+      if (element.nodeType === 1 && element.className) {
+        if (value) {
+          var className = (" " + element.className + " ").replace(/[\n\t]/g, " ");
+          for (var c = 0, cl = classNames.length; c < cl; c++) {
+            className = className.replace(" " + classNames[c] + " ", " ");
+          }
+          element.className = className.replace(/^\s+|\s+$/g, "");
+        } else {
+          element.className = "";
+        }
+      }
+    }
+    return this;
   };
   ZeroClipboard.dispatch = function(eventName, args) {
     ZeroClipboard._client.receiveEvent(eventName, args);
@@ -176,17 +218,17 @@
       this.htmlBridge.setAttribute("data-clipboard-ready", true);
       break;
      case "mouseover":
-      currentElement.addClass("zeroclipboard-is-hover");
+      _addClass(currentElement, "zeroclipboard-is-hover");
       break;
      case "mouseout":
-      currentElement.removeClass("zeroclipboard-is-hover");
+      _removeClass(currentElement, "zeroclipboard-is-hover");
       this.resetBridge();
       break;
      case "mousedown":
-      currentElement.addClass("zeroclipboard-is-active");
+      _addClass(currentElement, "zeroclipboard-is-active");
       break;
      case "mouseup":
-      currentElement.removeClass("zeroclipboard-is-active");
+      _removeClass(currentElement, "zeroclipboard-is-active");
       break;
      case "complete":
       this.resetText();
@@ -217,7 +259,7 @@
     }
     ZeroClipboard._client.setCurrent(elementWrapper(target));
   }
-  ZeroClipboard.Client.prototype.glue = function(query) {
+  ZeroClipboard.Client.prototype.glue = function(elements) {
     function _addEventHandler(element, method, func) {
       if (element.addEventListener) {
         element.addEventListener(method, func, false);
@@ -225,12 +267,13 @@
         element.attachEvent("on" + method, func);
       }
     }
-    var elements = ZeroClipboard.$(query);
+    if (typeof elements === "string") throw new TypeError("ZeroClipboard doesn't accept query strings.");
+    if (!elements.length) elements = [ elements ];
     for (var i = 0; i < elements.length; i++) {
       _addEventHandler(elements[i], "mouseover", _elementMouseOver);
     }
   };
-  ZeroClipboard.Client.prototype.unglue = function(query) {
+  ZeroClipboard.Client.prototype.unglue = function(elements) {
     function _removeEventHandler(element, method, func) {
       if (element.removeEventListener) {
         element.removeEventListener(method, func, false);
@@ -238,7 +281,8 @@
         element.detachEvent("on" + method, func);
       }
     }
-    var elements = ZeroClipboard.$(query);
+    if (typeof elements === "string") throw new TypeError("ZeroClipboard doesn't accept query strings.");
+    if (!elements.length) elements = [ elements ];
     for (var i = 0; i < elements.length; i++) {
       _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
     }
