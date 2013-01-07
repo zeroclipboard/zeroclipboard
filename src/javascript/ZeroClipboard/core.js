@@ -2,7 +2,7 @@ ZeroClipboard.version = "{{version}}";
 // ZeroClipboard options defaults
 var _defaults = {
   moviePath:        "ZeroClipboard.swf",        // URL to movie
-  trustedDomain:    undefined,                  // Domains that we should trust
+  trustedDomains:   null,                       // Domains that we should trust
   hoverClass:       "zeroclipboard-is-hover",   // The class used to hover over the object
   activeClass:      "zeroclipboard-is-active"   // The class used to set object active
 };

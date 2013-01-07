@@ -120,7 +120,13 @@
   };
   var _vars = function(options) {
     var str = [];
-    if (options.trustedDomain) str.push("trustedDomain=" + options.trustedDomain);
+    if (options.trustedDomains) {
+      if (options.trustedDomains.length) {
+        for (var i = 0; i < options.trustedDomains.length; i++) str.push("trustedDomain=" + options.trustedDomains[i]);
+      } else {
+        str.push("trustedDomain=" + options.trustedDomains);
+      }
+    }
     return str.join("&");
   };
   var _inArray = function(elem, array) {
@@ -177,7 +183,7 @@
   ZeroClipboard.version = "1.1.6";
   var _defaults = {
     moviePath: "ZeroClipboard.swf",
-    trustedDomain: undefined,
+    trustedDomains: null,
     hoverClass: "zeroclipboard-is-hover",
     activeClass: "zeroclipboard-is-active"
   };

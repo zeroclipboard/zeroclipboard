@@ -197,7 +197,14 @@ var _vars = function (options) {
   var str = [];
 
   // if trusted domain is set
-  if (options.trustedDomain) str.push("trustedDomain=" + options.trustedDomain);
+  if (options.trustedDomains) {
+    if (options.trustedDomains.length) {
+      for (var i = 0; i < options.trustedDomains.length; i++) str.push("trustedDomain=" + options.trustedDomains[i]);
+    } else {
+      str.push("trustedDomain=" + options.trustedDomains);
+    }
+
+  }
 
   // join the str by &
   return str.join("&");

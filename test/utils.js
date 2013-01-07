@@ -126,7 +126,7 @@ exports.utils = {
 
     test.equal(_utils._vars(clip.options), "");
 
-    clip.options.trustedDomain = "*";
+    clip.options.trustedDomains = ["*"];
 
     test.equal(_utils._vars(clip.options), "trustedDomain=*");
 

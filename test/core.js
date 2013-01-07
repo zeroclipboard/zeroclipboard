@@ -29,12 +29,12 @@ exports.core = {
     clip = new zeroClipboard();
 
     // Test the _trustedDomain is undefined
-    test.equal(clip.options.trustedDomain, undefined);
+    test.equal(clip.options.trustedDomains, undefined);
 
     // change the path
-    clip.options.trustedDomain = "google.com";
+    clip.options.trustedDomains = "google.com";
 
-    test.equal(clip.options.trustedDomain, "google.com");
+    test.equal(clip.options.trustedDomains, "google.com");
 
     test.done();
     zeroClipboard.destroy();
