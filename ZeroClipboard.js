@@ -9,18 +9,14 @@
   "use strict";
   var ZeroClipboard = {};
   ZeroClipboard.Client = function(elements, options) {
-    var singleton = ZeroClipboard._client;
-    if (singleton) {
-      if (elements) singleton.glue(elements);
-      return singleton;
-    }
+    if (elements) (ZeroClipboard.Client.prototype._singleton || this).glue(elements);
+    if (ZeroClipboard.Client.prototype._singleton) return ZeroClipboard.Client.prototype._singleton;
+    ZeroClipboard.Client.prototype._singleton = this;
     this.options = {};
     for (var kd in _defaults) this.options[kd] = _defaults[kd];
     for (var ko in options) this.options[ko] = options[ko];
     this.handlers = {};
     if (ZeroClipboard.detectFlashSupport()) this.bridge();
-    if (elements) this.glue(elements);
-    ZeroClipboard._client = this;
   };
   ZeroClipboard.Client.prototype.setCurrent = function(element) {
     ZeroClipboard.currentElement = element;
@@ -51,7 +47,6 @@
     if (this.ready()) this.flashBridge.setHandCursor(enabled);
   };
   ZeroClipboard.version = "1.1.6";
-  ZeroClipboard._client = null;
   var _defaults = {
     moviePath: "ZeroClipboard.swf",
     trustedDomain: undefined,
@@ -64,7 +59,7 @@
   ZeroClipboard.destroy = function() {
     var bridge = document.getElementById("global-zeroclipboard-html-bridge");
     if (!bridge) return;
-    delete ZeroClipboard._client;
+    delete ZeroClipboard.Client.prototype._singleton;
     bridge.parentNode.removeChild(bridge);
   };
   ZeroClipboard.detectFlashSupport = function() {
@@ -124,7 +119,7 @@
     this.setSize(pos.width, pos.height);
   };
   ZeroClipboard.dispatch = function(eventName, args) {
-    ZeroClipboard._client.receiveEvent(eventName, args);
+    ZeroClipboard.Client.prototype._singleton.receiveEvent(eventName, args);
   };
   ZeroClipboard.Client.prototype.on = function(eventName, func) {
     var events = eventName.toString().split(/\s/g);
@@ -220,7 +215,7 @@
     } else if (event.srcElement) {
       target = event.srcElement;
     }
-    ZeroClipboard._client.setCurrent(target);
+    ZeroClipboard.Client.prototype._singleton.setCurrent(target);
   };
   var _addEventHandler = function(element, method, func) {
     if (element.addEventListener) {

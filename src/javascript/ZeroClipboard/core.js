@@ -1,5 +1,4 @@
 ZeroClipboard.version = "{{version}}";
-ZeroClipboard._client = null; // The client
 // ZeroClipboard options defaults
 var _defaults = {
   moviePath:        "ZeroClipboard.swf",        // URL to movie
@@ -30,7 +29,7 @@ ZeroClipboard.destroy = function () {
   if (!bridge) return;
 
   // delete the client object
-  delete ZeroClipboard._client;
+  delete ZeroClipboard.Client.prototype._singleton;
 
   // remove the bridge
   bridge.parentNode.removeChild(bridge);

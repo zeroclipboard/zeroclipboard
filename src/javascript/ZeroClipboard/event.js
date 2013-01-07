@@ -5,7 +5,7 @@
  */
 ZeroClipboard.dispatch = function (eventName, args) {
   // receive event from flash movie, send to client
-  ZeroClipboard._client.receiveEvent(eventName, args);
+  ZeroClipboard.Client.prototype._singleton.receiveEvent(eventName, args);
 };
 
 /*

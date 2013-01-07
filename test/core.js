@@ -48,7 +48,7 @@ exports.core = {
     zeroClipboard.destroy();
 
     test.equal($("#global-zeroclipboard-html-bridge").length, 0);
-    test.ok(!zeroClipboard._client);
+    test.ok(!zeroClipboard.Client.prototype._singleton);
 
     test.done();
   },
