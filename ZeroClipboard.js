@@ -123,8 +123,7 @@
     var events = eventName.toString().split(/\s/g);
     for (var i = 0; i < events.length; i++) {
       eventName = events[i].toLowerCase().replace(/^on/, "");
-      if (!this.handlers[eventName]) this.handlers[eventName] = [];
-      this.handlers[eventName].push(func);
+      if (!this.handlers[eventName]) this.handlers[eventName] = func;
     }
     if (this.handlers.noflash && !ZeroClipboard.detectFlashSupport()) {
       this.receiveEvent("onNoFlash", null);
@@ -164,13 +163,11 @@
       break;
     }
     if (this.handlers[eventName]) {
-      for (var idx = 0, len = this.handlers[eventName].length; idx < len; idx++) {
-        var func = this.handlers[eventName][idx];
-        if (typeof func == "function") {
-          func.call(element, this, args);
-        } else if (typeof func == "string") {
-          window[func].call(element, this, args);
-        }
+      var func = this.handlers[eventName];
+      if (typeof func == "function") {
+        func.call(element, this, args);
+      } else if (typeof func == "string") {
+        window[func].call(element, this, args);
       }
     }
   };
