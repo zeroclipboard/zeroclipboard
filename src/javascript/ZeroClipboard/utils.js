@@ -202,10 +202,10 @@ var _vars = function (options) {
 
   // if trusted domain is set
   if (options.trustedDomains) {
-    if (options.trustedDomains.length) {
-      str.push("trustedDomain=" + options.trustedDomains.join(","));
-    } else {
+    if (typeof options.trustedDomains === "string") {
       str.push("trustedDomain=" + options.trustedDomains);
+    } else {
+      str.push("trustedDomain=" + options.trustedDomains.join(","));
     }
   }
 
