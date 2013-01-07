@@ -33,7 +33,7 @@ ZeroClipboard.destroy = function () {
   if (!bridge) return;
 
   // delete the client object
-  delete ZeroClipboard.Client.prototype._singleton;
+  delete ZeroClipboard.prototype._singleton;
   delete ZeroClipboard._trustedDomain;
   ZeroClipboard._moviePath = 'ZeroClipboard.swf';
 

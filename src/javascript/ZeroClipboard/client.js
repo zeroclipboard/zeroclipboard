@@ -3,15 +3,15 @@
  *
  * returns the client instance if it's already created
  */
-ZeroClipboard.Client = function (elements) {
+var ZeroClipboard = function (elements) {
 
   // If the elements exist glue
-  if (elements) (ZeroClipboard.Client.prototype._singleton || this).glue(elements);
+  if (elements) (ZeroClipboard.prototype._singleton || this).glue(elements);
 
   // If there's a client already, return the singleton
-  if (ZeroClipboard.Client.prototype._singleton) return ZeroClipboard.Client.prototype._singleton;
+  if (ZeroClipboard.prototype._singleton) return ZeroClipboard.prototype._singleton;
 
-  ZeroClipboard.Client.prototype._singleton = this;
+  ZeroClipboard.prototype._singleton = this;
 
   // event handlers
   this.handlers = {};
@@ -34,7 +34,7 @@ var currentElement;
  *
  * returns nothing
  */
-ZeroClipboard.Client.prototype.setCurrent = function (element) {
+ZeroClipboard.prototype.setCurrent = function (element) {
 
   // What element is current
   currentElement = element;
@@ -57,7 +57,7 @@ ZeroClipboard.Client.prototype.setCurrent = function (element) {
  *
  * returns nothing
  */
-ZeroClipboard.Client.prototype.setText = function (newText) {
+ZeroClipboard.prototype.setText = function (newText) {
   if (newText && newText !== "") {
     this._text = newText;
     if (this.ready()) this.flashBridge.setText(newText);
@@ -69,7 +69,7 @@ ZeroClipboard.Client.prototype.setText = function (newText) {
  *
  * returns nothing
  */
-ZeroClipboard.Client.prototype.resetText = function () {
+ZeroClipboard.prototype.resetText = function () {
   this._text = null;
 };
 
@@ -78,7 +78,7 @@ ZeroClipboard.Client.prototype.resetText = function () {
  *
  * returns nothing
  */
-ZeroClipboard.Client.prototype.setTitle = function (newTitle) {
+ZeroClipboard.prototype.setTitle = function (newTitle) {
   if (newTitle && newTitle !== "") this.htmlBridge.setAttribute("title", newTitle);
 };
 
@@ -87,7 +87,7 @@ ZeroClipboard.Client.prototype.setTitle = function (newTitle) {
  *
  * returns nothing
  */
-ZeroClipboard.Client.prototype.setSize = function (width, height) {
+ZeroClipboard.prototype.setSize = function (width, height) {
   if (this.ready()) this.flashBridge.setSize(width, height);
 };
 
@@ -96,6 +96,6 @@ ZeroClipboard.Client.prototype.setSize = function (width, height) {
  *
  * returns nothing
  */
-ZeroClipboard.Client.prototype.setHandCursor = function (enabled) {
+ZeroClipboard.prototype.setHandCursor = function (enabled) {
   if (this.ready()) this.flashBridge.setHandCursor(enabled);
 };

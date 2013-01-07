@@ -29,13 +29,13 @@ ZeroClipboard.setMoviePath( 'http://YOURSERVER/path/ZeroClipboard.swf' );
 Now you are ready to create one or more *Clients*.  A client is a single instance of the clipboard library on the page, linked to one or more DOM elements. Here is how to create a client instance:
 
 ```
-var clip = new ZeroClipboard.Client();
+var clip = new ZeroClipboard();
 ```
 
 You can also include an element or array of elements in the new client. * This example uses jQuery to find the button.
 
 ```
-var clip = new ZeroClipboard.Client($("#my-button"));
+var clip = new ZeroClipboard($("#my-button"));
 ```
 
 Next, you can set some options.
@@ -85,7 +85,7 @@ You can pass in a reference to the actual DOM element object itself or an array 
 And the code:
 
 ```
-var clip = new ZeroClipboard.Client( $("button#my-button") );
+var clip = new ZeroClipboard( $("button#my-button") );
 ```
 
 ### Page Resizing
@@ -331,7 +331,7 @@ Here is a quick example using as few calls as possible:
 
     <script type="text/javascript" src="ZeroClipboard.js"></script>
     <script language="JavaScript">
-      var clip = new ZeroClipboard.Client( document.getElementById('d_clip_button') );
+      var clip = new ZeroClipboard( document.getElementById('d_clip_button') );
     </script>
   </body>
   </html>
@@ -363,7 +363,7 @@ Here is a complete example which exercises every option and event handler:
     <div id="d_clip_button" data-clipboard-text="Copy Me!">Copy To Clipboard</div>
 
     <script language="JavaScript">
-      var clip = new ZeroClipboard.Client( $('#d_clip_button') );
+      var clip = new ZeroClipboard( $('#d_clip_button') );
 
       clip.on( 'load', function(client) {
         // alert( "movie is loaded" );

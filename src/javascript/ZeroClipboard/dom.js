@@ -3,7 +3,7 @@
  *
  * returns nothing
  */
-ZeroClipboard.Client.prototype.bridge = function () {
+ZeroClipboard.prototype.bridge = function () {
 
   // try and find the current global bridge
   this.htmlBridge = document.getElementById('global-zeroclipboard-html-bridge');
@@ -62,7 +62,7 @@ ZeroClipboard.Client.prototype.bridge = function () {
  *
  * returns nothing
  */
-ZeroClipboard.Client.prototype.resetBridge = function () {
+ZeroClipboard.prototype.resetBridge = function () {
   this.htmlBridge.style.left = "-9999px";
   this.htmlBridge.style.top = "-9999px";
   this.htmlBridge.removeAttribute("title");
@@ -77,7 +77,7 @@ ZeroClipboard.Client.prototype.resetBridge = function () {
  *
  * returns true if the flash bridge is ready
  */
-ZeroClipboard.Client.prototype.ready = function () {
+ZeroClipboard.prototype.ready = function () {
   // I don't want to eval() here
   var ready = this.htmlBridge.getAttribute("data-clipboard-ready");
   return ready === "true" || ready === true;
@@ -88,7 +88,7 @@ ZeroClipboard.Client.prototype.ready = function () {
  *
  * returns nothing
  */
-ZeroClipboard.Client.prototype.reposition = function () {
+ZeroClipboard.prototype.reposition = function () {
 
   // If there is no currentElement return
   if (!currentElement) return false;

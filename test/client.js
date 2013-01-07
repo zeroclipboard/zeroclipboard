@@ -6,7 +6,7 @@ exports.client = {
 
   setUp: function (callback) {
     zeroClipboard = require("../ZeroClipboard");
-    clip = new zeroClipboard.Client();
+    clip = new zeroClipboard();
     callback();
   },
 
@@ -151,7 +151,7 @@ exports.client = {
 
     test.equal($(".global-zeroclipboard-container").length, 1);
 
-    var clip2 = new zeroClipboard.Client();
+    var clip2 = new zeroClipboard();
 
     test.equal($(".global-zeroclipboard-container").length, 1);
 

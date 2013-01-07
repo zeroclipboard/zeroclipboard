@@ -14,7 +14,7 @@ exports.utils = {
       navigator: navigator,
       ZeroClipboard: ZeroClipboard
     });
-    clip = new ZeroClipboard.Client();
+    clip = new ZeroClipboard();
     callback();
   },
 

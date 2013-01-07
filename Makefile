@@ -20,7 +20,11 @@ node_modules: Makefile
 
 .INTERMEDIATE ZeroClipboard.js: \
 	src/javascript/start.js \
-	src/javascript/ZeroClipboard/*.js \
+	src/javascript/ZeroClipboard/utils.js \
+	src/javascript/ZeroClipboard/client.js \
+	src/javascript/ZeroClipboard/core.js \
+	src/javascript/ZeroClipboard/dom.js \
+	src/javascript/ZeroClipboard/event.js \
 	src/javascript/end.js
 
 ZeroClipboard.js:

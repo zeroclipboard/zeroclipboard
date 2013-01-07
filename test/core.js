@@ -6,7 +6,7 @@ var zeroClipboard, clip;
 exports.core = {
   setUp: function (callback) {
     zeroClipboard = require("../ZeroClipboard");
-    clip = new zeroClipboard.Client();
+    clip = new zeroClipboard();
     callback();
   },
 
@@ -44,7 +44,7 @@ exports.core = {
     zeroClipboard.destroy();
 
     test.equal($("#global-zeroclipboard-html-bridge").length, 0);
-    test.ok(!zeroClipboard.Client.prototype._singleton);
+    test.ok(!zeroClipboard.prototype._singleton);
     test.ok(!zeroClipboard._trustedDomain);
     test.equal(zeroClipboard._moviePath, 'ZeroClipboard.swf');
 

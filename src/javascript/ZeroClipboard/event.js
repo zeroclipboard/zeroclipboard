@@ -5,7 +5,7 @@
  */
 ZeroClipboard.dispatch = function (eventName, args) {
   // receive event from flash movie, send to client
-  ZeroClipboard.Client.prototype._singleton.receiveEvent(eventName, args);
+  ZeroClipboard.prototype._singleton.receiveEvent(eventName, args);
 };
 
 /*
@@ -13,7 +13,7 @@ ZeroClipboard.dispatch = function (eventName, args) {
  *
  * returns nothing
  */
-ZeroClipboard.Client.prototype.on = function (eventName, func) {
+ZeroClipboard.prototype.on = function (eventName, func) {
   // add user event listener for event
   // event types: load, queueStart, fileStart, fileComplete, queueComplete, progress, error, cancel
   var events = eventName.toString().split(/\s/g);
@@ -28,7 +28,7 @@ ZeroClipboard.Client.prototype.on = function (eventName, func) {
   }
 };
 // shortcut to old stuff
-ZeroClipboard.Client.prototype.addEventListener = function (eventName, func) {
+ZeroClipboard.prototype.addEventListener = function (eventName, func) {
   this.on(eventName, func);
 };
 
@@ -37,7 +37,7 @@ ZeroClipboard.Client.prototype.addEventListener = function (eventName, func) {
  *
  * returns nothing
  */
-ZeroClipboard.Client.prototype.receiveEvent = function (eventName, args) {
+ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
   // receive event from flash
   eventName = eventName.toString().toLowerCase().replace(/^on/, '');
 
@@ -99,7 +99,7 @@ ZeroClipboard.Client.prototype.receiveEvent = function (eventName, args) {
  *
  * returns nothing
  */
-ZeroClipboard.Client.prototype.glue = function (elements) {
+ZeroClipboard.prototype.glue = function (elements) {
 
   // if elements is a string
   if (typeof elements === "string") throw new TypeError("ZeroClipboard doesn't accept query strings.");
@@ -117,7 +117,7 @@ ZeroClipboard.Client.prototype.glue = function (elements) {
  *
  * returns nothing
  */
-ZeroClipboard.Client.prototype.unglue = function (elements) {
+ZeroClipboard.prototype.unglue = function (elements) {
 
   // if elements is a string
   if (typeof elements === "string") throw new TypeError("ZeroClipboard doesn't accept query strings.");
