@@ -25,7 +25,7 @@ var ZeroClipboard = function (elements, options) {
   this.handlers = {};
 
   // setup the flash->Javascript bridge
-  if (ZeroClipboard.detectFlashSupport()) this.bridge();
+  if (ZeroClipboard.detectFlashSupport()) _bridge();
 
 };
 

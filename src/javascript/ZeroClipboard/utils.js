@@ -222,3 +222,20 @@ var _inArray = function (elem, array) {
 
   return -1;
 };
+
+/*
+ * private _prepGlue function.
+ * prepares the elements for gluing/ungluing
+ *
+ * returns the elements
+ */
+var _prepGlue = function (elements) {
+
+  // if elements is a string
+  if (typeof elements === "string") throw new TypeError("ZeroClipboard doesn't accept query strings.");
+
+  // if the elements isn't an array
+  if (!elements.length) return [elements];
+
+  return elements;
+};

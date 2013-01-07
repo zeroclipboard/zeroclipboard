@@ -28,9 +28,7 @@ ZeroClipboard.prototype.on = function (eventName, func) {
   }
 };
 // shortcut to old stuff
-ZeroClipboard.prototype.addEventListener = function (eventName, func) {
-  this.on(eventName, func);
-};
+ZeroClipboard.prototype.addEventListener = ZeroClipboard.prototype.on;
 
 /*
  * Receive an event for a specific client.
@@ -101,11 +99,7 @@ ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
  */
 ZeroClipboard.prototype.glue = function (elements) {
 
-  // if elements is a string
-  if (typeof elements === "string") throw new TypeError("ZeroClipboard doesn't accept query strings.");
-
-  // if the elements isn't an array
-  if (!elements.length) elements = [elements];
+  elements = _prepGlue(elements);
 
   for (var i = 0; i < elements.length ; i++) {
 
@@ -127,11 +121,7 @@ ZeroClipboard.prototype.glue = function (elements) {
  */
 ZeroClipboard.prototype.unglue = function (elements) {
 
-  // if elements is a string
-  if (typeof elements === "string") throw new TypeError("ZeroClipboard doesn't accept query strings.");
-
-  // if the elements isn't an array
-  if (!elements.length) elements = [elements];
+  elements = _prepGlue(elements);
 
   for (var i = 0; i < elements.length; i++) {
 

@@ -22,20 +22,17 @@ ZeroClipboard.setDefaults = function (options) {
  * returns nothing
  */
 ZeroClipboard.destroy = function () {
-  // get the bridge
-  var bridge = document.getElementById("global-zeroclipboard-html-bridge");
-
-  // if no bridge exists return
-  if (!bridge) return;
 
   // unglue all the elements
   ZeroClipboard.prototype._singleton.unglue(gluedElements);
 
-  // delete the client object
-  delete ZeroClipboard.prototype._singleton;
+  var bridge = ZeroClipboard.prototype._singleton.htmlBridge;
 
   // remove the bridge
   bridge.parentNode.removeChild(bridge);
+
+  // delete the client object
+  delete ZeroClipboard.prototype._singleton;
 };
 
 /*
