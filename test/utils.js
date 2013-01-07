@@ -142,4 +142,15 @@ exports.utils = {
     test.done();
   },
 
+  "_inArray finds elements in array": function (test) {
+
+    var fruits = ["apple", "banana", "orange", "cherry", "strawberry"];
+
+    test.equal(_utils._inArray("kiwi", fruits), -1);
+    test.equal(_utils._inArray("banana", fruits), 1);
+    test.equal(_utils._inArray("strawberry", fruits), 4);
+
+    test.done();
+  },
+
 };
