@@ -199,11 +199,10 @@ var _vars = function (options) {
   // if trusted domain is set
   if (options.trustedDomains) {
     if (options.trustedDomains.length) {
-      for (var i = 0; i < options.trustedDomains.length; i++) str.push("trustedDomain=" + options.trustedDomains[i]);
+      str.push("trustedDomain=" + options.trustedDomains.join(","));
     } else {
       str.push("trustedDomain=" + options.trustedDomains);
     }
-
   }
 
   // join the str by &
