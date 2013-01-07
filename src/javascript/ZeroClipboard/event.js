@@ -42,7 +42,7 @@ ZeroClipboard.Client.prototype.receiveEvent = function (eventName, args) {
   // receive event from flash
   eventName = eventName.toString().toLowerCase().replace(/^on/, '');
 
-  var currentElement = ZeroClipboard.currentElement;
+  var element = currentElement;
 
   // special behavior for certain events
   switch (eventName) {
@@ -57,20 +57,20 @@ ZeroClipboard.Client.prototype.receiveEvent = function (eventName, args) {
     break;
 
   case 'mouseover':
-    _addClass(currentElement, 'zeroclipboard-is-hover');
+    _addClass(element, 'zeroclipboard-is-hover');
     break;
 
   case 'mouseout':
-    _removeClass(currentElement, 'zeroclipboard-is-hover');
+    _removeClass(element, 'zeroclipboard-is-hover');
     this.resetBridge();
     break;
 
   case 'mousedown':
-    _addClass(currentElement, 'zeroclipboard-is-active');
+    _addClass(element, 'zeroclipboard-is-active');
     break;
 
   case 'mouseup':
-    _removeClass(currentElement, 'zeroclipboard-is-active');
+    _removeClass(element, 'zeroclipboard-is-active');
     break;
 
   case 'complete':
@@ -84,11 +84,11 @@ ZeroClipboard.Client.prototype.receiveEvent = function (eventName, args) {
 
       if (typeof(func) == 'function') {
         // actual function reference
-        func.call(currentElement, this, args);
+        func.call(element, this, args);
       }
       else if (typeof(func) == 'string') {
         // name of function
-        window[func].call(currentElement, this, args);
+        window[func].call(element, this, args);
       }
     } // foreach event handler defined
   } // user defined handler for event

@@ -24,6 +24,9 @@ ZeroClipboard.Client = function (elements) {
 
 };
 
+// keep track of the current element that is being hovered.
+var currentElement;
+
 /*
  * Sets the current html object that the flash object should overlay.
  * This will put the global flash object on top of the current object and set
@@ -34,7 +37,7 @@ ZeroClipboard.Client = function (elements) {
 ZeroClipboard.Client.prototype.setCurrent = function (element) {
 
   // What element is current
-  ZeroClipboard.currentElement = element;
+  currentElement = element;
 
   this.reposition();
 
@@ -46,11 +49,7 @@ ZeroClipboard.Client.prototype.setCurrent = function (element) {
   }
 
   // If the element has a pointer style, set to hand cursor
-  if (_getStyle(element, "cursor") == "pointer") {
-    this.setHandCursor(true);
-  } else {
-    this.setHandCursor(false);
-  }
+  this.setHandCursor(_getStyle(element, "cursor") == "pointer");
 };
 
 /*
