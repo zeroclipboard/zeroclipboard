@@ -5,6 +5,8 @@
 
 * [FEATURE] The selector `ZeroClipboard.$` was removed in favor of leaving it up to the user. #63
 * [FEATURE] Creating new instance of the class is easier `new ZeroClipboard()` #65
+* [BUG] It was possible to glue an element multiple times.
+* [BUG] Removing multiple functions for same action. Was causing multiple firings.
 
 ### ZeroClipboard 1.1.5
 
