@@ -9,16 +9,12 @@
   "use strict";
   var ZeroClipboard = {};
   ZeroClipboard.Client = function(elements) {
-    var singleton = ZeroClipboard._client;
-    if (singleton) {
-      if (elements) singleton.glue(elements);
-      return singleton;
-    }
+    if (elements) (ZeroClipboard.Client.prototype._singleton || this).glue(elements);
+    if (ZeroClipboard.Client.prototype._singleton) return ZeroClipboard.Client.prototype._singleton;
+    ZeroClipboard.Client.prototype._singleton = this;
     this.handlers = {};
     this._text = null;
     if (ZeroClipboard.detectFlashSupport()) this.bridge();
-    if (elements) this.glue(elements);
-    ZeroClipboard._client = this;
   };
   ZeroClipboard.Client.prototype.setCurrent = function(element) {
     ZeroClipboard.currentElement = element;
@@ -53,7 +49,6 @@
   };
   ZeroClipboard.version = "1.1.6";
   ZeroClipboard._moviePath = "ZeroClipboard.swf";
-  ZeroClipboard._client = null;
   ZeroClipboard.setMoviePath = function(path) {
     this._moviePath = path;
   };
@@ -63,7 +58,7 @@
   ZeroClipboard.destroy = function() {
     var bridge = document.getElementById("global-zeroclipboard-html-bridge");
     if (!bridge) return;
-    delete ZeroClipboard._client;
+    delete ZeroClipboard.Client.prototype._singleton;
     delete ZeroClipboard._trustedDomain;
     ZeroClipboard._moviePath = "ZeroClipboard.swf";
     bridge.parentNode.removeChild(bridge);
@@ -125,7 +120,7 @@
     this.setSize(pos.width, pos.height);
   };
   ZeroClipboard.dispatch = function(eventName, args) {
-    ZeroClipboard._client.receiveEvent(eventName, args);
+    ZeroClipboard.Client.prototype._singleton.receiveEvent(eventName, args);
   };
   ZeroClipboard.Client.prototype.on = function(eventName, func) {
     var events = eventName.toString().split(/\s/g);
@@ -221,7 +216,7 @@
     } else if (event.srcElement) {
       target = event.srcElement;
     }
-    ZeroClipboard._client.setCurrent(target);
+    ZeroClipboard.Client.prototype._singleton.setCurrent(target);
   };
   var _addEventHandler = function(element, method, func) {
     if (element.addEventListener) {

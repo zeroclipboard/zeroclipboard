@@ -1,6 +1,5 @@
 ZeroClipboard.version = "{{version}}";
 ZeroClipboard._moviePath = 'ZeroClipboard.swf'; // URL to movie
-ZeroClipboard._client = null; // The client
 
 /*
  * Set the movie path for the flash file.
@@ -34,7 +33,7 @@ ZeroClipboard.destroy = function () {
   if (!bridge) return;
 
   // delete the client object
-  delete ZeroClipboard._client;
+  delete ZeroClipboard.Client.prototype._singleton;
   delete ZeroClipboard._trustedDomain;
   ZeroClipboard._moviePath = 'ZeroClipboard.swf';
 
