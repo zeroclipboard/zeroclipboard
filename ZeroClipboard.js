@@ -21,6 +21,7 @@
     return y;
   };
   var _elementMouseOver = function(event) {
+    if (!ZeroClipboard.prototype._singleton) return;
     if (!event) {
       event = window.event;
     }

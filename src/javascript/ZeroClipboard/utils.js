@@ -30,6 +30,10 @@ var _getStyle = function (el, prop) {
  * returns nothing
  */
 var _elementMouseOver = function (event) {
+
+  // If the singleton doesn't exist return
+  if (!ZeroClipboard.prototype._singleton) return;
+
   // IE won't have event
   if (!event) {
     event = window.event;
