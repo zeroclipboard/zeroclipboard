@@ -29,7 +29,7 @@ ZeroClipboard.destroy = function () {
   if (!bridge) return;
 
   // delete the client object
-  delete ZeroClipboard.Client.prototype._singleton;
+  delete ZeroClipboard.prototype._singleton;
 
   // remove the bridge
   bridge.parentNode.removeChild(bridge);

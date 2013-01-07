@@ -44,7 +44,7 @@ var _elementMouseOver = function (event) {
   } else if (event.srcElement) {
     target = event.srcElement;
   }
-  ZeroClipboard.Client.prototype._singleton.setCurrent(target);
+  ZeroClipboard.prototype._singleton.setCurrent(target);
 };
 
 // private function for adding events to the dom, IE before 9 is suckage

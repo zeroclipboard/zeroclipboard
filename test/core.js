@@ -8,7 +8,7 @@ exports.core = {
   "Changing movie path works": function (test) {
 
     zeroClipboard = require("../ZeroClipboard");
-    clip = new zeroClipboard.Client();
+    clip = new zeroClipboard();
 
     // Test the client has default path
     test.equal(clip.options.moviePath, "ZeroClipboard.swf");
@@ -26,7 +26,7 @@ exports.core = {
   "Set trusted domain": function (test) {
 
     zeroClipboard = require("../ZeroClipboard");
-    clip = new zeroClipboard.Client();
+    clip = new zeroClipboard();
 
     // Test the _trustedDomain is undefined
     test.equal(clip.options.trustedDomain, undefined);
@@ -43,19 +43,19 @@ exports.core = {
   "destroy clears up the client": function (test) {
 
     zeroClipboard = require("../ZeroClipboard");
-    clip = new zeroClipboard.Client();
+    clip = new zeroClipboard();
 
     zeroClipboard.destroy();
 
     test.equal($("#global-zeroclipboard-html-bridge").length, 0);
-    test.ok(!zeroClipboard.Client.prototype._singleton);
+    test.ok(!zeroClipboard.prototype._singleton);
 
     test.done();
   },
 
   "Detecting no flash": function (test) {
     zeroClipboard = require("../ZeroClipboard");
-    clip = new zeroClipboard.Client();
+    clip = new zeroClipboard();
 
     navigator.mimeTypes["application/x-shockwave-flash"] = undefined;
 
@@ -70,7 +70,7 @@ exports.core = {
   "Detecting has flash mimetype": function (test) {
 
     zeroClipboard = require("../ZeroClipboard");
-    clip = new zeroClipboard.Client();
+    clip = new zeroClipboard();
 
     // Test that we don't have flash
     test.equal(zeroClipboard.detectFlashSupport(), true);
@@ -86,7 +86,7 @@ exports.core = {
       moviePath: "the/path"
     });
 
-    clip = new zeroClipboard.Client();
+    clip = new zeroClipboard();
 
     test.equal(clip.options.moviePath, "the/path");
 
