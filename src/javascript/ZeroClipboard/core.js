@@ -1,23 +1,20 @@
 ZeroClipboard.version = "{{version}}";
-ZeroClipboard._moviePath = 'ZeroClipboard.swf'; // URL to movie
-
-/*
- * Set the movie path for the flash file.
- *
- * returns nothing
- */
-ZeroClipboard.setMoviePath = function (path) {
-  // set path to ZeroClipboard.swf
-  this._moviePath = path;
+// ZeroClipboard options defaults
+var _defaults = {
+  moviePath:        "ZeroClipboard.swf",        // URL to movie
+  trustedDomains:   null,                       // Domains that we should trust
+  text:             null,                       // The text to be copied
+  hoverClass:       "zeroclipboard-is-hover",   // The class used to hover over the object
+  activeClass:      "zeroclipboard-is-active"   // The class used to set object active
 };
 
 /*
- * Sets trusted domain to configure the flash file with.
+ * Set defaults.
  *
  * returns nothing
  */
-ZeroClipboard.setTrustedDomain = function (domain) {
-  this._trustedDomain = domain;
+ZeroClipboard.setDefaults = function (options) {
+  for (var ko in options) _defaults[ko] = options[ko];
 };
 
 /*
@@ -26,22 +23,17 @@ ZeroClipboard.setTrustedDomain = function (domain) {
  * returns nothing
  */
 ZeroClipboard.destroy = function () {
-  // get the bridge
-  var bridge = document.getElementById("global-zeroclipboard-html-bridge");
-
-  // if no bridge exists return
-  if (!bridge) return;
 
   // unglue all the elements
   ZeroClipboard.prototype._singleton.unglue(gluedElements);
 
-  // delete the client object
-  delete ZeroClipboard.prototype._singleton;
-  delete ZeroClipboard._trustedDomain;
-  ZeroClipboard._moviePath = 'ZeroClipboard.swf';
+  var bridge = ZeroClipboard.prototype._singleton.htmlBridge;
 
   // remove the bridge
   bridge.parentNode.removeChild(bridge);
+
+  // delete the client object
+  delete ZeroClipboard.prototype._singleton;
 };
 
 /*

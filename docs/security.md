@@ -10,7 +10,7 @@ Basically, if an attacker gets access to the main window/global object via an XS
  3. The `ZeroClipboard.prototype` object itself is not globally accessible.
  4. No `ZeroClipboard` instances are globally accessible.
  5. No callback functions for dispatched ZeroClipboard events are globally accessible.
- 6. If a variable is used to set the path to the SWF via `ZeroClipboard#setMoviePath`, that variable must not be globally accessible.
+ 6. If a variable is used to set the path to the SWF via `ZeroClipboard#setDefaults`, that variable must not be globally accessible.
 
 #### Examples
 

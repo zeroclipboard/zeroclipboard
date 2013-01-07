@@ -124,11 +124,11 @@ exports.utils = {
 
   "_vars builds flashvars": function (test) {
 
-    test.equal(_utils._vars(), "");
+    test.equal(_utils._vars(clip.options), "");
 
-    ZeroClipboard.setTrustedDomain("*");
+    clip.options.trustedDomains = ["*"];
 
-    test.equal(_utils._vars(), "trustedDomain=*");
+    test.equal(_utils._vars(clip.options), "trustedDomain=*");
 
     test.done();
   },

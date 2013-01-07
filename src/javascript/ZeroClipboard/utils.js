@@ -30,6 +30,10 @@ var _getStyle = function (el, prop) {
  * returns nothing
  */
 var _elementMouseOver = function (event) {
+
+  // If the singleton doesn't exist return
+  if (!ZeroClipboard.prototype._singleton) return;
+
   // IE won't have event
   if (!event) {
     event = window.event;
@@ -193,11 +197,17 @@ var _noCache = function (path) {
  *
  * returns flashvars separated by &
  */
-var _vars = function () {
+var _vars = function (options) {
   var str = [];
 
   // if trusted domain is set
-  if (ZeroClipboard._trustedDomain) str.push("trustedDomain=" + ZeroClipboard._trustedDomain);
+  if (options.trustedDomains) {
+    if (options.trustedDomains.length) {
+      str.push("trustedDomain=" + options.trustedDomains.join(","));
+    } else {
+      str.push("trustedDomain=" + options.trustedDomains);
+    }
+  }
 
   // join the str by &
   return str.join("&");
@@ -221,4 +231,21 @@ var _inArray = function (elem, array) {
   }
 
   return -1;
+};
+
+/*
+ * private _prepGlue function.
+ * prepares the elements for gluing/ungluing
+ *
+ * returns the elements
+ */
+var _prepGlue = function (elements) {
+
+  // if elements is a string
+  if (typeof elements === "string") throw new TypeError("ZeroClipboard doesn't accept query strings.");
+
+  // if the elements isn't an array
+  if (!elements.length) return [elements];
+
+  return elements;
 };

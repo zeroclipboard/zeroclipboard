@@ -3,7 +3,7 @@
  *
  * returns the client instance if it's already created
  */
-var ZeroClipboard = function (elements) {
+var ZeroClipboard = function (elements, options) {
 
   // If the elements exist glue
   if (elements) (ZeroClipboard.prototype._singleton || this).glue(elements);
@@ -13,14 +13,19 @@ var ZeroClipboard = function (elements) {
 
   ZeroClipboard.prototype._singleton = this;
 
+  this.options = {};
+
+  // set the defaults
+  for (var kd in _defaults) this.options[kd] = _defaults[kd];
+
+  // overried the defaults
+  for (var ko in options) this.options[ko] = options[ko];
+
   // event handlers
   this.handlers = {};
 
-  // text
-  this._text = null;
-
   // setup the flash->Javascript bridge
-  if (ZeroClipboard.detectFlashSupport()) this.bridge();
+  if (ZeroClipboard.detectFlashSupport()) _bridge();
 
 };
 
@@ -42,7 +47,7 @@ ZeroClipboard.prototype.setCurrent = function (element) {
 
   this.reposition();
 
-  this.setText(this._text || element.getAttribute("data-clipboard-text"));
+  this.setText(this.options.text || element.getAttribute("data-clipboard-text"));
 
   // If the dom element has a title
   if (element.getAttribute("title")) {
@@ -60,18 +65,9 @@ ZeroClipboard.prototype.setCurrent = function (element) {
  */
 ZeroClipboard.prototype.setText = function (newText) {
   if (newText && newText !== "") {
-    this._text = newText;
+    this.options.text = newText;
     if (this.ready()) this.flashBridge.setText(newText);
   }
-};
-
-/*
- * Sets the object's _text to null
- *
- * returns nothing
- */
-ZeroClipboard.prototype.resetText = function () {
-  this._text = null;
 };
 
 /*

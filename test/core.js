@@ -4,54 +4,59 @@ require("./fixtures/env")
 var zeroClipboard, clip;
 
 exports.core = {
-  setUp: function (callback) {
-    zeroClipboard = require("../ZeroClipboard");
-    clip = new zeroClipboard();
-    callback();
-  },
-
-  tearDown: function (callback) {
-    zeroClipboard.destroy();
-    callback();
-  },
 
   "Changing movie path works": function (test) {
 
+    zeroClipboard = require("../ZeroClipboard");
+    clip = new zeroClipboard();
+
     // Test the client has default path
-    test.equal(zeroClipboard._moviePath, "ZeroClipboard.swf");
+    test.equal(clip.options.moviePath, "ZeroClipboard.swf");
 
     // change the path
-    zeroClipboard.setMoviePath("new/movie/path.swf");
-    test.equal(zeroClipboard._moviePath, "new/movie/path.swf");
+    clip.options.moviePath = "new/movie/path.swf";
+
+    test.equal(clip.options.moviePath, "new/movie/path.swf");
 
     test.done();
+
+    zeroClipboard.destroy();
   },
 
   "Set trusted domain": function (test) {
 
+    zeroClipboard = require("../ZeroClipboard");
+    clip = new zeroClipboard();
+
     // Test the _trustedDomain is undefined
-    test.equal(zeroClipboard._trustedDomain, undefined);
+    test.equal(clip.options.trustedDomains, undefined);
 
     // change the path
-    zeroClipboard.setTrustedDomain("google.com");
-    test.equal(zeroClipboard._trustedDomain, "google.com");
+    clip.options.trustedDomains = "google.com";
+
+    test.equal(clip.options.trustedDomains, "google.com");
 
     test.done();
+    zeroClipboard.destroy();
   },
 
   "destroy clears up the client": function (test) {
+
+    zeroClipboard = require("../ZeroClipboard");
+    clip = new zeroClipboard();
 
     zeroClipboard.destroy();
 
     test.equal($("#global-zeroclipboard-html-bridge").length, 0);
     test.ok(!zeroClipboard.prototype._singleton);
-    test.ok(!zeroClipboard._trustedDomain);
-    test.equal(zeroClipboard._moviePath, 'ZeroClipboard.swf');
 
     test.done();
   },
 
   "Detecting no flash": function (test) {
+    zeroClipboard = require("../ZeroClipboard");
+    clip = new zeroClipboard();
+
     navigator.mimeTypes["application/x-shockwave-flash"] = undefined;
 
     // Test that we don't have flash
@@ -59,14 +64,34 @@ exports.core = {
 
     navigator.mimeTypes["application/x-shockwave-flash"] = true;
     test.done();
+    zeroClipboard.destroy();
   },
 
   "Detecting has flash mimetype": function (test) {
+
+    zeroClipboard = require("../ZeroClipboard");
+    clip = new zeroClipboard();
 
     // Test that we don't have flash
     test.equal(zeroClipboard.detectFlashSupport(), true);
 
     test.done();
+    zeroClipboard.destroy();
+  },
+
+  "Setting default options": function (test) {
+    zeroClipboard = require("../ZeroClipboard");
+
+    zeroClipboard.setDefaults({
+      moviePath: "the/path"
+    });
+
+    clip = new zeroClipboard();
+
+    test.equal(clip.options.moviePath, "the/path");
+
+    test.done();
+    zeroClipboard.destroy();
   },
 
 }

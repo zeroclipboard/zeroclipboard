@@ -3,19 +3,20 @@
  *
  * returns nothing
  */
-ZeroClipboard.prototype.bridge = function () {
+var _bridge = function () {
 
+  var client = ZeroClipboard.prototype._singleton;
   // try and find the current global bridge
-  this.htmlBridge = document.getElementById('global-zeroclipboard-html-bridge');
+  client.htmlBridge = document.getElementById('global-zeroclipboard-html-bridge');
 
-  if (this.htmlBridge) {
-    this.flashBridge = document["global-zeroclipboard-flash-bridge"];
+  if (client.htmlBridge) {
+    client.flashBridge = document["global-zeroclipboard-flash-bridge"];
     return;
   }
 
   var html = "\
     <object classid=\"clsid:d27cdb6e-ae6d-11cf-96b8-444553540000\" id=\"global-zeroclipboard-flash-bridge\" width=\"100%\" height=\"100%\"> \
-      <param name=\"movie\" value=\"" + ZeroClipboard._moviePath + _noCache(ZeroClipboard._moviePath) + "\"/> \
+      <param name=\"movie\" value=\"" + client.options.moviePath + _noCache(client.options.moviePath) + "\"/> \
       <param name=\"allowScriptAccess\" value=\"always\" /> \
       <param name=\"scale\" value=\"exactfit\"> \
       <param name=\"loop\" value=\"false\" /> \
@@ -23,8 +24,8 @@ ZeroClipboard.prototype.bridge = function () {
       <param name=\"quality\" value=\"best\" /> \
       <param name=\"bgcolor\" value=\"#ffffff\" /> \
       <param name=\"wmode\" value=\"transparent\"/> \
-      <param name=\"flashvars\" value=\"" + _vars() + "\"/> \
-      <embed src=\"" + ZeroClipboard._moviePath + _noCache(ZeroClipboard._moviePath) + "\" \
+      <param name=\"flashvars\" value=\"" + _vars(client.options) + "\"/> \
+      <embed src=\"" + client.options.moviePath + _noCache(client.options.moviePath) + "\" \
         loop=\"false\" menu=\"false\" \
         quality=\"best\" bgcolor=\"#ffffff\" \
         width=\"100%\" height=\"100%\" \
@@ -34,26 +35,26 @@ ZeroClipboard.prototype.bridge = function () {
         type=\"application/x-shockwave-flash\" \
         wmode=\"transparent\" \
         pluginspage=\"http://www.macromedia.com/go/getflashplayer\" \
-        flashvars=\"" + _vars() + "\" \
+        flashvars=\"" + _vars(client.options) + "\" \
         scale=\"exactfit\"> \
       </embed> \
     </object>";
 
-  this.htmlBridge = document.createElement('div');
-  this.htmlBridge.id = "global-zeroclipboard-html-bridge";
-  this.htmlBridge.setAttribute("class", "global-zeroclipboard-container");
-  this.htmlBridge.setAttribute("data-clipboard-ready", false);
-  this.htmlBridge.style.position = "absolute";
-  this.htmlBridge.style.left = "-9999px";
-  this.htmlBridge.style.top = "-9999px";
-  this.htmlBridge.style.width = "15px";
-  this.htmlBridge.style.height = "15px";
-  this.htmlBridge.style.zIndex = "9999";
+  client.htmlBridge = document.createElement('div');
+  client.htmlBridge.id = "global-zeroclipboard-html-bridge";
+  client.htmlBridge.setAttribute("class", "global-zeroclipboard-container");
+  client.htmlBridge.setAttribute("data-clipboard-ready", false);
+  client.htmlBridge.style.position = "absolute";
+  client.htmlBridge.style.left = "-9999px";
+  client.htmlBridge.style.top = "-9999px";
+  client.htmlBridge.style.width = "15px";
+  client.htmlBridge.style.height = "15px";
+  client.htmlBridge.style.zIndex = "9999";
 
-  this.htmlBridge.innerHTML = html;
+  client.htmlBridge.innerHTML = html;
 
-  document.body.appendChild(this.htmlBridge);
-  this.flashBridge = document["global-zeroclipboard-flash-bridge"];
+  document.body.appendChild(client.htmlBridge);
+  client.flashBridge = document["global-zeroclipboard-flash-bridge"];
 
 };
 
@@ -67,7 +68,7 @@ ZeroClipboard.prototype.resetBridge = function () {
   this.htmlBridge.style.top = "-9999px";
   this.htmlBridge.removeAttribute("title");
   this.htmlBridge.removeAttribute("data-clipboard-text");
-  _removeClass(currentElement, 'zeroclipboard-is-active');
+  _removeClass(currentElement, this.options.activeClass);
   currentElement = null;
 };
 

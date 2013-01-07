@@ -21,7 +21,7 @@ To use the library, simply include the following JavaScript file in your page:
 You also need to have the "`"ZeroClipboard.swf`" file available to the browser.  If this file is located in the same directory as your web page, then it will work out of the box.  However, if the SWF file is hosted elsewhere, you need to set the URL like this (place this code _after_ the script tag):
 
 ```
-ZeroClipboard.setMoviePath( 'http://YOURSERVER/path/ZeroClipboard.swf' );
+ZeroClipboard.setDefaults( { moviePath: 'http://YOURSERVER/path/ZeroClipboard.swf' } );
 ```
 
 ## Clients
@@ -42,7 +42,19 @@ Next, you can set some options.
 
 ## Setting Options
 
-Once you have your client instance, you can set some options.  These include setting the initial text to be copied, amongst other things.  The following subsections describe all the available options you can set.
+There are default options you can set before, or when you create a new client.
+
+```js
+var _defaults = {
+  moviePath:        "ZeroClipboard.swf",        // URL to movie
+  trustedDomain:    undefined,                  // Domains that we should trust
+  hoverClass:       "zeroclipboard-is-hover",   // The class used to hover over the object
+  activeClass:      "zeroclipboard-is-active"   // The class used to set object active
+};
+```
+You can override the defaults using `ZeroClipboard.setDefaults({ moviePath: "new/path" })` before you create any clients.
+
+You can also set the options when creating a new client by passing an optional json object `new ZeroClipboard( $("#d_clip_button", { moviePath: "new/path", text: "Copy me!" }))`
 
 ### Text To Copy
 
