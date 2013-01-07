@@ -193,11 +193,11 @@ var _noCache = function (path) {
  *
  * returns flashvars separated by &
  */
-var _vars = function () {
+var _vars = function (options) {
   var str = [];
 
   // if trusted domain is set
-  if (ZeroClipboard._trustedDomain) str.push("trustedDomain=" + ZeroClipboard._trustedDomain);
+  if (options.trustedDomain) str.push("trustedDomain=" + options.trustedDomain);
 
   // join the str by &
   return str.join("&");

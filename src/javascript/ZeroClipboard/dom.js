@@ -15,7 +15,7 @@ ZeroClipboard.Client.prototype.bridge = function () {
 
   var html = "\
     <object classid=\"clsid:d27cdb6e-ae6d-11cf-96b8-444553540000\" id=\"global-zeroclipboard-flash-bridge\" width=\"100%\" height=\"100%\"> \
-      <param name=\"movie\" value=\"" + ZeroClipboard._moviePath + _noCache(ZeroClipboard._moviePath) + "\"/> \
+      <param name=\"movie\" value=\"" + this.options.moviePath + _noCache(this.options.moviePath) + "\"/> \
       <param name=\"allowScriptAccess\" value=\"always\" /> \
       <param name=\"scale\" value=\"exactfit\"> \
       <param name=\"loop\" value=\"false\" /> \
@@ -23,8 +23,8 @@ ZeroClipboard.Client.prototype.bridge = function () {
       <param name=\"quality\" value=\"best\" /> \
       <param name=\"bgcolor\" value=\"#ffffff\" /> \
       <param name=\"wmode\" value=\"transparent\"/> \
-      <param name=\"flashvars\" value=\"" + _vars() + "\"/> \
-      <embed src=\"" + ZeroClipboard._moviePath + _noCache(ZeroClipboard._moviePath) + "\" \
+      <param name=\"flashvars\" value=\"" + _vars(this.options) + "\"/> \
+      <embed src=\"" + this.options.moviePath + _noCache(this.options.moviePath) + "\" \
         loop=\"false\" menu=\"false\" \
         quality=\"best\" bgcolor=\"#ffffff\" \
         width=\"100%\" height=\"100%\" \
@@ -34,7 +34,7 @@ ZeroClipboard.Client.prototype.bridge = function () {
         type=\"application/x-shockwave-flash\" \
         wmode=\"transparent\" \
         pluginspage=\"http://www.macromedia.com/go/getflashplayer\" \
-        flashvars=\"" + _vars() + "\" \
+        flashvars=\"" + _vars(this.options) + "\" \
         scale=\"exactfit\"> \
       </embed> \
     </object>";

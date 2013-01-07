@@ -44,23 +44,6 @@ exports.client = {
     test.done();
   },
 
-  "resetText clears the title": function (test) {
-    clip.glue($("#d_clip_button"));
-
-    clip.setCurrent($("#d_clip_button")[0]);
-
-    test.equal(clip._text, "Copy me!");
-
-    test.ok(clip._text);
-
-    clip.resetText();
-
-    test.equal(clip._text, null);
-
-    test.done();
-
-  },
-
   "setText overrides the data-clipboard-text attribute": function (test) {
     clip.glue($("#d_clip_button"));
 
@@ -68,25 +51,7 @@ exports.client = {
 
     clip.setCurrent($("#d_clip_button")[0]);
 
-    test.equal(clip._text, "This is the new text");
-
-    test.done();
-  },
-
-  "resetText turns things back to normal": function (test) {
-    clip.glue($("#d_clip_button"));
-
-    clip.setText("This is the new text");
-
-    clip.setCurrent($("#d_clip_button")[0]);
-
-    test.equal(clip._text, "This is the new text");
-
-    clip.resetText();
-
-    clip.setCurrent($("#d_clip_button")[0]);
-
-    test.equal(clip._text, "Copy me!");
+    test.equal(clip.options.text, "This is the new text");
 
     test.done();
   },
@@ -126,7 +91,7 @@ exports.client = {
 
     clip.setCurrent(element);
 
-    test.equal(clip._text, "Copy me!")
+    test.equal(clip.options.text, "Copy me!")
 
     clip.resetBridge();
 
