@@ -19,8 +19,7 @@ ZeroClipboard.prototype.on = function (eventName, func) {
   var events = eventName.toString().split(/\s/g);
   for (var i = 0; i < events.length; i++) {
     eventName = events[i].toLowerCase().replace(/^on/, '');
-    if (!this.handlers[eventName]) this.handlers[eventName] = [];
-    this.handlers[eventName].push(func);
+    if (!this.handlers[eventName]) this.handlers[eventName] = func;
   }
 
   // If we don't have flash, tell an adult
@@ -42,7 +41,7 @@ ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
   // receive event from flash
   eventName = eventName.toString().toLowerCase().replace(/^on/, '');
 
-  var currentElement = ZeroClipboard.currentElement;
+  var element = currentElement;
 
   // special behavior for certain events
   switch (eventName) {
@@ -57,20 +56,20 @@ ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
     break;
 
   case 'mouseover':
-    _addClass(currentElement, 'zeroclipboard-is-hover');
+    _addClass(element, 'zeroclipboard-is-hover');
     break;
 
   case 'mouseout':
-    _removeClass(currentElement, 'zeroclipboard-is-hover');
+    _removeClass(element, 'zeroclipboard-is-hover');
     this.resetBridge();
     break;
 
   case 'mousedown':
-    _addClass(currentElement, 'zeroclipboard-is-active');
+    _addClass(element, 'zeroclipboard-is-active');
     break;
 
   case 'mouseup':
-    _removeClass(currentElement, 'zeroclipboard-is-active');
+    _removeClass(element, 'zeroclipboard-is-active');
     break;
 
   case 'complete':
@@ -79,18 +78,17 @@ ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
   } // switch eventName
 
   if (this.handlers[eventName]) {
-    for (var idx = 0, len = this.handlers[eventName].length; idx < len; idx++) {
-      var func = this.handlers[eventName][idx];
 
-      if (typeof(func) == 'function') {
-        // actual function reference
-        func.call(currentElement, this, args);
-      }
-      else if (typeof(func) == 'string') {
-        // name of function
-        window[func].call(currentElement, this, args);
-      }
-    } // foreach event handler defined
+    var func = this.handlers[eventName];
+
+    if (typeof(func) == 'function') {
+      // actual function reference
+      func.call(element, this, args);
+    }
+    else if (typeof(func) == 'string') {
+      // name of function
+      window[func].call(element, this, args);
+    }
   } // user defined handler for event
 };
 

@@ -131,18 +131,15 @@
     this._text = null;
     if (ZeroClipboard.detectFlashSupport()) this.bridge();
   };
+  var currentElement;
   ZeroClipboard.prototype.setCurrent = function(element) {
-    ZeroClipboard.currentElement = element;
+    currentElement = element;
     this.reposition();
     this.setText(this._text || element.getAttribute("data-clipboard-text"));
     if (element.getAttribute("title")) {
       this.setTitle(element.getAttribute("title"));
     }
-    if (_getStyle(element, "cursor") == "pointer") {
-      this.setHandCursor(true);
-    } else {
-      this.setHandCursor(false);
-    }
+    this.setHandCursor(_getStyle(element, "cursor") == "pointer");
   };
   ZeroClipboard.prototype.setText = function(newText) {
     if (newText && newText !== "") {
@@ -217,16 +214,16 @@
     this.htmlBridge.style.top = "-9999px";
     this.htmlBridge.removeAttribute("title");
     this.htmlBridge.removeAttribute("data-clipboard-text");
-    _removeClass(ZeroClipboard.currentElement, "zeroclipboard-is-active");
-    delete ZeroClipboard.currentElement;
+    _removeClass(currentElement, "zeroclipboard-is-active");
+    currentElement = null;
   };
   ZeroClipboard.prototype.ready = function() {
     var ready = this.htmlBridge.getAttribute("data-clipboard-ready");
     return ready === "true" || ready === true;
   };
   ZeroClipboard.prototype.reposition = function() {
-    if (!ZeroClipboard.currentElement) return false;
-    var pos = _getDOMObjectPosition(ZeroClipboard.currentElement);
+    if (!currentElement) return false;
+    var pos = _getDOMObjectPosition(currentElement);
     this.htmlBridge.style.top = pos.top + "px";
     this.htmlBridge.style.left = pos.left + "px";
     this.htmlBridge.style.width = pos.width + "px";
@@ -241,8 +238,7 @@
     var events = eventName.toString().split(/\s/g);
     for (var i = 0; i < events.length; i++) {
       eventName = events[i].toLowerCase().replace(/^on/, "");
-      if (!this.handlers[eventName]) this.handlers[eventName] = [];
-      this.handlers[eventName].push(func);
+      if (!this.handlers[eventName]) this.handlers[eventName] = func;
     }
     if (this.handlers.noflash && !ZeroClipboard.detectFlashSupport()) {
       this.receiveEvent("onNoFlash", null);
@@ -253,7 +249,7 @@
   };
   ZeroClipboard.prototype.receiveEvent = function(eventName, args) {
     eventName = eventName.toString().toLowerCase().replace(/^on/, "");
-    var currentElement = ZeroClipboard.currentElement;
+    var element = currentElement;
     switch (eventName) {
      case "load":
       if (args && parseFloat(args.flashVersion.replace(",", ".").replace(/[^0-9\.]/gi, "")) < 10) {
@@ -265,30 +261,28 @@
       this.htmlBridge.setAttribute("data-clipboard-ready", true);
       break;
      case "mouseover":
-      _addClass(currentElement, "zeroclipboard-is-hover");
+      _addClass(element, "zeroclipboard-is-hover");
       break;
      case "mouseout":
-      _removeClass(currentElement, "zeroclipboard-is-hover");
+      _removeClass(element, "zeroclipboard-is-hover");
       this.resetBridge();
       break;
      case "mousedown":
-      _addClass(currentElement, "zeroclipboard-is-active");
+      _addClass(element, "zeroclipboard-is-active");
       break;
      case "mouseup":
-      _removeClass(currentElement, "zeroclipboard-is-active");
+      _removeClass(element, "zeroclipboard-is-active");
       break;
      case "complete":
       this.resetText();
       break;
     }
     if (this.handlers[eventName]) {
-      for (var idx = 0, len = this.handlers[eventName].length; idx < len; idx++) {
-        var func = this.handlers[eventName][idx];
-        if (typeof func == "function") {
-          func.call(currentElement, this, args);
-        } else if (typeof func == "string") {
-          window[func].call(currentElement, this, args);
-        }
+      var func = this.handlers[eventName];
+      if (typeof func == "function") {
+        func.call(element, this, args);
+      } else if (typeof func == "string") {
+        window[func].call(element, this, args);
       }
     }
   };

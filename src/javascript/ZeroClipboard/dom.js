@@ -67,8 +67,8 @@ ZeroClipboard.prototype.resetBridge = function () {
   this.htmlBridge.style.top = "-9999px";
   this.htmlBridge.removeAttribute("title");
   this.htmlBridge.removeAttribute("data-clipboard-text");
-  _removeClass(ZeroClipboard.currentElement, 'zeroclipboard-is-active');
-  delete ZeroClipboard.currentElement;
+  _removeClass(currentElement, 'zeroclipboard-is-active');
+  currentElement = null;
 };
 
 /*
@@ -91,9 +91,9 @@ ZeroClipboard.prototype.ready = function () {
 ZeroClipboard.prototype.reposition = function () {
 
   // If there is no currentElement return
-  if (!ZeroClipboard.currentElement) return false;
+  if (!currentElement) return false;
 
-  var pos = _getDOMObjectPosition(ZeroClipboard.currentElement);
+  var pos = _getDOMObjectPosition(currentElement);
 
   // new css
   this.htmlBridge.style.top    = pos.top + "px";
