@@ -184,6 +184,7 @@
   var _defaults = {
     moviePath: "ZeroClipboard.swf",
     trustedDomains: null,
+    text: null,
     hoverClass: "zeroclipboard-is-hover",
     activeClass: "zeroclipboard-is-active"
   };
