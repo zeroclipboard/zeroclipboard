@@ -29,8 +29,9 @@ var ZeroClipboard = function (elements, options) {
 
 };
 
-// keep track of the current element that is being hovered.
-var currentElement;
+
+var currentElement,      // keep track of the current element that is being hovered.
+    gluedElements = [];  // watch glued elements so we don't double glue
 
 /*
  * Sets the current html object that the flash object should overlay.

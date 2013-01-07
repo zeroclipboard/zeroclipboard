@@ -108,7 +108,15 @@ ZeroClipboard.prototype.glue = function (elements) {
   if (!elements.length) elements = [elements];
 
   for (var i = 0; i < elements.length ; i++) {
-    _addEventHandler(elements[i], "mouseover", _elementMouseOver);
+
+    // if the element has not been glued
+    if (_inArray(elements[i], gluedElements) == -1) {
+
+      // push to glued elements
+      gluedElements.push(elements[i]);
+
+      _addEventHandler(elements[i], "mouseover", _elementMouseOver);
+    }
   }
 };
 
@@ -125,7 +133,15 @@ ZeroClipboard.prototype.unglue = function (elements) {
   // if the elements isn't an array
   if (!elements.length) elements = [elements];
 
-  for (var i = 0; i < elements.length ; i++) {
+  for (var i = 0; i < elements.length; i++) {
+
     _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
+
+    // get the index of the item
+    var arrayIndex = _inArray(elements[i], gluedElements);
+
+    // if the index is not -1, remove from array
+    if (arrayIndex != -1) gluedElements.splice(arrayIndex, 1);
   }
+
 };
