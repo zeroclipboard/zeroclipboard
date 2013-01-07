@@ -32,6 +32,9 @@ ZeroClipboard.destroy = function () {
   // if no bridge exists return
   if (!bridge) return;
 
+  // unglue all the elements
+  ZeroClipboard.prototype._singleton.unglue(gluedElements);
+
   // delete the client object
   delete ZeroClipboard.prototype._singleton;
   delete ZeroClipboard._trustedDomain;

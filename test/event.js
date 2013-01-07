@@ -27,11 +27,25 @@ exports.event = {
     test.done();
   },
 
+  "unglue element removes items": function (test) {
+
+    clip.glue($("#d_clip_button, #d_clip_button2, #d_clip_button3"))
+
+    clip.unglue($("#d_clip_button3, #d_clip_button2"));
+
+    test.done();
+  },
+
   "Glue element with query string throws TypeError": function (test) {
 
     test.throws(function(){
       clip.glue("#d_clip_button")
     }, TypeError);
+
+    test.done();
+  },
+
+  "Element won't be glued twice": function(test) {
 
     test.done();
   },

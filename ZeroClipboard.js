@@ -123,6 +123,17 @@
     if (ZeroClipboard._trustedDomain) str.push("trustedDomain=" + ZeroClipboard._trustedDomain);
     return str.join("&");
   };
+  var _inArray = function(elem, array) {
+    if (array.indexOf) {
+      return array.indexOf(elem);
+    }
+    for (var i = 0, length = array.length; i < length; i++) {
+      if (array[i] === elem) {
+        return i;
+      }
+    }
+    return -1;
+  };
   var ZeroClipboard = function(elements) {
     if (elements) (ZeroClipboard.prototype._singleton || this).glue(elements);
     if (ZeroClipboard.prototype._singleton) return ZeroClipboard.prototype._singleton;
@@ -131,7 +142,7 @@
     this._text = null;
     if (ZeroClipboard.detectFlashSupport()) this.bridge();
   };
-  var currentElement;
+  var currentElement, gluedElements = [];
   ZeroClipboard.prototype.setCurrent = function(element) {
     currentElement = element;
     this.reposition();
@@ -170,6 +181,7 @@
   ZeroClipboard.destroy = function() {
     var bridge = document.getElementById("global-zeroclipboard-html-bridge");
     if (!bridge) return;
+    ZeroClipboard.prototype._singleton.unglue(gluedElements);
     delete ZeroClipboard.prototype._singleton;
     delete ZeroClipboard._trustedDomain;
     ZeroClipboard._moviePath = "ZeroClipboard.swf";
@@ -290,7 +302,10 @@
     if (typeof elements === "string") throw new TypeError("ZeroClipboard doesn't accept query strings.");
     if (!elements.length) elements = [ elements ];
     for (var i = 0; i < elements.length; i++) {
-      _addEventHandler(elements[i], "mouseover", _elementMouseOver);
+      if (_inArray(elements[i], gluedElements) == -1) {
+        gluedElements.push(elements[i]);
+        _addEventHandler(elements[i], "mouseover", _elementMouseOver);
+      }
     }
   };
   ZeroClipboard.prototype.unglue = function(elements) {
@@ -298,6 +313,8 @@
     if (!elements.length) elements = [ elements ];
     for (var i = 0; i < elements.length; i++) {
       _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
+      var arrayIndex = _inArray(elements[i], gluedElements);
+      if (arrayIndex != -1) gluedElements.splice(arrayIndex, 1);
     }
   };
   if (typeof module !== "undefined") {

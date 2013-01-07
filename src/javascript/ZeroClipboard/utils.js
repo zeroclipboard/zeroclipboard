@@ -202,3 +202,23 @@ var _vars = function () {
   // join the str by &
   return str.join("&");
 };
+
+/*
+ * private _inArray function.
+ * gets the index of an elem in an array
+ *
+ * returns the index of an element in the array, -1 if not found
+ */
+var _inArray = function (elem, array) {
+  if (array.indexOf) {
+    return array.indexOf(elem);
+  }
+
+  for (var i = 0, length = array.length; i < length; i++) {
+    if (array[i] === elem) {
+      return i;
+    }
+  }
+
+  return -1;
+};
