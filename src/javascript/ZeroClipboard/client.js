@@ -1,17 +1,17 @@
 /*
  * Creates a new ZeroClipboard client. from an element, or array of elements.
  *
- * returns _client instance if it's already created
+ * returns the client instance if it's already created
  */
 var ZeroClipboard = function (elements) {
 
-  var singleton = ZeroClipboard._client;
+  // If the elements exist glue
+  if (elements) (ZeroClipboard.prototype._singleton || this).glue(elements);
 
   // If there's a client already, return the singleton
-  if (singleton) {
-    if (elements) singleton.glue(elements);
-    return singleton;
-  }
+  if (ZeroClipboard.prototype._singleton) return ZeroClipboard.prototype._singleton;
+
+  ZeroClipboard.prototype._singleton = this;
 
   // event handlers
   this.handlers = {};
@@ -22,10 +22,6 @@ var ZeroClipboard = function (elements) {
   // setup the flash->Javascript bridge
   if (ZeroClipboard.detectFlashSupport()) this.bridge();
 
-  // If the elements exist glue
-  if (elements) this.glue(elements);
-
-  ZeroClipboard._client = this;
 };
 
 /*
