@@ -91,7 +91,7 @@ exports.client = {
 
     clip.setCurrent(element);
 
-    test.equal(clip.options.text, "Copy me!")
+    test.equal(clip.htmlBridge.getAttribute("data-clipboard-text"), "Copy me!")
 
     clip.resetBridge();
 
