@@ -240,6 +240,7 @@
     this.htmlBridge.removeAttribute("data-clipboard-text");
     _removeClass(currentElement, this.options.activeClass);
     currentElement = null;
+    this.options.text = null;
   };
   ZeroClipboard.prototype.ready = function() {
     var ready = this.htmlBridge.getAttribute("data-clipboard-ready");
