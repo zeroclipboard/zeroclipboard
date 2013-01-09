@@ -1,4 +1,4 @@
-# set a environment variable to override this to your location. export SWF_COMPILER = /My/Location/bin/mxmlc
+# set an environment variable to override this to your location. export SWF_COMPILER = /My/Location/bin/mxmlc
 SWF_COMPILER ?= /Applications/Adobe\ Flash\ Builder\ 4.7/sdks/4.6.0/bin/mxmlc -static-link-runtime-shared-libraries=true
 
 NODE_PATH ?= ./node_modules
