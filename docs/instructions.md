@@ -47,7 +47,7 @@ There are default options you can set before, or when you create a new client.
 ```js
 var _defaults = {
   moviePath:        "ZeroClipboard.swf",        // URL to movie
-  trustedDomain:    undefined,                  // Domains that we should trust
+  trustedDomains:   undefined,                 // Domains that we should trust (single string or array of strings)
   hoverClass:       "zeroclipboard-is-hover",   // The class used to hover over the object
   activeClass:      "zeroclipboard-is-active"   // The class used to set object active
 };
