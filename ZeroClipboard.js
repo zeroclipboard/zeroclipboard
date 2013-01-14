@@ -160,8 +160,6 @@
   ZeroClipboard.prototype.setCurrent = function(element) {
     currentElement = element;
     this.reposition();
-    this.htmlBridge.setAttribute("data-clipboard-text", this.options.text || element.getAttribute("data-clipboard-text"));
-    if (this.ready()) this.flashBridge.setText(this.options.text || element.getAttribute("data-clipboard-text"));
     if (element.getAttribute("title")) {
       this.setTitle(element.getAttribute("title"));
     }
@@ -296,6 +294,16 @@
       break;
      case "mouseup":
       _removeClass(element, this.options.activeClass);
+      break;
+     case "datarequested":
+      var targetId = element.getAttribute("data-clipboard-target"), targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        var textContent = targetEl.value || targetEl.textContent || targetEl.innerText;
+        if (textContent) this.setText(textContent);
+      } else {
+        var defaultText = element.getAttribute("data-clipboard-text");
+        if (defaultText) this.setText(defaultText);
+      }
       break;
      case "complete":
       this.options.text = null;

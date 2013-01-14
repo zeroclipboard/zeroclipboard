@@ -23,7 +23,7 @@
     private var button:Sprite;
 
     // The text in the clipboard
-    private var clipText:String = '';
+    private var clipText:String = "";
 
     // The format of the clipboard text we only support text right now
     private var clipFormat:String = ClipboardFormats.TEXT_FORMAT;
@@ -89,6 +89,9 @@
         text: clipText.split("\\").join("\\\\"),
         format: clipFormat
       }));
+
+      // reset the text
+      clipText = "";
     }
 
     // mouseOver
@@ -116,6 +119,13 @@
     // returns nothing
     private function mouseDown(event:MouseEvent): void {
       ExternalInterface.call( 'ZeroClipboard.dispatch', 'mouseDown', metaData(event) );
+
+      // if the clipText hasn't been set
+      if (clipText == "") {
+
+        // request data from the page
+        ExternalInterface.call( 'ZeroClipboard.dispatch', 'dataRequested', metaData(event) );
+      }
     }
 
     // mouseUp
