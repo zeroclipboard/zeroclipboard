@@ -76,7 +76,7 @@ clip.setText( "Copy me!" );
 
 Gluing refers to the process of "linking" the Flash movie to a DOM element on the page. Since the Flash movie is completely transparent, the user sees nothing out of the ordinary.
 
-The Flash movie receives the click event and copies the textto the clipboard.  Also, mouse actions like hovering and mouse-down generate events that you can capture (see *Event Handlers* below).
+The Flash movie receives the click event and copies the text to the clipboard.  Also, mouse actions like hovering and mouse-down generate events that you can capture (see *[Event Handlers](#event-handlers)* below).
 
 To glue elements, you must pass an element, or array of elements to the glue function.
 
