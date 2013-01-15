@@ -54,7 +54,7 @@ var _defaults = {
 ```
 You can override the defaults using `ZeroClipboard.setDefaults({ moviePath: "new/path" })` before you create any clients.
 
-You can also set the options when creating a new client by passing an optional json object `new ZeroClipboard( $("#d_clip_button", { moviePath: "new/path", text: "Copy me!" }))`
+You can also set the options when creating a new client by passing an optional json object `new ZeroClipboard($("#d_clip_button"), { moviePath: "new/path", text: "Copy me!" })`
 
 ### Text To Copy
 
