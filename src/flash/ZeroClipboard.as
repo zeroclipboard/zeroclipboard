@@ -1,4 +1,4 @@
-﻿package {
+package {
 
   import flash.display.Stage;
   import flash.display.Sprite;
@@ -121,7 +121,7 @@
       ExternalInterface.call( 'ZeroClipboard.dispatch', 'mouseDown', metaData(event) );
 
       // if the clipText hasn't been set
-      if (clipText == "") {
+      if (!clipText) {
 
         // request data from the page
         ExternalInterface.call( 'ZeroClipboard.dispatch', 'dataRequested', metaData(event) );
