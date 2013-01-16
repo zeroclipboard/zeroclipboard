@@ -58,19 +58,39 @@ You can also set the options when creating a new client by passing an optional j
 
 ### Text To Copy
 
-Setting the clipboard text happens 2 ways.
+Setting the clipboard text happens 3 ways.
 
-Set the text via `data-clipboard-text` attribute on the button. Doing this will let ZeroClipboard take care of the rest.
+1. Set the text via `data-clipboard-target` attribute on the button. ZeroClipboard will look for the target element via ID and try and get the text value via `.value` or `.textContent` or `.innerText`.
 
-```
-<button id="my-button" data-clipboard-text="Copy me!">Copy to Clipboard</button>
-```
+  ```html
+  <button id="my-button" data-clipboard-target="clipboard_text">Copy to Clipboard</button>
 
-Set the text via `clip.setText` property.  You can call this function at any time; when the page first loads, or later in an `onMouseOver` or `onMouseDown` handler.  Example:
+  <input type="text" id="clipboard_text" value="Clipboard Text"/>
+  <textarea id="clipboard_textarea">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+  tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+  quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+  consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+  cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+  proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</textarea>
+  <pre id="clipboard_pre">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+  tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+  quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+  consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+  cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+  proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</pre>
+  ```
 
-```
-clip.setText( "Copy me!" );
-```
+2. Set the text via `data-clipboard-text` attribute on the button. Doing this will let ZeroClipboard take care of the rest.
+
+  ```html
+  <button id="my-button" data-clipboard-text="Copy me!">Copy to Clipboard</button>
+  ```
+
+3. Set the text via `clip.setText` property.  You can call this function at any time; when the page first loads, or later in an `onMouseOver` or `onMouseDown` handler.  Example:
+
+  ```js
+  clip.setText( "Copy me!" );
+  ```
 
 ### Gluing
 
@@ -315,6 +335,25 @@ The `wrongflash` event is fired when the user has the wrong version of flash. Ze
 ```
 clip.on( 'wrongflash', function ( client, args ) {
   alert("Your flash is too old " + args.flashVersion);
+} );
+```
+
+The handler is passed these options to the `args`
+
+<dl>
+<dt>this</dt>
+<dd>The current element that is being provoked. if null this will be the window</dd>
+<dt>flashVersion</dt>
+<dd>This property contains the users' flash version</dd>
+</dl>
+
+#### dataRequested
+
+On mousedown, the flash object will check and see if the `clipText` has been set. If it hasn't, then it will fire off a `dataRequested` event. If the html object has `data-clipboard-text` or `data-clipboard-target` then ZeroClipboard will take care of getting the data. However if it hasn't been set, then it will be up to you to `clip.setText` from that method. Which will complete the loop.
+
+```
+clip.on( 'dataRequested', function ( client, args ) {
+  clip.setText( 'Copied to clipboard.' );
 } );
 ```
 
