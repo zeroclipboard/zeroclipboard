@@ -17,9 +17,29 @@
     <p id="d_clip_container">
       <button id="d_clip_button_no_text" class="my_clip_button"><b>Copy To Clipboard...</b></button>
     </p>
+    <p id="d_clip_container">
+      <button id="d_clip_button_input_text" class="my_clip_button" data-clipboard-target="clipboard_text"><b>Copy To Clipboard...</b></button>
+    </p>
+    <p id="d_clip_container">
+      <button id="d_clip_button_textarea_text" class="my_clip_button" data-clipboard-target="clipboard_textarea"><b>Copy To Clipboard...</b></button>
+    </p>
+    <button id="d_clip_button_pre_text" class="my_clip_button" data-clipboard-target="clipboard_pre"><b>Copy To Clipboard...</b></button>
     <a href="" class="no_pointer_anchor" style="cursor:default;"></a>
     <a href="" class="no_cursor_style" style="cursor:auto;"></a>
     <span class="zindex-auto" style="z-index:auto;"></span>
     <span class="big-border" style="border: 10px solid red;"></span>
+    <input type="text" id="clipboard_text" value="Clipboard Text"/>
+    <textarea id="clipboard_textarea">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</textarea>
+    <pre id="clipboard_pre">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</pre>
   </body>
 </html>

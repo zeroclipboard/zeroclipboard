@@ -1,5 +1,8 @@
 ### ZeroClipboard 1.1.7
 
+* [FEATURE] `data-clipboard-target` will look for an element by id, and get the value.
+* [FEATURE] `dataRequested` method will be called when the flash object is looking for data.
+
 ### ZeroClipboard 1.1.6
 
 ** IMPORTANT: WE NO LONGER ACCEPT QUERY STRINGS. INSTEAD PASS AN ELEMENT OR ARRAY OF ELEMENTS **

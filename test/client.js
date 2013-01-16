@@ -91,7 +91,67 @@ exports.client = {
 
     clip.setCurrent(element);
 
-    test.equal(clip.htmlBridge.getAttribute("data-clipboard-text"), "Copy me!")
+    zeroClipboard.dispatch("datarequested", { flashVersion: "MAC 11,0,0" });
+
+    test.equal(clip.options.text, "Copy me!")
+
+    clip.resetBridge();
+
+    test.done();
+  },
+
+  "Object has data-clipboard-target textarea": function (test) {
+
+    clip.glue($("#d_clip_button_textarea_text"));
+    var element = $("#d_clip_button_textarea_text")[0];
+
+    clip.setCurrent(element);
+
+    zeroClipboard.dispatch("datarequested", { flashVersion: "MAC 11,0,0" });
+
+    test.equal(clip.options.text, "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\n"+
+    "tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\n"+
+    "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\n"+
+    "consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\n"+
+    "cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\n"+
+    "proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+
+    clip.resetBridge();
+
+    test.done();
+  },
+
+  "Object has data-clipboard-target pre": function (test) {
+
+    clip.glue($("#d_clip_button_pre_text"));
+    var element = $("#d_clip_button_pre_text")[0];
+
+    clip.setCurrent(element);
+
+    zeroClipboard.dispatch("datarequested", { flashVersion: "MAC 11,0,0" });
+
+    test.equal(clip.options.text, "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\n"+
+    "tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\n"+
+    "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\n"+
+    "consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\n"+
+    "cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\n"+
+    "proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+
+    clip.resetBridge();
+
+    test.done();
+  },
+
+  "Object has data-clipboard-target input": function (test) {
+
+    clip.glue($("#d_clip_button_input_text"));
+    var element = $("#d_clip_button_input_text")[0];
+
+    clip.setCurrent(element);
+
+    zeroClipboard.dispatch("datarequested", { flashVersion: "MAC 11,0,0" });
+
+    test.equal(clip.options.text, "Clipboard Text")
 
     clip.resetBridge();
 
