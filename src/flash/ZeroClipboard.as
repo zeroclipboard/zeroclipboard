@@ -7,9 +7,6 @@ package {
   import flash.external.ExternalInterface;
   import flash.utils.*;
   import flash.system.Capabilities;
-  import flash.desktop.Clipboard;
-  import flash.desktop.ClipboardFormats;
-  import flash.desktop.ClipboardTransferMode;
 
   // ZeroClipboard
   //
@@ -24,9 +21,6 @@ package {
 
     // The text in the clipboard
     private var clipText:String = "";
-
-    // The format of the clipboard text we only support text right now
-    private var clipFormat:String = ClipboardFormats.TEXT_FORMAT;
 
     // constructor, setup event listeners and external interfaces
     public function ZeroClipboard() {
@@ -78,16 +72,13 @@ package {
     // returns nothing
     private function mouseClick(event:MouseEvent): void {
 
-      // Clear the current text from the clipboard
-      Clipboard.generalClipboard.clear();
-
-      // set the clipboard data from the variable
-      Clipboard.generalClipboard.setData(clipFormat, clipText);
+      // Linux currently doesn't use the correct clipboard buffer with the new
+      // Flash 10 API, so we need to use this until we can figure out an alternative
+      flash.system.System.setClipboard(clipText);
 
       // signal to the page it is done
       ExternalInterface.call( 'ZeroClipboard.dispatch', 'complete',  metaData(event, {
-        text: clipText.split("\\").join("\\\\"),
-        format: clipFormat
+        text: clipText.split("\\").join("\\\\")
       }));
 
       // reset the text

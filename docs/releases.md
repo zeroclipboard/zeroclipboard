@@ -2,6 +2,7 @@
 
 * [FEATURE] `data-clipboard-target` will look for an element by id, and get the value.
 * [FEATURE] `dataRequested` method will be called when the flash object is looking for data.
+* [BUG] On some linux distros, the copied text couldn't be pasted into terminal. #78
 
 ### ZeroClipboard 1.1.6
 
