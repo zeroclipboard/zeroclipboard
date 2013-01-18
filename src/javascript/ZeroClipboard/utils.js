@@ -171,8 +171,10 @@ var _getDOMObjectPosition = function (obj) {
 
     info.left += isNaN(obj.offsetLeft)  ? 0 : obj.offsetLeft;
     info.left += isNaN(borderLeftWidth) ? 0 : borderLeftWidth;
-    info.top  += isNaN(obj.offsetTop)   ? 0 : obj.offsetTop;
-    info.top  += isNaN(borderTopWidth)  ? 0 : borderTopWidth;
+    info.left -= isNaN(obj.scrollLeft)  ? 0 : obj.scrollLeft;
+    info.top += isNaN(obj.offsetTop)    ? 0 : obj.offsetTop;
+    info.top += isNaN(borderTopWidth)   ? 0 : borderTopWidth;
+    info.top -= isNaN(obj.scrollTop)    ? 0 : obj.scrollTop;
 
     obj = obj.offsetParent;
   }

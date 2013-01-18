@@ -110,8 +110,10 @@
       var borderTopWidth = parseInt(_getStyle(obj, "borderTopWidth"), 10);
       info.left += isNaN(obj.offsetLeft) ? 0 : obj.offsetLeft;
       info.left += isNaN(borderLeftWidth) ? 0 : borderLeftWidth;
+      info.left -= isNaN(obj.scrollLeft) ? 0 : obj.scrollLeft;
       info.top += isNaN(obj.offsetTop) ? 0 : obj.offsetTop;
       info.top += isNaN(borderTopWidth) ? 0 : borderTopWidth;
+      info.top -= isNaN(obj.scrollTop) ? 0 : obj.scrollTop;
       obj = obj.offsetParent;
     }
     return info;
@@ -269,6 +271,18 @@
     }
   };
   ZeroClipboard.prototype.addEventListener = ZeroClipboard.prototype.on;
+  ZeroClipboard.prototype.off = function(eventName, func) {
+    var events = eventName.toString().split(/\s/g);
+    for (var i = 0; i < events.length; i++) {
+      eventName = events[i].toLowerCase().replace(/^on/, "");
+      for (var event in this.handlers) {
+        if (event === eventName && this.handlers[event] === func) {
+          delete this.handlers[event];
+        }
+      }
+    }
+  };
+  ZeroClipboard.prototype.removeEventListener = ZeroClipboard.prototype.off;
   ZeroClipboard.prototype.receiveEvent = function(eventName, args) {
     eventName = eventName.toString().toLowerCase().replace(/^on/, "");
     var element = currentElement;

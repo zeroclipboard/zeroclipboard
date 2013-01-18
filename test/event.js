@@ -63,11 +63,45 @@ exports.event = {
     test.done();
   },
 
+  "Unegistering Events": function (test) {
+
+    var load = function(){};
+    var onNoFlash = function(){};
+    var onPhone = function(){};
+
+    clip.on("load",load);
+    clip.on("onNoFlash",onNoFlash);
+    clip.on("onPhone",onPhone);
+
+    clip.off("load",load);
+    test.ok(!clip.handlers.load);
+
+    clip.off("onNoFlash",onNoFlash);
+    test.ok(!clip.handlers.noflash);
+
+    clip.off("onPhone",onPhone);
+    test.ok(!clip.handlers.phone);
+
+    test.done();
+  },
+
   "Registering Events the old way": function (test) {
 
     clip.addEventListener("load",function(){});
 
     test.ok(clip.handlers.load);
+
+    test.done();
+  },
+
+  "Unregistering Events the old way": function (test) {
+
+    var func = function(){};
+
+    clip.addEventListener("load",func);
+    clip.removeEventListener("load",func);
+
+    test.ok(!clip.handlers.load);
 
     test.done();
   },
@@ -78,6 +112,19 @@ exports.event = {
 
     test.ok(clip.handlers.load);
     test.ok(clip.handlers.complete);
+
+    test.done();
+  },
+  
+  "Unregistering two events works": function (test) {
+
+    var func = function(){};
+
+    clip.on("load oncomplete",func);
+    clip.off("load oncomplete",func);
+
+    test.ok(!clip.handlers.load);
+    test.ok(!clip.handlers.complete);
 
     test.done();
   },

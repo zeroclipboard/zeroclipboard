@@ -31,6 +31,26 @@ ZeroClipboard.prototype.on = function (eventName, func) {
 ZeroClipboard.prototype.addEventListener = ZeroClipboard.prototype.on;
 
 /*
+ * Remove an event from the client.
+ *
+ * returns nothing
+ */
+ZeroClipboard.prototype.off = function (eventName, func) {
+  // remove user event listener for event
+  var events = eventName.toString().split(/\s/g);
+  for (var i = 0; i < events.length; i++) {
+    eventName = events[i].toLowerCase().replace(/^on/, "");
+    for (var event in this.handlers) {
+      if (event === eventName && this.handlers[event] === func) {
+        delete this.handlers[event];
+      }
+    }
+  }
+};
+// shortcut to old stuff
+ZeroClipboard.prototype.removeEventListener = ZeroClipboard.prototype.off;
+
+/*
  * Receive an event for a specific client.
  *
  * returns nothing

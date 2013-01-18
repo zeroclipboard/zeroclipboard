@@ -162,6 +162,12 @@ The first argument is the name of the event, and the second is a reference to yo
 
 Your custom function will be passed at least one argument -- a reference to the clipboard client object.  However, certain events pass additional arguments, which are described in each section below.  The following subsections describe all the available events you can hook.
 
+Event handlers can be removed by calling the `off()` method, which has the same method signature as `on()`:
+
+```
+clip.off( 'load', my_load_handler );
+```
+
 #### load
 
 The `load` event is fired when the Flash movie completes loading and is ready for action.  Please note that you don't need to listen for this event to set options -- those are automatically passed to the movie if you call them before it loads.  Example use:
