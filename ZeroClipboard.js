@@ -269,6 +269,18 @@
     }
   };
   ZeroClipboard.prototype.addEventListener = ZeroClipboard.prototype.on;
+  ZeroClipboard.prototype.off = function(eventName, func) {
+    var events = eventName.toString().split(/\s/g);
+    for (var i = 0; i < events.length; i++) {
+      eventName = events[i].toLowerCase().replace(/^on/, "");
+      for (var event in this.handlers) {
+        if (event === eventName && this.handlers[event] === func) {
+          delete this.handlers[event];
+        }
+      }
+    }
+  };
+  ZeroClipboard.prototype.removeEventListener = ZeroClipboard.prototype.off;
   ZeroClipboard.prototype.receiveEvent = function(eventName, args) {
     eventName = eventName.toString().toLowerCase().replace(/^on/, "");
     var element = currentElement;
