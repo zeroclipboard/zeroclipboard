@@ -296,9 +296,9 @@
       _removeClass(element, this.options.activeClass);
       break;
      case "datarequested":
-      var targetId = element.getAttribute("data-clipboard-target"), targetEl = document.getElementById(targetId);
-      if (targetEl) {
-        var textContent = targetEl.value || targetEl.textContent || targetEl.innerText;
+      var targetId = element.getAttribute("data-clipboard-target");
+      if (targetId && document.getElementById(targetId)) {
+        var targetEl = document.getElementById(targetId), textContent = targetEl.value || targetEl.textContent || targetEl.innerText;
         if (textContent) this.setText(textContent);
       } else {
         var defaultText = element.getAttribute("data-clipboard-text");
