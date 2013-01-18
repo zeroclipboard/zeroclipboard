@@ -91,8 +91,8 @@ ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
     break;
 
   case 'datarequested':
-    var targetId = element.getAttribute('data-clipboard-target') || "",
-       targetEl = document.getElementById(targetId);
+    var targetId = element.getAttribute('data-clipboard-target'),
+       targetEl = !targetId ? null : document.getElementById(targetId);
     if (targetEl) {
       var textContent = targetEl.value || targetEl.textContent || targetEl.innerText;
       if (textContent) this.setText(textContent);
