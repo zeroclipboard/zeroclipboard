@@ -37,7 +37,6 @@ ZeroClipboard.prototype.addEventListener = ZeroClipboard.prototype.on;
  */
 ZeroClipboard.prototype.off = function (eventName, func) {
   // remove user event listener for event
-  // event types: load, queueStart, fileStart, fileComplete, queueComplete, progress, error, cancel
   var events = eventName.toString().split(/\s/g);
   for (var i = 0; i < events.length; i++) {
     eventName = events[i].toLowerCase().replace(/^on/, "");
