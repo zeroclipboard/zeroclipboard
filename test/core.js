@@ -83,12 +83,14 @@ exports.core = {
     zeroClipboard = require("../ZeroClipboard");
 
     zeroClipboard.setDefaults({
-      moviePath: "the/path"
+      moviePath:         "the/path",
+      allowScriptAccess: "always"
     });
 
     clip = new zeroClipboard();
 
     test.equal(clip.options.moviePath, "the/path");
+    test.equal(clip.options.allowScriptAccess, "always");
 
     test.done();
     zeroClipboard.destroy();
