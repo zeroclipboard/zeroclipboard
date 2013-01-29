@@ -46,15 +46,24 @@ There are default options you can set before, or when you create a new client.
 
 ```js
 var _defaults = {
-  moviePath:        "ZeroClipboard.swf",        // URL to movie
-  trustedDomains:   undefined,                 // Domains that we should trust (single string or array of strings)
-  hoverClass:       "zeroclipboard-is-hover",   // The class used to hover over the object
-  activeClass:      "zeroclipboard-is-active"   // The class used to set object active
+  moviePath:         "ZeroClipboard.swf",        // URL to movie
+  trustedDomains:    undefined,                  // Domains that we should trust (single string or array of strings)
+  hoverClass:        "zeroclipboard-is-hover",   // The class used to hover over the object
+  activeClass:       "zeroclipboard-is-active",  // The class used to set object active
+  allowScriptAccess: "sameDomain"                // SWF outbound scripting policy
 };
 ```
 You can override the defaults using `ZeroClipboard.setDefaults({ moviePath: "new/path" })` before you create any clients.
 
 You can also set the options when creating a new client by passing an optional json object `new ZeroClipboard($("#d_clip_button"), { moviePath: "new/path", text: "Copy me!" })`
+
+#### A note on the `allowScriptAccess` option
+
+For version 1.1.7 and below, the `embed` tag had the `allowScriptAccess` parameter hard-coded to `always`. This allowed the "`"ZeroClipboard.swf`" file to be hosted on an external domain. However, to enhance security, versions after 1.1.7 have an option for `allowScriptAccess` with a default of `sameDomain`, which only allows "`"ZeroClipboard.swf`" to be served from the same domain as the hosting page.
+
+If you hosted "`"ZeroClipboard.swf`" on a different domain than the hosting page on version 1.1.7 or below, when you upgrade to a version above 1.1.7, you should either move "`"ZeroClipboard.swf`" to the same domain as the hosting page or set the `allowScriptAccess` option to `always`.
+
+For more information about `allowScriptAccess`, consult the *[official Flash documentation](http://helpx.adobe.com/flash/kb/control-access-scripts-host-web.html)*.
 
 ### Text To Copy
 
