@@ -188,7 +188,8 @@
     trustedDomains: null,
     text: null,
     hoverClass: "zeroclipboard-is-hover",
-    activeClass: "zeroclipboard-is-active"
+    activeClass: "zeroclipboard-is-active",
+    allowScriptAccess: "sameDomain"
   };
   ZeroClipboard.setDefaults = function(options) {
     for (var ko in options) _defaults[ko] = options[ko];
@@ -219,7 +220,7 @@
       client.flashBridge = document["global-zeroclipboard-flash-bridge"];
       return;
     }
-    var html = '    <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" id="global-zeroclipboard-flash-bridge" width="100%" height="100%">       <param name="movie" value="' + client.options.moviePath + _noCache(client.options.moviePath) + '"/>       <param name="allowScriptAccess" value="always" />       <param name="scale" value="exactfit">       <param name="loop" value="false" />       <param name="menu" value="false" />       <param name="quality" value="best" />       <param name="bgcolor" value="#ffffff" />       <param name="wmode" value="transparent"/>       <param name="flashvars" value="' + _vars(client.options) + '"/>       <embed src="' + client.options.moviePath + _noCache(client.options.moviePath) + '"         loop="false" menu="false"         quality="best" bgcolor="#ffffff"         width="100%" height="100%"         name="global-zeroclipboard-flash-bridge"         allowScriptAccess="always"         allowFullScreen="false"         type="application/x-shockwave-flash"         wmode="transparent"         pluginspage="http://www.macromedia.com/go/getflashplayer"         flashvars="' + _vars(client.options) + '"         scale="exactfit">       </embed>     </object>';
+    var html = '    <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" id="global-zeroclipboard-flash-bridge" width="100%" height="100%">       <param name="movie" value="' + client.options.moviePath + _noCache(client.options.moviePath) + '"/>       <param name="allowScriptAccess" value="' + client.options.allowScriptAccess + '" />       <param name="scale" value="exactfit">       <param name="loop" value="false" />       <param name="menu" value="false" />       <param name="quality" value="best" />       <param name="bgcolor" value="#ffffff" />       <param name="wmode" value="transparent"/>       <param name="flashvars" value="' + _vars(client.options) + '"/>       <embed src="' + client.options.moviePath + _noCache(client.options.moviePath) + '"         loop="false" menu="false"         quality="best" bgcolor="#ffffff"         width="100%" height="100%"         name="global-zeroclipboard-flash-bridge"         allowScriptAccess="always"         allowFullScreen="false"         type="application/x-shockwave-flash"         wmode="transparent"         pluginspage="http://www.macromedia.com/go/getflashplayer"         flashvars="' + _vars(client.options) + '"         scale="exactfit">       </embed>     </object>';
     client.htmlBridge = document.createElement("div");
     client.htmlBridge.id = "global-zeroclipboard-html-bridge";
     client.htmlBridge.setAttribute("class", "global-zeroclipboard-container");
