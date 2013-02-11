@@ -232,7 +232,7 @@
       document.body.appendChild(container);
     }
     client.htmlBridge = container;
-    client.flashBridge = container.children[0].children[9];
+    client.flashBridge = document["global-zeroclipboard-flash-bridge"] || container.children[0].lastElementChild;
   };
   ZeroClipboard.prototype.resetBridge = function() {
     this.htmlBridge.style.left = "-9999px";

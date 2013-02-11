@@ -51,7 +51,7 @@ var _bridge = function () {
   }
 
   client.htmlBridge = container;
-  client.flashBridge = container.children[0].children[9];
+  client.flashBridge = document["global-zeroclipboard-flash-bridge"] || container.children[0].lastElementChild;
 };
 
 /*
