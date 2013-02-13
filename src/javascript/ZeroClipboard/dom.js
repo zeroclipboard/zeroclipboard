@@ -36,7 +36,6 @@ var _bridge = function () {
       </object>";
 
     container = document.createElement("div");
-    container = ;
     container.id = "global-zeroclipboard-html-bridge";
     container.setAttribute("class", "global-zeroclipboard-container");
     container.setAttribute("data-clipboard-ready", false);
