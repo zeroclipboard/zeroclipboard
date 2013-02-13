@@ -80,5 +80,5 @@ Zero Clipboard 1.0.7 can now copy **Rich HTML** to the clipboard. When this is p
 
 Zero Clipboard 1.0.5 can now glue the Flash movie to a relatively positioned parent element (instead of the page body), resulting in perfect positioning of the movie on top of your copy button. This also allows you to use Zero Clipboard inside overflow:auto or position:fixed elements.
 
-The [Instructions](https://github.com/jonrohan/ZeroClipboard/blob/master/docs/instructions.md) have been updated with details on how to use the new feature. The API is 100% backward compatible with previous versions.
+The [Instructions](instructions.md) have been updated with details on how to use the new feature. The API is 100% backward compatible with previous versions.
 

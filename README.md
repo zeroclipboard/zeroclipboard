@@ -48,7 +48,7 @@ clip.on( 'mouseup', function(client) {
 } );
 ```
 
-See the [instructions](ZeroClipboard/blob/master/docs/instructions.md) for advanced instructions on how to use the library on your site.
+See the [instructions](instructions.md) for advanced instructions on how to use the library on your site.
 
 Here is a working [test page](http://jonrohan.github.com/ZeroClipboard/#demo) where you can try out ZeroClipboard in your browser.
 
@@ -75,15 +75,15 @@ Works in IE8+. Works in IE7 but requires Sizzle/jQuery. (And of course works in 
 
 ## Contributing
 
-see [CONTRIBUTING.md](ZeroClipboard/blob/master/CONTRIBUTING.md)
+see [CONTRIBUTING.md](docs/CONTRIBUTING.md)
 
 ## Releases
 
-see [releases.md](ZeroClipboard/blob/master/docs/releases.md)
+see [releases.md](docs/releases.md)
 
 ## Roadmap
 
-see [roadmap.md](ZeroClipboard/blob/master/docs/roadmap.md)
+see [roadmap.md](docs/roadmap.md)
 
 ## Last Build
 
