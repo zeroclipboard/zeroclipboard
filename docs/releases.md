@@ -9,8 +9,8 @@
 
 ### ZeroClipboard 1.1.6
 
-** IMPORTANT: WE NO LONGER ACCEPT QUERY STRINGS. INSTEAD PASS AN ELEMENT OR ARRAY OF ELEMENTS **
-** IMPORTANT: new ZeroClipboard.Client() is now new ZeroClipboard() **
+**IMPORTANT: WE NO LONGER ACCEPT QUERY STRINGS. INSTEAD PASS AN ELEMENT OR ARRAY OF ELEMENTS**<br/>
+**IMPORTANT: new ZeroClipboard.Client() is now new ZeroClipboard()**
 
 * [FEATURE] The selector `ZeroClipboard.$` was removed in favor of leaving it up to the user. #63
 * [FEATURE] Creating new instance of the class is easier `new ZeroClipboard()` #65
