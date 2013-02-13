@@ -75,7 +75,7 @@ Works in IE8+. Works in IE7 but requires Sizzle/jQuery. (And of course works in 
 
 ## Contributing
 
-see [CONTRIBUTING.md](docs/CONTRIBUTING.md)
+see [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Releases
 
