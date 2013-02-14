@@ -48,7 +48,7 @@ clip.on( 'mouseup', function(client) {
 } );
 ```
 
-See the [instructions](instructions.md) for advanced instructions on how to use the library on your site.
+See the [instructions](docs/instructions.md) for advanced instructions on how to use the library on your site.
 
 Here is a working [test page](http://jonrohan.github.com/ZeroClipboard/#demo) where you can try out ZeroClipboard in your browser.
 
