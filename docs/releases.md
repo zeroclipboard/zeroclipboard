@@ -3,6 +3,7 @@
 * [FEATURE] `data-clipboard-target` will look for an element by id, and get the value.
 * [FEATURE] `dataRequested` method will be called when the flash object is looking for data.
 * [FEATURE] Unregister events with .off #84
+* [FEATURE] [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) support #99
 * [BUG] Respect element scrollTo position #82 reverted 471974975064d710c15442c1170e9dbac9c542ec caused bugs #93
 * [BUG] On some linux distros, the copied text couldn't be pasted into terminal. #78
 * [BUG] Make ZeroClipboard XHTML compatible #95
