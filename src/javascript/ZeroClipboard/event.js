@@ -60,6 +60,7 @@ ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
   eventName = eventName.toString().toLowerCase().replace(/^on/, '');
 
   var element = currentElement;
+  var performCallbackAsync = true;
 
   // special behavior for certain events
   switch (eventName) {
@@ -101,6 +102,11 @@ ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
       var defaultText = element.getAttribute('data-clipboard-text');
       if (defaultText) this.setText(defaultText);
     }
+
+    // This callback cannot be performed asynchronously as it would prevent the
+    // user from being able to call `.setText` successfully before the pending
+    // clipboard injection associated with this event fires.
+    performCallbackAsync = false;
     break;
 
   case 'complete':
@@ -109,16 +115,15 @@ ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
   } // switch eventName
 
   if (this.handlers[eventName]) {
-
     var func = this.handlers[eventName];
 
-    if (typeof(func) == 'function') {
-      // actual function reference
-      func.call(element, this, args);
+    // If the user provided a string for their callback, grab that function
+    if (typeof func === 'string' && typeof window[func] === 'function') {
+      func = window[func];
     }
-    else if (typeof(func) == 'string') {
-      // name of function
-      window[func].call(element, this, args);
+    if (typeof func === 'function') {
+      // actual function reference
+      _dispatchCallback(func, element, this, args, performCallbackAsync);
     }
   } // user defined handler for event
 };

@@ -297,3 +297,21 @@ var _prepGlue = function (elements) {
 
   return elements;
 };
+
+
+/*
+ * private _dispatchCallback
+ * used to control if callback should be executed asynchronously or not
+ *
+ * returns nothing
+ */
+
+var _dispatchCallback = function (func, element, instance, args, async) {
+  if (async) {
+    window.setTimeout(function () {
+      func.call(element, instance, args);
+    }, 0);
+  } else {
+    func.call(element, instance, args);
+  }
+};

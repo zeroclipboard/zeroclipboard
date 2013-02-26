@@ -177,6 +177,15 @@
     if (!elements.length) return [ elements ];
     return elements;
   };
+  var _dispatchCallback = function(func, element, instance, args, async) {
+    if (async) {
+      window.setTimeout(function() {
+        func.call(element, instance, args);
+      }, 0);
+    } else {
+      func.call(element, instance, args);
+    }
+  };
   var ZeroClipboard = function(elements, options) {
     if (elements) (ZeroClipboard.prototype._singleton || this).glue(elements);
     if (ZeroClipboard.prototype._singleton) return ZeroClipboard.prototype._singleton;
@@ -324,6 +333,7 @@
   ZeroClipboard.prototype.receiveEvent = function(eventName, args) {
     eventName = eventName.toString().toLowerCase().replace(/^on/, "");
     var element = currentElement;
+    var performCallbackAsync = true;
     switch (eventName) {
      case "load":
       if (args && parseFloat(args.flashVersion.replace(",", ".").replace(/[^0-9\.]/gi, "")) < 10) {
@@ -356,6 +366,7 @@
         var defaultText = element.getAttribute("data-clipboard-text");
         if (defaultText) this.setText(defaultText);
       }
+      performCallbackAsync = false;
       break;
      case "complete":
       this.options.text = null;
@@ -363,10 +374,11 @@
     }
     if (this.handlers[eventName]) {
       var func = this.handlers[eventName];
-      if (typeof func == "function") {
-        func.call(element, this, args);
-      } else if (typeof func == "string") {
-        window[func].call(element, this, args);
+      if (typeof func === "string" && typeof window[func] === "function") {
+        func = window[func];
+      }
+      if (typeof func === "function") {
+        _dispatchCallback(func, element, this, args, performCallbackAsync);
       }
     }
   };

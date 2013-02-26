@@ -218,4 +218,33 @@ exports.utils = {
     test.done();
   },
 
+  "_dispatchCallback = function (func, element, instance, args, async) {": function (test) {
+    test.expect(6);
+    
+    var async = false;
+    var proof = false;
+    var proveIt = function() {
+      proof = true;
+      
+      if (async) {
+        test.strictEqual(proof, true);
+        
+        process.nextTick(function() {
+          test.strictEqual(proof, true);
+          test.done();
+        });
+      }
+    };
+    
+    test.strictEqual(proof, false);
+    _utils._dispatchCallback(proveIt, null, null, null, async);
+    test.strictEqual(proof, true);
+    
+    async = true;
+    proof = false;
+    test.strictEqual(proof, false);
+    _utils._dispatchCallback(proveIt, null, null, null, async);
+    test.strictEqual(proof, false);
+  }
+
 };
