@@ -173,6 +173,26 @@ var _removeClass = function (element, value) {
 };
 
 /*
+ * private get the zoom factor of the document. Always returns 1, except at
+ * non-default zoom levels in IE<8, and possibly some older versions of WebKit.
+ *
+ * returns floating unit percentage of the zoom factor (e.g. 150% = `1.5`)
+ */
+var _getZoomFactor = function () {
+  var rect, physicalWidth, logicalWidth,
+      zoomFactor = 1;
+  if (typeof document.body.getBoundingClientRect === "function") {
+    // rect is only in physical pixels in IE<8
+    rect = document.body.getBoundingClientRect();
+    physicalWidth = rect.right - rect.left;
+    logicalWidth = document.body.offsetWidth;
+
+    zoomFactor = Math.round((physicalWidth / logicalWidth) * 100) / 100;
+  }
+  return zoomFactor;
+};
+
+/*
  * private get the dom position of an object.
  *
  * returns json of object's position, height, width, and zIndex
@@ -182,8 +202,8 @@ var _getDOMObjectPosition = function (obj) {
   var info = {
     left:   0,
     top:    0,
-    width:  obj.width  || obj.offsetWidth  || 0,
-    height: obj.height || obj.offsetHeight || 0,
+    width:  0,
+    height: 0,
     zIndex: 999999999  /* Max value (32-bit): 2147483647 */
   };
 
@@ -194,19 +214,34 @@ var _getDOMObjectPosition = function (obj) {
     info.zIndex = parseInt(zi, 10);
   }
 
-  while (obj) {
+  // Use getBoundingClientRect where available (almost everywhere).
+  // See: http://www.quirksmode.org/dom/w3c_cssom.html
+  if (typeof obj.getBoundingClientRect === "function") {
+    // compute left / top offset (works for `position:fixed`, too!)
+    var rect = obj.getBoundingClientRect();
+    var pageXOffset, pageYOffset, zoomFactor;
 
-    var borderLeftWidth = parseInt(_getStyle(obj, "border-left-width"), 10);
-    var borderTopWidth  = parseInt(_getStyle(obj, "border-top-width"), 10);
+    // IE<9 doesn't support `pageXOffset`/`pageXOffset`
+    if ("pageXOffset" in window && "pageYOffset" in window) {
+      pageXOffset = window.pageXOffset;
+      pageYOffset = window.pageYOffset;
+    }
+    else {
+      zoomFactor = _getZoomFactor();
+      pageXOffset = Math.round(document.documentElement.scrollLeft / zoomFactor);
+      pageYOffset = Math.round(document.documentElement.scrollTop / zoomFactor);
+    }
+    
+    // `clientLeft`/`clientTop` are to fix IE's 2px offset in standards mode
+    var leftBorderWidth = document.documentElement.clientLeft || 0;
+    var topBorderWidth = document.documentElement.clientTop || 0;
 
-    info.left += isNaN(obj.offsetLeft)  ? 0 : obj.offsetLeft;
-    info.left += isNaN(borderLeftWidth) ? 0 : borderLeftWidth;
-    info.top += isNaN(obj.offsetTop)    ? 0 : obj.offsetTop;
-    info.top += isNaN(borderTopWidth)   ? 0 : borderTopWidth;
-
-    obj = obj.offsetParent;
+    info.left = rect.left + pageXOffset - leftBorderWidth;
+    info.top = rect.top + pageYOffset - topBorderWidth;
+    info.width = rect.width;
+    info.height = rect.height;
   }
-
+  
   return info;
 };
 

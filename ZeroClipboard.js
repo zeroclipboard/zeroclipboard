@@ -111,26 +111,45 @@
     }
     return element;
   };
+  var _getZoomFactor = function() {
+    var rect, physicalWidth, logicalWidth, zoomFactor = 1;
+    if (typeof document.body.getBoundingClientRect === "function") {
+      rect = document.body.getBoundingClientRect();
+      physicalWidth = rect.right - rect.left;
+      logicalWidth = document.body.offsetWidth;
+      zoomFactor = Math.round(physicalWidth / logicalWidth * 100) / 100;
+    }
+    return zoomFactor;
+  };
   var _getDOMObjectPosition = function(obj) {
     var info = {
       left: 0,
       top: 0,
-      width: obj.width || obj.offsetWidth || 0,
-      height: obj.height || obj.offsetHeight || 0,
+      width: 0,
+      height: 0,
       zIndex: 999999999
     };
     var zi = _getStyle(obj, "z-index");
     if (zi && zi !== "auto") {
       info.zIndex = parseInt(zi, 10);
     }
-    while (obj) {
-      var borderLeftWidth = parseInt(_getStyle(obj, "border-left-width"), 10);
-      var borderTopWidth = parseInt(_getStyle(obj, "border-top-width"), 10);
-      info.left += isNaN(obj.offsetLeft) ? 0 : obj.offsetLeft;
-      info.left += isNaN(borderLeftWidth) ? 0 : borderLeftWidth;
-      info.top += isNaN(obj.offsetTop) ? 0 : obj.offsetTop;
-      info.top += isNaN(borderTopWidth) ? 0 : borderTopWidth;
-      obj = obj.offsetParent;
+    if (typeof obj.getBoundingClientRect === "function") {
+      var rect = obj.getBoundingClientRect();
+      var pageXOffset, pageYOffset, zoomFactor;
+      if ("pageXOffset" in window && "pageYOffset" in window) {
+        pageXOffset = window.pageXOffset;
+        pageYOffset = window.pageYOffset;
+      } else {
+        zoomFactor = _getZoomFactor();
+        pageXOffset = Math.round(document.documentElement.scrollLeft / zoomFactor);
+        pageYOffset = Math.round(document.documentElement.scrollTop / zoomFactor);
+      }
+      var leftBorderWidth = document.documentElement.clientLeft || 0;
+      var topBorderWidth = document.documentElement.clientTop || 0;
+      info.left = rect.left + pageXOffset - leftBorderWidth;
+      info.top = rect.top + pageYOffset - topBorderWidth;
+      info.width = rect.width;
+      info.height = rect.height;
     }
     return info;
   };
