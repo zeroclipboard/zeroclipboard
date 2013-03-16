@@ -117,7 +117,12 @@
     return info;
   };
   var _noCache = function(path) {
-    return (path.indexOf("?") >= 0 ? "&" : "?") + "nocache=" + (new Date).getTime();
+    var client = ZeroClipboard.prototype._singleton;
+    if (client.options.useNoCache) {
+      return (path.indexOf("?") >= 0 ? "&" : "?") + "nocache=" + (new Date).getTime();
+    } else {
+      return "";
+    }
   };
   var _vars = function(options) {
     var str = [];
@@ -187,7 +192,8 @@
     text: null,
     hoverClass: "zeroclipboard-is-hover",
     activeClass: "zeroclipboard-is-active",
-    allowScriptAccess: "sameDomain"
+    allowScriptAccess: "sameDomain",
+    useNoCache: true
   };
   ZeroClipboard.setDefaults = function(options) {
     for (var ko in options) _defaults[ko] = options[ko];

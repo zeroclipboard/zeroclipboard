@@ -50,7 +50,8 @@ var _defaults = {
   trustedDomains:    undefined,                  // Domains that we should trust (single string or array of strings)
   hoverClass:        "zeroclipboard-is-hover",   // The class used to hover over the object
   activeClass:       "zeroclipboard-is-active",  // The class used to set object active
-  allowScriptAccess: "sameDomain"                // SWF outbound scripting policy
+  allowScriptAccess: "sameDomain",               // SWF outbound scripting policy
+  useNoCache:        true                        // Include a nocache query parameter on requests for the SWF
 };
 ```
 You can override the defaults using `ZeroClipboard.setDefaults({ moviePath: "new/path" })` before you create any clients.
