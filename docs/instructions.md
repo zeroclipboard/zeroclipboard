@@ -2,7 +2,7 @@
 
 The *ZeroClipboard* JavaScript library provides an easy way to copy text to the clipboard using an invisible Adobe Flash movie.  The "Zero" signifies that the library is invisible and the user interface is left entirely up to you.
 
-Browsers won't let you access the clipboard directly. So this libraby puts a flash object on the page to proxy the clipboard for you. The library will move and resize over all the glued objects.
+Browsers won't let you access the clipboard directly. So this library puts a flash object on the page to proxy the clipboard for you. The library will move and resize over all the glued objects.
 
 ## Setup
 
@@ -18,7 +18,7 @@ To use the library, simply include the following JavaScript file in your page:
 <script type="text/javascript" src="ZeroClipboard.js"></script>
 ```
 
-You also need to have the "`"ZeroClipboard.swf`" file available to the browser.  If this file is located in the same directory as your web page, then it will work out of the box.  However, if the SWF file is hosted elsewhere, you need to set the URL like this (place this code _after_ the script tag):
+You also need to have the "`ZeroClipboard.swf`" file available to the browser.  If this file is located in the same directory as your web page, then it will work out of the box.  However, if the SWF file is hosted elsewhere, you need to set the URL like this (place this code _after_ the script tag):
 
 ```
 ZeroClipboard.setDefaults( { moviePath: 'http://YOURSERVER/path/ZeroClipboard.swf' } );
@@ -59,9 +59,9 @@ You can also set the options when creating a new client by passing an optional j
 
 #### A note on the `allowScriptAccess` option
 
-For version 1.1.7 and below, the `embed` tag had the `allowScriptAccess` parameter hard-coded to `always`. This allowed the "`"ZeroClipboard.swf`" file to be hosted on an external domain. However, to enhance security, versions after 1.1.7 have an option for `allowScriptAccess` with a default of `sameDomain`, which only allows "`"ZeroClipboard.swf`" to be served from the same domain as the hosting page.
+For version 1.1.7 and below, the `embed` tag had the `allowScriptAccess` parameter hard-coded to `always`. This allowed the "`ZeroClipboard.swf`" file to be hosted on an external domain. However, to enhance security, versions after 1.1.7 have an option for `allowScriptAccess` with a default of `sameDomain`, which only allows "`ZeroClipboard.swf`" to be served from the same domain as the hosting page.
 
-If you hosted "`"ZeroClipboard.swf`" on a different domain than the hosting page on version 1.1.7 or below, when you upgrade to a version above 1.1.7, you should either move "`"ZeroClipboard.swf`" to the same domain as the hosting page or set the `allowScriptAccess` option to `always`.
+If you hosted "`ZeroClipboard.swf`" on a different domain than the hosting page on version 1.1.7 or below, when you upgrade to a version above 1.1.7, you should either move "`ZeroClipboard.swf`" to the same domain as the hosting page or set the `allowScriptAccess` option to `always`.
 
 For more information about `allowScriptAccess`, consult the *[official Flash documentation](http://helpx.adobe.com/flash/kb/control-access-scripts-host-web.html)*.
 
