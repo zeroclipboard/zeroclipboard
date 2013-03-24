@@ -6,7 +6,8 @@ var _defaults = {
   text:              null,                       // The text to be copied
   hoverClass:        "zeroclipboard-is-hover",   // The class used to hover over the object
   activeClass:       "zeroclipboard-is-active",  // The class used to set object active
-  allowScriptAccess: "sameDomain"                // SWF outbound scripting policy
+  allowScriptAccess: "sameDomain",               // SWF outbound scripting policy
+  useNoCache:        true                        // Ability to turn off flash cache hack for ie.
 };
 
 /*

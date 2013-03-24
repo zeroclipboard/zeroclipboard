@@ -119,7 +119,7 @@
   var _noCache = function(path) {
     var client = ZeroClipboard.prototype._singleton;
     if (client.options.useNoCache) {
-      return (path.indexOf("?") >= 0 ? "&" : "?") + "nocache=" + (new Date).getTime();
+      return (path.indexOf("?") >= 0 ? "&nocache=" : "?nocache=") + (new Date).getTime();
     } else {
       return "";
     }

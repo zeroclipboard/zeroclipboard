@@ -142,6 +142,17 @@ exports.utils = {
     test.done();
   },
 
+  "_noCache can be turned off.": function (test) {
+
+    clip.options.useNoCache = false;
+
+    test.equal(_utils._noCache("path.com/z.swf").indexOf("?nocache="), -1);
+
+    test.equal(_utils._noCache("path.com/z.swf?q=jon").indexOf("&nocache="), -1);
+
+    test.done();
+  },
+
   "_inArray finds elements in array": function (test) {
 
     var fruits = ["apple", "banana", "orange", "cherry", "strawberry"];

@@ -188,7 +188,12 @@ var _getDOMObjectPosition = function (obj) {
  * returns path with noncache param added
  */
 var _noCache = function (path) {
-  return ((path.indexOf("?") >= 0) ? "&" : "?") + "nocache=" + (new Date().getTime());
+  var client = ZeroClipboard.prototype._singleton;
+  if (client.options.useNoCache) {
+    return (path.indexOf("?") >= 0 ? "&nocache=" : "?nocache=") + (new Date()).getTime();
+  } else {
+    return "";
+  }
 };
 
 /*
