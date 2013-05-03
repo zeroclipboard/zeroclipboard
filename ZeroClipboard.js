@@ -206,14 +206,15 @@
   };
   ZeroClipboard.detectFlashSupport = function() {
     var hasFlash = false;
-    try {
-      if (new ActiveXObject("ShockwaveFlash.ShockwaveFlash")) {
-        hasFlash = true;
-      }
-    } catch (error) {
-      if (navigator.mimeTypes["application/x-shockwave-flash"]) {
-        hasFlash = true;
-      }
+    if (typeof ActiveXObject === "function") {
+      try {
+        if (new ActiveXObject("ShockwaveFlash.ShockwaveFlash")) {
+          hasFlash = true;
+        }
+      } catch (error) {}
+    }
+    if (!hasFlash && navigator.mimeTypes["application/x-shockwave-flash"]) {
+      hasFlash = true;
     }
     return hasFlash;
   };
