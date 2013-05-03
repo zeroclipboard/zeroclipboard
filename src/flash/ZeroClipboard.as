@@ -34,7 +34,8 @@ package {
 
       // Allow the swf object to be run on any domain, for when the site hosts the file on a separate server
       if (flashvars.trustedDomain) {
-        flash.system.Security.allowDomain(flashvars.trustedDomain.split("\\").join("\\\\"));
+        var domains:Array = flashvars.trustedDomain.split("\\").join("\\\\").split(",");
+        flash.system.Security.allowDomain.apply(null, domains);
       }
 
       // invisible button covers entire stage
