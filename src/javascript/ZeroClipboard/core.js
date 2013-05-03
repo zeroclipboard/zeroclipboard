@@ -41,25 +41,24 @@ ZeroClipboard.destroy = function () {
 /*
  * Simple Flash Detection
  *
- * returns true if flash is detected
+ * returns true if Flash is detected
  */
 ZeroClipboard.detectFlashSupport = function () {
-
-  // Assume we don't have it
   var hasFlash = false;
 
-  try {
-
-    // If we can create an ActiveXObject
-    if (new ActiveXObject('ShockwaveFlash.ShockwaveFlash')) {
-      hasFlash = true;
+  // IE
+  if (typeof ActiveXObject === "function") {
+    try {
+      if (new ActiveXObject("ShockwaveFlash.ShockwaveFlash")) {
+        hasFlash = true;
+      }
     }
-  } catch (error) {
+    catch (error) {}
+  }
 
-    // If the navigator knows what to do with the flash mimetype
-    if (navigator.mimeTypes["application/x-shockwave-flash"]) {
-      hasFlash = true;
-    }
+  // Every other browser
+  if (!hasFlash && navigator.mimeTypes["application/x-shockwave-flash"]) {
+    hasFlash = true;
   }
 
   return hasFlash;
