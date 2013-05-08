@@ -1,10 +1,10 @@
 /*!
  * zeroclipboard
- * The Zero Clipboard library provides an easy way to copy text to the clipboard using an invisible Adobe Flash movie, and a JavaScript interface.
+ * The ZeroClipboard library provides an easy way to copy text to the clipboard using an invisible Adobe Flash movie, and a JavaScript interface.
  * Copyright 2012 Jon Rohan, James M. Greene, .
  * Released under the MIT license
  * http://jonrohan.github.com/ZeroClipboard/
- * v1.1.7
+ * v1.2.0-beta.1
  */(function() {
   "use strict";
   var _getStyle = function(el, prop) {
@@ -127,11 +127,16 @@
   var _vars = function(options) {
     var str = [];
     if (options.trustedDomains) {
-      if (typeof options.trustedDomains === "string") {
-        str.push("trustedDomain=" + options.trustedDomains);
-      } else {
-        str.push("trustedDomain=" + options.trustedDomains.join(","));
+      var domains;
+      if (typeof options.trustedDomains === "string" && options.trustedDomains) {
+        domains = [ options.trustedDomains ];
+      } else if ("length" in options.trustedDomains) {
+        domains = options.trustedDomains;
       }
+      str.push("trustedDomain=" + encodeURIComponent(domains.join(",")));
+    }
+    if (typeof options.amdModuleId === "string" && options.amdModuleId) {
+      str.push("amdModuleId=" + encodeURIComponent(options.amdModuleId));
     }
     return str.join("&");
   };
@@ -185,7 +190,7 @@
   ZeroClipboard.prototype.setHandCursor = function(enabled) {
     if (this.ready()) this.flashBridge.setHandCursor(enabled);
   };
-  ZeroClipboard.version = "1.1.7";
+  ZeroClipboard.version = "1.2.0-beta.1";
   var _defaults = {
     moviePath: "ZeroClipboard.swf",
     trustedDomains: null,
@@ -193,7 +198,8 @@
     hoverClass: "zeroclipboard-is-hover",
     activeClass: "zeroclipboard-is-active",
     allowScriptAccess: "sameDomain",
-    useNoCache: true
+    useNoCache: true,
+    amdModuleId: null
   };
   ZeroClipboard.setDefaults = function(options) {
     for (var ko in options) _defaults[ko] = options[ko];

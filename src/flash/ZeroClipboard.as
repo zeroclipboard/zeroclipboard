@@ -16,12 +16,28 @@ package {
   // returns nothing
   public class ZeroClipboard extends Sprite {
 
+    // "CONSTANTS" 
+    // Function through which JavaScript events are dispatched normally
+    private static var normalDispatcher:String = "ZeroClipboard.dispatch";
+
+    // Function through which JavaScript events are dispatched if using an AMD loader
+    private static var amdWrappedDispatcher:String =
+      "(function (event, args, amdModuleId) {\n" +
+      "  require([amdModuleId], function (ZeroClipboard) {\n" +
+      "    ZeroClipboard.dispatch(event, args);\n" +
+      "  });\n" +
+      "})";
+
+
     // The button sprite
     private var button:Sprite;
 
     // The text in the clipboard
     private var clipText:String = "";
-
+    
+    // AMD module ID or path to access the ZeroClipboard object
+    private var amdModuleId:String = null;
+    
     // constructor, setup event listeners and external interfaces
     public function ZeroClipboard() {
 
@@ -33,9 +49,14 @@ package {
       var flashvars:Object = LoaderInfo( this.root.loaderInfo ).parameters;
 
       // Allow the swf object to be run on any domain, for when the site hosts the file on a separate server
-      if (flashvars.trustedDomain) {
+      if (flashvars.trustedDomain && typeof flashvars.trustedDomain === "string") {
         var domains:Array = flashvars.trustedDomain.split("\\").join("\\\\").split(",");
         flash.system.Security.allowDomain.apply(null, domains);
+      }
+      
+      // Enable complete AMD support (e.g. RequireJS)
+      if (flashvars.amdModuleId && typeof flashvars.amdModuleId === "string") {
+        amdModuleId = flashvars.amdModuleId.split("\\").join("\\\\");
       }
 
       // invisible button covers entire stage
@@ -60,7 +81,7 @@ package {
       ExternalInterface.addCallback("setSize", setSize);
 
       // signal to the browser that we are ready
-      ExternalInterface.call( 'ZeroClipboard.dispatch', 'load', metaData());
+      dispatch("load", ZeroClipboard.metaData());
     }
 
     // mouseClick
@@ -78,7 +99,7 @@ package {
       flash.system.System.setClipboard(clipText);
 
       // signal to the page it is done
-      ExternalInterface.call( 'ZeroClipboard.dispatch', 'complete',  metaData(event, {
+      dispatch("complete", ZeroClipboard.metaData(event, {
         text: clipText.split("\\").join("\\\\")
       }));
 
@@ -92,7 +113,7 @@ package {
     //
     // returns nothing
     private function mouseOver(event:MouseEvent): void {
-      ExternalInterface.call( 'ZeroClipboard.dispatch', 'mouseOver', metaData(event) );
+      dispatch("mouseOver", ZeroClipboard.metaData(event));
     }
 
     // mouseOut
@@ -101,7 +122,7 @@ package {
     //
     // returns nothing
     private function mouseOut(event:MouseEvent): void {
-      ExternalInterface.call( 'ZeroClipboard.dispatch', 'mouseOut', metaData(event) );
+      dispatch("mouseOut", ZeroClipboard.metaData(event));
     }
 
     // mouseDown
@@ -110,13 +131,12 @@ package {
     //
     // returns nothing
     private function mouseDown(event:MouseEvent): void {
-      ExternalInterface.call( 'ZeroClipboard.dispatch', 'mouseDown', metaData(event) );
+      dispatch("mouseDown", ZeroClipboard.metaData(event));
 
       // if the clipText hasn't been set
       if (!clipText) {
-
         // request data from the page
-        ExternalInterface.call( 'ZeroClipboard.dispatch', 'dataRequested', metaData(event) );
+        dispatch("dataRequested", ZeroClipboard.metaData(event));
       }
     }
 
@@ -126,36 +146,7 @@ package {
     //
     // returns nothing
     private function mouseUp(event:MouseEvent): void {
-      ExternalInterface.call( 'ZeroClipboard.dispatch', 'mouseUp', metaData(event) );
-    }
-
-    // metaData
-    //
-    // The metaData function will take a mouseEvent, and an extra object to
-    // create a meta object of more info. This will let the page know if
-    // certain modifier keys are down
-    //
-    // returns an Object of extra event data
-    private function metaData(event:MouseEvent = void, extra:Object = void):Object {
-
-      // create the default options, contains flash version
-      var normalOptions:Object = {
-        flashVersion : Capabilities.version
-      }
-
-      // if an event is passed in, return what modifier keys are pressed
-      if (event) {
-        normalOptions.altKey = event.altKey;
-        normalOptions.ctrlKey = event.ctrlKey;
-        normalOptions.shiftKey = event.shiftKey;
-      }
-
-      // for everything in the extra object, add it to the normal options
-      for(var i:String in extra) {
-        normalOptions[i] = extra[i];
-      }
-
-      return normalOptions;
+      dispatch("mouseUp", ZeroClipboard.metaData(event));
     }
 
     // setText
@@ -185,6 +176,49 @@ package {
     public function setSize(width:Number, height:Number): void {
       button.width = width;
       button.height = height;
+    }
+    
+    // dispatch
+    //
+    // Function through which JavaScript events are dispatched
+    //
+    // returns nothing
+    private function dispatch(eventName:String, eventArgs:Object): void {
+      if (!amdModuleId) {
+        ExternalInterface.call(ZeroClipboard.normalDispatcher, eventName, eventArgs);
+      }
+      else {
+        ExternalInterface.call(ZeroClipboard.amdWrappedDispatcher, eventName, eventArgs, amdModuleId);
+      }
+    }
+
+    // metaData
+    //
+    // The metaData function will take a mouseEvent, and an extra object to
+    // create a meta object of more info. This will let the page know if
+    // certain modifier keys are down
+    //
+    // returns an Object of extra event data
+    private static function metaData(event:MouseEvent = void, extra:Object = void):Object {
+
+      // create the default options, contains flash version
+      var normalOptions:Object = {
+        flashVersion: Capabilities.version
+      };
+
+      // if an event is passed in, return what modifier keys are pressed
+      if (event) {
+        normalOptions.altKey = event.altKey;
+        normalOptions.ctrlKey = event.ctrlKey;
+        normalOptions.shiftKey = event.shiftKey;
+      }
+
+      // for everything in the extra object, add it to the normal options
+      for (var i:String in extra) {
+        normalOptions[i] = extra[i];
+      }
+
+      return normalOptions;
     }
   }
 }

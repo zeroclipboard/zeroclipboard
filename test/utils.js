@@ -24,7 +24,7 @@ exports.utils = {
   },
 
   "_getStyle returns computed styles": function (test) {
-
+    test.expect(5);
     test.equal(_utils._getStyle($("a.no_cursor_style")[0], "cursor"), "pointer");
     test.notEqual(_utils._getStyle($("a.no_pointer_anchor")[0], "cursor"), "pointer");
 
@@ -35,6 +35,7 @@ exports.utils = {
     test.done();
   },
   "_removeClass removes classes from element": function (test) {
+    test.expect(5);
     var div = $("<div>").addClass("class-1 class-2 class_3")[0];
 
     _utils._removeClass(div, "class-1");
@@ -56,6 +57,7 @@ exports.utils = {
   },
 
   "_removeClass doesn't remove partial class names": function (test) {
+    test.expect(3);
     var div = $("<div>").addClass("class-1 class-2 class_3")[0];
 
     _utils._removeClass(div, "ass");
@@ -71,6 +73,7 @@ exports.utils = {
   },
 
   "_addClass adds a class name": function (test) {
+    test.expect(4);
     var div = $("<div>")[0];
 
     _utils._addClass(div, "class-1");
@@ -89,6 +92,7 @@ exports.utils = {
   },
 
   "elements with addClass already use the function": function (test) {
+    test.expect(1);
     var div = $("<div>");
 
     _utils._addClass(div, "class-1");
@@ -98,6 +102,7 @@ exports.utils = {
   },
 
   "elements with removeClass already use the function": function (test) {
+    test.expect(2);
     var div = $("<div>").addClass("class-1");
 
     test.equal(div[0].className, "class-1");
@@ -109,7 +114,7 @@ exports.utils = {
   },
 
   "when object borderWidth isNaN don't fail": function (test) {
-
+    test.expect(4);
     clip.glue($("#d_clip_button"));
 
     clip.setCurrent($("#d_clip_button")[0]);
@@ -123,7 +128,7 @@ exports.utils = {
   },
 
   "_vars builds flashvars": function (test) {
-
+    test.expect(2);
     test.equal(_utils._vars(clip.options), "");
 
     clip.options.trustedDomains = ["*"];
@@ -134,7 +139,7 @@ exports.utils = {
   },
 
   "_noCache adds cache properly": function (test) {
-
+    test.expect(2);
     test.equal(_utils._noCache("path.com/z.swf").indexOf("?nocache="), 0);
 
     test.equal(_utils._noCache("path.com/z.swf?q=jon").indexOf("&nocache="), 0);
@@ -143,7 +148,7 @@ exports.utils = {
   },
 
   "_noCache can be turned off.": function (test) {
-
+    test.expect(2);
     clip.options.useNoCache = false;
 
     test.equal(_utils._noCache("path.com/z.swf").indexOf("?nocache="), -1);
@@ -154,7 +159,7 @@ exports.utils = {
   },
 
   "_inArray finds elements in array": function (test) {
-
+    test.expect(3);
     var fruits = ["apple", "banana", "orange", "cherry", "strawberry"];
 
     test.equal(_utils._inArray("kiwi", fruits), -1);

@@ -207,11 +207,19 @@ var _vars = function (options) {
 
   // if trusted domain is set
   if (options.trustedDomains) {
-    if (typeof options.trustedDomains === "string") {
-      str.push("trustedDomain=" + options.trustedDomains);
-    } else {
-      str.push("trustedDomain=" + options.trustedDomains.join(","));
+    var domains;
+    if (typeof options.trustedDomains === "string" && options.trustedDomains) {
+      domains = [options.trustedDomains];
     }
+    else if ("length" in options.trustedDomains) {
+      domains = options.trustedDomains;
+    }
+    str.push("trustedDomain=" + encodeURIComponent(domains.join(",")));
+  }
+
+  // if ZeroClipboard is loaded an an AMD module
+  if (typeof options.amdModuleId === "string" && options.amdModuleId) {
+    str.push("amdModuleId=" + encodeURIComponent(options.amdModuleId));
   }
 
   // join the str by &

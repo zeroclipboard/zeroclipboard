@@ -17,7 +17,7 @@ exports.event = {
   },
 
   "Glue element after new client": function (test) {
-
+    test.expect(2);
     clip.glue($("#d_clip_button"))
 
     // Test the client was created properly
@@ -28,7 +28,7 @@ exports.event = {
   },
 
   "unglue element removes items": function (test) {
-
+    test.expect(0);
     clip.glue($("#d_clip_button, #d_clip_button2, #d_clip_button3"))
 
     clip.unglue($("#d_clip_button3, #d_clip_button2"));
@@ -37,7 +37,7 @@ exports.event = {
   },
 
   "Glue element with query string throws TypeError": function (test) {
-
+    test.expect(1);
     test.throws(function(){
       clip.glue("#d_clip_button")
     }, TypeError);
@@ -46,15 +46,15 @@ exports.event = {
   },
 
   "Element won't be glued twice": function(test) {
-
+    test.expect(0);
     test.done();
   },
 
   "Registering Events": function (test) {
-
-    clip.on("load",function(){});
-    clip.on("onNoFlash",function(){});
-    clip.on("onPhone",function(){});
+    test.expect(3);
+    clip.on("load", function(){});
+    clip.on("onNoFlash", function(){});
+    clip.on("onPhone", function(){});
 
     test.ok(clip.handlers.load);
     test.ok(clip.handlers.noflash);
@@ -64,30 +64,30 @@ exports.event = {
   },
 
   "Unegistering Events": function (test) {
-
+    test.expect(3);
     var load = function(){};
     var onNoFlash = function(){};
     var onPhone = function(){};
 
-    clip.on("load",load);
-    clip.on("onNoFlash",onNoFlash);
-    clip.on("onPhone",onPhone);
+    clip.on("load", load);
+    clip.on("onNoFlash", onNoFlash);
+    clip.on("onPhone", onPhone);
 
-    clip.off("load",load);
+    clip.off("load", load);
     test.ok(!clip.handlers.load);
 
-    clip.off("onNoFlash",onNoFlash);
+    clip.off("onNoFlash", onNoFlash);
     test.ok(!clip.handlers.noflash);
 
-    clip.off("onPhone",onPhone);
+    clip.off("onPhone", onPhone);
     test.ok(!clip.handlers.phone);
 
     test.done();
   },
 
   "Registering Events the old way": function (test) {
-
-    clip.addEventListener("load",function(){});
+    test.expect(1);
+    clip.addEventListener("load", function(){});
 
     test.ok(clip.handlers.load);
 
@@ -95,11 +95,11 @@ exports.event = {
   },
 
   "Unregistering Events the old way": function (test) {
-
+    test.expect(1);
     var func = function(){};
 
-    clip.addEventListener("load",func);
-    clip.removeEventListener("load",func);
+    clip.addEventListener("load", func);
+    clip.removeEventListener("load", func);
 
     test.ok(!clip.handlers.load);
 
@@ -107,8 +107,8 @@ exports.event = {
   },
 
   "Registering two events works": function (test) {
-
-    clip.on("load oncomplete",function(){});
+    test.expect(2);
+    clip.on("load oncomplete", function(){});
 
     test.ok(clip.handlers.load);
     test.ok(clip.handlers.complete);
@@ -117,7 +117,7 @@ exports.event = {
   },
   
   "Unregistering two events works": function (test) {
-
+    test.expect(2);
     var func = function(){};
 
     clip.on("load oncomplete",func);
@@ -130,6 +130,7 @@ exports.event = {
   },
 
   "Test onNoFlash Event": function (test) {
+    test.expect(1);
     navigator.mimeTypes["application/x-shockwave-flash"] = undefined;
 
     var id = clip.id;
@@ -142,7 +143,7 @@ exports.event = {
   },
 
   "Test onWrongFlash Event": function (test) {
-
+    test.expect(1);
     clip.glue($("#d_clip_button"));
 
     var id = clip.id;
@@ -157,7 +158,7 @@ exports.event = {
   },
 
   "Test mouseover and mouseout event": function (test) {
-
+    test.expect(3);
     clip.glue($("#d_clip_button"));
 
     clip.setCurrent($("#d_clip_button")[0]);
@@ -177,7 +178,7 @@ exports.event = {
   },
 
   "Test mousedown and mouseup event": function (test) {
-
+    test.expect(2);
     clip.glue($("#d_clip_button"));
 
     clip.setCurrent($("#d_clip_button")[0]);
@@ -195,6 +196,7 @@ exports.event = {
   },
 
   "Test that the current Element is passed back to event handler": function (test) {
+    test.expect(9);
     clip.glue($("#d_clip_button"));
 
     clip.setCurrent($("#d_clip_button")[0]);
@@ -222,5 +224,55 @@ exports.event = {
     zeroClipboard.dispatch("complete", { flashVersion: "MAC 11,0,0" });
     zeroClipboard.dispatch("mouseout", { flashVersion: "MAC 11,0,0" });
   },
+  
+  "Test onLoad Event with AMD": function (test) {
+    test.expect(4);
+    
+    var amdModuleId = "zc";
+    var requireFn = (function() {
+      var amdCache = {};
+      amdCache[amdModuleId] = zeroClipboard;
+      return function(depIds, cb) {
+        var depVals = depIds.map(function(id) { return amdCache[id]; });
+        process.nextTick(function() {
+          cb.apply(this, depVals);
+        });
+      };
+    })();
+
+    // Special setup for this test
+    zeroClipboard.setDefaults({
+      "amdModuleId": amdModuleId
+    });
+    var clip = new zeroClipboard();
+    clip.glue($("#d_clip_button"));
+
+    var id = clip.id;
+
+    clip.on( "load", function(client, args) {
+      test.equal(client.id, id);
+      
+      // Special teardown for this test
+      zeroClipboard.setDefaults({
+        "amdModuleId": null
+      });
+      
+      test.done();
+    } );
+
+    // fake load event
+    eval(
+'\
+(function(eventName, args, amdModuleId) {\
+  requireFn([amdModuleId], function(ZeroClipboard) {\
+    test.equal(ZeroClipboard, zeroClipboard);\
+    test.equal(eventName, "load");\
+    test.deepEqual(args, { flashVersion: "MAC 11,0,0" });\
+    ZeroClipboard.dispatch(eventName, args);\
+  });\
+})("load", { flashVersion: "MAC 11,0,0" }, ' + JSON.stringify(amdModuleId) + ');\
+'
+    );
+  }
 
 }
