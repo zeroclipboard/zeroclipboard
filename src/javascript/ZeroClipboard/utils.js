@@ -145,7 +145,7 @@ var _removeClass = function (element, value) {
 /*
  * private get the dom position of an object.
  *
- * returns json of objects position, height, width, and zindex
+ * returns json of objects position, height, width, and zIndex
  */
 var _getDOMObjectPosition = function (obj) {
   // get absolute coordinates for dom element
@@ -154,7 +154,7 @@ var _getDOMObjectPosition = function (obj) {
     top:    0,
     width:  obj.width  || obj.offsetWidth  || 0,
     height: obj.height || obj.offsetHeight || 0,
-    zIndex: 9999
+    zIndex: 999999999  /* Max value (32-bit): 2147483647 */
   };
 
 
