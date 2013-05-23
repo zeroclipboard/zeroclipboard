@@ -50,11 +50,11 @@ clip.on( 'mouseup', function(client) {
 
 See the [instructions](docs/instructions.md) for advanced instructions on how to use the library on your site.
 
-Here is a working [test page](http://jonrohan.github.com/ZeroClipboard/#demo) where you can try out ZeroClipboard in your browser.
+Here is a working [test page](http://zeroclipboard.github.com/ZeroClipboard/#demo) where you can try out ZeroClipboard in your browser.
 
 ## Testing ZeroClipboard.swf Locally
 
-To test the page [demo page](http://jonrohan.github.com/ZeroClipboard/#demo) locally. checkout the `gh-pages` branch and run `make`. This should open [localhost:3000](http://localhost:3000/)
+To test the page [demo page](http://zeroclipboard.github.com/ZeroClipboard/#demo) locally. checkout the `gh-pages` branch and run `make`. This should open [localhost:3000](http://localhost:3000/)
 
 ```
 git co gh-pages
@@ -89,4 +89,4 @@ see [roadmap.md](docs/roadmap.md)
 
 ## Last Build
 
-[![Build Status](https://secure.travis-ci.org/jonrohan/ZeroClipboard.png?branch=master)](https://travis-ci.org/jonrohan/ZeroClipboard)
+[![Build Status](https://secure.travis-ci.org/zeroclipboard/ZeroClipboard.png?branch=master)](https://travis-ci.org/zeroclipboard/ZeroClipboard)

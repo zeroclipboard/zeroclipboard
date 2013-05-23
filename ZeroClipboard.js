@@ -3,7 +3,7 @@
  * The ZeroClipboard library provides an easy way to copy text to the clipboard using an invisible Adobe Flash movie, and a JavaScript interface.
  * Copyright 2012 Jon Rohan, James M. Greene, .
  * Released under the MIT license
- * http://jonrohan.github.com/ZeroClipboard/
+ * http://zeroclipboard.github.com/ZeroClipboard/
  * v1.2.0-beta.1
  */(function() {
   "use strict";

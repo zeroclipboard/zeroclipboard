@@ -7,7 +7,7 @@ If you want to build some new features, we have a [roadmap.md](docs/roadmap.md) 
 
 ### Cloning
 
-    $ git clone https://github.com/jonrohan/ZeroClipboard.git
+    $ git clone https://github.com/zeroclipboard/ZeroClipboard.git
     $ cd ZeroClipboard/
     $ make
 
