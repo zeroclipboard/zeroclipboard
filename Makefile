@@ -11,7 +11,7 @@ all: \
 	node_modules \
 	ZeroClipboard.min.js \
 	ZeroClipboard.swf \
-	component.json \
+	bower.json \
 	LICENSE \
 	test \
 
@@ -47,9 +47,9 @@ LICENSE: Makefile
 	cat ./src/license.js | node src/build.js > $@
 	@chmod a-w $@
 
-component.json: Makefile
+bower.json: Makefile
 	@rm -f $@
-	cat ./src/component.js | node src/build.js > $@
+	cat ./src/bower.js | node src/build.js > $@
 	@chmod a-w $@
 
 test: ZeroClipboard.min.js
@@ -57,6 +57,6 @@ test: ZeroClipboard.min.js
 	$(JS_TEST) ./test
 
 clean:
-	rm -rf ./component.json ./ZeroClipboard* ./LICENSE
+	rm -rf ./bower.json ./ZeroClipboard* ./LICENSE
 
 .PHONY: all test clean
