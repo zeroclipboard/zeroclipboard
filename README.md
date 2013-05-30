@@ -57,13 +57,13 @@ Here is a working [test page](http://zeroclipboard.github.com/ZeroClipboard/#dem
 To test the page [demo page](http://zeroclipboard.github.com/ZeroClipboard/#demo) locally. checkout the `gh-pages` branch and run `make`. This should open [localhost:3000](http://localhost:3000/)
 
 ```
-git co gh-pages
+git checkout gh-pages
 make
 ```
 add `BRANCH=my-dev-branch` to get the assets from a certain branch
 
 ```
-git co gh-pages
+git checkout gh-pages
 make BRANCH=my-dev-branch
 ```
 
