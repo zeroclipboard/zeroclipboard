@@ -15,7 +15,7 @@ Basically, if an attacker gets access to the main window/global object via an XS
 
  1. Having `ZeroClipboard` instances globally accessible (versus encapsulated in a closure). This allows an attacker to manually call a client's `setText` method and inject their own text.
  2. As with all globally accessible functions in JavaScript, any globally accessible callback functions (hooked to events) can be overridden by an attacker. This isn't terribly dangerous but could be annoying.
- 3. **If** we add a `"dataRequested"` event (see #46), then users would need to apply the safety precautions mentioned in_**both**_ of the aforementioned examples to avoid allowing an attacker to inject their own text.
+ 3. **If** we add a `"dataRequested"` event (see #46), then users would need to apply the safety precautions mentioned in _**both**_ of the aforementioned examples to avoid allowing an attacker to inject their own text.
  4. Overriding any of the `ZeroClipboard` or `ZeroClipboard.prototype` properties or methods, if globally accessible.
 
 ### Responsible Disclosure
