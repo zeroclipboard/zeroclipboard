@@ -499,4 +499,4 @@ window.require = curl;
 
 ## Browser Support
 
-Works in IE8+. Works in IE7 but requires Sizzle/jQuery. (And of course works in all of the other browsers.)
+Works in IE7+ and, of course, all of the modern browsers.

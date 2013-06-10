@@ -71,7 +71,7 @@ make BRANCH=my-dev-branch
 
 This library is fully compatible with Flash Player 10, which requires that the clipboard copy operation be initiated by a user click event inside the Flash movie. This is achieved by automatically floating the invisible movie on top of a [DOM](http://en.wikipedia.org/wiki/Document_Object_Model) element of your choice. Standard mouse events are even propagated out to your DOM element, so you can still have rollover and mouse down effects.
 
-Works in IE8+. Works in IE7 but requires Sizzle/jQuery. (And of course works in all of the other browsers.)
+Works in IE7+ and, of course, all of the modern browsers.
 
 ## Contributing
 
