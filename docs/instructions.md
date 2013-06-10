@@ -4,6 +4,7 @@ The *ZeroClipboard* JavaScript library provides an easy way to copy text to the 
 
 Browsers won't let you access the clipboard directly. So this library puts a flash object on the page to proxy the clipboard for you. The library will move and resize over all the glued objects.
 
+
 ## Setup
 
 If you are installing for node.
@@ -24,6 +25,7 @@ You also need to have the "`ZeroClipboard.swf`" file available to the browser.  
 ZeroClipboard.setDefaults( { moviePath: 'http://YOURSERVER/path/ZeroClipboard.swf' } );
 ```
 
+
 ## Clients
 
 Now you are ready to create one or more *Clients*.  A client is a single instance of the clipboard library on the page, linked to one or more DOM elements. Here is how to create a client instance:
@@ -39,6 +41,7 @@ var clip = new ZeroClipboard($("#my-button"));
 ```
 
 Next, you can set some options.
+
 
 ## Setting Options
 
@@ -59,6 +62,7 @@ You can override the defaults using `ZeroClipboard.setDefaults({ moviePath: "new
 
 You can also set the options when creating a new client by passing an optional json object `new ZeroClipboard($("#d_clip_button"), { moviePath: "new/path", text: "Copy me!" })`
 
+
 ### A note on the `allowScriptAccess` option
 
 For version 1.1.7 and below, the `embed` tag had the `allowScriptAccess` parameter hard-coded to `always`. This allowed the "`ZeroClipboard.swf`" file to be hosted on an external domain. However, to enhance security, versions after 1.1.7 have an option for `allowScriptAccess` with a default of `sameDomain`, which only allows "`ZeroClipboard.swf`" to be served from the same domain as the hosting page.
@@ -66,6 +70,17 @@ For version 1.1.7 and below, the `embed` tag had the `allowScriptAccess` paramet
 If you hosted "`ZeroClipboard.swf`" on a different domain than the hosting page on version 1.1.7 or below, when you upgrade to a version above 1.1.7, you should either move "`ZeroClipboard.swf`" to the same domain as the hosting page or set the `allowScriptAccess` option to `always`.
 
 For more information about `allowScriptAccess`, consult the *[official Flash documentation](http://helpx.adobe.com/flash/kb/control-access-scripts-host-web.html)*.
+
+
+### Cross-Protocol Limitations
+
+ZeroClipboard was intentionally configured to _not_ allow the SWF to be served from a secure domain (HTTPS) but scripted by an insecure domain (HTTP).
+
+If you find yourself in this situation (as in [Issue #170](https://github.com/zeroclipboard/ZeroClipboard/issues/170)), please consider the following options:  
+ 1. Serve the SWF over HTTP instead of HTTPS. If the page's protocol can vary (e.g. authorized/unauthorized, staging/production, etc.), you should include add the SWF with a relative protocol (`//s3.amazonaws.com/blah/ZeroClipboard.swf`) instead of an absolute protocol (`https://s3.amazonaws.com/blah/ZeroClipboard.swf`).
+ 2. Serve the page over HTTPS instead of HTTP. If the page's protocol can vary, see the note on the previous option (1).
+ 3. Update ZeroClipboard's ActionScript codebase to call the [`allowInsecureDomain`](http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/Security.html#allowInsecureDomain\(\)) method, then recompile the SWF with your custom changes.
+
 
 ### Text To Copy
 
@@ -103,6 +118,7 @@ Setting the clipboard text happens 3 ways.
   clip.setText( "Copy me!" );
   ```
 
+
 ### Gluing
 
 Gluing refers to the process of "linking" the Flash movie to a DOM element on the page. Since the Flash movie is completely transparent, the user sees nothing out of the ordinary.
@@ -119,6 +135,7 @@ clip.glue( document.getElementById('d_clip_button') );
 
 You can pass in a reference to the actual DOM element object itself or an array of DOM objects.  The rest all happens automatically -- the movie is created, all your options set, and it is floated above the element, awaiting clicks from the user.
 
+
 ### Recommended Implementation
 
 ```html
@@ -131,6 +148,7 @@ And the code:
 var clip = new ZeroClipboard( $("button#my-button") );
 ```
 
+
 ### Page Resizing
 
 If the page gets resized, or something happens which moves your DOM element, you will need to reposition the movie.  This can be achieved by calling the `reposition()` method.  Example:
@@ -140,6 +158,7 @@ clip.reposition();
 ```
 
 A typical use of this is to put it inside a `window.onresize` handler.
+
 
 ## CSS Effects
 
@@ -161,6 +180,7 @@ If this feature is enabled, the CSS classes "hover" and "active" are added / rem
 
 These classes are for a DOM element with an ID: "d_clip_button".  The "zeroclipboard-is-hover" and "zeroclipboard-is-active" sub-classes would automatically be activated as the user hovers over, and clicks down on the Flash movie, respectively.  They behave exactly like CSS pseudo-classes of the same names.
 
+
 ## Event Handlers
 
 The clipboard library allows you set a number of different event handlers.  These are all set by calling the `on()` method, as in this example:
@@ -178,6 +198,7 @@ Event handlers can be removed by calling the `off()` method, which has the same 
 ```js
 clip.off( 'load', my_load_handler );
 ```
+
 
 #### load
 
@@ -197,6 +218,7 @@ The handler is passed these options to the `args`
 <dt>flashVersion</dt>
 <dd>This property contains the users' flash version</dd>
 </dl>
+
 
 #### mouseover
 
@@ -249,6 +271,7 @@ The handler is passed these options to the `args`
 <dd>`true` if the Shift key is active; `false` if it is inactive.</dd>
 </dl>
 
+
 #### mousedown
 
 The `mousedown` event is fired when the user clicks on the Flash movie.  Please note that this does not guarantee that the user will release the mouse button while still over the movie (i.e. resulting in a click).  You can use this to simulate a click effect on your DOM element, however see *CSS Effects* for an easier way to do this.  Example use:
@@ -274,6 +297,7 @@ The handler is passed these options to the `args`
 <dd>`true` if the Shift key is active; `false` if it is inactive.</dd>
 </dl>
 
+
 #### mouseup
 
 The `mouseup` event is fired when the user releases the mouse button (having first pressed the mouse button while hovering over the movie).  Please note that this does not guarantee that the mouse cursor is still over the movie (i.e. resulting in a click).  You can use this to simulate a click effect on your DOM element, however see *CSS Effects* for an easier way to do this.  Example use:
@@ -298,6 +322,7 @@ The handler is passed these options to the `args`
 <dt>shiftKey</dt>
 <dd>`true` if the Shift key is active; `false` if it is inactive.</dd>
 </dl>
+
 
 #### complete
 
@@ -326,6 +351,7 @@ The handler is passed these options to the `args`
 <dd>The copied text.</dd>
 </dl>
 
+
 #### noflash
 
 The `noflash` event is fired when the user doesn't have flash installed on their system
@@ -344,6 +370,7 @@ The handler is passed these options to the `args`
 <dt>flashVersion</dt>
 <dd>This property contains the users' flash version</dd>
 </dl>
+
 
 #### wrongflash
 
@@ -364,6 +391,7 @@ The handler is passed these options to the `args`
 <dd>This property contains the users' flash version</dd>
 </dl>
 
+
 #### dataRequested
 
 On mousedown, the flash object will check and see if the `clipText` has been set. If it hasn't, then it will fire off a `dataRequested` event. If the html object has `data-clipboard-text` or `data-clipboard-target` then ZeroClipboard will take care of getting the data. However if it hasn't been set, then it will be up to you to `clip.setText` from that method. Which will complete the loop.
@@ -383,9 +411,11 @@ The handler is passed these options to the `args`
 <dd>This property contains the users' flash version</dd>
 </dl>
 
+
 ## Examples
 
 The following are complete, working examples of using the clipboard client library in HTML pages.
+
 
 ### Minimal Example
 
@@ -406,6 +436,7 @@ Here is a quick example using as few calls as possible:
 ```
 
 When clicked, the text "Copy me!" will be copied to the clipboard.
+
 
 ### Complete Example
 
@@ -463,6 +494,7 @@ Here is a complete example which exercises every option and event handler:
   </html>
 ```
 
+
 ## AMD
 
 If using [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) with a library such as [RequireJS](http://requirejs.org/), [curl.js](https://github.com/cujojs/curl), etc., you _MUST_ configure ZeroClipboard with the `amdModuleId` option set to the ID or path of the ZeroClipboard JavaScript file in order to enable ZeroClipboard's event dispatching to work correctly. For example:
@@ -496,6 +528,7 @@ In order to correctly dispatch events while using AMD, ZeroClipboard expects a [
 ```js
 window.require = curl;
 ```
+
 
 ## Browser Support
 
