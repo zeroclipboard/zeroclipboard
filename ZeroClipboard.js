@@ -7,18 +7,36 @@
  * v1.2.0-beta.1
  */(function() {
   "use strict";
+  var _camelizeCssPropName = function() {
+    var matcherRegex = /\-([a-z])/g, replacerFn = function(match, group) {
+      return group.toUpperCase();
+    };
+    return function(prop) {
+      return prop.replace(matcherRegex, replacerFn);
+    };
+  }();
   var _getStyle = function(el, prop) {
-    var y = el.style[prop];
-    if (el.currentStyle) y = el.currentStyle[prop]; else if (window.getComputedStyle) y = document.defaultView.getComputedStyle(el, null).getPropertyValue(prop);
-    if (y == "auto" && prop == "cursor") {
-      var possiblePointers = [ "a" ];
-      for (var i = 0; i < possiblePointers.length; i++) {
-        if (el.tagName.toLowerCase() == possiblePointers[i]) {
+    var value, camelProp, tagName, possiblePointers, i, len;
+    if (window.getComputedStyle) {
+      value = window.getComputedStyle(el, null).getPropertyValue(prop);
+    } else {
+      camelProp = _camelizeCssPropName(prop);
+      if (el.currentStyle) {
+        value = el.currentStyle[camelProp];
+      } else {
+        value = el.style[camelProp];
+      }
+    }
+    if (value === "auto" && prop === "cursor") {
+      tagName = el.tagName.toLowerCase();
+      possiblePointers = [ "a" ];
+      for (i = 0, len = possiblePointers.length; i < len; i++) {
+        if (tagName === possiblePointers[i]) {
           return "pointer";
         }
       }
     }
-    return y;
+    return value;
   };
   var _elementMouseOver = function(event) {
     if (!ZeroClipboard.prototype._singleton) return;
@@ -101,13 +119,13 @@
       height: obj.height || obj.offsetHeight || 0,
       zIndex: 9999
     };
-    var zi = _getStyle(obj, "zIndex");
-    if (zi && zi != "auto") {
+    var zi = _getStyle(obj, "z-index");
+    if (zi && zi !== "auto") {
       info.zIndex = parseInt(zi, 10);
     }
     while (obj) {
-      var borderLeftWidth = parseInt(_getStyle(obj, "borderLeftWidth"), 10);
-      var borderTopWidth = parseInt(_getStyle(obj, "borderTopWidth"), 10);
+      var borderLeftWidth = parseInt(_getStyle(obj, "border-left-width"), 10);
+      var borderTopWidth = parseInt(_getStyle(obj, "border-top-width"), 10);
       info.left += isNaN(obj.offsetLeft) ? 0 : obj.offsetLeft;
       info.left += isNaN(borderLeftWidth) ? 0 : borderLeftWidth;
       info.top += isNaN(obj.offsetTop) ? 0 : obj.offsetTop;
@@ -173,7 +191,7 @@
     if (element.getAttribute("title")) {
       this.setTitle(element.getAttribute("title"));
     }
-    this.setHandCursor(_getStyle(element, "cursor") == "pointer");
+    this.setHandCursor(_getStyle(element, "cursor") === "pointer");
   };
   ZeroClipboard.prototype.setText = function(newText) {
     if (newText && newText !== "") {

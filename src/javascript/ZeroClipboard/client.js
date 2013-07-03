@@ -53,7 +53,7 @@ ZeroClipboard.prototype.setCurrent = function (element) {
   }
 
   // If the element has a pointer style, set to hand cursor
-  this.setHandCursor(_getStyle(element, "cursor") == "pointer");
+  this.setHandCursor(_getStyle(element, "cursor") === "pointer");
 };
 
 /*

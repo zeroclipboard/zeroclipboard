@@ -1,27 +1,57 @@
 /*
+ * Private function _camelizeCssPropName is used to convert standard CSS
+ * property names into the equivalent CSS property names for use by oldIE
+ * and/or `el.style.{prop}`.
+ * e.g. "z-index" -> "zIndex"
+ *
+ * NOTE: oldIE has other special cases that are not accounted for here,
+ * e.g. "float" -> "styleFloat"
+ *
+ * returns the CSS property name for oldIE and/or `el.style.{prop}`
+ */
+var _camelizeCssPropName = (function () {
+  var matcherRegex = /\-([a-z])/g,
+      replacerFn = function (match, group) { return group.toUpperCase(); };
+
+  return function (prop) {
+    return prop.replace(matcherRegex, replacerFn);
+  };
+})();
+
+/*
  * Private function _getStyle is used to try and guess the element style; If
  * if we're looking for cursor, then we make a guess for <a>.
  *
  * returns the computed style
  */
 var _getStyle = function (el, prop) {
-  var y = el.style[prop];
+  var value, camelProp, tagName, possiblePointers, i, len;
+  
+  if (window.getComputedStyle) {
+    value = window.getComputedStyle(el, null).getPropertyValue(prop);
+  }
+  else {
+    camelProp = _camelizeCssPropName(prop);
 
-  if (el.currentStyle)
-    y = el.currentStyle[prop];
-  else if (window.getComputedStyle)
-    y = document.defaultView.getComputedStyle(el, null).getPropertyValue(prop);
+    if (el.currentStyle) {
+      value = el.currentStyle[camelProp];
+    }
+    else {
+      value = el.style[camelProp];
+    }
+  }
 
-  if (y == "auto" && prop == "cursor") {
-    var possiblePointers = ["a"];
-    for (var i = 0; i < possiblePointers.length; i++) {
-      if (el.tagName.toLowerCase() == possiblePointers[i]) {
+  if (value === "auto" && prop === "cursor") {
+    tagName = el.tagName.toLowerCase();
+    possiblePointers = ["a"];
+    for (i = 0, len = possiblePointers.length; i < len; i++) {
+      if (tagName === possiblePointers[i]) {
         return "pointer";
       }
     }
   }
 
-  return y;
+  return value;
 };
 
 /*
@@ -158,16 +188,16 @@ var _getDOMObjectPosition = function (obj) {
   };
 
 
-  var zi = _getStyle(obj, "zIndex");
+  var zi = _getStyle(obj, "z-index");
   // float just above object, or default zIndex if dom element isn't set
-  if (zi && zi != "auto") {
+  if (zi && zi !== "auto") {
     info.zIndex = parseInt(zi, 10);
   }
 
   while (obj) {
 
-    var borderLeftWidth = parseInt(_getStyle(obj, "borderLeftWidth"), 10);
-    var borderTopWidth  = parseInt(_getStyle(obj, "borderTopWidth"), 10);
+    var borderLeftWidth = parseInt(_getStyle(obj, "border-left-width"), 10);
+    var borderTopWidth  = parseInt(_getStyle(obj, "border-top-width"), 10);
 
     info.left += isNaN(obj.offsetLeft)  ? 0 : obj.offsetLeft;
     info.left += isNaN(borderLeftWidth) ? 0 : borderLeftWidth;

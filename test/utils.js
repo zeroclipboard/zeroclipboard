@@ -22,18 +22,54 @@ exports.utils = {
     ZeroClipboard.destroy();
     callback();
   },
-
-  "_getStyle returns computed styles": function (test) {
-    test.expect(5);
-    test.equal(_utils._getStyle($("a.no_cursor_style")[0], "cursor"), "pointer");
-    test.notEqual(_utils._getStyle($("a.no_pointer_anchor")[0], "cursor"), "pointer");
-
-    test.equal(_utils._getStyle($(".zindex-auto")[0], "zIndex"), 0);
-    test.equal(_utils._getStyle($("#d_clip_button")[0], "borderLeftWidth"), 0);
-    test.equal(_utils._getStyle($(".big-border")[0], "borderLeftWidth"), 0);
-
+  
+  "_camelizeCssPropName converts CSS property names": function (test) {
+    test.expect(3);
+    test.strictEqual(_utils._camelizeCssPropName("z-index"), "zIndex");
+    test.strictEqual(_utils._camelizeCssPropName("border-left-width"), "borderLeftWidth");
+    test.strictEqual(_utils._camelizeCssPropName("cursor"), "cursor");
     test.done();
   },
+
+  "_getStyle returns computed styles": function (test) {
+    test.expect(10);
+    
+    test.equal(_utils._getStyle($("a.no_cursor_style")[0], "cursor"), "pointer");
+    test.notEqual(_utils._getStyle($("a.no_pointer_anchor")[0], "cursor"), "pointer");
+    
+    var els = {
+      zIndex: $(".zindex-auto")[0],
+      clipButton: $("#d_clip_button")[0],
+      bigBorder: $(".big-border")[0]
+    };
+
+    // evergreen browsers: `window.getComputedStyle(el, null)`
+    test.equal(_utils._getStyle(els.zIndex, "z-index"), "auto");  
+    test.equal(_utils._getStyle(els.clipButton, "border-left-width"), 0);
+    test.equal(_utils._getStyle(els.bigBorder, "border-left-width"), 0);
+
+    // oldIE (IE8-), doesn't exist in jsdom: `el.currentStyle`
+    test.equal(typeof els.zIndex.currentStyle, "undefined");
+    test.equal(els.zIndex.currentStyle, null);
+    
+    // Plain ole `el.style`
+    var tmp = window.getComputedStyle;
+    try {
+      window.getComputedStyle = undefined;
+      test.equal(_utils._getStyle(els.zIndex, "z-index"), "auto");
+      test.equal(_utils._getStyle(els.clipButton, "border-left-width"), 0);
+      test.equal(_utils._getStyle(els.bigBorder, "border-left-width"), 0);
+    }
+    catch (e) {
+      test.ok(false, "An error occurred: " + e);    
+    }
+    finally {
+      window.getComputedStyle = tmp;
+    }
+    
+    test.done();
+  },
+
   "_removeClass removes classes from element": function (test) {
     test.expect(5);
     var div = $("<div>").addClass("class-1 class-2 class_3")[0];
