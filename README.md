@@ -81,7 +81,7 @@ see [CONTRIBUTING.md](CONTRIBUTING.md)
 
 After version [1.1.7](docs/releases.md#zeroclipboard-117) ZeroClipboard uses [semantic versioning](http://semver.org/)
 
-see [releases.md](docs/releases.md)
+see [releases](https://github.com/zeroclipboard/ZeroClipboard/releases)
 
 ## Roadmap
 
