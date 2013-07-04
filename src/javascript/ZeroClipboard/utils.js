@@ -247,9 +247,14 @@ var _vars = function (options) {
     str.push("trustedDomain=" + encodeURIComponent(domains.join(",")));
   }
 
-  // if ZeroClipboard is loaded an an AMD module
+  // if ZeroClipboard is loaded as an AMD module
   if (typeof options.amdModuleId === "string" && options.amdModuleId) {
     str.push("amdModuleId=" + encodeURIComponent(options.amdModuleId));
+  }
+
+  // if ZeroClipboard is loaded as a CommonJS module
+  if (typeof options.cjsModuleId === "string" && options.cjsModuleId) {
+    str.push("cjsModuleId=" + encodeURIComponent(options.cjsModuleId));
   }
 
   // join the str by &

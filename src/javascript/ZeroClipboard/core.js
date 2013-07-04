@@ -8,7 +8,8 @@ var _defaults = {
   activeClass:       "zeroclipboard-is-active",  // The class used to set object active
   allowScriptAccess: "sameDomain",               // SWF outbound scripting policy
   useNoCache:        true,                       // Ability to turn off Flash cache hack for IE
-  amdModuleId:       null                        // AMD module ID or path to access the ZeroClipboard object
+  amdModuleId:       null,                       // AMD module ID or path to access the ZeroClipboard object
+  cjsModuleId:       null                        // CommonJS module ID or path to access the ZeroClipboard object
 };
 
 /*

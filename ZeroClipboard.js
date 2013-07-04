@@ -153,6 +153,9 @@
       }
       str.push("trustedDomain=" + encodeURIComponent(domains.join(",")));
     }
+    if (typeof options.cjsModuleId === "string" && options.cjsModuleId) {
+      str.push("cjsModuleId=" + encodeURIComponent(options.cjsModuleId));
+    }
     if (typeof options.amdModuleId === "string" && options.amdModuleId) {
       str.push("amdModuleId=" + encodeURIComponent(options.amdModuleId));
     }
@@ -217,7 +220,8 @@
     activeClass: "zeroclipboard-is-active",
     allowScriptAccess: "sameDomain",
     useNoCache: true,
-    amdModuleId: null
+    amdModuleId: null,
+    cjsModuleId: null
   };
   ZeroClipboard.setDefaults = function(options) {
     for (var ko in options) _defaults[ko] = options[ko];
@@ -378,12 +382,12 @@
       if (arrayIndex != -1) gluedElements.splice(arrayIndex, 1);
     }
   };
-  if (typeof module !== "undefined") {
-    module.exports = ZeroClipboard;
-  } else if (typeof define === "function" && define.amd) {
+  if (typeof define === "function" && define.amd) {
     define(function() {
       return ZeroClipboard;
     });
+  } else if (typeof module !== "undefined") {
+    module.exports = ZeroClipboard;
   } else {
     window.ZeroClipboard = ZeroClipboard;
   }

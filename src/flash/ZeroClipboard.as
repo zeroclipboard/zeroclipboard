@@ -28,16 +28,26 @@ package {
       "  });\n" +
       "})";
 
+    // Function through which JavaScript events are dispatched if using a CommonJS module loader
+    private static var cjsWrappedDispatcher:String =
+      "(function (event, args, cjsModuleId) {\n" +
+      "  var ZeroClipboard = require(cjsModuleId);\n" +
+      "  ZeroClipboard.dispatch(event, args);\n" +
+      "})";
+
 
     // The button sprite
     private var button:Sprite;
 
     // The text in the clipboard
     private var clipText:String = "";
-    
+
     // AMD module ID or path to access the ZeroClipboard object
     private var amdModuleId:String = null;
-    
+
+    // CommonJS module ID or path to access the ZeroClipboard object
+    private var cjsModuleId:String = null;
+
     // constructor, setup event listeners and external interfaces
     public function ZeroClipboard() {
 
@@ -57,6 +67,11 @@ package {
       // Enable complete AMD support (e.g. RequireJS)
       if (flashvars.amdModuleId && typeof flashvars.amdModuleId === "string") {
         amdModuleId = flashvars.amdModuleId.split("\\").join("\\\\");
+      }
+
+      // Enable complete CommonJS support (e.g. Browserify)
+      if (flashvars.cjsModuleId && typeof flashvars.cjsModuleId === "string") {
+        cjsModuleId = flashvars.cjsModuleId.split("\\").join("\\\\");
       }
 
       // invisible button covers entire stage
@@ -184,11 +199,14 @@ package {
     //
     // returns nothing
     private function dispatch(eventName:String, eventArgs:Object): void {
-      if (!amdModuleId) {
-        ExternalInterface.call(ZeroClipboard.normalDispatcher, eventName, eventArgs);
+      if (amdModuleId) {
+        ExternalInterface.call(ZeroClipboard.amdWrappedDispatcher, eventName, eventArgs, amdModuleId);
+      }
+      else if (cjsModuleId) {
+        ExternalInterface.call(ZeroClipboard.cjsWrappedDispatcher, eventName, eventArgs, cjsModuleId);
       }
       else {
-        ExternalInterface.call(ZeroClipboard.amdWrappedDispatcher, eventName, eventArgs, amdModuleId);
+        ExternalInterface.call(ZeroClipboard.normalDispatcher, eventName, eventArgs);
       }
     }
 

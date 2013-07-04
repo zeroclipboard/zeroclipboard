@@ -273,6 +273,52 @@ exports.event = {
 })("load", { flashVersion: "MAC 11,0,0" }, ' + JSON.stringify(amdModuleId) + ');\
 '
     );
+  },
+  
+  "Test onLoad Event with CommonJS": function (test) {
+    test.expect(4);
+    
+    var cjsModuleId = "zc";
+    var requireFn = (function() {
+      var cjsCache = {};
+      cjsCache[cjsModuleId] = zeroClipboard;
+      return function(id) {
+        return cjsCache[id];
+      };
+    })();
+
+    // Special setup for this test
+    zeroClipboard.setDefaults({
+      "cjsModuleId": cjsModuleId
+    });
+    var clip = new zeroClipboard();
+    clip.glue($("#d_clip_button"));
+
+    var id = clip.id;
+
+    clip.on( "load", function(client, args) {
+      test.equal(client.id, id);
+      
+      // Special teardown for this test
+      zeroClipboard.setDefaults({
+        "cjsModuleId": null
+      });
+      
+      test.done();
+    } );
+
+    // fake load event
+    eval(
+'\
+(function(eventName, args, cjsModuleId) {\
+  var ZeroClipboard = requireFn(cjsModuleId);\
+  test.equal(ZeroClipboard, zeroClipboard);\
+  test.equal(eventName, "load");\
+  test.deepEqual(args, { flashVersion: "MAC 11,0,0" });\
+  ZeroClipboard.dispatch(eventName, args);\
+})("load", { flashVersion: "MAC 11,0,0" }, ' + JSON.stringify(cjsModuleId) + ');\
+'
+    );
   }
 
 }
