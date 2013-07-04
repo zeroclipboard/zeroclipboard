@@ -117,7 +117,7 @@
       top: 0,
       width: obj.width || obj.offsetWidth || 0,
       height: obj.height || obj.offsetHeight || 0,
-      zIndex: 9999
+      zIndex: 999999999
     };
     var zi = _getStyle(obj, "z-index");
     if (zi && zi !== "auto") {
