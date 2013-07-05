@@ -164,12 +164,25 @@ exports.utils = {
   },
 
   "_vars builds flashvars": function (test) {
-    test.expect(2);
-    test.equal(_utils._vars(clip.options), "");
+    test.expect(5);
+    
+    test.strictEqual(_utils._vars(clip.options), "");
 
     clip.options.trustedDomains = ["*"];
-
-    test.equal(_utils._vars(clip.options), "trustedDomain=*");
+    test.strictEqual(_utils._vars(clip.options), "trustedDomain=*");
+    
+    clip.options.trustedDomains = null;
+    clip.options.amdModuleId = "zcAMD";
+    test.strictEqual(_utils._vars(clip.options), "amdModuleId=zcAMD");
+    
+    clip.options.amdModuleId = null;
+    clip.options.cjsModuleId = "zcCJS";
+    test.strictEqual(_utils._vars(clip.options), "cjsModuleId=zcCJS");
+    
+    clip.options.trustedDomains = ["*"];
+    clip.options.amdModuleId = "zcAMD";
+    clip.options.cjsModuleId = "zcCJS";
+    test.strictEqual(_utils._vars(clip.options), "trustedDomain=*&amdModuleId=zcAMD&cjsModuleId=zcCJS");
 
     test.done();
   },

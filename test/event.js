@@ -228,10 +228,13 @@ exports.event = {
   "Test onLoad Event with AMD": function (test) {
     test.expect(4);
     
-    var amdModuleId = "zc";
+    // This is a special private variable inside of ZeroClipboard, so we can
+    // only simulate its functionality here
+    var _amdModuleId = "zc";
+    
     var requireFn = (function() {
       var amdCache = {};
-      amdCache[amdModuleId] = zeroClipboard;
+      amdCache[_amdModuleId] = zeroClipboard;
       return function(depIds, cb) {
         var depVals = depIds.map(function(id) { return amdCache[id]; });
         process.nextTick(function() {
@@ -240,10 +243,6 @@ exports.event = {
       };
     })();
 
-    // Special setup for this test
-    zeroClipboard.setDefaults({
-      "amdModuleId": amdModuleId
-    });
     var clip = new zeroClipboard();
     clip.glue($("#d_clip_button"));
 
@@ -251,12 +250,6 @@ exports.event = {
 
     clip.on( "load", function(client, args) {
       test.equal(client.id, id);
-      
-      // Special teardown for this test
-      zeroClipboard.setDefaults({
-        "amdModuleId": null
-      });
-      
       test.done();
     } );
 
@@ -270,7 +263,7 @@ exports.event = {
     test.deepEqual(args, { flashVersion: "MAC 11,0,0" });\
     ZeroClipboard.dispatch(eventName, args);\
   });\
-})("load", { flashVersion: "MAC 11,0,0" }, ' + JSON.stringify(amdModuleId) + ');\
+})("load", { flashVersion: "MAC 11,0,0" }, ' + JSON.stringify(_amdModuleId) + ');\
 '
     );
   },
@@ -278,19 +271,18 @@ exports.event = {
   "Test onLoad Event with CommonJS": function (test) {
     test.expect(4);
     
-    var cjsModuleId = "zc";
+    // This is a special private variable inside of ZeroClipboard, so we can
+    // only simulate its functionality here
+    var _cjsModuleId = "zc";
+    
     var requireFn = (function() {
       var cjsCache = {};
-      cjsCache[cjsModuleId] = zeroClipboard;
+      cjsCache[_cjsModuleId] = zeroClipboard;
       return function(id) {
         return cjsCache[id];
       };
     })();
 
-    // Special setup for this test
-    zeroClipboard.setDefaults({
-      "cjsModuleId": cjsModuleId
-    });
     var clip = new zeroClipboard();
     clip.glue($("#d_clip_button"));
 
@@ -298,12 +290,6 @@ exports.event = {
 
     clip.on( "load", function(client, args) {
       test.equal(client.id, id);
-      
-      // Special teardown for this test
-      zeroClipboard.setDefaults({
-        "cjsModuleId": null
-      });
-      
       test.done();
     } );
 
@@ -316,7 +302,7 @@ exports.event = {
   test.equal(eventName, "load");\
   test.deepEqual(args, { flashVersion: "MAC 11,0,0" });\
   ZeroClipboard.dispatch(eventName, args);\
-})("load", { flashVersion: "MAC 11,0,0" }, ' + JSON.stringify(cjsModuleId) + ');\
+})("load", { flashVersion: "MAC 11,0,0" }, ' + JSON.stringify(_cjsModuleId) + ');\
 '
     );
   }

@@ -1,3 +1,9 @@
+/* AMD module ID or path to access the ZeroClipboard object */
+var _amdModuleId = null;
+
+/* CommonJS module ID or path to access the ZeroClipboard object */
+var _cjsModuleId = null;
+
 /*
  * Find or create an htmlBridge and flashBridge for the client.
  *
@@ -9,6 +15,16 @@ var _bridge = function () {
   var container = document.getElementById("global-zeroclipboard-html-bridge");
 
   if (!container) {
+    // Create a copy of the `client.options` object to avoid exposing
+    // the `amdModuleId` and `cjsModuleId` settings
+    var opts = {};
+    for (var ko in client.options) opts[ko] = client.options[ko];
+    // Set these last to override them just in case any [v1.2.0-beta.1] users
+    // are still passing them in to [v1.2.0-beta.2] (or higher)
+    opts.amdModuleId = _amdModuleId;
+    opts.cjsModuleId = _cjsModuleId;
+    
+    var flashvars = _vars(opts);
     var html = "\
       <object classid=\"clsid:d27cdb6e-ae6d-11cf-96b8-444553540000\" id=\"global-zeroclipboard-flash-bridge\" width=\"100%\" height=\"100%\"> \
         <param name=\"movie\" value=\"" + client.options.moviePath + _noCache(client.options.moviePath) + "\"/> \
@@ -19,7 +35,7 @@ var _bridge = function () {
         <param name=\"quality\" value=\"best\" /> \
         <param name=\"bgcolor\" value=\"#ffffff\"/> \
         <param name=\"wmode\" value=\"transparent\"/> \
-        <param name=\"flashvars\" value=\"" + _vars(client.options) + "\"/> \
+        <param name=\"flashvars\" value=\"" + flashvars + "\"/> \
         <embed src=\"" + client.options.moviePath + _noCache(client.options.moviePath) + "\" \
           loop=\"false\" menu=\"false\" \
           quality=\"best\" bgcolor=\"#ffffff\" \
@@ -30,7 +46,7 @@ var _bridge = function () {
           type=\"application/x-shockwave-flash\" \
           wmode=\"transparent\" \
           pluginspage=\"http://www.macromedia.com/go/getflashplayer\" \
-          flashvars=\"" + _vars(client.options) + "\" \
+          flashvars=\"" + flashvars + "\" \
           scale=\"exactfit\"> \
         </embed> \
       </object>";
