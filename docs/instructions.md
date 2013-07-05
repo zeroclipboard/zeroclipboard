@@ -54,8 +54,7 @@ var _defaults = {
   hoverClass:        "zeroclipboard-is-hover",   // The class used to hover over the object
   activeClass:       "zeroclipboard-is-active",  // The class used to set object active
   allowScriptAccess: "sameDomain",               // SWF outbound scripting policy
-  useNoCache:        true,                       // Include a nocache query parameter on requests for the SWF
-  amdModuleId:       null                        // AMD module ID or path to access the ZeroClipboard object
+  useNoCache:        true                        // Include a nocache query parameter on requests for the SWF
 };
 ```
 You can override the defaults using `ZeroClipboard.setDefaults({ moviePath: "new/path" })` before you create any clients.
@@ -497,33 +496,9 @@ Here is a complete example which exercises every option and event handler:
 
 ## AMD
 
-If using [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) with a library such as [RequireJS](http://requirejs.org/), [curl.js](https://github.com/cujojs/curl), etc., you _MUST_ configure ZeroClipboard with the `amdModuleId` option set to the ID or path of the ZeroClipboard JavaScript file in order to enable ZeroClipboard's event dispatching to work correctly. For example:
+If using [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) with a library such as [RequireJS](http://requirejs.org/), etc., you shouldn't need to do any special configuration for ZeroClipboard to work correctly as an AMD module.
 
-```js
-define(['path/to/zero-clipboard'], function (ZeroClipboard) {
-  ZeroClipboard.setDefaults({
-    amdModuleId: 'path/to/zero-clipboard'
-  });
-});
-```
-
-Or, with a path configuration, e.g. in RequireJS:
-
-```js
-requirejs.config({
-  paths: {
-    'ZeroClipboard': 'path/to/zero-clipboard'
-  }
-});
-
-define(['ZeroClipboard'], function(ZeroClipboard) {
-  ZeroClipboard.setDefaults({
-    amdModuleId: 'ZeroClipboard'
-  });
-});
-```
-
-In order to correctly dispatch events while using AMD, ZeroClipboard expects a [global `require` function](https://github.com/amdjs/amdjs-api/wiki/require) to exist. If you are using an AMD loader that does _not_ expose a global `require` function (e.g. curl.js), then you will need to add that function yourself. For example, with curl.js:
+However, in order to correctly dispatch events while using AMD, ZeroClipboard expects a [global `require` function](https://github.com/amdjs/amdjs-api/wiki/require) to exist. If you are using an AMD loader that does _not_ expose a global `require` function (e.g. curl.js), then you will need to add that function yourself. For example, with curl.js:
 
 ```js
 window.require = curl;
@@ -532,4 +507,4 @@ window.require = curl;
 
 ## Browser Support
 
-Works in IE7+ and, of course, all of the modern browsers.
+Works in IE7+ and all of the evergreen browsers.
