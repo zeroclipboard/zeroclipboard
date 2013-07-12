@@ -216,7 +216,7 @@ var _getDOMObjectPosition = function (obj) {
 
   // Use getBoundingClientRect where available (almost everywhere).
   // See: http://www.quirksmode.org/dom/w3c_cssom.html
-  if (typeof obj.getBoundingClientRect === "function") {
+  if (obj.getBoundingClientRect) {
     // compute left / top offset (works for `position:fixed`, too!)
     var rect = obj.getBoundingClientRect();
     var pageXOffset, pageYOffset, zoomFactor;
@@ -238,8 +238,8 @@ var _getDOMObjectPosition = function (obj) {
 
     info.left = rect.left + pageXOffset - leftBorderWidth;
     info.top = rect.top + pageYOffset - topBorderWidth;
-    info.width = rect.width;
-    info.height = rect.height;
+    info.width = "width" in rect ? rect.width : rect.right - rect.left;
+    info.height = "height" in rect ? rect.height : rect.bottom - rect.top;
   }
   
   return info;
