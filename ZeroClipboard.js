@@ -4,7 +4,7 @@
  * Copyright 2013 Jon Rohan, James M. Greene, .
  * Released under the MIT license
  * http://zeroclipboard.github.io/ZeroClipboard/
- * v1.2.0-beta.3
+ * v1.2.0-beta.4
  */(function() {
   "use strict";
   var _camelizeCssPropName = function() {
@@ -27,12 +27,14 @@
         value = el.style[camelProp];
       }
     }
-    if (value === "auto" && prop === "cursor") {
-      tagName = el.tagName.toLowerCase();
-      possiblePointers = [ "a" ];
-      for (i = 0, len = possiblePointers.length; i < len; i++) {
-        if (tagName === possiblePointers[i]) {
-          return "pointer";
+    if (prop === "cursor") {
+      if (!value || value === "auto") {
+        tagName = el.tagName.toLowerCase();
+        possiblePointers = [ "a" ];
+        for (i = 0, len = possiblePointers.length; i < len; i++) {
+          if (tagName === possiblePointers[i]) {
+            return "pointer";
+          }
         }
       }
     }
@@ -219,10 +221,12 @@
   ZeroClipboard.prototype.setCurrent = function(element) {
     currentElement = element;
     this.reposition();
-    if (element.getAttribute("title")) {
-      this.setTitle(element.getAttribute("title"));
+    var titleAttr = element.getAttribute("title");
+    if (titleAttr) {
+      this.setTitle(titleAttr);
     }
-    this.setHandCursor(_getStyle(element, "cursor") === "pointer");
+    var useHandCursor = this.options.forceHandCursor === true || _getStyle(element, "cursor") === "pointer";
+    _setHandCursor.call(this, useHandCursor);
   };
   ZeroClipboard.prototype.setText = function(newText) {
     if (newText && newText !== "") {
@@ -237,9 +241,14 @@
     if (this.ready()) this.flashBridge.setSize(width, height);
   };
   ZeroClipboard.prototype.setHandCursor = function(enabled) {
+    enabled = typeof enabled === "boolean" ? enabled : !!enabled;
+    _setHandCursor.call(this, enabled);
+    this.options.forceHandCursor = enabled;
+  };
+  var _setHandCursor = function(enabled) {
     if (this.ready()) this.flashBridge.setHandCursor(enabled);
   };
-  ZeroClipboard.version = "1.2.0-beta.3";
+  ZeroClipboard.version = "1.2.0-beta.4";
   var _defaults = {
     moviePath: "ZeroClipboard.swf",
     trustedDomains: null,
@@ -247,7 +256,8 @@
     hoverClass: "zeroclipboard-is-hover",
     activeClass: "zeroclipboard-is-active",
     allowScriptAccess: "sameDomain",
-    useNoCache: true
+    useNoCache: true,
+    forceHandCursor: false
   };
   ZeroClipboard.setDefaults = function(options) {
     for (var ko in options) _defaults[ko] = options[ko];

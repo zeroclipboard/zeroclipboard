@@ -54,7 +54,8 @@ var _defaults = {
   hoverClass:        "zeroclipboard-is-hover",   // The class used to hover over the object
   activeClass:       "zeroclipboard-is-active",  // The class used to set object active
   allowScriptAccess: "sameDomain",               // SWF outbound scripting policy
-  useNoCache:        true                        // Include a nocache query parameter on requests for the SWF
+  useNoCache:        true,                       // Include a nocache query parameter on requests for the SWF
+  forceHandCursor:   false                       // Forcibly set the hand cursor ("pointer") for all glued elements
 };
 ```
 You can override the defaults using `ZeroClipboard.setDefaults({ moviePath: "new/path" })` before you create any clients.
@@ -508,3 +509,11 @@ window.require = curl;
 ## Browser Support
 
 Works in IE7+ and all of the evergreen browsers.
+
+
+# Deprecations
+
+The current list of deprecations includes:  
+ - `ZeroClipboard.prototype.setHandCursor` &rarr; as of [v1.2.0-beta.4]
+     - Use the `forceHandCursor` config option instead!
+

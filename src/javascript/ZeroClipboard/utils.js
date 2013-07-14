@@ -41,12 +41,14 @@ var _getStyle = function (el, prop) {
     }
   }
 
-  if (value === "auto" && prop === "cursor") {
-    tagName = el.tagName.toLowerCase();
-    possiblePointers = ["a"];
-    for (i = 0, len = possiblePointers.length; i < len; i++) {
-      if (tagName === possiblePointers[i]) {
-        return "pointer";
+  if (prop === "cursor") {
+    if (!value || value === "auto") {
+      tagName = el.tagName.toLowerCase();
+      possiblePointers = ["a"];
+      for (i = 0, len = possiblePointers.length; i < len; i++) {
+        if (tagName === possiblePointers[i]) {
+          return "pointer";
+        }
       }
     }
   }

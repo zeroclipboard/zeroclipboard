@@ -30,8 +30,8 @@ var ZeroClipboard = function (elements, options) {
 };
 
 
-var currentElement,      // keep track of the current element that is being hovered.
-    gluedElements = [];  // watch glued elements so we don't double glue
+var currentElement,      // Keep track of the current element that is being hovered.
+    gluedElements = [];  // Watch glued elements so we don't double glue.
 
 /*
  * Sets the current html object that the flash object should overlay.
@@ -48,12 +48,15 @@ ZeroClipboard.prototype.setCurrent = function (element) {
   this.reposition();
 
   // If the dom element has a title
-  if (element.getAttribute("title")) {
-    this.setTitle(element.getAttribute("title"));
+  var titleAttr = element.getAttribute("title");
+  if (titleAttr) {
+    this.setTitle(titleAttr);
   }
 
   // If the element has a pointer style, set to hand cursor
-  this.setHandCursor(_getStyle(element, "cursor") === "pointer");
+  var useHandCursor = this.options.forceHandCursor === true || _getStyle(element, "cursor") === "pointer";
+  // Update the hand cursor state without updating the `forceHandCursor` option
+  _setHandCursor.call(this, useHandCursor);
 };
 
 /*
@@ -87,10 +90,27 @@ ZeroClipboard.prototype.setSize = function (width, height) {
 };
 
 /*
- * Sends a signal to the flash object to display the hand cursor if true
+ * @deprecated in [v1.2.0-beta.4], slated for removal in [v2.0.0]. See docs for alternatives.
+ *
+ * Sends a signal to the flash object to display the hand cursor if true.
+ * Updates the value of the `forceHandCursor` option.
  *
  * returns nothing
  */
 ZeroClipboard.prototype.setHandCursor = function (enabled) {
+  enabled = typeof enabled === "boolean" ? enabled : !!enabled;
+  _setHandCursor.call(this, enabled);
+  this.options.forceHandCursor = enabled;
+};
+
+/*
+ * @private
+ *
+ * Sends a signal to the flash object to display the hand cursor if true.
+ * Does NOT update the value of the `forceHandCursor` option.
+ *
+ * returns nothing
+ */
+var _setHandCursor = function (enabled) {
   if (this.ready()) this.flashBridge.setHandCursor(enabled);
 };
