@@ -97,6 +97,8 @@ ZeroClipboard.prototype.ready = function () {
 };
 
 /*
+ * @deprecated in [v1.2.0-beta.4], slated for removal in [v2.0.0]. See docs for more info.
+ *
  * Reposition the flash object, if the page size changes.
  *
  * returns nothing

@@ -149,17 +149,6 @@ var clip = new ZeroClipboard( $("button#my-button") );
 ```
 
 
-### Page Resizing
-
-If the page gets resized, or something happens which moves your DOM element, you will need to reposition the movie.  This can be achieved by calling the `reposition()` method.  Example:
-
-```js
-clip.reposition();
-```
-
-A typical use of this is to put it inside a `window.onresize` handler.
-
-
 ## CSS Effects
 
 Since the Flash movie is floating on top of your DOM element, it will receive all the mouse events before the browser has a chance to catch them.  However, for convenience these events are passed through to your clipboard client which you can capture (see *Event Handlers* below).  But in addition to this, the Flash movie can also activate CSS classes on your DOM element to simulate the ":hover" and ":active" pseudo-classes.
@@ -516,4 +505,6 @@ Works in IE7+ and all of the evergreen browsers.
 The current list of deprecations includes:  
  - `ZeroClipboard.prototype.setHandCursor` &rarr; as of [v1.2.0-beta.4]
      - Use the `forceHandCursor` config option instead!
+ - `ZeroClipboard.prototype.reposition` &rarr; as of [v1.2.0-beta.4]
+     - Repositioning is now handled more intelligently internally, so this method is simply no longer needed by users.
 
