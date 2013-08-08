@@ -5,13 +5,22 @@ The *ZeroClipboard* JavaScript library provides an easy way to copy text to the 
 Browsers won't let you access the clipboard directly. So this library puts a flash object on the page to proxy the clipboard for you. The library will move and resize over all the glued objects.
 
 
-## Setup
+## Installation
 
-If you are installing for node.
+If you are installing for Node:
 
 ```shell
 npm install zeroclipboard
 ```
+
+If you are installing for the web, you can use Bower:
+
+```shell
+bower install zeroclipboard
+```
+
+
+## Setup
 
 To use the library, simply include the following JavaScript file in your page:
 
@@ -28,7 +37,7 @@ ZeroClipboard.setDefaults( { moviePath: 'http://YOURSERVER/path/ZeroClipboard.sw
 
 ## Clients
 
-Now you are ready to create one or more *Clients*.  A client is a single instance of the clipboard library on the page, linked to one or more DOM elements. Here is how to create a client instance:
+Now you are ready to create one or more _Clients_.  A client is a single instance of the clipboard library on the page, linked to one or more DOM elements. Here is how to create a client instance:
 
 ```js
 var clip = new ZeroClipboard();
@@ -84,9 +93,17 @@ If you find yourself in this situation (as in [Issue #170](https://github.com/ze
 
 ### Text To Copy
 
-Setting the clipboard text happens 3 ways.
+Setting the clipboard text can be done in 4 ways:
 
-1. Set the text via `data-clipboard-target` attribute on the button. ZeroClipboard will look for the target element via ID and try and get the text value via `.value` or `.textContent` or `.innerText`.
+1. Add a `dataRequested` event handler in which you call `clip.setText` to set the appropriate text. This event is triggered every time ZeroClipboard tries to inject into the clipboard. Example:
+
+   ```js
+   clip.on( 'dataRequested', function (client, args) {
+      client.setText( "Copy me!" );
+   });
+   ```
+
+2. Set the text via `data-clipboard-target` attribute on the button. ZeroClipboard will look for the target element via ID and try and get the text value via `.value` or `.textContent` or `.innerText`.
 
   ```html
   <button id="my-button" data-clipboard-target="clipboard_text">Copy to Clipboard</button>
@@ -106,17 +123,20 @@ Setting the clipboard text happens 3 ways.
   proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</pre>
   ```
 
-2. Set the text via `data-clipboard-text` attribute on the button. Doing this will let ZeroClipboard take care of the rest.
+3. Set the text via `data-clipboard-text` attribute on the button. Doing this will let ZeroClipboard take care of the rest.
 
   ```html
   <button id="my-button" data-clipboard-text="Copy me!">Copy to Clipboard</button>
   ```
 
-3. Set the text via `clip.setText` property.  You can call this function at any time; when the page first loads, or later in an `onMouseOver` or `onMouseDown` handler.  Example:
+4. Set the text via `clip.setText` property.  You can call this function at any time; when the page first loads, or later like in a `dataRequested` event handler.  Example:
 
   ```js
   clip.setText( "Copy me!" );
   ```
+  
+  The important caveat of using `clip.setText` is that the text it sets is **transient** and _will only be used for a single copy operation_. As such, we do not particularly
+  recommend using `clip.setText` other than inside of a `dataRequested` event handler; however, the API will not prevent you from using it in other ways.
 
 
 ### Gluing
