@@ -1,6 +1,6 @@
 "use strict";
 
-require("./fixtures/env")
+require("./fixtures/env");
 var zeroClipboard, clip;
 
 exports.dom = {
@@ -24,4 +24,4 @@ exports.dom = {
     test.done();
   },
 
-}
+};

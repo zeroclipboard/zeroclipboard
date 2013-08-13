@@ -1,11 +1,12 @@
 /*!
- * zeroclipboard
- * The ZeroClipboard library provides an easy way to copy text to the clipboard using an invisible Adobe Flash movie, and a JavaScript interface.
- * Copyright 2013 Jon Rohan, James M. Greene, .
- * Released under the MIT license
- * http://zeroclipboard.github.io/ZeroClipboard/
- * v1.2.0-beta.4
- */(function() {
+* ZeroClipboard
+* The ZeroClipboard library provides an easy way to copy text to the clipboard using an invisible Adobe Flash movie and a JavaScript interface.
+* Copyright (c) 2013 Jon Rohan, James M. Greene
+* Licensed MIT
+* http://zeroclipboard.github.io/ZeroClipboard/
+* v1.2.0-beta.4 (2013-08-23)
+*/
+(function() {
   "use strict";
   var _camelizeCssPropName = function() {
     var matcherRegex = /\-([a-z])/g, replacerFn = function(match, group) {
@@ -158,7 +159,7 @@
   var _noCache = function(path) {
     var client = ZeroClipboard.prototype._singleton;
     if (client.options.useNoCache) {
-      return (path.indexOf("?") >= 0 ? "&nocache=" : "?nocache=") + (new Date).getTime();
+      return (path.indexOf("?") >= 0 ? "&nocache=" : "?nocache=") + new Date().getTime();
     } else {
       return "";
     }
@@ -373,19 +374,24 @@
       }
       this.htmlBridge.setAttribute("data-clipboard-ready", true);
       break;
+
      case "mouseover":
       _addClass(element, this.options.hoverClass);
       break;
+
      case "mouseout":
       _removeClass(element, this.options.hoverClass);
       this.resetBridge();
       break;
+
      case "mousedown":
       _addClass(element, this.options.activeClass);
       break;
+
      case "mouseup":
       _removeClass(element, this.options.activeClass);
       break;
+
      case "datarequested":
       var targetId = element.getAttribute("data-clipboard-target"), targetEl = !targetId ? null : document.getElementById(targetId);
       if (targetEl) {
@@ -397,6 +403,7 @@
       }
       performCallbackAsync = false;
       break;
+
      case "complete":
       this.options.text = null;
       break;

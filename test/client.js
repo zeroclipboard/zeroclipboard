@@ -1,6 +1,6 @@
 "use strict";
 
-require("./fixtures/env")
+require("./fixtures/env");
 var zeroClipboard, clip;
 exports.client = {
 
@@ -64,7 +64,7 @@ exports.client = {
 
     clip.setCurrent(element);
 
-    test.equal(clip.htmlBridge.getAttribute("title"), "Click me to copy to clipboard.")
+    test.equal(clip.htmlBridge.getAttribute("title"), "Click me to copy to clipboard.");
 
     clip.resetBridge();
 
@@ -93,7 +93,7 @@ exports.client = {
 
     zeroClipboard.dispatch("datarequested", { flashVersion: "MAC 11,0,0" });
 
-    test.equal(clip.options.text, "Copy me!")
+    test.equal(clip.options.text, "Copy me!");
 
     clip.resetBridge();
 
@@ -114,7 +114,7 @@ exports.client = {
     "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\n"+
     "consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\n"+
     "cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\n"+
-    "proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+    "proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
 
     clip.resetBridge();
 
@@ -135,7 +135,7 @@ exports.client = {
     "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\n"+
     "consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\n"+
     "cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\n"+
-    "proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+    "proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
 
     clip.resetBridge();
 
@@ -151,7 +151,7 @@ exports.client = {
 
     zeroClipboard.dispatch("datarequested", { flashVersion: "MAC 11,0,0" });
 
-    test.equal(clip.options.text, "Clipboard Text")
+    test.equal(clip.options.text, "Clipboard Text");
 
     clip.resetBridge();
 

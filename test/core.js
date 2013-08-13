@@ -1,6 +1,6 @@
 "use strict";
 
-require("./fixtures/env")
+require("./fixtures/env");
 var zeroClipboard, clip;
 
 exports.core = {
@@ -96,4 +96,4 @@ exports.core = {
     zeroClipboard.destroy();
   },
 
-}
+};

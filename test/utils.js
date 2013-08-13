@@ -1,6 +1,6 @@
 "use strict";
 
-require("./fixtures/env")
+require("./fixtures/env");
 var sandbox = require('nodeunit').utils.sandbox;
 
 var ZeroClipboard, clip, _utils;
@@ -22,7 +22,7 @@ exports.utils = {
     ZeroClipboard.destroy();
     callback();
   },
-  
+
   "_camelizeCssPropName converts CSS property names": function (test) {
     test.expect(3);
     test.strictEqual(_utils._camelizeCssPropName("z-index"), "zIndex");
@@ -33,10 +33,10 @@ exports.utils = {
 
   "_getStyle returns computed styles": function (test) {
     test.expect(10);
-    
+
     test.equal(_utils._getStyle($("a.no_cursor_style")[0], "cursor"), "pointer");
     test.notEqual(_utils._getStyle($("a.no_pointer_anchor")[0], "cursor"), "pointer");
-    
+
     var els = {
       zIndex: $(".zindex-auto")[0],
       clipButton: $("#d_clip_button")[0],
@@ -44,14 +44,14 @@ exports.utils = {
     };
 
     // evergreen browsers: `window.getComputedStyle(el, null)`
-    test.equal(_utils._getStyle(els.zIndex, "z-index"), "auto");  
+    test.equal(_utils._getStyle(els.zIndex, "z-index"), "auto");
     test.equal(_utils._getStyle(els.clipButton, "border-left-width"), 0);
     test.equal(_utils._getStyle(els.bigBorder, "border-left-width"), 0);
 
     // oldIE (IE8-), doesn't exist in jsdom: `el.currentStyle`
     test.equal(typeof els.zIndex.currentStyle, "undefined");
     test.equal(els.zIndex.currentStyle, null);
-    
+
     // Plain ole `el.style`
     var tmp = window.getComputedStyle;
     try {
@@ -61,12 +61,12 @@ exports.utils = {
       test.equal(_utils._getStyle(els.bigBorder, "border-left-width"), 0);
     }
     catch (e) {
-      test.ok(false, "An error occurred: " + e);    
+      test.ok(false, "An error occurred: " + e);
     }
     finally {
       window.getComputedStyle = tmp;
     }
-    
+
     test.done();
   },
 
@@ -165,20 +165,20 @@ exports.utils = {
 
   "_vars builds flashvars": function (test) {
     test.expect(5);
-    
+
     test.strictEqual(_utils._vars(clip.options), "");
 
     clip.options.trustedDomains = ["*"];
     test.strictEqual(_utils._vars(clip.options), "trustedDomain=*");
-    
+
     clip.options.trustedDomains = null;
     clip.options.amdModuleId = "zcAMD";
     test.strictEqual(_utils._vars(clip.options), "amdModuleId=zcAMD");
-    
+
     clip.options.amdModuleId = null;
     clip.options.cjsModuleId = "zcCJS";
     test.strictEqual(_utils._vars(clip.options), "cjsModuleId=zcCJS");
-    
+
     clip.options.trustedDomains = ["*"];
     clip.options.amdModuleId = "zcAMD";
     clip.options.cjsModuleId = "zcCJS";
@@ -220,26 +220,26 @@ exports.utils = {
 
   "_dispatchCallback = function (func, element, instance, args, async) {": function (test) {
     test.expect(6);
-    
+
     var async = false;
     var proof = false;
     var proveIt = function() {
       proof = true;
-      
+
       if (async) {
         test.strictEqual(proof, true);
-        
+
         process.nextTick(function() {
           test.strictEqual(proof, true);
           test.done();
         });
       }
     };
-    
+
     test.strictEqual(proof, false);
     _utils._dispatchCallback(proveIt, null, null, null, async);
     test.strictEqual(proof, true);
-    
+
     async = true;
     proof = false;
     test.strictEqual(proof, false);

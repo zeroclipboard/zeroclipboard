@@ -1,4 +1,4 @@
-ZeroClipboard.version = "{{version}}";
+ZeroClipboard.version = "<%= version %>";
 // ZeroClipboard options defaults
 var _defaults = {
   moviePath:         "ZeroClipboard.swf",        // URL to movie

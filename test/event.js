@@ -1,6 +1,6 @@
 "use strict";
 
-require("./fixtures/env")
+require("./fixtures/env");
 
 var zeroClipboard, clip;
 exports.event = {
@@ -18,7 +18,7 @@ exports.event = {
 
   "Glue element after new client": function (test) {
     test.expect(2);
-    clip.glue($("#d_clip_button"))
+    clip.glue($("#d_clip_button"));
 
     // Test the client was created properly
     test.ok(clip.htmlBridge);
@@ -29,7 +29,7 @@ exports.event = {
 
   "unglue element removes items": function (test) {
     test.expect(0);
-    clip.glue($("#d_clip_button, #d_clip_button2, #d_clip_button3"))
+    clip.glue($("#d_clip_button, #d_clip_button2, #d_clip_button3"));
 
     clip.unglue($("#d_clip_button3, #d_clip_button2"));
 
@@ -39,7 +39,7 @@ exports.event = {
   "Glue element with query string throws TypeError": function (test) {
     test.expect(1);
     test.throws(function(){
-      clip.glue("#d_clip_button")
+      clip.glue("#d_clip_button");
     }, TypeError);
 
     test.done();
@@ -115,7 +115,7 @@ exports.event = {
 
     test.done();
   },
-  
+
   "Unregistering two events works": function (test) {
     test.expect(2);
     var func = function(){};
@@ -224,14 +224,14 @@ exports.event = {
     zeroClipboard.dispatch("complete", { flashVersion: "MAC 11,0,0" });
     zeroClipboard.dispatch("mouseout", { flashVersion: "MAC 11,0,0" });
   },
-  
+
   "Test onLoad Event with AMD": function (test) {
     test.expect(4);
-    
+
     // This is a special private variable inside of ZeroClipboard, so we can
     // only simulate its functionality here
     var _amdModuleId = "zc";
-    
+
     var requireFn = (function() {
       var amdCache = {};
       amdCache[_amdModuleId] = zeroClipboard;
@@ -255,26 +255,24 @@ exports.event = {
 
     // fake load event
     eval(
-'\
-(function(eventName, args, amdModuleId) {\
-  requireFn([amdModuleId], function(ZeroClipboard) {\
-    test.equal(ZeroClipboard, zeroClipboard);\
-    test.equal(eventName, "load");\
-    test.deepEqual(args, { flashVersion: "MAC 11,0,0" });\
-    ZeroClipboard.dispatch(eventName, args);\
-  });\
-})("load", { flashVersion: "MAC 11,0,0" }, ' + JSON.stringify(_amdModuleId) + ');\
-'
+'(function(eventName, args, amdModuleId) {' +
+'  requireFn([amdModuleId], function(ZeroClipboard) {' +
+'    test.equal(ZeroClipboard, zeroClipboard);' +
+'    test.equal(eventName, "load");' +
+'    test.deepEqual(args, { flashVersion: "MAC 11,0,0" });' +
+'    ZeroClipboard.dispatch(eventName, args);' +
+'  });' +
+'})("load", { flashVersion: "MAC 11,0,0" }, ' + JSON.stringify(_amdModuleId) + ');'
     );
   },
-  
+
   "Test onLoad Event with CommonJS": function (test) {
     test.expect(4);
-    
+
     // This is a special private variable inside of ZeroClipboard, so we can
     // only simulate its functionality here
     var _cjsModuleId = "zc";
-    
+
     var requireFn = (function() {
       var cjsCache = {};
       cjsCache[_cjsModuleId] = zeroClipboard;
@@ -295,16 +293,14 @@ exports.event = {
 
     // fake load event
     eval(
-'\
-(function(eventName, args, cjsModuleId) {\
-  var ZeroClipboard = requireFn(cjsModuleId);\
-  test.equal(ZeroClipboard, zeroClipboard);\
-  test.equal(eventName, "load");\
-  test.deepEqual(args, { flashVersion: "MAC 11,0,0" });\
-  ZeroClipboard.dispatch(eventName, args);\
-})("load", { flashVersion: "MAC 11,0,0" }, ' + JSON.stringify(_cjsModuleId) + ');\
-'
+'(function(eventName, args, cjsModuleId) {' +
+'  var ZeroClipboard = requireFn(cjsModuleId);' +
+'  test.equal(ZeroClipboard, zeroClipboard);' +
+'  test.equal(eventName, "load");' +
+'  test.deepEqual(args, { flashVersion: "MAC 11,0,0" });' +
+'  ZeroClipboard.dispatch(eventName, args);' +
+'})("load", { flashVersion: "MAC 11,0,0" }, ' + JSON.stringify(_cjsModuleId) + ');'
     );
   }
 
-}
+};
