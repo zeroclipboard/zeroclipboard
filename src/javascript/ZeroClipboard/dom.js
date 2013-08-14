@@ -72,7 +72,7 @@ var _bridge = function () {
 /*
  * Reset the html bridge to be hidden off screen and not have title or text.
  *
- * returns nothing
+ * returns object instance
  */
 ZeroClipboard.prototype.resetBridge = function () {
   this.htmlBridge.style.left = "-9999px";
@@ -103,7 +103,7 @@ ZeroClipboard.prototype.ready = function () {
  *
  * Reposition the flash object, if the page size changes.
  *
- * returns nothing
+ * returns object instance
  */
 ZeroClipboard.prototype.reposition = function () {
 

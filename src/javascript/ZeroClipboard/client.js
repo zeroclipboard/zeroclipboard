@@ -38,7 +38,7 @@ var currentElement,      // Keep track of the current element that is being hove
  * This will put the global flash object on top of the current object and set
  * the text and title from the html object.
  *
- * returns nothing
+ * returns object instance
  */
 ZeroClipboard.prototype.setCurrent = function (element) {
 
@@ -64,7 +64,7 @@ ZeroClipboard.prototype.setCurrent = function (element) {
 /*
  * Sends a signal to the flash object to set the clipboard text.
  *
- * returns nothing
+ * returns object instance
  */
 ZeroClipboard.prototype.setText = function (newText) {
   if (newText && newText !== "") {
@@ -78,7 +78,7 @@ ZeroClipboard.prototype.setText = function (newText) {
 /*
  * Adds a title="" attribute to the htmlBridge to give it tooltip capabiities
  *
- * returns nothing
+ * returns object instance
  */
 ZeroClipboard.prototype.setTitle = function (newTitle) {
   if (newTitle && newTitle !== "") this.htmlBridge.setAttribute("title", newTitle);
@@ -89,7 +89,7 @@ ZeroClipboard.prototype.setTitle = function (newTitle) {
 /*
  * Sends a signal to the flash object to change the stage size.
  *
- * returns nothing
+ * returns object instance
  */
 ZeroClipboard.prototype.setSize = function (width, height) {
   if (this.ready()) this.flashBridge.setSize(width, height);
@@ -103,7 +103,7 @@ ZeroClipboard.prototype.setSize = function (width, height) {
  * Sends a signal to the flash object to display the hand cursor if true.
  * Updates the value of the `forceHandCursor` option.
  *
- * returns nothing
+ * returns object instance
  */
 ZeroClipboard.prototype.setHandCursor = function (enabled) {
   enabled = typeof enabled === "boolean" ? enabled : !!enabled;
