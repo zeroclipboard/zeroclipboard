@@ -26,6 +26,8 @@ ZeroClipboard.prototype.on = function (eventName, func) {
   if (this.handlers.noflash && !ZeroClipboard.detectFlashSupport()) {
     this.receiveEvent("onNoFlash", null);
   }
+
+  return this;
 };
 // shortcut to old stuff
 ZeroClipboard.prototype.addEventListener = ZeroClipboard.prototype.on;
@@ -46,6 +48,8 @@ ZeroClipboard.prototype.off = function (eventName, func) {
       }
     }
   }
+
+  return this;
 };
 // shortcut to old stuff
 ZeroClipboard.prototype.removeEventListener = ZeroClipboard.prototype.off;
