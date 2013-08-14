@@ -57,6 +57,8 @@ ZeroClipboard.prototype.setCurrent = function (element) {
   var useHandCursor = this.options.forceHandCursor === true || _getStyle(element, "cursor") === "pointer";
   // Update the hand cursor state without updating the `forceHandCursor` option
   _setHandCursor.call(this, useHandCursor);
+
+  return this;
 };
 
 /*
@@ -69,6 +71,8 @@ ZeroClipboard.prototype.setText = function (newText) {
     this.options.text = newText;
     if (this.ready()) this.flashBridge.setText(newText);
   }
+
+  return this;
 };
 
 /*
@@ -78,6 +82,8 @@ ZeroClipboard.prototype.setText = function (newText) {
  */
 ZeroClipboard.prototype.setTitle = function (newTitle) {
   if (newTitle && newTitle !== "") this.htmlBridge.setAttribute("title", newTitle);
+
+  return this;
 };
 
 /*
@@ -87,6 +93,8 @@ ZeroClipboard.prototype.setTitle = function (newTitle) {
  */
 ZeroClipboard.prototype.setSize = function (width, height) {
   if (this.ready()) this.flashBridge.setSize(width, height);
+
+  return this;
 };
 
 /*
@@ -101,6 +109,8 @@ ZeroClipboard.prototype.setHandCursor = function (enabled) {
   enabled = typeof enabled === "boolean" ? enabled : !!enabled;
   _setHandCursor.call(this, enabled);
   this.options.forceHandCursor = enabled;
+
+  return this;
 };
 
 /*

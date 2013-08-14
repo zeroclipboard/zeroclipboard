@@ -154,6 +154,8 @@ ZeroClipboard.prototype.glue = function (elements) {
       _addEventHandler(elements[i], "mouseover", _elementMouseOver);
     }
   }
+
+  return this;
 };
 
 /*
@@ -176,4 +178,5 @@ ZeroClipboard.prototype.unglue = function (elements) {
     if (arrayIndex != -1) gluedElements.splice(arrayIndex, 1);
   }
 
+  return this;
 };
