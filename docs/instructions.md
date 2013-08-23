@@ -156,7 +156,7 @@ clip.glue( document.getElementById('d_clip_button') );
 You can pass in a reference to the actual DOM element object itself or an array of DOM objects.  The rest all happens automatically -- the movie is created, all your options set, and it is floated above the element, awaiting clicks from the user.
 
 
-### Recommended Implementation
+### Example Implementation
 
 ```html
 <button id="my-button" data-clipboard-text="Copy me!" title="Click to copy to clipboard.">Copy to Clipboard</button>
@@ -437,7 +437,7 @@ Here is a quick example using as few calls as possible:
     <div id="d_clip_button" data-clipboard-text="Copy Me!" title="Click to copy." style="border:1px solid black; padding:20px;">Copy To Clipboard</div>
 
     <script type="text/javascript" src="ZeroClipboard.js"></script>
-    <script language="JavaScript">
+    <script type="text/javascript">
       var clip = new ZeroClipboard( document.getElementById('d_clip_button') );
     </script>
   </body>
@@ -456,13 +456,14 @@ Here is a complete example which exercises every option and event handler:
   <head>
     <style type="text/css">
       #d_clip_button {
-        text-align:center;
-        border:1px solid black;
-        background-color:#ccc;
-        margin:10px; padding:10px;
+        text-align: center;
+        border: 1px solid black;
+        background-color: #ccc;
+        margin: 10px;
+        padding: 10px;
       }
-      #d_clip_button.zeroclipboard-is-hover { background-color:#eee; }
-      #d_clip_button.zeroclipboard-is-active { background-color:#aaa; }
+      #d_clip_button.zeroclipboard-is-hover { background-color: #eee; }
+      #d_clip_button.zeroclipboard-is-active { background-color: #aaa; }
     </style>
   </head>
   <body>
@@ -470,7 +471,7 @@ Here is a complete example which exercises every option and event handler:
 
     <div id="d_clip_button" data-clipboard-text="Copy Me!">Copy To Clipboard</div>
 
-    <script language="JavaScript">
+    <script type="text/javascript">
       var clip = new ZeroClipboard( $('#d_clip_button') );
 
       clip.on( 'load', function(client) {
@@ -518,6 +519,28 @@ window.require = curl;
 ## Browser Support
 
 Works in IE7+ and all of the evergreen browsers.
+
+
+## OS Considerations
+
+Because ZeroClipboard will be interacting with your users' system clipboards, there are some special considerations
+specific to the users' operating systems that you should be aware of. With this information, you can make informed
+decisions of how _your_ site should handle each of these situations.
+
+ - **Windows:**
+     - If you want to ensure that your Windows users will be able to paste their copied text into Windows
+       Notepad and have it honor line breaks, you'll need to ensure that the text uses the sequence `\r\n` instead of
+       just `\n` for line breaks.  If the text to copy is based on user input (e.g. a `textarea`), then you can achieve
+       this transformation by utilizing the `dataRequested` event handler, e.g.  
+
+      ```js
+      clip.on('dataRequested', function(client, args) {
+          var text = document.getElementById('yourTextArea').value;
+          var windowsText = text.replace(/\n/g, '\r\n');
+          client.setText(windowsText);
+      });
+      ```
+
 
 
 # Deprecations
