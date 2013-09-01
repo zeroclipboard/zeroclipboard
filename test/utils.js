@@ -168,10 +168,10 @@ exports.utils = {
 
     test.strictEqual(_utils._vars(clip.options), "");
 
-    clip.options.trustedDomains = ["*"];
-    test.strictEqual(_utils._vars(clip.options), "trustedDomain=*");
+    clip.options.trustedOrigins = ["*"];
+    test.strictEqual(_utils._vars(clip.options), "trustedOrigins=*");
 
-    clip.options.trustedDomains = null;
+    clip.options.trustedOrigins = null;
     clip.options.amdModuleId = "zcAMD";
     test.strictEqual(_utils._vars(clip.options), "amdModuleId=zcAMD");
 
@@ -179,10 +179,10 @@ exports.utils = {
     clip.options.cjsModuleId = "zcCJS";
     test.strictEqual(_utils._vars(clip.options), "cjsModuleId=zcCJS");
 
-    clip.options.trustedDomains = ["*"];
+    clip.options.trustedOrigins = ["*"];
     clip.options.amdModuleId = "zcAMD";
     clip.options.cjsModuleId = "zcCJS";
-    test.strictEqual(_utils._vars(clip.options), "trustedDomain=*&amdModuleId=zcAMD&cjsModuleId=zcCJS");
+    test.strictEqual(_utils._vars(clip.options), "trustedOrigins=*&amdModuleId=zcAMD&cjsModuleId=zcCJS");
 
     test.done();
   },

@@ -23,18 +23,18 @@ exports.core = {
     zeroClipboard.destroy();
   },
 
-  "Set trusted domain": function (test) {
+  "Set trusted origins": function (test) {
 
     zeroClipboard = require("../ZeroClipboard");
     clip = new zeroClipboard();
 
-    // Test the _trustedDomain is undefined
-    test.equal(clip.options.trustedDomains, undefined);
+    // Test that trustedOrigins is undefined
+    test.equal(clip.options.trustedOrigins, undefined);
 
     // change the path
-    clip.options.trustedDomains = "google.com";
+    clip.options.trustedOrigins = "google.com";
 
-    test.equal(clip.options.trustedDomains, "google.com");
+    test.equal(clip.options.trustedOrigins, "google.com");
 
     test.done();
     zeroClipboard.destroy();

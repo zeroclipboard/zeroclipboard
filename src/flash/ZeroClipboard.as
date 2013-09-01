@@ -58,10 +58,10 @@ package {
       // Get the flashvars
       var flashvars:Object = LoaderInfo( this.root.loaderInfo ).parameters;
 
-      // Allow the swf object to be run on any domain, for when the site hosts the file on a separate server
-      if (flashvars.trustedDomain && typeof flashvars.trustedDomain === "string") {
-        var domains:Array = flashvars.trustedDomain.split("\\").join("\\\\").split(",");
-        flash.system.Security.allowDomain.apply(null, domains);
+      // Allow the SWF object to communicate with a page on a different origin than its own (e.g. SWF served from CDN)
+      if (flashvars.trustedOrigins && typeof flashvars.trustedOrigins === "string") {
+        var origins:Array = flashvars.trustedOrigins.split("\\").join("\\\\").split(",");
+        flash.system.Security.allowDomain.apply(null, origins);
       }
       
       // Enable complete AMD support (e.g. RequireJS)

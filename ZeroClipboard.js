@@ -4,7 +4,11 @@
 * Copyright (c) 2013 Jon Rohan, James M. Greene
 * Licensed MIT
 * http://zeroclipboard.org/
+<<<<<<< HEAD
 * v1.2.0-beta.4 (2013-08-29)
+=======
+* v1.2.0-beta.4 (2013-08-31)
+>>>>>>> trustedOrigins
 */
 (function() {
   "use strict";
@@ -166,14 +170,23 @@
   };
   var _vars = function(options) {
     var str = [];
-    if (options.trustedDomains) {
-      var domains;
-      if (typeof options.trustedDomains === "string" && options.trustedDomains) {
-        domains = [ options.trustedDomains ];
-      } else if ("length" in options.trustedDomains) {
-        domains = options.trustedDomains;
+    var origins = [];
+    if (options.trustedOrigins) {
+      if (typeof options.trustedOrigins === "string") {
+        origins = origins.push(options.trustedOrigins);
+      } else if (typeof options.trustedOrigins === "object" && "length" in options.trustedOrigins) {
+        origins = origins.concat(options.trustedOrigins);
       }
-      str.push("trustedDomain=" + encodeURIComponent(domains.join(",")));
+    }
+    if (options.trustedDomains) {
+      if (typeof options.trustedDomains === "string") {
+        origins = origins.push(options.trustedDomains);
+      } else if (typeof options.trustedDomains === "object" && "length" in options.trustedDomains) {
+        origins = origins.concat(options.trustedDomains);
+      }
+    }
+    if (origins.length) {
+      str.push("trustedOrigins=" + encodeURIComponent(origins.join(",")));
     }
     if (typeof options.amdModuleId === "string" && options.amdModuleId) {
       str.push("amdModuleId=" + encodeURIComponent(options.amdModuleId));
@@ -252,7 +265,7 @@
   ZeroClipboard.version = "1.2.0-beta.4";
   var _defaults = {
     moviePath: "ZeroClipboard.swf",
-    trustedDomains: null,
+    trustedOrigins: null,
     text: null,
     hoverClass: "zeroclipboard-is-hover",
     activeClass: "zeroclipboard-is-active",

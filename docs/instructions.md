@@ -59,7 +59,7 @@ There are default options you can set before, or when you create a new client.
 ```js
 var _defaults = {
   moviePath:         "ZeroClipboard.swf",        // URL to movie
-  trustedDomains:    undefined,                  // Domains that we should trust (single string or array of strings)
+  trustedOrigins:    null,                       // Page origins that the SWF should trust (single string or array of strings)
   hoverClass:        "zeroclipboard-is-hover",   // The class used to hover over the object
   activeClass:       "zeroclipboard-is-active",  // The class used to set object active
   allowScriptAccess: "sameDomain",               // SWF outbound scripting policy
@@ -70,6 +70,17 @@ var _defaults = {
 You can override the defaults using `ZeroClipboard.setDefaults({ moviePath: "new/path" })` before you create any clients.
 
 You can also set the options when creating a new client by passing an optional json object `new ZeroClipboard($("#d_clip_button"), { moviePath: "new/path", text: "Copy me!" })`
+
+
+### A note on the `trustedOrigins` option
+
+If your ZeroClipboard SWF is served from a different origin/domain than your page, you need to tell the SWF that it's OK to trust your page. The following is almost _**always**_ how you want to do this:
+
+```js
+ZeroClipboard.setDefaults({
+  trustedOrigins: [window.location.protocol + "//" + window.location.host]
+});
+```
 
 
 ### A note on the `allowScriptAccess` option
@@ -550,4 +561,5 @@ The current list of deprecations includes:
      - Use the `forceHandCursor` config option instead!
  - `ZeroClipboard.prototype.reposition` &rarr; as of [v1.2.0-beta.4]
      - Repositioning is now handled more intelligently internally, so this method is simply no longer needed by users.
-
+ - The `trustedDomains` config option &rarr; as of [v1.2.0-beta.4]
+     - Use the `trustedOrigins` config option instead!
