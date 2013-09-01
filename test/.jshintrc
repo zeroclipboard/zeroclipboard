@@ -6,9 +6,10 @@
   "boss": true,
   "browser": true,
   "node": true,
-  "multistr": true,
+  "multistr": false,
   "evil": true,
   "globals": {
-    "$": false
+    "$": false,
+    "QUnit": false
   }
 }

@@ -27,7 +27,7 @@ var _bridge = function () {
     var flashvars = _vars(opts);
     var html = "\
       <object classid=\"clsid:d27cdb6e-ae6d-11cf-96b8-444553540000\" id=\"global-zeroclipboard-flash-bridge\" width=\"100%\" height=\"100%\"> \
-        <param name=\"movie\" value=\"" + client.options.moviePath + _noCache(client.options.moviePath) + "\"/> \
+        <param name=\"movie\" value=\"" + client.options.moviePath + _noCache(client.options.moviePath, client.options) + "\"/> \
         <param name=\"allowScriptAccess\" value=\"" + client.options.allowScriptAccess +  "\"/> \
         <param name=\"scale\" value=\"exactfit\"/> \
         <param name=\"loop\" value=\"false\"/> \
@@ -36,7 +36,7 @@ var _bridge = function () {
         <param name=\"bgcolor\" value=\"#ffffff\"/> \
         <param name=\"wmode\" value=\"transparent\"/> \
         <param name=\"flashvars\" value=\"" + flashvars + "\"/> \
-        <embed src=\"" + client.options.moviePath + _noCache(client.options.moviePath) + "\" \
+        <embed src=\"" + client.options.moviePath + _noCache(client.options.moviePath, client.options) + "\" \
           loop=\"false\" menu=\"false\" \
           quality=\"best\" bgcolor=\"#ffffff\" \
           width=\"100%\" height=\"100%\" \

@@ -183,6 +183,20 @@ exports.client = {
     test.equal(clip2, clip);
 
     test.done();
+  },
+
+  "when object borderWidth isNaN don't fail": function (test) {
+    test.expect(4);
+    clip.glue($("#d_clip_button"));
+
+    clip.setCurrent($("#d_clip_button")[0]);
+
+    test.equal(clip.htmlBridge.style.top, "0px");
+    test.equal(clip.htmlBridge.style.left, "0px");
+    test.equal(clip.htmlBridge.style.width, "0px");
+    test.equal(clip.htmlBridge.style.height, "0px");
+
+    test.done();
   }
 
 };

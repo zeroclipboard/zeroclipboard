@@ -109,6 +109,8 @@ var _removeEventHandler = function (element, method, func) {
  */
 var _addClass = function (element, value) {
 
+  // TODO: Remove this shortcut as we should only ever be receiving a normal HTML element here, which do not have `addClass` functions.
+  // TODO: Add a shortcut using the newer DOM property `classList`:  https://developer.mozilla.org/en-US/docs/Web/API/element.classList
   // If the element has addClass already
   if (element.addClass) {
     element.addClass(value);
@@ -146,6 +148,8 @@ var _addClass = function (element, value) {
  */
 var _removeClass = function (element, value) {
 
+  // TODO: Remove this shortcut as we should only ever be receiving a normal HTML element here, which do not have `removeClass` functions.
+  // TODO: Add a shortcut using the newer DOM property `classList`:  https://developer.mozilla.org/en-US/docs/Web/API/element.classList
   // If the element has removeClass already
   if (element.removeClass) {
     element.removeClass(value);
@@ -249,15 +253,15 @@ var _getDOMObjectPosition = function (obj) {
 
 /*
  * private _noCache function.
- * Will look at a path, and will append ?nocache=date or &nocache=date to path.
- * because externalenterface craps out when flash is cached. (IE)
+ * Will look at a path, and will append "?noCache={time}" or "&noCache={time}" to path.
+ * because ExternalInterface craps out when Flash is cached in IE.
  *
- * returns path with noncache param added
+ * returns path with noCache param added
  */
-var _noCache = function (path) {
-  var client = ZeroClipboard.prototype._singleton;
-  if (client.options.useNoCache) {
-    return (path.indexOf("?") >= 0 ? "&nocache=" : "?nocache=") + (new Date()).getTime();
+var _noCache = function (path, options) {
+  var useNoCache = !(options && options.useNoCache === false);
+  if (useNoCache) {
+    return (path.indexOf("?") === -1 ? "?" : "&") + "nocache=" + (new Date()).getTime();
   } else {
     return "";
   }

@@ -1,250 +1,258 @@
+/*globals _camelizeCssPropName, _getStyle, _removeClass, _addClass, _vars, _noCache, _inArray, _dispatchCallback */
+
 "use strict";
 
-require("./fixtures/env");
-var sandbox = require('nodeunit').utils.sandbox;
+(function(module, test, expect) {
 
-var ZeroClipboard, clip, _utils;
-exports.utils = {
+  module("utils.js");
 
-  setUp: function (callback) {
-    ZeroClipboard = require("../ZeroClipboard");
-    _utils = sandbox("./src/javascript/ZeroClipboard/utils.js", {
-      window: window,
-      document: document,
-      navigator: navigator,
-      ZeroClipboard: ZeroClipboard
-    });
-    clip = new ZeroClipboard();
-    callback();
-  },
+  test("`_camelizeCssPropName` converts CSS property names", function(assert) {
+    (assert.expect || expect)(3);
 
-  tearDown: function (callback) {
-    ZeroClipboard.destroy();
-    callback();
-  },
+    // Arrange -> N/A
 
-  "_camelizeCssPropName converts CSS property names": function (test) {
-    test.expect(3);
-    test.strictEqual(_utils._camelizeCssPropName("z-index"), "zIndex");
-    test.strictEqual(_utils._camelizeCssPropName("border-left-width"), "borderLeftWidth");
-    test.strictEqual(_utils._camelizeCssPropName("cursor"), "cursor");
-    test.done();
-  },
+    // Act -> N/A
 
-  "_getStyle returns computed styles": function (test) {
-    test.expect(10);
+    // Assert
+    assert.strictEqual(_camelizeCssPropName("z-index"), "zIndex");
+    assert.strictEqual(_camelizeCssPropName("border-left-width"), "borderLeftWidth");
+    assert.strictEqual(_camelizeCssPropName("cursor"), "cursor");
+  });
 
-    test.equal(_utils._getStyle($("a.no_cursor_style")[0], "cursor"), "pointer");
-    test.notEqual(_utils._getStyle($("a.no_pointer_anchor")[0], "cursor"), "pointer");
 
-    var els = {
-      zIndex: $(".zindex-auto")[0],
-      clipButton: $("#d_clip_button")[0],
-      bigBorder: $(".big-border")[0]
+  test("`_getStyle` returns computed styles", function(assert) {
+    (assert.expect || expect)(5);
+
+    // Arrange
+    var pointerEl    = $("a.no_cursor_style")[0];
+    var nonPointerEl = $("a.no_pointer_anchor")[0];
+    var zIndexAutoEl = $(".zindex-auto")[0];
+    var clipButtonEl = $("#d_clip_button")[0];
+    var bigBorderEl  = $(".big-border")[0];
+
+    // Act
+    var pointerElComputedCursor = _getStyle(pointerEl, "cursor");
+    var nonPointerElComputedCursor = _getStyle(nonPointerEl, "cursor");
+    var zIndexAutoElComputedZIndex = _getStyle(zIndexAutoEl, "z-index");
+    var clipButtonElComputedBorderLeftWidth = _getStyle(clipButtonEl, "border-left-width");
+    var bigBorderElComputedBorderLeftWith = _getStyle(bigBorderEl, "border-left-width");
+
+    // Assert
+    assert.strictEqual(pointerElComputedCursor, "pointer");
+    assert.notStrictEqual(nonPointerElComputedCursor, "pointer");
+    assert.strictEqual(zIndexAutoElComputedZIndex, "auto");
+    assert.strictEqual(clipButtonElComputedBorderLeftWidth, "0px");
+    assert.strictEqual(bigBorderElComputedBorderLeftWith, "10px");
+  });
+
+
+  test("`_removeClass` removes classes from element", function(assert) {
+    (assert.expect || expect)(5);
+
+    // Arrange
+    var div = $("<div></div>").addClass("class1 class-2 class_3")[0];
+
+    // Act & Assert
+    _removeClass(div, "class1");
+    assert.strictEqual(div.className, "class-2 class_3");
+
+    _removeClass(div, "classd");
+    assert.strictEqual(div.className, "class-2 class_3");
+
+    _removeClass(div, "class-2");
+    assert.strictEqual(div.className, "class_3");
+
+    _removeClass(div, "class_3");
+    assert.strictEqual(div.className, "");
+
+    _removeClass(div, "class-3");
+    assert.strictEqual(div.className, "");
+    
+    div = null;
+  });
+
+
+  test("`_removeClass` doesn't remove partial class names", function(assert) {
+    (assert.expect || expect)(3);
+
+    // Arrange
+    var div = $("<div></div>").addClass("class1 class-2 class_3")[0];
+
+    // Act & Assert
+    _removeClass(div, "ass");
+    assert.strictEqual(div.className, "class1 class-2 class_3");
+
+    _removeClass(div, "-");
+    assert.strictEqual(div.className, "class1 class-2 class_3");
+
+    _removeClass(div, " ");
+    assert.strictEqual(div.className, "class1 class-2 class_3");
+
+    div = null;
+  });
+
+
+  test("`_addClass` adds a class name", function(assert) {
+    (assert.expect || expect)(4);
+
+    // Arrange
+    var div = $("<div></div>")[0];
+
+    // Act & Assert
+    _addClass(div, "class1");
+    assert.strictEqual(div.className, "class1");
+
+    _addClass(div, "class-2");
+    assert.strictEqual(div.className, "class1 class-2");
+
+    _addClass(div, "class_3");
+    assert.strictEqual(div.className, "class1 class-2 class_3");
+
+    _addClass(div, "class_3");
+    assert.strictEqual(div.className, "class1 class-2 class_3");
+
+    div = null;
+  });
+
+
+  // TODO: Remove this test; see TODO notes in utils.js source
+  test("elements with `addClass` already use the function", function(assert) {
+    (assert.expect || expect)(2);
+
+    // Arrange
+    var $div = $("<div></div>");
+
+    // Act & Assert
+    assert.strictEqual($div[0].className, "");
+    _addClass($div, "class1");
+    assert.strictEqual($div[0].className, "class1");
+
+    $div = null;
+  });
+
+
+  // TODO: Remove this test; see TODO notes in utils.js source
+  test("elements with `removeClass` already use the function", function(assert) {
+    (assert.expect || expect)(2);
+
+    // Arrange
+    var $div = $("<div></div>").addClass("class1");
+
+    // Act & Assert
+    assert.strictEqual($div[0].className, "class1");
+
+    _removeClass($div, "class1");
+    assert.strictEqual($div[0].className, "");
+
+    $div = null;
+  });
+
+
+  test("`_vars` builds flashvars", function(assert) {
+    (assert.expect || expect)(5);
+
+    // Arrange
+    var clipOptionsEmpty = {};
+    var clipOptionsTrustedOriginsOnly = {
+      trustedOrigins: ["*"]
+    };
+    var clipOptionsAmdOnly = {
+      amdModuleId: "zcAMD"
+    };
+    var clipOptionsCommonJsOnly = {
+      cjsModuleId: "zcCJS"
+    };
+    var clipOptionsAll = {
+      trustedOrigins: ["*"],
+      amdModuleId: "zcAMD",
+      cjsModuleId: "zcCJS"
     };
 
-    // evergreen browsers: `window.getComputedStyle(el, null)`
-    test.equal(_utils._getStyle(els.zIndex, "z-index"), "auto");
-    test.equal(_utils._getStyle(els.clipButton, "border-left-width"), 0);
-    test.equal(_utils._getStyle(els.bigBorder, "border-left-width"), 0);
+    // Act & Assert
+    assert.strictEqual(_vars(clipOptionsEmpty), "");
+    assert.strictEqual(_vars(clipOptionsTrustedOriginsOnly), "trustedOrigins=*");
+    assert.strictEqual(_vars(clipOptionsAmdOnly), "amdModuleId=zcAMD");
+    assert.strictEqual(_vars(clipOptionsCommonJsOnly), "cjsModuleId=zcCJS");
+    assert.strictEqual(_vars(clipOptionsAll), "trustedOrigins=*&amdModuleId=zcAMD&cjsModuleId=zcCJS");
+  });
 
-    // oldIE (IE8-), doesn't exist in jsdom: `el.currentStyle`
-    test.equal(typeof els.zIndex.currentStyle, "undefined");
-    test.equal(els.zIndex.currentStyle, null);
 
-    // Plain ole `el.style`
-    var tmp = window.getComputedStyle;
-    try {
-      window.getComputedStyle = undefined;
-      test.equal(_utils._getStyle(els.zIndex, "z-index"), "auto");
-      test.equal(_utils._getStyle(els.clipButton, "border-left-width"), 0);
-      test.equal(_utils._getStyle(els.bigBorder, "border-left-width"), 0);
-    }
-    catch (e) {
-      test.ok(false, "An error occurred: " + e);
-    }
-    finally {
-      window.getComputedStyle = tmp;
-    }
+  test("`_noCache` adds cache-buster appropriately", function(assert) {
+    (assert.expect || expect)(2);
 
-    test.done();
-  },
+    // Arrange
+    var pathWithoutQuery = "path.com/z.swf";
+    var pathWithQuery = "path.com/z.swf?q=jon";
 
-  "_removeClass removes classes from element": function (test) {
-    test.expect(5);
-    var div = $("<div>").addClass("class-1 class-2 class_3")[0];
+    // Act & Assert
+    assert.strictEqual(_noCache(pathWithoutQuery).indexOf("?nocache="), 0);
+    assert.strictEqual(_noCache(pathWithQuery).indexOf("&nocache="), 0);
+  });
 
-    _utils._removeClass(div, "class-1");
-    test.equal(div.className, "class-2 class_3");
 
-    _utils._removeClass(div, "classd");
-    test.equal(div.className, "class-2 class_3");
+  test("`_noCache` can be disabled", function(assert) {
+    (assert.expect || expect)(2);
 
-    _utils._removeClass(div, "class-2");
-    test.equal(div.className, "class_3");
+    // Arrange
+    var pathWithoutQuery = "path.com/z.swf";
+    var pathWithQuery = "path.com/z.swf?q=jon";
+    var options = {
+      useNoCache: false
+    };
 
-    _utils._removeClass(div, "class_3");
-    test.equal(div.className, "");
+    // Act & Assert
+    assert.strictEqual(_noCache(pathWithoutQuery, options), "");
+    assert.strictEqual(_noCache(pathWithQuery, options), "");
+  });
 
-    _utils._removeClass(div, "class-3");
-    test.equal(div.className, "");
 
-    test.done();
-  },
+  test("`_inArray` finds elements in array", function(assert) {
+    (assert.expect || expect)(4);
 
-  "_removeClass doesn't remove partial class names": function (test) {
-    test.expect(3);
-    var div = $("<div>").addClass("class-1 class-2 class_3")[0];
-
-    _utils._removeClass(div, "ass");
-    test.equal(div.className, "class-1 class-2 class_3");
-
-    _utils._removeClass(div, "-");
-    test.equal(div.className, "class-1 class-2 class_3");
-
-    _utils._removeClass(div, " ");
-    test.equal(div.className, "class-1 class-2 class_3");
-
-    test.done();
-  },
-
-  "_addClass adds a class name": function (test) {
-    test.expect(4);
-    var div = $("<div>")[0];
-
-    _utils._addClass(div, "class-1");
-    test.equal(div.className, "class-1");
-
-    _utils._addClass(div, "class-2");
-    test.equal(div.className, "class-1 class-2");
-
-    _utils._addClass(div, "class-3");
-    test.equal(div.className, "class-1 class-2 class-3");
-
-    _utils._addClass(div, "class-3");
-    test.equal(div.className, "class-1 class-2 class-3");
-
-    test.done();
-  },
-
-  "elements with addClass already use the function": function (test) {
-    test.expect(1);
-    var div = $("<div>");
-
-    _utils._addClass(div, "class-1");
-    test.equal(div[0].className, "class-1");
-
-    test.done();
-  },
-
-  "elements with removeClass already use the function": function (test) {
-    test.expect(2);
-    var div = $("<div>").addClass("class-1");
-
-    test.equal(div[0].className, "class-1");
-
-    _utils._removeClass(div, "class-1");
-    test.equal(div[0].className, "");
-
-    test.done();
-  },
-
-  "when object borderWidth isNaN don't fail": function (test) {
-    test.expect(4);
-    clip.glue($("#d_clip_button"));
-
-    clip.setCurrent($("#d_clip_button")[0]);
-
-    test.equal(clip.htmlBridge.style.top, "0px");
-    test.equal(clip.htmlBridge.style.left, "0px");
-    test.equal(clip.htmlBridge.style.width, "0px");
-    test.equal(clip.htmlBridge.style.height, "0px");
-
-    test.done();
-  },
-
-  "_vars builds flashvars": function (test) {
-    test.expect(5);
-
-    test.strictEqual(_utils._vars(clip.options), "");
-
-    clip.options.trustedOrigins = ["*"];
-    test.strictEqual(_utils._vars(clip.options), "trustedOrigins=*");
-
-    clip.options.trustedOrigins = null;
-    clip.options.amdModuleId = "zcAMD";
-    test.strictEqual(_utils._vars(clip.options), "amdModuleId=zcAMD");
-
-    clip.options.amdModuleId = null;
-    clip.options.cjsModuleId = "zcCJS";
-    test.strictEqual(_utils._vars(clip.options), "cjsModuleId=zcCJS");
-
-    clip.options.trustedOrigins = ["*"];
-    clip.options.amdModuleId = "zcAMD";
-    clip.options.cjsModuleId = "zcCJS";
-    test.strictEqual(_utils._vars(clip.options), "trustedOrigins=*&amdModuleId=zcAMD&cjsModuleId=zcCJS");
-
-    test.done();
-  },
-
-  "_noCache adds cache properly": function (test) {
-    test.expect(2);
-    test.equal(_utils._noCache("path.com/z.swf").indexOf("?nocache="), 0);
-
-    test.equal(_utils._noCache("path.com/z.swf?q=jon").indexOf("&nocache="), 0);
-
-    test.done();
-  },
-
-  "_noCache can be turned off.": function (test) {
-    test.expect(2);
-    clip.options.useNoCache = false;
-
-    test.equal(_utils._noCache("path.com/z.swf").indexOf("?nocache="), -1);
-
-    test.equal(_utils._noCache("path.com/z.swf?q=jon").indexOf("&nocache="), -1);
-
-    test.done();
-  },
-
-  "_inArray finds elements in array": function (test) {
-    test.expect(3);
+    // Arrange
     var fruits = ["apple", "banana", "orange", "cherry", "strawberry"];
 
-    test.equal(_utils._inArray("kiwi", fruits), -1);
-    test.equal(_utils._inArray("banana", fruits), 1);
-    test.equal(_utils._inArray("strawberry", fruits), 4);
+    // Act & Assert
+    assert.strictEqual(_inArray("kiwi", fruits), -1);
+    assert.strictEqual(_inArray("BANANA", fruits), -1);
+    assert.strictEqual(_inArray("banana", fruits), 1);
+    assert.strictEqual(_inArray("strawberry", fruits), 4);
+  });
 
-    test.done();
-  },
 
-  "_dispatchCallback = function (func, element, instance, args, async) {": function (test) {
-    test.expect(6);
+  test("`_dispatchCallback` can fire asynchronously", function(assert) {
+    (assert.expect || expect)(6);
 
-    var async = false;
-    var proof = false;
-    var proveIt = function() {
-      proof = true;
+    // Arrange
+    var syncExec = false;
+    var syncProof = false;
+    var syncProveIt = function() {
+      syncProof = true;
+    };
+    var asyncExec = true;
+    var asyncProof = false;
+    var asyncProveIt = function() {
+      // Resume test evaluation
+      QUnit.start();
 
-      if (async) {
-        test.strictEqual(proof, true);
-
-        process.nextTick(function() {
-          test.strictEqual(proof, true);
-          test.done();
-        });
-      }
+      assert.strictEqual(asyncProof, false);
+      asyncProof = true;
+      assert.strictEqual(asyncProof, true);
     };
 
-    test.strictEqual(proof, false);
-    _utils._dispatchCallback(proveIt, null, null, null, async);
-    test.strictEqual(proof, true);
+    // Act & Assert
+    // Synchronous
+    assert.strictEqual(syncProof, false);
+    _dispatchCallback(syncProveIt, null, null, null, syncExec);
+    assert.strictEqual(syncProof, true);
 
-    async = true;
-    proof = false;
-    test.strictEqual(proof, false);
-    _utils._dispatchCallback(proveIt, null, null, null, async);
-    test.strictEqual(proof, false);
-  }
+    // Asynchronous
+    assert.strictEqual(asyncProof, false);
+    _dispatchCallback(asyncProveIt, null, null, null, asyncExec);
+    assert.strictEqual(asyncProof, false);
 
-};
+    // Stop test evaluation
+    QUnit.stop();
+  });
+
+})(QUnit.module, QUnit.test, QUnit.expect);

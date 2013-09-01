@@ -4,6 +4,9 @@ module.exports = function(grunt) {
   // Metadata
   var pkg = grunt.file.readJSON('package.json');
 
+  // Shared configuration
+  var localPort = 7320;  // "ZERO"
+
   // Project configuration.
   grunt.initConfig({
     // Task configuration
@@ -98,31 +101,52 @@ module.exports = function(grunt) {
       },
       dist: ['ZeroClipboard.*', 'bower.json', 'LICENSE']
     },
+    connect: {
+      server: {
+        options: {
+          port: localPort
+        }
+      }
+    },
+    qunit: {
+      //file: ['test/**/*.js.html'],
+      file: ['test/utils.js.html'],
+      http: {
+        options: {
+          //urls: grunt.file.expand(['test/**/*.js.html']).map(function(testPage) {
+          urls: ['test/utils.js.html'].map(function(testPage) {
+            return 'http://localhost:' + localPort + '/' + testPage;
+          })
+        }
+      }
+    },
     nodeunit: {
-      all: ['test/*.js']
+      all: ['test/client.js', 'test/core.js', 'test/dom.js', 'test/event.js']
     }
   });
 
   // These plugins provide necessary tasks
-  grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-nodeunit');
+  grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-mxmlc');
-  grunt.loadNpmTasks('grunt-chmod');
   grunt.loadNpmTasks('grunt-template');
+  grunt.loadNpmTasks('grunt-chmod');
+  grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-contrib-qunit');
+  grunt.loadNpmTasks('grunt-contrib-nodeunit');
 
 
   //
   // Task aliases and chains
   //
 
-  // Default task
-  grunt.registerTask('default', ['jshint', 'clean', 'concat', 'uglify', 'mxmlc', 'template', 'chmod', 'nodeunit']);
+  grunt.registerTask('unittest', ['connect', 'qunit', 'nodeunit']);
+  grunt.registerTask('test',     ['jshint', 'unittest']);
+  grunt.registerTask('travis',   ['test']);
 
-  // Other tasks
-  grunt.registerTask('test',   ['jshint', 'nodeunit']);
-  grunt.registerTask('travis', ['test']);
+  // Default task
+  grunt.registerTask('default',  ['jshint', 'clean', 'concat', 'uglify', 'mxmlc', 'template', 'chmod', 'unittest']);
 
 };
