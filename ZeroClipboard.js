@@ -237,23 +237,28 @@
     }
     var useHandCursor = this.options.forceHandCursor === true || _getStyle(element, "cursor") === "pointer";
     _setHandCursor.call(this, useHandCursor);
+    return this;
   };
   ZeroClipboard.prototype.setText = function(newText) {
     if (newText && newText !== "") {
       this.options.text = newText;
       if (this.ready()) this.flashBridge.setText(newText);
     }
+    return this;
   };
   ZeroClipboard.prototype.setTitle = function(newTitle) {
     if (newTitle && newTitle !== "") this.htmlBridge.setAttribute("title", newTitle);
+    return this;
   };
   ZeroClipboard.prototype.setSize = function(width, height) {
     if (this.ready()) this.flashBridge.setSize(width, height);
+    return this;
   };
   ZeroClipboard.prototype.setHandCursor = function(enabled) {
     enabled = typeof enabled === "boolean" ? enabled : !!enabled;
     _setHandCursor.call(this, enabled);
     this.options.forceHandCursor = enabled;
+    return this;
   };
   var _setHandCursor = function(enabled) {
     if (this.ready()) this.flashBridge.setHandCursor(enabled);
@@ -328,6 +333,7 @@
     _removeClass(currentElement, this.options.activeClass);
     currentElement = null;
     this.options.text = null;
+    return this;
   };
   ZeroClipboard.prototype.ready = function() {
     var ready = this.htmlBridge.getAttribute("data-clipboard-ready");
@@ -342,6 +348,7 @@
     this.htmlBridge.style.height = pos.height + "px";
     this.htmlBridge.style.zIndex = pos.zIndex + 1;
     this.setSize(pos.width, pos.height);
+    return this;
   };
   ZeroClipboard.dispatch = function(eventName, args) {
     ZeroClipboard.prototype._singleton.receiveEvent(eventName, args);
@@ -355,6 +362,7 @@
     if (this.handlers.noflash && !ZeroClipboard.detectFlashSupport()) {
       this.receiveEvent("onNoFlash", null);
     }
+    return this;
   };
   ZeroClipboard.prototype.addEventListener = ZeroClipboard.prototype.on;
   ZeroClipboard.prototype.off = function(eventName, func) {
@@ -367,6 +375,7 @@
         }
       }
     }
+    return this;
   };
   ZeroClipboard.prototype.removeEventListener = ZeroClipboard.prototype.off;
   ZeroClipboard.prototype.receiveEvent = function(eventName, args) {
@@ -435,6 +444,7 @@
         _addEventHandler(elements[i], "mouseover", _elementMouseOver);
       }
     }
+    return this;
   };
   ZeroClipboard.prototype.unglue = function(elements) {
     elements = _prepGlue(elements);
@@ -443,6 +453,7 @@
       var arrayIndex = _inArray(elements[i], gluedElements);
       if (arrayIndex != -1) gluedElements.splice(arrayIndex, 1);
     }
+    return this;
   };
   if (typeof define === "function" && define.amd) {
     define([ "require", "exports", "module" ], function(require, exports, module) {
