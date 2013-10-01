@@ -23,7 +23,7 @@ var _bridge = function () {
     // are still passing them in to [v1.2.0-beta.2] (or higher)
     opts.amdModuleId = _amdModuleId;
     opts.cjsModuleId = _cjsModuleId;
-    
+
     var flashvars = _vars(opts);
     var html = "\
       <object classid=\"clsid:d27cdb6e-ae6d-11cf-96b8-444553540000\" id=\"global-zeroclipboard-flash-bridge\" width=\"100%\" height=\"100%\"> \
@@ -72,7 +72,7 @@ var _bridge = function () {
 /*
  * Reset the html bridge to be hidden off screen and not have title or text.
  *
- * returns nothing
+ * returns object instance
  */
 ZeroClipboard.prototype.resetBridge = function () {
   this.htmlBridge.style.left = "-9999px";
@@ -82,6 +82,8 @@ ZeroClipboard.prototype.resetBridge = function () {
   _removeClass(currentElement, this.options.activeClass);
   currentElement = null;
   this.options.text = null;
+
+  return this;
 };
 
 /*
@@ -101,7 +103,7 @@ ZeroClipboard.prototype.ready = function () {
  *
  * Reposition the flash object, if the page size changes.
  *
- * returns nothing
+ * returns object instance
  */
 ZeroClipboard.prototype.reposition = function () {
 
@@ -118,4 +120,6 @@ ZeroClipboard.prototype.reposition = function () {
   this.htmlBridge.style.zIndex = pos.zIndex + 1;
 
   this.setSize(pos.width, pos.height);
+
+  return this;
 };

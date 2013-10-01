@@ -11,7 +11,7 @@ ZeroClipboard.dispatch = function (eventName, args) {
 /*
  * Add an event to the client.
  *
- * returns nothing
+ * returns object instance
  */
 ZeroClipboard.prototype.on = function (eventName, func) {
   // add user event listener for event
@@ -26,6 +26,8 @@ ZeroClipboard.prototype.on = function (eventName, func) {
   if (this.handlers.noflash && !ZeroClipboard.detectFlashSupport()) {
     this.receiveEvent("onNoFlash", null);
   }
+
+  return this;
 };
 // shortcut to old stuff
 ZeroClipboard.prototype.addEventListener = ZeroClipboard.prototype.on;
@@ -33,7 +35,7 @@ ZeroClipboard.prototype.addEventListener = ZeroClipboard.prototype.on;
 /*
  * Remove an event from the client.
  *
- * returns nothing
+ * returns object instance
  */
 ZeroClipboard.prototype.off = function (eventName, func) {
   // remove user event listener for event
@@ -46,6 +48,8 @@ ZeroClipboard.prototype.off = function (eventName, func) {
       }
     }
   }
+
+  return this;
 };
 // shortcut to old stuff
 ZeroClipboard.prototype.removeEventListener = ZeroClipboard.prototype.off;
@@ -133,7 +137,7 @@ ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
 /*
  * Register new element(s) to the object.
  *
- * returns nothing
+ * returns object instance
  */
 ZeroClipboard.prototype.glue = function (elements) {
 
@@ -150,12 +154,14 @@ ZeroClipboard.prototype.glue = function (elements) {
       _addEventHandler(elements[i], "mouseover", _elementMouseOver);
     }
   }
+
+  return this;
 };
 
 /*
  * Unregister the clipboard actions of an element on the page
  *
- * returns nothing
+ * returns object instance
  */
 ZeroClipboard.prototype.unglue = function (elements) {
 
@@ -172,4 +178,5 @@ ZeroClipboard.prototype.unglue = function (elements) {
     if (arrayIndex != -1) gluedElements.splice(arrayIndex, 1);
   }
 
+  return this;
 };
