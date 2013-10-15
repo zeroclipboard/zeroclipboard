@@ -15,7 +15,7 @@ if (typeof define === "function" && define.amd) {
       return ZeroClipboard;
     });
 }
-else if (typeof module !== "undefined" && module) {
+else if (typeof module === "object" && module && typeof module.exports === "object" && module.exports) {
   // CommonJS module loaders are required to provide an `id` property on the
   // `module` object that can be used to uniquely load this module again,
   // i.e. `require(module.id)`. This requirement is per the CommonJS modules
