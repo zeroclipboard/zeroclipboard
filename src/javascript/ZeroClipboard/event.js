@@ -55,6 +55,8 @@ ZeroClipboard.prototype.off = function (eventName, func) {
 ZeroClipboard.prototype.removeEventListener = ZeroClipboard.prototype.off;
 
 /*
+ * @deprecated in [v1.2.0], slated for removal from the public API in [v2.0.0]. See docs for more info.
+ *
  * Receive an event for a specific client.
  *
  * returns nothing

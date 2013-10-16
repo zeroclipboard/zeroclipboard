@@ -40,6 +40,8 @@ ZeroClipboard.destroy = function () {
 };
 
 /*
+ * @deprecated in [v1.2.0], slated for removal from the public API in [v2.0.0]. See docs for more info.
+ *
  * Simple Flash Detection
  *
  * returns true if Flash is detected

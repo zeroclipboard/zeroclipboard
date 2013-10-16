@@ -285,7 +285,7 @@ var _vars = function (options) {
       origins = origins.concat(options.trustedOrigins);
     }
   }
-  /** @deprecated `trustedDomains` in [v1.2.0-beta.4], slated for removal in [v2.0.0]. See docs for more info. */
+  /** @deprecated `trustedDomains` in [v1.2.0], slated for removal in [v2.0.0]. See docs for more info. */
   if (options.trustedDomains) {
     if (typeof options.trustedDomains === "string") {
       origins = origins.push(options.trustedDomains);
