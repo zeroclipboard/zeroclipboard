@@ -9,7 +9,9 @@
     "copy",
     "cut",
     "paste",
-    "zclip"
+    "zclip",
+    "clip",
+    "clippy"
   ],
   "homepage": "http://zeroclipboard.org/",
   "licenses": [
