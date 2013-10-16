@@ -7,7 +7,9 @@
     "flash",
     "clipboard",
     "copy",
-    "paste"
+    "cut",
+    "paste",
+    "zclip"
   ],
   "homepage": "http://zeroclipboard.org/",
   "licenses": [
