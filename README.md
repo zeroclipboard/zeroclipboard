@@ -25,7 +25,7 @@ clip.on( 'load', function(client) {
 } );
 
 clip.on( 'complete', function(client, args) {
-  this.style.display = 'none'; // "this" is the element that was clicked
+  this.style.display = "none"; // "this" is the element that was clicked
   alert("Copied text to clipboard: " + args.text );
 } );
 
@@ -80,7 +80,7 @@ see [CONTRIBUTING.md](CONTRIBUTING.md)
 
 After version [1.1.7](docs/releases.md#zeroclipboard-117), ZeroClipboard uses [semantic versioning](http://semver.org/).
 
-see [releases](https://github.com/zeroclipboard/ZeroClipboard/releases)
+see [releases](https://github.com/zeroclipboard/zeroclipboard/releases)
 
 ## Roadmap
 
@@ -88,4 +88,4 @@ see [roadmap.md](docs/roadmap.md)
 
 ## Last Build
 
-[![Build Status](https://secure.travis-ci.org/zeroclipboard/ZeroClipboard.png?branch=master)](https://travis-ci.org/zeroclipboard/ZeroClipboard)
+[![Build Status](https://secure.travis-ci.org/zeroclipboard/zeroclipboard.png?branch=master)](https://travis-ci.org/zeroclipboard/zeroclipboard)
