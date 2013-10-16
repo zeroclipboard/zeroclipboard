@@ -4,7 +4,7 @@
 * Copyright (c) 2013 Jon Rohan, James M. Greene
 * Licensed MIT
 * http://zeroclipboard.org/
-* v1.2.0-beta.4
+* v1.2.0
 */
 (function() {
   "use strict";
@@ -263,7 +263,7 @@
   var _setHandCursor = function(enabled) {
     if (this.ready()) this.flashBridge.setHandCursor(enabled);
   };
-  ZeroClipboard.version = "1.2.0-beta.4";
+  ZeroClipboard.version = "1.2.0";
   var _defaults = {
     moviePath: "ZeroClipboard.swf",
     trustedOrigins: null,
@@ -460,7 +460,7 @@
       _amdModuleId = module && module.id || null;
       return ZeroClipboard;
     });
-  } else if (typeof module !== "undefined" && module) {
+  } else if (typeof module === "object" && module && typeof module.exports === "object" && module.exports) {
     _cjsModuleId = module.id || null;
     module.exports = ZeroClipboard;
   } else {

@@ -557,9 +557,13 @@ decisions of how _your_ site should handle each of these situations.
 # Deprecations
 
 The current list of deprecations includes:  
- - `ZeroClipboard.prototype.setHandCursor` &rarr; as of [v1.2.0-beta.4]
+ - `ZeroClipboard.prototype.setHandCursor` &rarr; as of [v1.2.0], removing in [v2.0.0]
      - Use the `forceHandCursor` config option instead!
- - `ZeroClipboard.prototype.reposition` &rarr; as of [v1.2.0-beta.4]
+ - `ZeroClipboard.prototype.reposition` &rarr; as of [v1.2.0], removing in [v2.0.0]
      - Repositioning is now handled more intelligently internally, so this method is simply no longer needed by users.
- - The `trustedDomains` config option &rarr; as of [v1.2.0-beta.4]
+ - The `trustedDomains` config option &rarr; as of [v1.2.0], removing in [v2.0.0]
      - Use the `trustedOrigins` config option instead!
+ - The `ZeroClipboard.prototype.receiveEvent` &rarr; as of [v1.2.0], removing in [v2.0.0]
+     - This should only be used internally, so this method will be removed from the public API.
+ - The `ZeroClipboard.detectFlashSupport` &rarr; as of [v1.2.0], removing in [v2.0.0]
+     - This should only be used internally, so this method will be removed from the public API.

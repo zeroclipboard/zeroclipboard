@@ -98,7 +98,7 @@ ZeroClipboard.prototype.setSize = function (width, height) {
 };
 
 /*
- * @deprecated in [v1.2.0-beta.4], slated for removal in [v2.0.0]. See docs for alternatives.
+ * @deprecated in [v1.2.0], slated for removal in [v2.0.0]. See docs for alternatives.
  *
  * Sends a signal to the flash object to display the hand cursor if true.
  * Updates the value of the `forceHandCursor` option.
