@@ -26,7 +26,7 @@ var _camelizeCssPropName = (function () {
  */
 var _getStyle = function (el, prop) {
   var value, camelProp, tagName, possiblePointers, i, len;
-  
+
   if (window.getComputedStyle) {
     value = window.getComputedStyle(el, null).getPropertyValue(prop);
   }
@@ -237,7 +237,7 @@ var _getDOMObjectPosition = function (obj) {
       pageXOffset = Math.round(document.documentElement.scrollLeft / zoomFactor);
       pageYOffset = Math.round(document.documentElement.scrollTop / zoomFactor);
     }
-    
+
     // `clientLeft`/`clientTop` are to fix IE's 2px offset in standards mode
     var leftBorderWidth = document.documentElement.clientLeft || 0;
     var topBorderWidth = document.documentElement.clientTop || 0;
@@ -247,7 +247,7 @@ var _getDOMObjectPosition = function (obj) {
     info.width = "width" in rect ? rect.width : rect.right - rect.left;
     info.height = "height" in rect ? rect.height : rect.bottom - rect.top;
   }
-  
+
   return info;
 };
 
@@ -279,7 +279,7 @@ var _vars = function (options) {
   var origins = [];
   if (options.trustedOrigins) {
     if (typeof options.trustedOrigins === "string") {
-      origins = origins.push(options.trustedOrigins);
+      origins.push(options.trustedOrigins);
     }
     else if (typeof options.trustedOrigins === "object" && "length" in options.trustedOrigins) {
       origins = origins.concat(options.trustedOrigins);
@@ -288,7 +288,7 @@ var _vars = function (options) {
   /** @deprecated `trustedDomains` in [v1.2.0], slated for removal in [v2.0.0]. See docs for more info. */
   if (options.trustedDomains) {
     if (typeof options.trustedDomains === "string") {
-      origins = origins.push(options.trustedDomains);
+      origins.push(options.trustedDomains);
     }
     else if (typeof options.trustedDomains === "object" && "length" in options.trustedDomains) {
       origins = origins.concat(options.trustedDomains);
