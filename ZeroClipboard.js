@@ -4,7 +4,7 @@
 * Copyright (c) 2013 Jon Rohan, James M. Greene
 * Licensed MIT
 * http://zeroclipboard.org/
-* v1.2.0
+* v1.2.1
 */
 (function() {
   "use strict";
@@ -263,7 +263,7 @@
   var _setHandCursor = function(enabled) {
     if (this.ready()) this.flashBridge.setHandCursor(enabled);
   };
-  ZeroClipboard.version = "1.2.0";
+  ZeroClipboard.version = "1.2.1";
   var _defaults = {
     moviePath: "ZeroClipboard.swf",
     trustedOrigins: null,
