@@ -20,34 +20,18 @@ var clip = new ZeroClipboard( document.getElementById("copy-button"), {
   moviePath: "/path/to/ZeroClipboard.swf"
 } );
 
-clip.on( 'load', function(client) {
+clip.on( "load", function(client) {
   // alert( "movie is loaded" );
-} );
 
-clip.on( 'complete', function(client, args) {
-  this.style.display = "none"; // "this" is the element that was clicked
-  alert("Copied text to clipboard: " + args.text );
-} );
-
-clip.on( 'mouseover', function(client) {
-  // alert("mouse over");
-} );
-
-clip.on( 'mouseout', function(client) {
-  // alert("mouse out");
-} );
-
-clip.on( 'mousedown', function(client) {
-
-  // alert("mouse down");
-} );
-
-clip.on( 'mouseup', function(client) {
-  // alert("mouse up");
+  client.on( "complete", function(client, args) {
+    // `this` is the element that was clicked
+    this.style.display = "none";
+    alert("Copied text to clipboard: " + args.text );
+  } );
 } );
 ```
 
-See the [instructions](docs/instructions.md) for advanced instructions on how to use the library on your site.
+See the [instructions](docs/instructions.md) for more advanced options in using the library on your site.
 
 Here is a working [test page](http://zeroclipboard.org/#demo) where you can try out ZeroClipboard in your browser.
 
