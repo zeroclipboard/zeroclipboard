@@ -24,7 +24,7 @@ module.exports = function(grunt) {
       }
     },
     clean: {
-      dist: ['ZeroClipboard.*', 'bower.json', 'LICENSE']
+      dist: ['ZeroClipboard.*', 'bower.json', 'composer.json', 'LICENSE']
     },
     concat: {
       options: {
@@ -89,6 +89,11 @@ module.exports = function(grunt) {
           'bower.json': ['src/meta/bower.json.tmpl']
         }
       },
+      composer: {
+        files: {
+          'composer.json': ['src/meta/composer.json.tmpl']
+        }
+      },
       LICENSE: {
         files: {
           'LICENSE': ['src/meta/LICENSE.tmpl']
@@ -99,7 +104,7 @@ module.exports = function(grunt) {
       options: {
         mode: '444'
       },
-      dist: ['ZeroClipboard.*', 'bower.json', 'LICENSE']
+      dist: ['ZeroClipboard.*', 'bower.json', 'composer.json', 'LICENSE']
     },
     connect: {
       server: {
