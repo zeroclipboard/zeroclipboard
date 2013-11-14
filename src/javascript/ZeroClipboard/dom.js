@@ -10,6 +10,7 @@ var _cjsModuleId = null;
  * returns nothing
  */
 var _bridge = function () {
+  var flashBridge, len;
   var client = ZeroClipboard.prototype._singleton;
   // try and find the current global bridge
   var container = document.getElementById("global-zeroclipboard-html-bridge");
@@ -66,7 +67,12 @@ var _bridge = function () {
   }
 
   client.htmlBridge = container;
-  client.flashBridge = document["global-zeroclipboard-flash-bridge"] || container.children[0].lastElementChild;
+  
+  flashBridge = document["global-zeroclipboard-flash-bridge"];
+  if (flashBridge && (len = flashBridge.length)) {
+    flashBridge = flashBridge[len - 1];
+  }
+  client.flashBridge = flashBridge || container.children[0].lastElementChild;
 };
 
 /*
