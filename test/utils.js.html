@@ -5,8 +5,20 @@
   <title>ZeroClipboard unit tests: utils.js</title>
   <link rel="stylesheet" href="../node_modules/qunitjs/qunit/qunit.css">
   <script src="../node_modules/qunitjs/qunit/qunit.js"></script>
-  <script src="lib/jquery.js"></script>
+  <script>
+    // Polyfill in future functionality: https://github.com/jquery/qunit/issues/490
+    if (!QUnit.assert.expect) {
+      QUnit.assert.expect = QUnit.expect;
+    }
+
+    // Require `expect` calls
+    QUnit.config.requireExpects = true;
+
+    // Prevent against Firefox/Firebug failing the global pollution check
+    var getInterface = null;
+  </script>
   <script src="../src/javascript/ZeroClipboard/utils.js"></script>
+  <script src="lib/jquery.js"></script>
   <script src="utils.js"></script>
 </head>
 <body>

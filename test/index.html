@@ -8,9 +8,15 @@
   <script src="../node_modules/qunitjs/qunit/qunit.js"></script>
   <script src="../node_modules/qunit-composite/qunit-composite.js"></script>
   <script>
-    QUnit.testSuites([
-      "utils.js.html", "client.js.html", "core.js.html", "dom.js.html", "event.js.html"
-    ]);
+    (function() {
+      var queryParams = "?noglobals=true";
+      QUnit.testSuites([
+        "utils.js.html" + queryParams,
+        "core.js.html" + queryParams,
+        "event.js.html" + queryParams,
+        "ZeroClipboard.js.html" + queryParams
+      ]);
+    })();
   </script>
 </head>
 <body>

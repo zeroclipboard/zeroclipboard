@@ -70,54 +70,58 @@ ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
 
   // special behavior for certain events
   switch (eventName) {
-  case 'load':
-    // If the flash version is less than 10, throw event.
-    if (args && parseFloat(args.flashVersion.replace(",", ".").replace(/[^0-9\.]/gi, '')) < 10) {
-      this.receiveEvent("onWrongFlash", { flashVersion: args.flashVersion });
-      return;
-    }
+    case 'load':
+      // If the flash version is less than 10, throw event.
+      if (args && parseFloat(args.flashVersion.replace(",", ".").replace(/[^0-9\.]/gi, '')) < 10) {
+        this.receiveEvent("onWrongFlash", { flashVersion: args.flashVersion });
+        return;
+      }
 
-    this.htmlBridge.setAttribute("data-clipboard-ready", true);
-    break;
+      this.htmlBridge.setAttribute("data-clipboard-ready", true);
+      break;
 
-  case 'mouseover':
-    _addClass(element, this.options.hoverClass);
-    break;
+    case 'mouseover':
+      _addClass(element, this.options.hoverClass);
+      break;
 
-  case 'mouseout':
-    _removeClass(element, this.options.hoverClass);
-    this.resetBridge();
-    break;
+    case 'mouseout':
+      _removeClass(element, this.options.hoverClass);
+      this.resetBridge();
+      break;
 
-  case 'mousedown':
-    _addClass(element, this.options.activeClass);
-    break;
+    case 'mousedown':
+      _addClass(element, this.options.activeClass);
+      break;
 
-  case 'mouseup':
-    _removeClass(element, this.options.activeClass);
-    break;
+    case 'mouseup':
+      _removeClass(element, this.options.activeClass);
+      break;
 
-  case 'datarequested':
-    var targetId = element.getAttribute('data-clipboard-target'),
-       targetEl = !targetId ? null : document.getElementById(targetId);
-    if (targetEl) {
-      var textContent = targetEl.value || targetEl.textContent || targetEl.innerText;
-      if (textContent) this.setText(textContent);
-    }
-    else {
-      var defaultText = element.getAttribute('data-clipboard-text');
-      if (defaultText) this.setText(defaultText);
-    }
+    case 'datarequested':
+      var targetId = element.getAttribute('data-clipboard-target'),
+          targetEl = !targetId ? null : document.getElementById(targetId);
+      if (targetEl) {
+        var textContent = targetEl.value || targetEl.textContent || targetEl.innerText;
+        if (textContent) {
+          this.setText(textContent);
+        }
+      }
+      else {
+        var defaultText = element.getAttribute('data-clipboard-text');
+        if (defaultText) {
+          this.setText(defaultText);
+        }
+      }
 
-    // This callback cannot be performed asynchronously as it would prevent the
-    // user from being able to call `.setText` successfully before the pending
-    // clipboard injection associated with this event fires.
-    performCallbackAsync = false;
-    break;
+      // This callback cannot be performed asynchronously as it would prevent the
+      // user from being able to call `.setText` successfully before the pending
+      // clipboard injection associated with this event fires.
+      performCallbackAsync = false;
+      break;
 
-  case 'complete':
-    this.options.text = null;
-    break;
+    case 'complete':
+      this.options.text = null;
+      break;
   } // switch eventName
 
   if (this.handlers[eventName]) {
@@ -135,8 +139,6 @@ ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
 };
 
 /*
-
-/*
  * Register new element(s) to the object.
  *
  * returns object instance
@@ -146,14 +148,15 @@ ZeroClipboard.prototype.glue = function (elements) {
   elements = _prepGlue(elements);
 
   for (var i = 0; i < elements.length ; i++) {
+    if (elements[i] && elements[i].nodeType === 1) {
+      // if the element has not been glued
+      if (_inArray(elements[i], gluedElements) == -1) {
 
-    // if the element has not been glued
-    if (_inArray(elements[i], gluedElements) == -1) {
+        // push to glued elements
+        gluedElements.push(elements[i]);
 
-      // push to glued elements
-      gluedElements.push(elements[i]);
-
-      _addEventHandler(elements[i], "mouseover", _elementMouseOver);
+        _addEventHandler(elements[i], "mouseover", _elementMouseOver);
+      }
     }
   }
 

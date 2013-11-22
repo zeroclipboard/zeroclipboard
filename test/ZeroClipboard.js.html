@@ -1,15 +1,45 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-  <head></head>
-  <body>
+<head>
+  <meta charset="UTF-8">
+  <title>ZeroClipboard unit tests: ZeroClipboard (built)</title>
+  <link rel="stylesheet" href="../node_modules/qunitjs/qunit/qunit.css">
+  <script src="../node_modules/qunitjs/qunit/qunit.js"></script>
+  <script>
+    // Polyfill in future functionality: https://github.com/jquery/qunit/issues/490
+    if (!QUnit.assert.expect) {
+      QUnit.assert.expect = QUnit.expect;
+    }
+
+    // Require `expect` calls
+    QUnit.config.requireExpects = true;
+
+    // Prevent against Firefox/Firebug failing the global pollution check
+    var getInterface = null;
+
+    // Prevent against Flash's ExternalInterface failing the global pollution check (seems to be only in IE < 11)
+    var __flash__arrayToXML = null,
+        __flash__argumentsToXML = null,
+        __flash__objectToXML = null,
+        __flash__escapeXML = null,
+        __flash__toXML = null,
+        __flash__addCallback = null,
+        __flash__removeCallback = null;
+  </script>
+  <script src="../ZeroClipboard.js"></script>
+  <script>
+    ZeroClipboard.setDefaults({
+      moviePath: "../ZeroClipboard.swf"
+    });
+  </script>
+  <script src="lib/jquery.js"></script>
+  <script src="ZeroClipboard.js"></script>
+</head>
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture">
     <p id="d_clip_container">
       <button id="d_clip_button" class="my_clip_button" title="Click me to copy to clipboard." data-clipboard-text="Copy me!"><b>Copy To Clipboard...</b></button>
-    </p>
-    <p id="d_clip_container2">
-      <button id="d_clip_button2" class="my_clip_button" title="Click me to copy to clipboard.2" data-clipboard-text="Copy me!"><b>Copy To Clipboard...</b></button>
-    </p>
-    <p id="d_clip_container3">
-      <button id="d_clip_button3" class="my_clip_button" title="Click me to copy to clipboard.3" data-clipboard-text="Copy me!"><b>Copy To Clipboard...</b></button>
     </p>
     <p id="d_clip_container">
       <button id="d_clip_button_no_title" class="my_clip_button" data-clipboard-text="Copy me!"><b>Copy To Clipboard...</b></button>
@@ -24,10 +54,6 @@
       <button id="d_clip_button_textarea_text" class="my_clip_button" data-clipboard-target="clipboard_textarea"><b>Copy To Clipboard...</b></button>
     </p>
     <button id="d_clip_button_pre_text" class="my_clip_button" data-clipboard-target="clipboard_pre"><b>Copy To Clipboard...</b></button>
-    <a href="" class="no_pointer_anchor" style="cursor:default;"></a>
-    <a href="" class="no_cursor_style" style="cursor:auto;"></a>
-    <span class="zindex-auto" style="z-index:auto;"></span>
-    <span class="big-border" style="border: 10px solid red;"></span>
     <input type="text" id="clipboard_text" value="Clipboard Text"/>
     <textarea id="clipboard_textarea">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
 tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
@@ -41,5 +67,6 @@ quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
 consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
 cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
 proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</pre>
-  </body>
+  </div>
+</body>
 </html>

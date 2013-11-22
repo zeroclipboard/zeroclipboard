@@ -278,10 +278,14 @@
     for (var ko in options) _defaults[ko] = options[ko];
   };
   ZeroClipboard.destroy = function() {
-    ZeroClipboard.prototype._singleton.unglue(gluedElements);
-    var bridge = ZeroClipboard.prototype._singleton.htmlBridge;
-    bridge.parentNode.removeChild(bridge);
-    delete ZeroClipboard.prototype._singleton;
+    if (ZeroClipboard.prototype._singleton) {
+      ZeroClipboard.prototype._singleton.unglue(gluedElements);
+      var bridge = ZeroClipboard.prototype._singleton.htmlBridge;
+      if (bridge && bridge.parentNode) {
+        bridge.parentNode.removeChild(bridge);
+      }
+      delete ZeroClipboard.prototype._singleton;
+    }
   };
   ZeroClipboard.detectFlashSupport = function() {
     var hasFlash = false;
@@ -419,10 +423,14 @@
       var targetId = element.getAttribute("data-clipboard-target"), targetEl = !targetId ? null : document.getElementById(targetId);
       if (targetEl) {
         var textContent = targetEl.value || targetEl.textContent || targetEl.innerText;
-        if (textContent) this.setText(textContent);
+        if (textContent) {
+          this.setText(textContent);
+        }
       } else {
         var defaultText = element.getAttribute("data-clipboard-text");
-        if (defaultText) this.setText(defaultText);
+        if (defaultText) {
+          this.setText(defaultText);
+        }
       }
       performCallbackAsync = false;
       break;
@@ -444,9 +452,11 @@
   ZeroClipboard.prototype.glue = function(elements) {
     elements = _prepGlue(elements);
     for (var i = 0; i < elements.length; i++) {
-      if (_inArray(elements[i], gluedElements) == -1) {
-        gluedElements.push(elements[i]);
-        _addEventHandler(elements[i], "mouseover", _elementMouseOver);
+      if (elements[i] && elements[i].nodeType === 1) {
+        if (_inArray(elements[i], gluedElements) == -1) {
+          gluedElements.push(elements[i]);
+          _addEventHandler(elements[i], "mouseover", _elementMouseOver);
+        }
       }
     }
     return this;

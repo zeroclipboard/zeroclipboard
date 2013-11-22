@@ -1,13 +1,13 @@
-/*globals _camelizeCssPropName, _getStyle, _removeClass, _addClass, _vars, _noCache, _inArray, _dispatchCallback */
+/*global _camelizeCssPropName, _getStyle, _removeClass, _addClass, _vars, _noCache, _inArray, _dispatchCallback */
 
 "use strict";
 
-(function(module, test, expect) {
+(function(module, test) {
 
   module("utils.js");
 
   test("`_camelizeCssPropName` converts CSS property names", function(assert) {
-    (assert.expect || expect)(3);
+    assert.expect(3);
 
     // Arrange -> N/A
 
@@ -21,7 +21,7 @@
 
 
   test("`_getStyle` returns computed styles", function(assert) {
-    (assert.expect || expect)(5);
+    assert.expect(5);
 
     // Arrange
     var pointerEl    = $("a.no_cursor_style")[0];
@@ -40,14 +40,16 @@
     // Assert
     assert.strictEqual(pointerElComputedCursor, "pointer");
     assert.notStrictEqual(nonPointerElComputedCursor, "pointer");
-    assert.strictEqual(zIndexAutoElComputedZIndex, "auto");
-    assert.strictEqual(clipButtonElComputedBorderLeftWidth, "0px");
+    // Returns 0 in IE7, "auto" everywhere else
+    assert.strictEqual(/^(?:auto|0)$/.test(zIndexAutoElComputedZIndex), true);
+    // This varies between "0px" and "3px" depending on the browser (WAT?)
+    assert.strictEqual(/^[0-3]px$/.test(clipButtonElComputedBorderLeftWidth), true);
     assert.strictEqual(bigBorderElComputedBorderLeftWith, "10px");
   });
 
 
   test("`_removeClass` removes classes from element", function(assert) {
-    (assert.expect || expect)(5);
+    assert.expect(5);
 
     // Arrange
     var div = $("<div></div>").addClass("class1 class-2 class_3")[0];
@@ -73,7 +75,7 @@
 
 
   test("`_removeClass` doesn't remove partial class names", function(assert) {
-    (assert.expect || expect)(3);
+    assert.expect(3);
 
     // Arrange
     var div = $("<div></div>").addClass("class1 class-2 class_3")[0];
@@ -93,7 +95,7 @@
 
 
   test("`_addClass` adds a class name", function(assert) {
-    (assert.expect || expect)(4);
+    assert.expect(4);
 
     // Arrange
     var div = $("<div></div>")[0];
@@ -117,7 +119,7 @@
 
   // TODO: Remove this test; see TODO notes in utils.js source
   test("elements with `addClass` already use the function", function(assert) {
-    (assert.expect || expect)(2);
+    assert.expect(2);
 
     // Arrange
     var $div = $("<div></div>");
@@ -133,7 +135,7 @@
 
   // TODO: Remove this test; see TODO notes in utils.js source
   test("elements with `removeClass` already use the function", function(assert) {
-    (assert.expect || expect)(2);
+    assert.expect(2);
 
     // Arrange
     var $div = $("<div></div>").addClass("class1");
@@ -149,7 +151,7 @@
 
 
   test("`_vars` builds flashvars", function(assert) {
-    (assert.expect || expect)(5);
+    assert.expect(5);
 
     // Arrange
     var clipOptionsEmpty = {};
@@ -178,7 +180,7 @@
 
 
   test("`_noCache` adds cache-buster appropriately", function(assert) {
-    (assert.expect || expect)(2);
+    assert.expect(2);
 
     // Arrange
     var pathWithoutQuery = "path.com/z.swf";
@@ -191,7 +193,7 @@
 
 
   test("`_noCache` can be disabled", function(assert) {
-    (assert.expect || expect)(2);
+    assert.expect(2);
 
     // Arrange
     var pathWithoutQuery = "path.com/z.swf";
@@ -207,7 +209,7 @@
 
 
   test("`_inArray` finds elements in array", function(assert) {
-    (assert.expect || expect)(4);
+    assert.expect(4);
 
     // Arrange
     var fruits = ["apple", "banana", "orange", "cherry", "strawberry"];
@@ -221,7 +223,7 @@
 
 
   test("`_dispatchCallback` can fire asynchronously", function(assert) {
-    (assert.expect || expect)(6);
+    assert.expect(6);
 
     // Arrange
     var syncExec = false;
@@ -255,4 +257,4 @@
     QUnit.stop();
   });
 
-})(QUnit.module, QUnit.test, QUnit.expect);
+})(QUnit.module, QUnit.test);

@@ -1,99 +1,101 @@
+/*global ZeroClipboard, _defaults */
+
 "use strict";
 
-require("./fixtures/env");
-var zeroClipboard, clip;
+(function(module, test) {
 
-exports.core = {
+  var mimeType, ax, originalMoviePath;
 
-  "Changing movie path works": function (test) {
+  module("core", {
+    setup: function() {
+      mimeType = window.navigator.mimeTypes["application/x-shockwave-flash"];
+      ax = window.ActiveXObject;
+      originalMoviePath = _defaults.moviePath;
+    },
+    teardown: function() {
+      window.navigator.mimeTypes["application/x-shockwave-flash"] = mimeType;
+      window.ActiveXObject = ax;
+      ZeroClipboard.setDefaults({
+        moviePath: originalMoviePath
+      });
+    }
+  });
 
-    zeroClipboard = require("../ZeroClipboard");
-    clip = new zeroClipboard();
+  test("Changing movie path works", function(assert) {
+    assert.expect(2);
 
-    // Test the client has default path
-    test.equal(clip.options.moviePath, "ZeroClipboard.swf");
+    // Arrange
+    var clip = new ZeroClipboard();
 
-    // change the path
+    // Assert, act, assert
+
+    // Test that the client has the default path
+    assert.strictEqual(clip.options.moviePath, "ZeroClipboard.swf");
+    // Change the path
     clip.options.moviePath = "new/movie/path.swf";
+    // Test that the client has the changed path
+    assert.strictEqual(clip.options.moviePath, "new/movie/path.swf");
+  });
 
-    test.equal(clip.options.moviePath, "new/movie/path.swf");
+  test("Set trusted origins", function(assert) {
+    assert.expect(2);
 
-    test.done();
+    // Arrange
+    var clip = new ZeroClipboard();
 
-    zeroClipboard.destroy();
-  },
-
-  "Set trusted origins": function (test) {
-
-    zeroClipboard = require("../ZeroClipboard");
-    clip = new zeroClipboard();
-
-    // Test that trustedOrigins is undefined
-    test.equal(clip.options.trustedOrigins, undefined);
-
-    // change the path
+    // Assert, act, assert
+    // Test that trustedOrigins is `null`/`undefined`
+    assert.equal(clip.options.trustedOrigins, null);
+    // Change the value
     clip.options.trustedOrigins = "google.com";
+    // Test that trustedOrigins is now defined as the new value
+    assert.strictEqual(clip.options.trustedOrigins, "google.com");
+  });
 
-    test.equal(clip.options.trustedOrigins, "google.com");
+  test("Detecting no Flash", function(assert) {
+    assert.expect(1);
 
-    test.done();
-    zeroClipboard.destroy();
-  },
+    // Arrange
+    window.navigator.mimeTypes["application/x-shockwave-flash"] = undefined;
+    window.ActiveXObject = undefined;
 
-  "destroy clears up the client": function (test) {
+    // Act & Assert
+    assert.strictEqual(ZeroClipboard.detectFlashSupport(), false);
+  });
 
-    zeroClipboard = require("../ZeroClipboard");
-    clip = new zeroClipboard();
+  test("Detecting has Flash mimetype", function(assert) {
+    assert.expect(1);
 
-    zeroClipboard.destroy();
+    // Arrange
+    window.navigator.mimeTypes["application/x-shockwave-flash"] = {};
+    window.ActiveXObject = function() { };
 
-    test.equal($("#global-zeroclipboard-html-bridge").length, 0);
-    test.ok(!zeroClipboard.prototype._singleton);
+    // Act & Assert
+    assert.strictEqual(ZeroClipboard.detectFlashSupport(), true);
+  });
 
-    test.done();
-  },
+  test("Setting default options", function(assert) {
+    assert.expect(4);
 
-  "Detecting no flash": function (test) {
-    zeroClipboard = require("../ZeroClipboard");
-    clip = new zeroClipboard();
+    // Arrange
+    var newPath = "the/path";
+    var scriptAccess = "always";
 
-    navigator.mimeTypes["application/x-shockwave-flash"] = undefined;
+    // Assert
+    var clip = new ZeroClipboard();
+    assert.notEqual(clip.options.moviePath, newPath);
+    assert.notEqual(clip.options.allowScriptAccess, scriptAccess);
 
-    // Test that we don't have flash
-    test.equal(zeroClipboard.detectFlashSupport(), false);
-
-    navigator.mimeTypes["application/x-shockwave-flash"] = true;
-    test.done();
-    zeroClipboard.destroy();
-  },
-
-  "Detecting has flash mimetype": function (test) {
-
-    zeroClipboard = require("../ZeroClipboard");
-    clip = new zeroClipboard();
-
-    // Test that we don't have flash
-    test.equal(zeroClipboard.detectFlashSupport(), true);
-
-    test.done();
-    zeroClipboard.destroy();
-  },
-
-  "Setting default options": function (test) {
-    zeroClipboard = require("../ZeroClipboard");
-
-    zeroClipboard.setDefaults({
-      moviePath:         "the/path",
-      allowScriptAccess: "always"
+    // Act
+    ZeroClipboard.setDefaults({
+      moviePath: newPath,
+      allowScriptAccess: scriptAccess
     });
 
-    clip = new zeroClipboard();
+    // Assert
+    clip = new ZeroClipboard();
+    assert.strictEqual(clip.options.moviePath, newPath);
+    assert.strictEqual(clip.options.allowScriptAccess, scriptAccess);
+  });
 
-    test.equal(clip.options.moviePath, "the/path");
-    test.equal(clip.options.allowScriptAccess, "always");
-
-    test.done();
-    zeroClipboard.destroy();
-  },
-
-};
+})(QUnit.module, QUnit.test);

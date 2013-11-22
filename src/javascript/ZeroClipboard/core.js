@@ -26,17 +26,21 @@ ZeroClipboard.setDefaults = function (options) {
  * returns nothing
  */
 ZeroClipboard.destroy = function () {
+  // If there is an existing singleton
+  if (ZeroClipboard.prototype._singleton) {
+    // unglue all the elements
+    ZeroClipboard.prototype._singleton.unglue(gluedElements);
 
-  // unglue all the elements
-  ZeroClipboard.prototype._singleton.unglue(gluedElements);
+    var bridge = ZeroClipboard.prototype._singleton.htmlBridge;
 
-  var bridge = ZeroClipboard.prototype._singleton.htmlBridge;
+    // remove the bridge
+    if (bridge && bridge.parentNode) {
+      bridge.parentNode.removeChild(bridge);
+    }
 
-  // remove the bridge
-  bridge.parentNode.removeChild(bridge);
-
-  // delete the client object
-  delete ZeroClipboard.prototype._singleton;
+    // delete the client object
+    delete ZeroClipboard.prototype._singleton;
+  }
 };
 
 /*

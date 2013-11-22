@@ -5,11 +5,67 @@
   <title>ZeroClipboard unit tests: event.js</title>
   <link rel="stylesheet" href="../node_modules/qunitjs/qunit/qunit.css">
   <script src="../node_modules/qunitjs/qunit/qunit.js"></script>
+  <script>
+    // Polyfill in future functionality: https://github.com/jquery/qunit/issues/490
+    if (!QUnit.assert.expect) {
+      QUnit.assert.expect = QUnit.expect;
+    }
+
+    // Require `expect` calls
+    QUnit.config.requireExpects = true;
+
+    // Prevent against Firefox/Firebug failing the global pollution check
+    var getInterface = null;
+  </script>
+  <script src="../src/javascript/ZeroClipboard/utils.js"></script>
+  <script>
+    var gluedElements = [],
+        currentElement = null,
+        _zcCounter = 1;
+    function ZeroClipboard(elements, options) {
+      // If there's a client already, return the singleton
+      if (ZeroClipboard.prototype._singleton) {
+        return ZeroClipboard.prototype._singleton;
+      }
+      ZeroClipboard.prototype._singleton = this;
+
+      this.options = QUnit.extend({
+        hoverClass:  "zeroclipboard-is-hover",
+        activeClass: "zeroclipboard-is-active"
+      }, options);
+      this.handlers = {};
+      this.htmlBridge = {
+        style: {
+          left: "0px"
+        },
+        getAttribute: function(key) { return "val"; },
+        setAttribute: function(key, val) { }
+      };
+      this.id = "ZC_" + _zcCounter++;
+    }
+    ZeroClipboard.prototype.setCurrent = function(el) {
+      currentElement = el;
+    };
+    ZeroClipboard.prototype.resetBridge = function() {
+      this.htmlBridge.style.left = "-9999px";
+    };
+    ZeroClipboard.prototype._singleton = null;
+  </script>
   <script src="../src/javascript/ZeroClipboard/event.js"></script>
   <script src="event.js"></script>
 </head>
 <body>
   <div id="qunit"></div>
-  <div id="qunit-fixture"></div>
+  <div id="qunit-fixture">
+    <p id="d_clip_container">
+      <button id="d_clip_button" class="my_clip_button" title="Click me to copy to clipboard." data-clipboard-text="Copy me!"><b>Copy To Clipboard...</b></button>
+    </p>
+    <p id="d_clip_container2">
+      <button id="d_clip_button2" class="my_clip_button" title="Click me to copy to clipboard.2" data-clipboard-text="Copy me!"><b>Copy To Clipboard...</b></button>
+    </p>
+    <p id="d_clip_container3">
+      <button id="d_clip_button3" class="my_clip_button" title="Click me to copy to clipboard.3" data-clipboard-text="Copy me!"><b>Copy To Clipboard...</b></button>
+    </p>
+  </div>
 </body>
 </html>

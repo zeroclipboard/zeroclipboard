@@ -1,306 +1,450 @@
+/*global ZeroClipboard, gluedElements */
+
 "use strict";
 
-require("./fixtures/env");
+(function(module, test) {
 
-var zeroClipboard, clip;
-exports.event = {
+  var originalDetectFlashSupport;
 
-  setUp: function (callback) {
-    zeroClipboard = require("../ZeroClipboard");
-    clip = new zeroClipboard();
-    callback();
-  },
+  module("events", {
+    setup: function() {
+      originalDetectFlashSupport = ZeroClipboard.detectFlashSupport;
+      ZeroClipboard.detectFlashSupport = function() { return true; };
+      ZeroClipboard.prototype._singleton = null;
+      gluedElements.length = 0;
+    },
+    teardown: function() {
+      ZeroClipboard.detectFlashSupport = originalDetectFlashSupport;
+      if (gluedElements && "length" in gluedElements) {
+        if (gluedElements.length) {
+          var destroyer = new ZeroClipboard();
+          destroyer.unglue(gluedElements);
+          destroyer.handlers = {};
+          destroyer = null;
+        }
+        gluedElements.length = 0;
+      }
+      ZeroClipboard.prototype._singleton = null;
+    }
+  });
 
-  tearDown: function (callback) {
-    zeroClipboard.destroy();
-    callback();
-  },
+  test("Glue element after new client", function(assert) {
+    assert.expect(2);
 
-  "Glue element after new client": function (test) {
-    test.expect(2);
-    clip.glue($("#d_clip_button"));
+    // Arrange
+    var clip = new ZeroClipboard();
 
-    // Test the client was created properly
-    test.ok(clip.htmlBridge);
-    test.ok(clip.handlers);
+    // Act
+    clip.glue(document.getElementById("d_clip_button"));
 
-    test.done();
-  },
+    // Assert
+    assert.ok(clip.htmlBridge);
+    assert.ok(clip.handlers);
+  });
 
-  "unglue element removes items": function (test) {
-    test.expect(0);
-    clip.glue($("#d_clip_button, #d_clip_button2, #d_clip_button3"));
+  test("unglue element removes items", function(assert) {
+    assert.expect(3);
 
-    clip.unglue($("#d_clip_button3, #d_clip_button2"));
+    // Arrange
+    var clip = new ZeroClipboard();
 
-    test.done();
-  },
+    // Assert pre-conditions
+    assert.strictEqual(gluedElements.length, 0);
 
-  "Glue element with query string throws TypeError": function (test) {
-    test.expect(1);
-    test.throws(function(){
+    // Act
+    clip.glue([
+      document.getElementById("d_clip_button"),
+      document.getElementById("d_clip_button2"),
+      document.getElementById("d_clip_button3")
+    ]);
+
+    // Assert initial state
+    assert.strictEqual(gluedElements.length, 3);
+
+    // Act more
+    clip.unglue([
+      document.getElementById("d_clip_button3"),
+      document.getElementById("d_clip_button2")
+    ]);
+
+    // Assert end state
+    assert.strictEqual(gluedElements.length, 1);
+  });
+
+  test("Glue element with query string throws TypeError", function(assert) {
+    assert.expect(1);
+
+    // Arrange
+    var clip = new ZeroClipboard();
+
+    // Assert
+    assert.throws(function() {
+      // Act
       clip.glue("#d_clip_button");
     }, TypeError);
+  });
 
-    test.done();
-  },
+  test("Element won't be glued twice", function(assert) {
+    assert.expect(5);
 
-  "Element won't be glued twice": function(test) {
-    test.expect(0);
-    test.done();
-  },
+    // Arrange
+    var clip = new ZeroClipboard();
+    var currentEl = document.getElementById("d_clip_button");
 
-  "Registering Events": function (test) {
-    test.expect(3);
+    // Assert, act, assert
+    assert.strictEqual(gluedElements.length, 0);
+    clip.glue(currentEl);
+    assert.strictEqual(gluedElements.length, 1);
+    assert.strictEqual(gluedElements[0], currentEl);
+    clip.glue(currentEl);
+    assert.strictEqual(gluedElements.length, 1);
+    assert.strictEqual(gluedElements[0], currentEl);
+  });
+
+  test("Registering Events", function(assert) {
+    assert.expect(3);
+
+    // Arrange
+    var clip = new ZeroClipboard();
+
+    // Act
     clip.on("load", function(){});
     clip.on("onNoFlash", function(){});
     clip.on("onPhone", function(){});
 
-    test.ok(clip.handlers.load);
-    test.ok(clip.handlers.noflash);
-    test.ok(clip.handlers.phone);
+    // Assert
+    assert.ok(clip.handlers.load);
+    assert.ok(clip.handlers.noflash);
+    assert.ok(clip.handlers.phone);
+  });
 
-    test.done();
-  },
+  test("Unregistering Events", function(assert) {
+    assert.expect(6);
 
-  "Unegistering Events": function (test) {
-    test.expect(3);
+    // Arrange
+    var clip = new ZeroClipboard();
     var load = function(){};
     var onNoFlash = function(){};
     var onPhone = function(){};
 
+    // Act
     clip.on("load", load);
     clip.on("onNoFlash", onNoFlash);
     clip.on("onPhone", onPhone);
 
+    // Assert
+    assert.ok(clip.handlers.load);
+    assert.ok(clip.handlers.noflash);
+    assert.ok(clip.handlers.phone);
+
+    // Act & Assert
     clip.off("load", load);
-    test.ok(!clip.handlers.load);
+    assert.ok(!clip.handlers.load);
 
+    // Act & Assert
     clip.off("onNoFlash", onNoFlash);
-    test.ok(!clip.handlers.noflash);
+    assert.ok(!clip.handlers.noflash);
 
+    // Act & Assert
     clip.off("onPhone", onPhone);
-    test.ok(!clip.handlers.phone);
+    assert.ok(!clip.handlers.phone);
+  });
 
-    test.done();
-  },
+  test("Registering Events the old way", function(assert) {
+    assert.expect(2);
 
-  "Registering Events the old way": function (test) {
-    test.expect(1);
+    // Arrange
+    var clip = new ZeroClipboard();
+
+    // Assert
+    assert.ok(!clip.handlers.load);
+
+    // Act
     clip.addEventListener("load", function(){});
 
-    test.ok(clip.handlers.load);
+    // Assert
+    assert.ok(clip.handlers.load);
+  });
 
-    test.done();
-  },
+  test("Unregistering Events the old way", function(assert) {
+    assert.expect(3);
 
-  "Unregistering Events the old way": function (test) {
-    test.expect(1);
+    // Arrange
+    var clip = new ZeroClipboard();
     var func = function(){};
 
+    // Assert
+    assert.ok(!clip.handlers.load);
+
+    // Act & Assert
     clip.addEventListener("load", func);
+    assert.ok(clip.handlers.load);
+
+    // Act & Assert
     clip.removeEventListener("load", func);
+    assert.ok(!clip.handlers.load);
+  });
 
-    test.ok(!clip.handlers.load);
+  test("Registering two events works", function(assert) {
+    assert.expect(4);
 
-    test.done();
-  },
+    // Arrange
+    var clip = new ZeroClipboard();
 
-  "Registering two events works": function (test) {
-    test.expect(2);
+    // Assert
+    assert.ok(!clip.handlers.load);
+    assert.ok(!clip.handlers.complete);
+
+    // Act
     clip.on("load oncomplete", function(){});
 
-    test.ok(clip.handlers.load);
-    test.ok(clip.handlers.complete);
+    // Assert more
+    assert.ok(clip.handlers.load);
+    assert.ok(clip.handlers.complete);
+  });
 
-    test.done();
-  },
+  test("Unregistering two events works", function(assert) {
+    assert.expect(6);
 
-  "Unregistering two events works": function (test) {
-    test.expect(2);
-    var func = function(){};
+    // Arrange
+    var clip = new ZeroClipboard();
+    var func = function() {};
 
-    clip.on("load oncomplete",func);
-    clip.off("load oncomplete",func);
+    // Assert
+    assert.ok(!clip.handlers.load);
+    assert.ok(!clip.handlers.complete);
 
-    test.ok(!clip.handlers.load);
-    test.ok(!clip.handlers.complete);
+    // Act
+    clip.on("load oncomplete", func);
 
-    test.done();
-  },
+    // Assert more
+    assert.ok(clip.handlers.load);
+    assert.ok(clip.handlers.complete);
 
-  "Test onNoFlash Event": function (test) {
-    test.expect(1);
-    navigator.mimeTypes["application/x-shockwave-flash"] = undefined;
+    // Act more
+    clip.off("load oncomplete", func);
 
+    // Assert even more
+    assert.ok(!clip.handlers.load);
+    assert.ok(!clip.handlers.complete);
+  });
+
+  test("Test noFlash Event", function(assert) {
+    assert.expect(1);
+
+    // Arrange
+    ZeroClipboard.detectFlashSupport = function() { return false; };
+    var clip = new ZeroClipboard();
     var id = clip.id;
 
-    clip.addEventListener( 'onNoFlash', function(client, text) {
-      test.equal(client.id, id);
-      navigator.mimeTypes["application/x-shockwave-flash"] = true;
-      test.done();
+    // Act (should auto-fire immediately but the handler will be invoked asynchronously)
+    clip.on( 'noFlash', function(client, text) {
+      // Assert
+      assert.strictEqual(client.id, id);
+      QUnit.start();
     } );
-  },
+    QUnit.stop();
+  });
 
-  "Test onWrongFlash Event": function (test) {
-    test.expect(1);
-    clip.glue($("#d_clip_button"));
+  test("Test wrongFlash Event", function(assert) {
+    assert.expect(1);
 
+    // Arrange
+    var clip = new ZeroClipboard();
+    var currentEl = document.getElementById("d_clip_button");
     var id = clip.id;
-
-    clip.addEventListener( 'onWrongFlash', function(client, text) {
-      test.equal(client.id, id);
-      test.done();
+    clip.glue(currentEl);
+    clip.on( 'wrongFlash', function(client, text) {
+      // Assert
+      assert.strictEqual(client.id, id);
+      QUnit.start();
     } );
 
-    // fake load event
-    zeroClipboard.dispatch("load", { flashVersion: "MAC 9,0,0" });
-  },
+    // Act
+    QUnit.stop();
+    ZeroClipboard.dispatch("load", { flashVersion: "MAC 9,0,0" });
+  });
 
-  "Test mouseover and mouseout event": function (test) {
-    test.expect(3);
-    clip.glue($("#d_clip_button"));
+  test("Test mouseover and mouseout event", function(assert) {
+    assert.expect(3);
 
-    clip.setCurrent($("#d_clip_button")[0]);
+    // Arrange
+    var clip = new ZeroClipboard();
+    var currentEl = document.getElementById("d_clip_button");
+    clip.glue(currentEl);
+    clip.setCurrent(currentEl);
 
-    zeroClipboard.dispatch("mouseover", { flashVersion: "MAC 11,0,0" });
+    // Act
+    QUnit.stop();
+    ZeroClipboard.dispatch("mouseover", { flashVersion: "MAC 11,0,0" });
 
-    test.ok($("#d_clip_button").hasClass("zeroclipboard-is-hover"));
+    setTimeout(function() {
+      // Assert
+      assert.strictEqual(/(^| )zeroclipboard-is-hover( |$)/.test(currentEl.className), true);
 
-    zeroClipboard.dispatch("mouseout", { flashVersion: "MAC 11,0,0" });
+      // Act more
+      ZeroClipboard.dispatch("mouseout", { flashVersion: "MAC 11,0,0" });
+      
+      setTimeout(function() {
+        // Assert more
+        assert.strictEqual(/(^| )zeroclipboard-is-hover( |$)/.test(currentEl.className), false);
+        assert.strictEqual(clip.htmlBridge.style.left, "-9999px");
+        QUnit.start();
+      }, 25);
+    }, 25);
+  });
 
-    test.ok(!$("#d_clip_button").hasClass("zeroclipboard-is-hover"));
+  test("Test mousedown and mouseup event", function(assert) {
+    assert.expect(2);
 
-    test.equal(clip.htmlBridge.style.left, "-9999px");
+    // Arrange
+    var clip = new ZeroClipboard();
+    var currentEl = document.getElementById("d_clip_button");
+    clip.glue(currentEl);
+    clip.setCurrent(currentEl);
 
-    test.done();
+    // Act
+    QUnit.stop();
+    ZeroClipboard.dispatch("mousedown", { flashVersion: "MAC 11,0,0" });
 
-  },
+    setTimeout(function() {
+      // Assert
+      assert.strictEqual(/(^| )zeroclipboard-is-active( |$)/.test(currentEl.className), true);
 
-  "Test mousedown and mouseup event": function (test) {
-    test.expect(2);
-    clip.glue($("#d_clip_button"));
+      // Act more
+      ZeroClipboard.dispatch("mouseup", { flashVersion: "MAC 11,0,0" });
 
-    clip.setCurrent($("#d_clip_button")[0]);
+      setTimeout(function() {
+        // Assert more
+        assert.strictEqual(/(^| )zeroclipboard-is-active( |$)/.test(currentEl.className), false);
+        QUnit.start();
+      }, 25);
+    }, 25);
+  });
 
-    zeroClipboard.dispatch("mousedown", { flashVersion: "MAC 11,0,0" });
+  test("Test that the current Element is passed back to event handler", function(assert) {
+    assert.expect(9);
 
-    test.ok($("#d_clip_button").hasClass("zeroclipboard-is-active"));
-
-    zeroClipboard.dispatch("mouseout", { flashVersion: "MAC 11,0,0" });
-
-    test.ok(!$("#d_clip_button").hasClass("zeroclipboard-is-active"));
-
-    test.done();
-
-  },
-
-  "Test that the current Element is passed back to event handler": function (test) {
-    test.expect(9);
-    clip.glue($("#d_clip_button"));
-
-    clip.setCurrent($("#d_clip_button")[0]);
+    // Arrange
+    var clip = new ZeroClipboard();
+    var currentElId = "d_clip_button";
+    var currentEl = document.getElementById(currentElId);
+    clip.glue(currentEl);
+    clip.setCurrent(currentEl);
 
     clip.on( 'load mousedown mouseover mouseup wrongflash noflash', function(client, args) {
-      test.equal(this.id, "d_clip_button");
+      // Assert
+      assert.strictEqual(this.id, currentElId);
     } );
 
     clip.on( 'complete', function(client, args) {
-      test.equal(this.id, "d_clip_button");
-      test.ok(!client._text);
+      // Assert
+      assert.strictEqual(this.id, currentElId);
+      assert.ok(!client._text);
     } );
 
     clip.on( 'mouseout', function(client, args) {
-      test.equal(this.id, "d_clip_button");
-      test.done();
+      // Assert
+      assert.strictEqual(this.id, currentElId);
+      QUnit.start();
     } );
 
-    zeroClipboard.dispatch("load", { flashVersion: "MAC 11,0,0" });
-    zeroClipboard.dispatch("wrongflash", { flashVersion: "MAC 11,0,0" });
-    zeroClipboard.dispatch("noflash", { flashVersion: "MAC 11,0,0" });
-    zeroClipboard.dispatch("mousedown", { flashVersion: "MAC 11,0,0" });
-    zeroClipboard.dispatch("mouseover", { flashVersion: "MAC 11,0,0" });
-    zeroClipboard.dispatch("mouseup", { flashVersion: "MAC 11,0,0" });
-    zeroClipboard.dispatch("complete", { flashVersion: "MAC 11,0,0" });
-    zeroClipboard.dispatch("mouseout", { flashVersion: "MAC 11,0,0" });
-  },
+    // Act
+    QUnit.stop();
+    ZeroClipboard.dispatch("load", { flashVersion: "MAC 11,0,0" });
+    ZeroClipboard.dispatch("wrongflash", { flashVersion: "MAC 11,0,0" });
+    ZeroClipboard.dispatch("noflash", { flashVersion: "MAC 11,0,0" });
+    ZeroClipboard.dispatch("mousedown", { flashVersion: "MAC 11,0,0" });
+    ZeroClipboard.dispatch("mouseover", { flashVersion: "MAC 11,0,0" });
+    ZeroClipboard.dispatch("mouseup", { flashVersion: "MAC 11,0,0" });
+    ZeroClipboard.dispatch("complete", { flashVersion: "MAC 11,0,0" });
+    ZeroClipboard.dispatch("mouseout", { flashVersion: "MAC 11,0,0" });
+  });
 
-  "Test onLoad Event with AMD": function (test) {
-    test.expect(4);
+  test("Test onLoad Event with AMD", function(assert) {
+    assert.expect(4);
 
+    // Arrange
     // This is a special private variable inside of ZeroClipboard, so we can
     // only simulate its functionality here
     var _amdModuleId = "zc";
 
     var requireFn = (function() {
       var amdCache = {};
-      amdCache[_amdModuleId] = zeroClipboard;
+      amdCache[_amdModuleId] = ZeroClipboard;
       return function(depIds, cb) {
         var depVals = depIds.map(function(id) { return amdCache[id]; });
-        process.nextTick(function() {
+        setTimeout(function() {
           cb.apply(this, depVals);
-        });
+        }, 0);
       };
     })();
 
-    var clip = new zeroClipboard();
-    clip.glue($("#d_clip_button"));
-
+    var clip = new ZeroClipboard();
+    var currentEl = document.getElementById("d_clip_button");
+    clip.glue(currentEl);
+    clip.setCurrent(currentEl);
     var id = clip.id;
 
     clip.on( "load", function(client, args) {
-      test.equal(client.id, id);
-      test.done();
+      // Assert
+      assert.strictEqual(client.id, id);
+      QUnit.start();
     } );
 
-    // fake load event
+    // Act
+    QUnit.stop();
     eval(
 '(function(eventName, args, amdModuleId) {' +
-'  requireFn([amdModuleId], function(ZeroClipboard) {' +
-'    test.equal(ZeroClipboard, zeroClipboard);' +
-'    test.equal(eventName, "load");' +
-'    test.deepEqual(args, { flashVersion: "MAC 11,0,0" });' +
-'    ZeroClipboard.dispatch(eventName, args);' +
+'  requireFn([amdModuleId], function(zero) {' +
+'    assert.strictEqual(zero, ZeroClipboard);' +
+'    assert.strictEqual(eventName, "load");' +
+'    assert.deepEqual(args, { flashVersion: "MAC 11,0,0" });' +
+'    zero.dispatch(eventName, args);' +
 '  });' +
 '})("load", { flashVersion: "MAC 11,0,0" }, ' + JSON.stringify(_amdModuleId) + ');'
     );
-  },
+  });
 
-  "Test onLoad Event with CommonJS": function (test) {
-    test.expect(4);
+  test("Test onLoad Event with CommonJS", function(assert) {
+    assert.expect(4);
 
+    // Arrange
     // This is a special private variable inside of ZeroClipboard, so we can
     // only simulate its functionality here
     var _cjsModuleId = "zc";
 
     var requireFn = (function() {
       var cjsCache = {};
-      cjsCache[_cjsModuleId] = zeroClipboard;
+      cjsCache[_cjsModuleId] = ZeroClipboard;
       return function(id) {
         return cjsCache[id];
       };
     })();
 
-    var clip = new zeroClipboard();
-    clip.glue($("#d_clip_button"));
-
+    var clip = new ZeroClipboard();
+    var currentEl = document.getElementById("d_clip_button");
+    clip.glue(currentEl);
+    clip.setCurrent(currentEl);
     var id = clip.id;
 
     clip.on( "load", function(client, args) {
-      test.equal(client.id, id);
-      test.done();
+      // Assert
+      assert.strictEqual(client.id, id);
+      QUnit.start();
     } );
 
-    // fake load event
+    // Act
+    QUnit.stop();
     eval(
 '(function(eventName, args, cjsModuleId) {' +
-'  var ZeroClipboard = requireFn(cjsModuleId);' +
-'  test.equal(ZeroClipboard, zeroClipboard);' +
-'  test.equal(eventName, "load");' +
-'  test.deepEqual(args, { flashVersion: "MAC 11,0,0" });' +
-'  ZeroClipboard.dispatch(eventName, args);' +
+'  var zero = requireFn(cjsModuleId);' +
+'  assert.strictEqual(zero, ZeroClipboard);' +
+'  assert.strictEqual(eventName, "load");' +
+'  assert.deepEqual(args, { flashVersion: "MAC 11,0,0" });' +
+'  zero.dispatch(eventName, args);' +
 '})("load", { flashVersion: "MAC 11,0,0" }, ' + JSON.stringify(_cjsModuleId) + ');'
     );
-  }
+  });
 
-};
+})(QUnit.module, QUnit.test);
