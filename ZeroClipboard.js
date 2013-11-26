@@ -324,8 +324,8 @@
       container.style.width = "15px";
       container.style.height = "15px";
       container.style.zIndex = "9999";
-      container.innerHTML = html;
       document.body.appendChild(container);
+      container.innerHTML = html;
     }
     client.htmlBridge = container;
     flashBridge = document["global-zeroclipboard-flash-bridge"];

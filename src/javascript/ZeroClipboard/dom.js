@@ -62,8 +62,14 @@ var _bridge = function () {
     container.style.width = "15px";
     container.style.height = "15px";
     container.style.zIndex = "9999";
-    container.innerHTML = html;
+
+    // NOTE: Fixes https://github.com/zeroclipboard/zeroclipboard/issues/204
+    // Although many web developers will tell you that the following 2 lines should be switched to
+    // avoid unnecessary reflows, that is (a) not true in modern browsers, and (b) will actually
+    // BREAK this particular bit of code in oldIE (IE8, at least, if not IE7 as well). Something
+    // odd about oldIE and its parsing of plugin HTML....
     document.body.appendChild(container);
+    container.innerHTML = html;
   }
 
   client.htmlBridge = container;
