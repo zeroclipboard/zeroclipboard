@@ -1,4 +1,4 @@
-/*global ZeroClipboard, gluedElements */
+/*global ZeroClipboard, gluedElements, currentElement:true, flashState:true */
 
 "use strict";
 
@@ -12,6 +12,8 @@
       ZeroClipboard.detectFlashSupport = function() { return true; };
       ZeroClipboard.prototype._singleton = null;
       gluedElements.length = 0;
+      currentElement = null;
+      flashState = {};
     },
     teardown: function() {
       ZeroClipboard.detectFlashSupport = originalDetectFlashSupport;
@@ -25,6 +27,8 @@
         gluedElements.length = 0;
       }
       ZeroClipboard.prototype._singleton = null;
+      currentElement = null;
+      flashState = {};
     }
   });
 
@@ -238,7 +242,7 @@
     var id = clip.id;
 
     // Act (should auto-fire immediately but the handler will be invoked asynchronously)
-    clip.on( 'noFlash', function(client, text) {
+    clip.on( 'noFlash', function(client, args) {
       // Assert
       assert.strictEqual(client.id, id);
       QUnit.start();
@@ -254,7 +258,7 @@
     var currentEl = document.getElementById("d_clip_button");
     var id = clip.id;
     clip.glue(currentEl);
-    clip.on( 'wrongFlash', function(client, text) {
+    clip.on( 'wrongFlash', function(client, args) {
       // Assert
       assert.strictEqual(client.id, id);
       QUnit.start();
@@ -263,6 +267,69 @@
     // Act
     QUnit.stop();
     ZeroClipboard.dispatch("load", { flashVersion: "MAC 9,0,0" });
+  });
+
+  test("Test wrongFlash Event after first load", function(assert) {
+    assert.expect(1);
+
+    // Arrange
+    flashState["ZeroClipboard.swf"] = {
+      noflash: false,
+      wrongflash: true,
+      ready: false,
+      version: "MAC 9,0,0"
+    };
+    var clip = new ZeroClipboard();
+    var id = clip.id;
+
+    // Act (should auto-fire immediately but the handler will be invoked asynchronously)
+    clip.on( 'wrongFlash', function(client, args) {
+      // Assert
+      assert.strictEqual(client.id, id);
+      QUnit.start();
+    } );
+    QUnit.stop();
+  });
+
+  test("Test load Event", function(assert) {
+    assert.expect(1);
+
+    // Arrange
+    var clip = new ZeroClipboard();
+    var currentEl = document.getElementById("d_clip_button");
+    var id = clip.id;
+    clip.glue(currentEl);
+    clip.on( 'load', function(client, args) {
+      // Assert
+      assert.strictEqual(client.id, id);
+      QUnit.start();
+    } );
+
+    // Act
+    QUnit.stop();
+    ZeroClipboard.dispatch("load", { flashVersion: "WIN 11,9,0" });
+  });
+
+  test("Test load Event after first load", function(assert) {
+    assert.expect(1);
+
+    // Arrange
+    flashState["ZeroClipboard.swf"] = {
+      noflash: false,
+      wrongflash: false,
+      ready: true,
+      version: "WIN 11,9,0"
+    };
+    var clip = new ZeroClipboard();
+    var id = clip.id;
+
+    // Act (should auto-fire immediately but the handler will be invoked asynchronously)
+    clip.on( 'load', function(client, args) {
+      // Assert
+      assert.strictEqual(client.id, id);
+      QUnit.start();
+    } );
+    QUnit.stop();
   });
 
   test("Test mouseover and mouseout event", function(assert) {

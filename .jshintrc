@@ -5,6 +5,7 @@
   "trailing": true,
   "boss": true,
   "browser": true,
-  "node": true,
-  "multistr": true
+  "multistr": true,
+  "es3": true,
+  "es5": false
 }

@@ -1,3 +1,7 @@
+var currentElement,      // Keep track of the current element that is being hovered.
+    gluedElements = [],  // Watch glued elements so we don't double glue.
+    flashState = {};     // Keep track of the state of the Flash object(s).
+
 /*
  * Creates a new ZeroClipboard client. from an element, or array of elements.
  *
@@ -18,20 +22,29 @@ var ZeroClipboard = function (elements, options) {
   // set the defaults
   for (var kd in _defaults) this.options[kd] = _defaults[kd];
 
-  // overried the defaults
+  // override the defaults
   for (var ko in options) this.options[ko] = options[ko];
 
   // event handlers
   this.handlers = {};
 
-  // setup the flash->Javascript bridge
-  if (ZeroClipboard.detectFlashSupport()) _bridge();
+  // Flash status
+  if (!flashState.hasOwnProperty(this.options.moviePath)) {
+    flashState[this.options.moviePath] = {
+      noflash:    !ZeroClipboard.detectFlashSupport(),
+      wrongflash: false,
+      ready:      false,
+      version:    "0.0.0"
+    };
+  }
+
+  // Setup the Flash <-> JavaScript bridge
+  if (flashState[this.options.moviePath].noflash === false) {
+    _bridge();
+  }
 
 };
 
-
-var currentElement,      // Keep track of the current element that is being hovered.
-    gluedElements = [];  // Watch glued elements so we don't double glue.
 
 /*
  * Sets the current html object that the flash object should overlay.

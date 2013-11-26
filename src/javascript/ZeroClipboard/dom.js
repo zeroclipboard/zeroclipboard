@@ -55,7 +55,6 @@ var _bridge = function () {
     container = document.createElement("div");
     container.id = "global-zeroclipboard-html-bridge";
     container.setAttribute("class", "global-zeroclipboard-container");
-    container.setAttribute("data-clipboard-ready", false);
     container.style.position = "absolute";
     container.style.left = "0px";
     container.style.top = "-9999px";
@@ -102,15 +101,13 @@ ZeroClipboard.prototype.resetBridge = function () {
 };
 
 /*
- * Helper function to determine if the flash bridge is ready. Gets this info from
- * a data-clipboard-ready attribute on the global html element.
+ * Helper function to determine if the Flash bridge is ready. Gets this info from
+ * a per-bridge status tracker.
  *
- * returns true if the flash bridge is ready
+ * returns true if the Flash bridge is ready
  */
 ZeroClipboard.prototype.ready = function () {
-  // I don't want to eval() here
-  var ready = this.htmlBridge.getAttribute("data-clipboard-ready");
-  return ready === "true" || ready === true;
+  return flashState[this.options.moviePath].ready === true;
 };
 
 /*

@@ -21,6 +21,7 @@
   <script>
     var gluedElements = [],
         currentElement = null,
+        flashState = {},
         _zcCounter = 1;
     function ZeroClipboard(elements, options) {
       // If there's a client already, return the singleton
@@ -31,8 +32,19 @@
 
       this.options = QUnit.extend({
         hoverClass:  "zeroclipboard-is-hover",
-        activeClass: "zeroclipboard-is-active"
+        activeClass: "zeroclipboard-is-active",
+        moviePath:   "ZeroClipboard.swf"
       }, options);
+
+      if (!flashState.hasOwnProperty(this.options.moviePath)) {
+        flashState[this.options.moviePath] = {
+          noflash:    !ZeroClipboard.detectFlashSupport(),
+          wrongflash: false,
+          ready:      false,
+          version:    "0.0.0"
+        };
+      }
+
       this.handlers = {};
       this.htmlBridge = {
         style: {

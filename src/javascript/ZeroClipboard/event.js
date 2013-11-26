@@ -15,16 +15,34 @@ ZeroClipboard.dispatch = function (eventName, args) {
  */
 ZeroClipboard.prototype.on = function (eventName, func) {
   // add user event listener for event
-  // event types: load, queueStart, fileStart, fileComplete, queueComplete, progress, error, cancel
-  var events = eventName.toString().split(/\s/g);
-  for (var i = 0; i < events.length; i++) {
+  var events = eventName.toString().split(/\s/g),
+      added = {};
+  for (var i = 0, len = events.length; i < len; i++) {
     eventName = events[i].toLowerCase().replace(/^on/, '');
-    if (!this.handlers[eventName]) this.handlers[eventName] = func;
+    added[eventName] = true;
+    if (!this.handlers[eventName]) {
+      this.handlers[eventName] = func;
+    }
   }
 
-  // If we don't have flash, tell an adult
-  if (this.handlers.noflash && !ZeroClipboard.detectFlashSupport()) {
-    this.receiveEvent("onNoFlash", null);
+  // The following events must be memorized and fired immediately if relevant as they only occur
+  // once per Flash object load.
+
+  // If we don't have Flash, tell an adult
+  if (added.noflash && flashState[this.options.moviePath].noflash) {
+    this.receiveEvent("onNoFlash", {});
+  }
+  // If we have old Flash,
+  if (added.wrongflash && flashState[this.options.moviePath].wrongflash) {
+    this.receiveEvent("onWrongFlash", {
+      flashVersion: flashState[this.options.moviePath].version
+    });
+  }
+  // If the SWF was already loaded, we're à gogo!
+  if (added.load && flashState[this.options.moviePath].ready) {
+    this.receiveEvent("onLoad", {
+      flashVersion: flashState[this.options.moviePath].version
+    });
   }
 
   return this;
@@ -71,13 +89,22 @@ ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
   // special behavior for certain events
   switch (eventName) {
     case 'load':
-      // If the flash version is less than 10, throw event.
-      if (args && parseFloat(args.flashVersion.replace(",", ".").replace(/[^0-9\.]/gi, '')) < 10) {
-        this.receiveEvent("onWrongFlash", { flashVersion: args.flashVersion });
-        return;
+      if (args && args.flashVersion) {
+        // If the flash version is less than 10, throw event.
+        if (!_isFlashVersionSupported(args.flashVersion)) {
+          this.receiveEvent("onWrongFlash", { flashVersion: args.flashVersion });
+          return;
+        }
+        flashState[this.options.moviePath].ready = true;
+        flashState[this.options.moviePath].version = args.flashVersion;
       }
+      break;
 
-      this.htmlBridge.setAttribute("data-clipboard-ready", true);
+    case 'wrongflash':
+      if (args && args.flashVersion && !_isFlashVersionSupported(args.flashVersion)) {
+        flashState[this.options.moviePath].wrongflash = true;
+        flashState[this.options.moviePath].version = args.flashVersion;
+      }
       break;
 
     case 'mouseover':
@@ -185,3 +212,8 @@ ZeroClipboard.prototype.unglue = function (elements) {
 
   return this;
 };
+
+
+function _isFlashVersionSupported(flashVersion) {
+  return parseFloat(flashVersion.replace(/,/g, ".").replace(/[^0-9\.]/g, "")) >= 10.0;
+}

@@ -217,6 +217,7 @@
       func.call(element, instance, args);
     }
   };
+  var currentElement, gluedElements = [], flashState = {};
   var ZeroClipboard = function(elements, options) {
     if (elements) (ZeroClipboard.prototype._singleton || this).glue(elements);
     if (ZeroClipboard.prototype._singleton) return ZeroClipboard.prototype._singleton;
@@ -225,9 +226,18 @@
     for (var kd in _defaults) this.options[kd] = _defaults[kd];
     for (var ko in options) this.options[ko] = options[ko];
     this.handlers = {};
-    if (ZeroClipboard.detectFlashSupport()) _bridge();
+    if (!flashState.hasOwnProperty(this.options.moviePath)) {
+      flashState[this.options.moviePath] = {
+        noflash: !ZeroClipboard.detectFlashSupport(),
+        wrongflash: false,
+        ready: false,
+        version: "0.0.0"
+      };
+    }
+    if (flashState[this.options.moviePath].noflash === false) {
+      _bridge();
+    }
   };
-  var currentElement, gluedElements = [];
   ZeroClipboard.prototype.setCurrent = function(element) {
     currentElement = element;
     this.reposition();
@@ -317,7 +327,6 @@
       container = document.createElement("div");
       container.id = "global-zeroclipboard-html-bridge";
       container.setAttribute("class", "global-zeroclipboard-container");
-      container.setAttribute("data-clipboard-ready", false);
       container.style.position = "absolute";
       container.style.left = "0px";
       container.style.top = "-9999px";
@@ -348,8 +357,7 @@
     return this;
   };
   ZeroClipboard.prototype.ready = function() {
-    var ready = this.htmlBridge.getAttribute("data-clipboard-ready");
-    return ready === "true" || ready === true;
+    return flashState[this.options.moviePath].ready === true;
   };
   ZeroClipboard.prototype.reposition = function() {
     if (!currentElement) return false;
@@ -366,13 +374,26 @@
     ZeroClipboard.prototype._singleton.receiveEvent(eventName, args);
   };
   ZeroClipboard.prototype.on = function(eventName, func) {
-    var events = eventName.toString().split(/\s/g);
-    for (var i = 0; i < events.length; i++) {
+    var events = eventName.toString().split(/\s/g), added = {};
+    for (var i = 0, len = events.length; i < len; i++) {
       eventName = events[i].toLowerCase().replace(/^on/, "");
-      if (!this.handlers[eventName]) this.handlers[eventName] = func;
+      added[eventName] = true;
+      if (!this.handlers[eventName]) {
+        this.handlers[eventName] = func;
+      }
     }
-    if (this.handlers.noflash && !ZeroClipboard.detectFlashSupport()) {
-      this.receiveEvent("onNoFlash", null);
+    if (added.noflash && flashState[this.options.moviePath].noflash) {
+      this.receiveEvent("onNoFlash", {});
+    }
+    if (added.wrongflash && flashState[this.options.moviePath].wrongflash) {
+      this.receiveEvent("onWrongFlash", {
+        flashVersion: flashState[this.options.moviePath].version
+      });
+    }
+    if (added.load && flashState[this.options.moviePath].ready) {
+      this.receiveEvent("onLoad", {
+        flashVersion: flashState[this.options.moviePath].version
+      });
     }
     return this;
   };
@@ -396,13 +417,23 @@
     var performCallbackAsync = true;
     switch (eventName) {
      case "load":
-      if (args && parseFloat(args.flashVersion.replace(",", ".").replace(/[^0-9\.]/gi, "")) < 10) {
-        this.receiveEvent("onWrongFlash", {
-          flashVersion: args.flashVersion
-        });
-        return;
+      if (args && args.flashVersion) {
+        if (!_isFlashVersionSupported(args.flashVersion)) {
+          this.receiveEvent("onWrongFlash", {
+            flashVersion: args.flashVersion
+          });
+          return;
+        }
+        flashState[this.options.moviePath].ready = true;
+        flashState[this.options.moviePath].version = args.flashVersion;
       }
-      this.htmlBridge.setAttribute("data-clipboard-ready", true);
+      break;
+
+     case "wrongflash":
+      if (args && args.flashVersion && !_isFlashVersionSupported(args.flashVersion)) {
+        flashState[this.options.moviePath].wrongflash = true;
+        flashState[this.options.moviePath].version = args.flashVersion;
+      }
       break;
 
      case "mouseover":
@@ -473,6 +504,9 @@
     }
     return this;
   };
+  function _isFlashVersionSupported(flashVersion) {
+    return parseFloat(flashVersion.replace(/,/g, ".").replace(/[^0-9\.]/g, "")) >= 10;
+  }
   if (typeof define === "function" && define.amd) {
     define([ "require", "exports", "module" ], function(require, exports, module) {
       _amdModuleId = module && module.id || null;
