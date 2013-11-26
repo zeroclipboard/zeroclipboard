@@ -57,7 +57,7 @@ var _bridge = function () {
     container.setAttribute("class", "global-zeroclipboard-container");
     container.setAttribute("data-clipboard-ready", false);
     container.style.position = "absolute";
-    container.style.left = "-9999px";
+    container.style.left = "0px";
     container.style.top = "-9999px";
     container.style.width = "15px";
     container.style.height = "15px";
@@ -87,12 +87,15 @@ var _bridge = function () {
  * returns object instance
  */
 ZeroClipboard.prototype.resetBridge = function () {
-  this.htmlBridge.style.left = "-9999px";
-  this.htmlBridge.style.top = "-9999px";
-  this.htmlBridge.removeAttribute("title");
-  this.htmlBridge.removeAttribute("data-clipboard-text");
-  _removeClass(currentElement, this.options.activeClass);
-  currentElement = null;
+  if (this.htmlBridge) {
+    this.htmlBridge.style.left = "0px";
+    this.htmlBridge.style.top = "-9999px";
+    this.htmlBridge.removeAttribute("title");
+  }
+  if (currentElement) {
+    _removeClass(currentElement, this.options.activeClass);
+    currentElement = null;
+  }
   this.options.text = null;
 
   return this;
