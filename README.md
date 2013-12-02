@@ -60,6 +60,24 @@ Works in IE7+ and all of the evergreen browsers.
 
 see [CONTRIBUTING.md](CONTRIBUTING.md)
 
+## Known issues
+
+- Can not have different handlers for different instances of ZeroClipboard ([#90](https://github.com/zeroclipboard/zeroclipboard/issues/90))
+
+```js
+var clip1 = new ZeroClipboard(document.getElementById("copy-button-1"));
+clip1.on('complete', function() {
+  console.log('Copy button 1');
+});
+var clip2 = new ZeroClipboard(document.getElementById("copy-button-2"));
+clip2.on('complete', function() {
+  console.log('Copy button 2');
+});
+
+// click on copy-button-1 -> "Copy button 1"
+// click on copy-button-2 -> "Copy button 1"
+```
+
 ## Releases
 
 Starting with version [1.1.7](https://github.com/zeroclipboard/zeroclipboard/releases/tag/v1.1.7), ZeroClipboard uses [semantic versioning](http://semver.org/).
