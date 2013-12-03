@@ -17,12 +17,11 @@
     // Prevent against Firefox/Firebug failing the global pollution check
     var getInterface = null;
   </script>
+  <script src="../src/javascript/ZeroClipboard/state.js"></script>
   <script src="../src/javascript/ZeroClipboard/utils.js"></script>
+  <script src="../src/javascript/ZeroClipboard/flash.js"></script>
   <script>
-    var gluedElements = [],
-        currentElement = null,
-        flashState = {},
-        _zcCounter = 1;
+    var _zcCounter = 1;
     function ZeroClipboard(elements, options) {
       // If there's a client already, return the singleton
       if (ZeroClipboard.prototype._singleton) {
@@ -36,12 +35,12 @@
         moviePath:   "ZeroClipboard.swf"
       }, options);
 
-      if (!flashState.hasOwnProperty(this.options.moviePath)) {
-        flashState[this.options.moviePath] = {
-          noflash:    !ZeroClipboard.detectFlashSupport(),
-          wrongflash: false,
-          ready:      false,
-          version:    "0.0.0"
+      if (typeof flashState.global.noflash !== "boolean") {
+        flashState.global.noflash = !_detectFlashSupport();
+      }
+      if (!flashState.clients.hasOwnProperty(this.options.moviePath)) {
+        flashState.clients[this.options.moviePath] = {
+          ready: false
         };
       }
 

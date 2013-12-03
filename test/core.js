@@ -4,17 +4,13 @@
 
 (function(module, test) {
 
-  var mimeType, ax, originalMoviePath;
+  var originalMoviePath;
 
   module("core", {
     setup: function() {
-      mimeType = window.navigator.mimeTypes["application/x-shockwave-flash"];
-      ax = window.ActiveXObject;
       originalMoviePath = _defaults.moviePath;
     },
     teardown: function() {
-      window.navigator.mimeTypes["application/x-shockwave-flash"] = mimeType;
-      window.ActiveXObject = ax;
       ZeroClipboard.setDefaults({
         moviePath: originalMoviePath
       });
@@ -50,28 +46,6 @@
     clip.options.trustedOrigins = "google.com";
     // Test that trustedOrigins is now defined as the new value
     assert.strictEqual(clip.options.trustedOrigins, "google.com");
-  });
-
-  test("Detecting no Flash", function(assert) {
-    assert.expect(1);
-
-    // Arrange
-    window.navigator.mimeTypes["application/x-shockwave-flash"] = undefined;
-    window.ActiveXObject = undefined;
-
-    // Act & Assert
-    assert.strictEqual(ZeroClipboard.detectFlashSupport(), false);
-  });
-
-  test("Detecting has Flash mimetype", function(assert) {
-    assert.expect(1);
-
-    // Arrange
-    window.navigator.mimeTypes["application/x-shockwave-flash"] = {};
-    window.ActiveXObject = function() { };
-
-    // Act & Assert
-    assert.strictEqual(ZeroClipboard.detectFlashSupport(), true);
   });
 
   test("Setting default options", function(assert) {

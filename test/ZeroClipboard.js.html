@@ -17,6 +17,11 @@
     // Prevent against Firefox/Firebug failing the global pollution check
     var getInterface = null;
 
+    // Prevent against failing the global pollution check in all browsers other than IE
+    if (typeof window.ActiveXObject === "undefined") {
+      window.ActiveXObject = null;
+    }
+
     // Prevent against Flash's ExternalInterface failing the global pollution check (seems to be only in IE < 11)
     var __flash__arrayToXML = null,
         __flash__argumentsToXML = null,

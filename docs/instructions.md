@@ -65,12 +65,23 @@ var _defaults = {
   allowScriptAccess: "sameDomain",               // SWF outbound scripting policy
   useNoCache:        true,                       // Include a nocache query parameter on requests for the SWF
   forceHandCursor:   false,                      // Forcibly set the hand cursor ("pointer") for all glued elements
-  zIndex:            999999999                   // The z-index used by the Flash object. Max value (32-bit): 2147483647
+  zIndex:            999999999,                  // The z-index used by the Flash object. Max value (32-bit): 2147483647
+  debug:             true                        // Debug enabled: send `console` messages with deprecation warnings, etc.
 };
 ```
 You can override the defaults using `ZeroClipboard.setDefaults({ moviePath: "new/path" })` before you create any clients.
 
-You can also set the options when creating a new client by passing an optional json object `new ZeroClipboard($("#d_clip_button"), { moviePath: "new/path" })`
+You can also set the options when creating a new client by passing an optional "options" object, e.g.  
+```js
+var clip = new ZeroClipboard($("#d_clip_button"), { moviePath: "new/path" });`
+```
+
+Whenever possible, we recommend that you change the defaults rather than changing options per client. This works out
+better in most situations as:
+ 1. Some options apply outside of `ZeroClipboard` instances, e.g. `debug` currently affects some static methods.
+ 2. If you have multiple clients glued to a shared element, having per-client options can result in confusing effects
+    when that shared element is being activated, e.g. differing values for `zIndex`, `forceHandCursor`, `hoverClass`,
+    `activeClass`, etc.
 
 
 ### A note on the `trustedOrigins` option
@@ -556,6 +567,12 @@ decisions of how _your_ site should handle each of these situations.
 
 
 # Deprecations
+
+By default, ZeroClipboard will issue deprecation warnings to the developer `console`. To disable this, set the
+following option:  
+```js
+ZeroClipboard.setDefaults({ debug: false });`
+```
 
 The current list of deprecations includes:  
  - `ZeroClipboard.prototype.setHandCursor` &rarr; as of [v1.2.0], removing in [v2.0.0]

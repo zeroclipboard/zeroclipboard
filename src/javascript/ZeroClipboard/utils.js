@@ -389,3 +389,24 @@ var _getSafeZIndex = function (val) {
 
   return zIndex || 0;
 };
+
+
+/*
+ * private _deprecationWarning
+ * If `console` is available, issue a `console.warn`/`console.log` warning against the use of
+ * deprecated methods.
+ *
+ * returns void
+ */
+var _deprecationWarning = function(deprecatedApiName, debugEnabled) {
+  if (deprecatedApiName && debugEnabled !== false && typeof console !== "undefined" && console && (console.warn || console.log)) {
+    var deprecationWarning = "`" + deprecatedApiName + "` is deprecated. See docs for more info:\n" +
+          "    https://github.com/zeroclipboard/zeroclipboard/blob/master/docs/instructions.md#deprecations";
+    if (console.warn) {
+      console.warn(deprecationWarning);
+    }
+    else {
+      console.log(deprecationWarning);
+    }
+  }
+};

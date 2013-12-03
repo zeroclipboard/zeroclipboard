@@ -107,17 +107,15 @@ ZeroClipboard.prototype.resetBridge = function () {
  * returns true if the Flash bridge is ready
  */
 ZeroClipboard.prototype.ready = function () {
-  return flashState[this.options.moviePath].ready === true;
+  return flashState.clients[this.options.moviePath].ready === true;
 };
 
 /*
- * @deprecated in [v1.2.0], slated for removal in [v2.0.0]. See docs for more info.
- *
- * Reposition the flash object, if the page size changes.
+ * Reposition the Flash object to cover the current element being hovered over.
  *
  * returns object instance
  */
-ZeroClipboard.prototype.reposition = function () {
+var _reposition = function () {
 
   // If there is no `currentElement`, skip it
   if (currentElement) {

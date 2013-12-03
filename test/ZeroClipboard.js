@@ -4,15 +4,20 @@
 
 (function(module, test) {
 
-  var originalDetectFlashSupport;
+  var mimeType, ax;
 
   module("ZeroClipboard (built) - Client", {
     setup: function() {
-      originalDetectFlashSupport = ZeroClipboard.detectFlashSupport;
-      ZeroClipboard.detectFlashSupport = function() { return true; };
+      // Store
+      mimeType = window.navigator.mimeTypes["application/x-shockwave-flash"];
+      ax = window.ActiveXObject;
+      // Modify
+      window.navigator.mimeTypes["application/x-shockwave-flash"] = {};
+      window.ActiveXObject = function() { };
     },
     teardown: function() {
-      ZeroClipboard.detectFlashSupport = originalDetectFlashSupport;
+      window.navigator.mimeTypes["application/x-shockwave-flash"] = mimeType;
+      window.ActiveXObject = ax;
       ZeroClipboard.destroy();
     }
   });
@@ -257,11 +262,17 @@
 
 
   module("ZeroClipboard (built) - Core", {
-    setup: function(assert) {
-      originalDetectFlashSupport = ZeroClipboard.detectFlashSupport;
+    setup: function() {
+      // Store
+      mimeType = window.navigator.mimeTypes["application/x-shockwave-flash"];
+      ax = window.ActiveXObject;
+      // Modify
+      window.navigator.mimeTypes["application/x-shockwave-flash"] = {};
+      window.ActiveXObject = function() { };
     },
-    teardown: function(assert) {
-      ZeroClipboard.detectFlashSupport = originalDetectFlashSupport;
+    teardown: function() {
+      window.navigator.mimeTypes["application/x-shockwave-flash"] = mimeType;
+      window.ActiveXObject = ax;
       ZeroClipboard.destroy();
     }
   });
@@ -287,11 +298,17 @@
 
 
   module("ZeroClipboard (built) - DOM", {
-    setup: function(assert) {
-      originalDetectFlashSupport = ZeroClipboard.detectFlashSupport;
+    setup: function() {
+      // Store
+      mimeType = window.navigator.mimeTypes["application/x-shockwave-flash"];
+      ax = window.ActiveXObject;
+      // Modify
+      window.navigator.mimeTypes["application/x-shockwave-flash"] = {};
+      window.ActiveXObject = function() { };
     },
-    teardown: function(assert) {
-      ZeroClipboard.detectFlashSupport = originalDetectFlashSupport;
+    teardown: function() {
+      window.navigator.mimeTypes["application/x-shockwave-flash"] = mimeType;
+      window.ActiveXObject = ax;
       ZeroClipboard.destroy();
     }
   });

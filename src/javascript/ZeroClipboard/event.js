@@ -1,11 +1,21 @@
 /*
- * Bridge from the flash object back to the javascript
+ * Bridge from the Flash object back to the JavaScript
  *
  * returns nothing
  */
 ZeroClipboard.dispatch = function (eventName, args) {
-  // receive event from flash movie, send to client
-  ZeroClipboard.prototype._singleton.receiveEvent(eventName, args);
+  if (typeof eventName === "string" && eventName) {
+    // TODO: Update this to get an array of clients that have been glued to the `currentElement`
+    var client = ZeroClipboard.prototype._singleton;
+
+    // Sanitize the event name
+    var cleanEventName = eventName.toLowerCase().replace(/^on/, "");
+
+    // receive event from Flash movie, send to client
+    if (cleanEventName) {
+      _receiveEvent.call(client, cleanEventName, args);
+    }
+  }
 };
 
 /*
@@ -29,19 +39,19 @@ ZeroClipboard.prototype.on = function (eventName, func) {
   // once per Flash object load.
 
   // If we don't have Flash, tell an adult
-  if (added.noflash && flashState[this.options.moviePath].noflash) {
-    this.receiveEvent("onNoFlash", {});
+  if (added.noflash && flashState.global.noflash) {
+    _receiveEvent.call(this, "onNoFlash", {});
   }
   // If we have old Flash,
-  if (added.wrongflash && flashState[this.options.moviePath].wrongflash) {
-    this.receiveEvent("onWrongFlash", {
-      flashVersion: flashState[this.options.moviePath].version
+  if (added.wrongflash && flashState.global.wrongflash) {
+    _receiveEvent.call(this, "onWrongFlash", {
+      flashVersion: flashState.global.version
     });
   }
   // If the SWF was already loaded, we're à gogo!
-  if (added.load && flashState[this.options.moviePath].ready) {
-    this.receiveEvent("onLoad", {
-      flashVersion: flashState[this.options.moviePath].version
+  if (added.load && flashState.clients[this.options.moviePath].ready) {
+    _receiveEvent.call(this, "onLoad", {
+      flashVersion: flashState.global.version
     });
   }
 
@@ -73,13 +83,11 @@ ZeroClipboard.prototype.off = function (eventName, func) {
 ZeroClipboard.prototype.removeEventListener = ZeroClipboard.prototype.off;
 
 /*
- * @deprecated in [v1.2.0], slated for removal from the public API in [v2.0.0]. See docs for more info.
- *
  * Receive an event for a specific client.
  *
  * returns nothing
  */
-ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
+var _receiveEvent = function (eventName, args) {
   // receive event from flash
   eventName = eventName.toString().toLowerCase().replace(/^on/, '');
 
@@ -92,18 +100,18 @@ ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
       if (args && args.flashVersion) {
         // If the flash version is less than 10, throw event.
         if (!_isFlashVersionSupported(args.flashVersion)) {
-          this.receiveEvent("onWrongFlash", { flashVersion: args.flashVersion });
+          _receiveEvent.call(this, "onWrongFlash", { flashVersion: args.flashVersion });
           return;
         }
-        flashState[this.options.moviePath].ready = true;
-        flashState[this.options.moviePath].version = args.flashVersion;
+        flashState.clients[this.options.moviePath].ready = true;
+        flashState.global.version = args.flashVersion;
       }
       break;
 
     case 'wrongflash':
       if (args && args.flashVersion && !_isFlashVersionSupported(args.flashVersion)) {
-        flashState[this.options.moviePath].wrongflash = true;
-        flashState[this.options.moviePath].version = args.flashVersion;
+        flashState.global.wrongflash = true;
+        flashState.global.version = args.flashVersion;
       }
       break;
 

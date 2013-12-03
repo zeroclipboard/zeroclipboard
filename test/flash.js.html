@@ -16,14 +16,15 @@
 
     // Prevent against Firefox/Firebug failing the global pollution check
     var getInterface = null;
+
+    // Prevent against failing the global pollution check in all browsers other than IE
+    if (typeof window.ActiveXObject === "undefined") {
+      window.ActiveXObject = null;
+    }
   </script>
-  <script>
-    var ZeroClipboard = function(elements, options) {
-      this.options = QUnit.extend(QUnit.extend({}, _defaults), options);
-    };
-  </script>
-  <script src="../src/javascript/ZeroClipboard/core.js"></script>
-  <script src="core.js"></script>
+  <script src="../src/javascript/ZeroClipboard/state.js"></script>
+  <script src="../src/javascript/ZeroClipboard/flash.js"></script>
+  <script src="flash.js"></script>
 </head>
 <body>
   <div id="qunit"></div>

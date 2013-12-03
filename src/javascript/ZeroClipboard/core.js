@@ -7,9 +7,10 @@ var _defaults = {
   hoverClass:        "zeroclipboard-is-hover",   // The class used to hover over the object
   activeClass:       "zeroclipboard-is-active",  // The class used to set object active
   allowScriptAccess: "sameDomain",               // SWF outbound scripting policy
-  useNoCache:        true,                       // Ability to turn off Flash cache hack for IE
+  useNoCache:        true,                       // Include a nocache query parameter on requests for the SWF
   forceHandCursor:   false,                      // Forcibly set the hand cursor ("pointer") for all glued elements
-  zIndex:            999999999                   // The z-index used by the Flash object. Max value (32-bit): 2147483647
+  zIndex:            999999999,                  // The z-index used by the Flash object. Max value (32-bit): 2147483647
+  debug:             true                        // Debug enabled: send `console` messages with deprecation warnings, etc.
 };
 
 /*
@@ -42,32 +43,4 @@ ZeroClipboard.destroy = function () {
     // delete the client object
     delete ZeroClipboard.prototype._singleton;
   }
-};
-
-/*
- * @deprecated in [v1.2.0], slated for removal from the public API in [v2.0.0]. See docs for more info.
- *
- * Simple Flash Detection
- *
- * returns true if Flash is detected
- */
-ZeroClipboard.detectFlashSupport = function () {
-  var hasFlash = false;
-
-  // IE
-  if (typeof ActiveXObject === "function") {
-    try {
-      if (new ActiveXObject("ShockwaveFlash.ShockwaveFlash")) {
-        hasFlash = true;
-      }
-    }
-    catch (error) {}
-  }
-
-  // Every other browser
-  if (!hasFlash && navigator.mimeTypes["application/x-shockwave-flash"]) {
-    hasFlash = true;
-  }
-
-  return hasFlash;
 };

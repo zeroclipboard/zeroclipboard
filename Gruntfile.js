@@ -38,11 +38,14 @@ module.exports = function(grunt) {
         src: [
           'src/meta/source-banner.tmpl',
           'src/javascript/start.js',
+          'src/javascript/ZeroClipboard/state.js',
           'src/javascript/ZeroClipboard/utils.js',
           'src/javascript/ZeroClipboard/client.js',
+          'src/javascript/ZeroClipboard/flash.js',
           'src/javascript/ZeroClipboard/core.js',
           'src/javascript/ZeroClipboard/dom.js',
           'src/javascript/ZeroClipboard/event.js',
+          'src/javascript/ZeroClipboard/deprecated.js',
           'src/javascript/end.js'
         ],
         dest: 'ZeroClipboard.js'

@@ -1,22 +1,32 @@
-/*global ZeroClipboard, gluedElements, currentElement:true, flashState:true */
+/*global ZeroClipboard, gluedElements, currentElement:true, flashState:true, _detectFlashSupport:true */
 
 "use strict";
 
 (function(module, test) {
 
-  var originalDetectFlashSupport;
+  var originalDetectFlashSupport, originalFlashState;
 
   module("events", {
     setup: function() {
-      originalDetectFlashSupport = ZeroClipboard.detectFlashSupport;
-      ZeroClipboard.detectFlashSupport = function() { return true; };
+      // Store
+      originalDetectFlashSupport = _detectFlashSupport;
+      originalFlashState = QUnit.extend({}, flashState);
+      // Modify
+      _detectFlashSupport = function() { return true; };
       ZeroClipboard.prototype._singleton = null;
       gluedElements.length = 0;
       currentElement = null;
-      flashState = {};
+      flashState = {
+        global: {
+          noflash: null,
+          wrongflash: null,
+          version: "0.0.0"
+        },
+        clients: {}
+      };
     },
     teardown: function() {
-      ZeroClipboard.detectFlashSupport = originalDetectFlashSupport;
+      _detectFlashSupport = originalDetectFlashSupport;
       if (gluedElements && "length" in gluedElements) {
         if (gluedElements.length) {
           var destroyer = new ZeroClipboard();
@@ -28,7 +38,7 @@
       }
       ZeroClipboard.prototype._singleton = null;
       currentElement = null;
-      flashState = {};
+      flashState = originalFlashState;
     }
   });
 
@@ -237,7 +247,7 @@
     assert.expect(1);
 
     // Arrange
-    ZeroClipboard.detectFlashSupport = function() { return false; };
+    _detectFlashSupport = function() { return false; };
     var clip = new ZeroClipboard();
     var id = clip.id;
 
@@ -273,11 +283,11 @@
     assert.expect(1);
 
     // Arrange
-    flashState["ZeroClipboard.swf"] = {
-      noflash: false,
-      wrongflash: true,
-      ready: false,
-      version: "MAC 9,0,0"
+    flashState.global.noflash = false;
+    flashState.global.wrongflash = true;
+    flashState.global.version = "MAC 9,0,0";
+    flashState.clients["ZeroClipboard.swf"] = {
+      ready: false
     };
     var clip = new ZeroClipboard();
     var id = clip.id;
@@ -314,11 +324,11 @@
     assert.expect(1);
 
     // Arrange
-    flashState["ZeroClipboard.swf"] = {
-      noflash: false,
-      wrongflash: false,
-      ready: true,
-      version: "WIN 11,9,0"
+    flashState.global.noflash = false;
+    flashState.global.wrongflash = false;
+    flashState.global.version = "WIN 11,9,0";
+    flashState.clients["ZeroClipboard.swf"] = {
+      ready: true
     };
     var clip = new ZeroClipboard();
     var id = clip.id;

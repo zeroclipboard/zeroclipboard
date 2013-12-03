@@ -1,7 +1,3 @@
-var currentElement,      // Keep track of the current element that is being hovered.
-    gluedElements = [],  // Watch glued elements so we don't double glue.
-    flashState = {};     // Keep track of the state of the Flash object(s).
-
 /*
  * Creates a new ZeroClipboard client. from an element, or array of elements.
  *
@@ -29,17 +25,17 @@ var ZeroClipboard = function (elements, options) {
   this.handlers = {};
 
   // Flash status
-  if (!flashState.hasOwnProperty(this.options.moviePath)) {
-    flashState[this.options.moviePath] = {
-      noflash:    !ZeroClipboard.detectFlashSupport(),
-      wrongflash: false,
-      ready:      false,
-      version:    "0.0.0"
+  if (typeof flashState.global.noflash !== "boolean") {
+    flashState.global.noflash = !_detectFlashSupport();
+  }
+  if (!flashState.clients.hasOwnProperty(this.options.moviePath)) {
+    flashState.clients[this.options.moviePath] = {
+      ready: false
     };
   }
 
   // Setup the Flash <-> JavaScript bridge
-  if (flashState[this.options.moviePath].noflash === false) {
+  if (flashState.global.noflash === false) {
     _bridge();
   }
 
@@ -58,7 +54,7 @@ ZeroClipboard.prototype.setCurrent = function (element) {
   // What element is current
   currentElement = element;
 
-  this.reposition();
+  _reposition.call(this);
 
   // If the dom element has a title
   var titleAttr = element.getAttribute("title");
@@ -106,22 +102,6 @@ ZeroClipboard.prototype.setTitle = function (newTitle) {
  */
 ZeroClipboard.prototype.setSize = function (width, height) {
   if (this.ready()) this.flashBridge.setSize(width, height);
-
-  return this;
-};
-
-/*
- * @deprecated in [v1.2.0], slated for removal in [v2.0.0]. See docs for alternatives.
- *
- * Sends a signal to the flash object to display the hand cursor if true.
- * Updates the value of the `forceHandCursor` option.
- *
- * returns object instance
- */
-ZeroClipboard.prototype.setHandCursor = function (enabled) {
-  enabled = typeof enabled === "boolean" ? enabled : !!enabled;
-  _setHandCursor.call(this, enabled);
-  this.options.forceHandCursor = enabled;
 
   return this;
 };
