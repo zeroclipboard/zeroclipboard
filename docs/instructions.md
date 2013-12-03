@@ -64,12 +64,13 @@ var _defaults = {
   activeClass:       "zeroclipboard-is-active",  // The class used to set object active
   allowScriptAccess: "sameDomain",               // SWF outbound scripting policy
   useNoCache:        true,                       // Include a nocache query parameter on requests for the SWF
-  forceHandCursor:   false                       // Forcibly set the hand cursor ("pointer") for all glued elements
+  forceHandCursor:   false,                      // Forcibly set the hand cursor ("pointer") for all glued elements
+  zIndex:            999999999                   // The z-index used by the Flash object. Max value (32-bit): 2147483647
 };
 ```
 You can override the defaults using `ZeroClipboard.setDefaults({ moviePath: "new/path" })` before you create any clients.
 
-You can also set the options when creating a new client by passing an optional json object `new ZeroClipboard($("#d_clip_button"), { moviePath: "new/path", text: "Copy me!" })`
+You can also set the options when creating a new client by passing an optional json object `new ZeroClipboard($("#d_clip_button"), { moviePath: "new/path" })`
 
 
 ### A note on the `trustedOrigins` option

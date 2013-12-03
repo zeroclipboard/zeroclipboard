@@ -203,22 +203,15 @@ var _getZoomFactor = function () {
  *
  * returns json of object's position, height, width, and zIndex
  */
-var _getDOMObjectPosition = function (obj) {
+var _getDOMObjectPosition = function (obj, defaultZIndex) {
   // get absolute coordinates for dom element
   var info = {
     left:   0,
     top:    0,
     width:  0,
     height: 0,
-    zIndex: 999999999  /* Max value (32-bit): 2147483647 */
+    zIndex: _getSafeZIndex(defaultZIndex) - 1
   };
-
-
-  var zi = _getStyle(obj, "z-index");
-  // float just above object, or default zIndex if dom element isn't set
-  if (zi && zi !== "auto") {
-    info.zIndex = parseInt(zi, 10);
-  }
 
   // Use getBoundingClientRect where available (almost everywhere).
   // See: http://www.quirksmode.org/dom/w3c_cssom.html
@@ -356,7 +349,6 @@ var _prepGlue = function (elements) {
  *
  * returns nothing
  */
-
 var _dispatchCallback = function (func, element, instance, args, async) {
   if (async) {
     window.setTimeout(function () {
@@ -365,4 +357,35 @@ var _dispatchCallback = function (func, element, instance, args, async) {
   } else {
     func.call(element, instance, args);
   }
+};
+
+
+/*
+ * private _getSafeZIndex
+ * Used to get a safe and numeric value for `zIndex`
+ *
+ * returns an integer greater than 0
+ */
+var _getSafeZIndex = function (val) {
+  var zIndex, tmp;
+
+  if (val) {
+    if (typeof val === "number" && val > 0) {
+      zIndex = val;
+    }
+    else if (typeof val === "string" && (tmp = parseInt(val, 10)) && !isNaN(tmp) && tmp > 0) {
+      zIndex = tmp;
+    }
+  }
+
+  if (!zIndex) {
+    if (typeof _defaults.zIndex === "number" && _defaults.zIndex > 0) {
+      zIndex = _defaults.zIndex;
+    }
+    else if (typeof _defaults.zIndex === "string" && (tmp = parseInt(_defaults.zIndex, 10)) && !isNaN(tmp) && tmp > 0) {
+      zIndex = tmp;
+    }
+  }
+
+  return zIndex || 0;
 };

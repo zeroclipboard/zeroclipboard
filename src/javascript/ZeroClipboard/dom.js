@@ -60,7 +60,7 @@ var _bridge = function () {
     container.style.top = "-9999px";
     container.style.width = "15px";
     container.style.height = "15px";
-    container.style.zIndex = "9999";
+    container.style.zIndex = "" + _getSafeZIndex(client.options.zIndex);
 
     // NOTE: Fixes https://github.com/zeroclipboard/zeroclipboard/issues/204
     // Although many web developers will tell you that the following 2 lines should be switched to
@@ -119,19 +119,19 @@ ZeroClipboard.prototype.ready = function () {
  */
 ZeroClipboard.prototype.reposition = function () {
 
-  // If there is no currentElement return
-  if (!currentElement) return false;
+  // If there is no `currentElement`, skip it
+  if (currentElement) {
+    var pos = _getDOMObjectPosition(currentElement, this.options.zIndex);
 
-  var pos = _getDOMObjectPosition(currentElement);
+    // new css
+    this.htmlBridge.style.top    = pos.top + "px";
+    this.htmlBridge.style.left   = pos.left + "px";
+    this.htmlBridge.style.width  = pos.width + "px";
+    this.htmlBridge.style.height = pos.height + "px";
+    this.htmlBridge.style.zIndex = pos.zIndex + 1;
 
-  // new css
-  this.htmlBridge.style.top    = pos.top + "px";
-  this.htmlBridge.style.left   = pos.left + "px";
-  this.htmlBridge.style.width  = pos.width + "px";
-  this.htmlBridge.style.height = pos.height + "px";
-  this.htmlBridge.style.zIndex = pos.zIndex + 1;
-
-  this.setSize(pos.width, pos.height);
+    this.setSize(pos.width, pos.height);
+  }
 
   return this;
 };

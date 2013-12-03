@@ -8,7 +8,8 @@ var _defaults = {
   activeClass:       "zeroclipboard-is-active",  // The class used to set object active
   allowScriptAccess: "sameDomain",               // SWF outbound scripting policy
   useNoCache:        true,                       // Ability to turn off Flash cache hack for IE
-  forceHandCursor:   false                       // Forcibly set the hand cursor ("pointer") for all glued elements
+  forceHandCursor:   false,                      // Forcibly set the hand cursor ("pointer") for all glued elements
+  zIndex:            999999999                   // The z-index used by the Flash object. Max value (32-bit): 2147483647
 };
 
 /*

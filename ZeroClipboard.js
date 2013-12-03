@@ -124,18 +124,14 @@
     }
     return zoomFactor;
   };
-  var _getDOMObjectPosition = function(obj) {
+  var _getDOMObjectPosition = function(obj, defaultZIndex) {
     var info = {
       left: 0,
       top: 0,
       width: 0,
       height: 0,
-      zIndex: 999999999
+      zIndex: _getSafeZIndex(defaultZIndex) - 1
     };
-    var zi = _getStyle(obj, "z-index");
-    if (zi && zi !== "auto") {
-      info.zIndex = parseInt(zi, 10);
-    }
     if (obj.getBoundingClientRect) {
       var rect = obj.getBoundingClientRect();
       var pageXOffset, pageYOffset, zoomFactor;
@@ -217,6 +213,24 @@
       func.call(element, instance, args);
     }
   };
+  var _getSafeZIndex = function(val) {
+    var zIndex, tmp;
+    if (val) {
+      if (typeof val === "number" && val > 0) {
+        zIndex = val;
+      } else if (typeof val === "string" && (tmp = parseInt(val, 10)) && !isNaN(tmp) && tmp > 0) {
+        zIndex = tmp;
+      }
+    }
+    if (!zIndex) {
+      if (typeof _defaults.zIndex === "number" && _defaults.zIndex > 0) {
+        zIndex = _defaults.zIndex;
+      } else if (typeof _defaults.zIndex === "string" && (tmp = parseInt(_defaults.zIndex, 10)) && !isNaN(tmp) && tmp > 0) {
+        zIndex = tmp;
+      }
+    }
+    return zIndex || 0;
+  };
   var currentElement, gluedElements = [], flashState = {};
   var ZeroClipboard = function(elements, options) {
     if (elements) (ZeroClipboard.prototype._singleton || this).glue(elements);
@@ -282,7 +296,8 @@
     activeClass: "zeroclipboard-is-active",
     allowScriptAccess: "sameDomain",
     useNoCache: true,
-    forceHandCursor: false
+    forceHandCursor: false,
+    zIndex: 999999999
   };
   ZeroClipboard.setDefaults = function(options) {
     for (var ko in options) _defaults[ko] = options[ko];
@@ -332,7 +347,7 @@
       container.style.top = "-9999px";
       container.style.width = "15px";
       container.style.height = "15px";
-      container.style.zIndex = "9999";
+      container.style.zIndex = "" + _getSafeZIndex(client.options.zIndex);
       document.body.appendChild(container);
       container.innerHTML = html;
     }
@@ -360,14 +375,15 @@
     return flashState[this.options.moviePath].ready === true;
   };
   ZeroClipboard.prototype.reposition = function() {
-    if (!currentElement) return false;
-    var pos = _getDOMObjectPosition(currentElement);
-    this.htmlBridge.style.top = pos.top + "px";
-    this.htmlBridge.style.left = pos.left + "px";
-    this.htmlBridge.style.width = pos.width + "px";
-    this.htmlBridge.style.height = pos.height + "px";
-    this.htmlBridge.style.zIndex = pos.zIndex + 1;
-    this.setSize(pos.width, pos.height);
+    if (currentElement) {
+      var pos = _getDOMObjectPosition(currentElement, this.options.zIndex);
+      this.htmlBridge.style.top = pos.top + "px";
+      this.htmlBridge.style.left = pos.left + "px";
+      this.htmlBridge.style.width = pos.width + "px";
+      this.htmlBridge.style.height = pos.height + "px";
+      this.htmlBridge.style.zIndex = pos.zIndex + 1;
+      this.setSize(pos.width, pos.height);
+    }
     return this;
   };
   ZeroClipboard.dispatch = function(eventName, args) {
