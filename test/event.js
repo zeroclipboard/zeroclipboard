@@ -116,7 +116,7 @@
   });
 
   test("Registering Events", function(assert) {
-    assert.expect(3);
+    assert.expect(6);
 
     // Arrange
     var clip = new ZeroClipboard();
@@ -124,48 +124,57 @@
     // Act
     clip.on("load", function(){});
     clip.on("onNoFlash", function(){});
-    clip.on("onPhone", function(){});
+    clip.on("onCustomEvent", function(){});
 
     // Assert
     assert.ok(clip.handlers.load);
     assert.ok(clip.handlers.noflash);
-    assert.ok(clip.handlers.phone);
+    assert.ok(clip.handlers.customevent);
+    assert.strictEqual(clip.handlers.load.length, 1);
+    assert.strictEqual(clip.handlers.noflash.length, 1);
+    assert.strictEqual(clip.handlers.customevent.length, 1);
   });
 
   test("Unregistering Events", function(assert) {
-    assert.expect(6);
+    assert.expect(12);
 
     // Arrange
     var clip = new ZeroClipboard();
     var load = function(){};
     var onNoFlash = function(){};
-    var onPhone = function(){};
+    var onCustomEvent = function(){};
 
     // Act
     clip.on("load", load);
     clip.on("onNoFlash", onNoFlash);
-    clip.on("onPhone", onPhone);
+    clip.on("onCustomEvent", onCustomEvent);
 
     // Assert
     assert.ok(clip.handlers.load);
     assert.ok(clip.handlers.noflash);
-    assert.ok(clip.handlers.phone);
+    assert.ok(clip.handlers.customevent);
+    assert.strictEqual(clip.handlers.load.length, 1);
+    assert.strictEqual(clip.handlers.noflash.length, 1);
+    assert.strictEqual(clip.handlers.customevent.length, 1);
+    assert.strictEqual(clip.handlers.load[0], load);
+    assert.strictEqual(clip.handlers.noflash[0], onNoFlash);
+    assert.strictEqual(clip.handlers.customevent[0], onCustomEvent);
 
     // Act & Assert
     clip.off("load", load);
-    assert.ok(!clip.handlers.load);
+    assert.strictEqual(clip.handlers.load.length, 0);
 
     // Act & Assert
     clip.off("onNoFlash", onNoFlash);
-    assert.ok(!clip.handlers.noflash);
+    assert.strictEqual(clip.handlers.noflash.length, 0);
 
     // Act & Assert
-    clip.off("onPhone", onPhone);
-    assert.ok(!clip.handlers.phone);
+    clip.off("onCustomEvent", onCustomEvent);
+    assert.strictEqual(clip.handlers.customevent.length, 0);
   });
 
   test("Registering Events the old way", function(assert) {
-    assert.expect(2);
+    assert.expect(3);
 
     // Arrange
     var clip = new ZeroClipboard();
@@ -178,10 +187,11 @@
 
     // Assert
     assert.ok(clip.handlers.load);
+    assert.strictEqual(clip.handlers.load.length, 1);
   });
 
   test("Unregistering Events the old way", function(assert) {
-    assert.expect(3);
+    assert.expect(5);
 
     // Arrange
     var clip = new ZeroClipboard();
@@ -193,14 +203,16 @@
     // Act & Assert
     clip.addEventListener("load", func);
     assert.ok(clip.handlers.load);
+    assert.strictEqual(clip.handlers.load.length, 1);
+    assert.strictEqual(clip.handlers.load[0], func);
 
     // Act & Assert
     clip.removeEventListener("load", func);
-    assert.ok(!clip.handlers.load);
+    assert.strictEqual(clip.handlers.load.length, 0);
   });
 
   test("Registering two events works", function(assert) {
-    assert.expect(4);
+    assert.expect(6);
 
     // Arrange
     var clip = new ZeroClipboard();
@@ -215,6 +227,8 @@
     // Assert more
     assert.ok(clip.handlers.load);
     assert.ok(clip.handlers.complete);
+    assert.strictEqual(clip.handlers.load.length, 1);
+    assert.strictEqual(clip.handlers.complete.length, 1);
   });
 
   test("Unregistering two events works", function(assert) {
@@ -239,8 +253,153 @@
     clip.off("load oncomplete", func);
 
     // Assert even more
+    assert.strictEqual(clip.handlers.load.length, 0);
+    assert.strictEqual(clip.handlers.complete.length, 0);
+  });
+
+  test("`on` can add multiple handlers for the same event", function(assert) {
+    assert.expect(7);
+
+    // Arrange
+    var clip = new ZeroClipboard();
+    var func1 = function() {};
+    var func2 = function() {};
+
+    // Assert
     assert.ok(!clip.handlers.load);
-    assert.ok(!clip.handlers.complete);
+
+    // Act
+    clip.on("load", func1);
+
+    // Assert more
+    assert.ok(clip.handlers.load);
+    assert.strictEqual(clip.handlers.load.length, 1);
+    assert.strictEqual(clip.handlers.load[0], func1);
+
+    // Act more
+    clip.on("load", func2);
+
+    // Assert even more
+    assert.strictEqual(clip.handlers.load.length, 2);
+    assert.strictEqual(clip.handlers.load[0], func1);
+    assert.strictEqual(clip.handlers.load[1], func2);
+  });
+
+  test("`off` can remove multiple handlers for the same event", function(assert) {
+    assert.expect(12);
+
+    // Arrange
+    var clip = new ZeroClipboard();
+    var func1 = function() {};
+    var func2 = function() {};
+    var func3 = function() {};
+
+    // Assert
+    assert.ok(!clip.handlers.load);
+
+    // Act
+    clip.on("load", func1);
+    clip.on("load", func2);
+    clip.on("load", func3);
+
+    // Assert more
+    assert.ok(clip.handlers.load);
+    assert.strictEqual(clip.handlers.load.length, 3);
+    assert.strictEqual(clip.handlers.load[0], func1);
+    assert.strictEqual(clip.handlers.load[1], func2);
+    assert.strictEqual(clip.handlers.load[2], func3);
+
+    // Act and assert even more
+    clip.off("load", func3);  // Remove from the end
+    assert.strictEqual(clip.handlers.load.length, 2);
+    assert.strictEqual(clip.handlers.load[0], func1);
+    assert.strictEqual(clip.handlers.load[1], func2);
+
+    clip.off("load", func1);  // Remove from the start
+    assert.strictEqual(clip.handlers.load.length, 1);
+    assert.strictEqual(clip.handlers.load[0], func2);
+
+    clip.off("load", func2);  // Remove the last one
+    assert.strictEqual(clip.handlers.load.length, 0);
+  });
+
+  test("`on` can add more than one entry of the same handler function for the same event", function(assert) {
+    assert.expect(5);
+
+    // Arrange
+    var clip = new ZeroClipboard();
+    var func1 = function() {};
+
+    // Assert
+    assert.ok(!clip.handlers.load);
+
+    // Act
+    clip.on("load", func1);
+    clip.on("load", func1);
+
+    // Assert more
+    assert.ok(clip.handlers.load);
+    assert.strictEqual(clip.handlers.load.length, 2);
+    assert.strictEqual(clip.handlers.load[0], func1);
+    assert.strictEqual(clip.handlers.load[1], func1);
+  });
+
+  test("`off` will remove all entries of the same handler function for the same event", function(assert) {
+    assert.expect(6);
+
+    // Arrange
+    var clip = new ZeroClipboard();
+    var func1 = function() {};
+
+    // Assert
+    assert.ok(!clip.handlers.load);
+
+    // Act
+    clip.on("load", func1);
+    clip.on("load", func1);
+
+    // Assert more
+    assert.ok(clip.handlers.load);
+    assert.strictEqual(clip.handlers.load.length, 2);
+    assert.strictEqual(clip.handlers.load[0], func1);
+    assert.strictEqual(clip.handlers.load[1], func1);
+
+    // Act more
+    clip.off("load", func1);
+
+    // Assert even more
+    assert.strictEqual(clip.handlers.load.length, 0);
+  });
+
+  test("`off` will remove all handler functions for an event if no function is specified", function(assert) {
+    assert.expect(8);
+
+    // Arrange
+    var clip = new ZeroClipboard();
+    var func1 = function() {};
+    var func2 = function() {};
+    var func3 = function() {};
+
+    // Assert
+    assert.ok(!clip.handlers.load);
+
+    // Act
+    clip.on("load", func1);
+    clip.on("load", func2);
+    clip.on("load", func3);
+    clip.on("load", func1);
+
+    // Assert more
+    assert.ok(clip.handlers.load);
+    assert.strictEqual(clip.handlers.load.length, 4);
+    assert.strictEqual(clip.handlers.load[0], func1);
+    assert.strictEqual(clip.handlers.load[1], func2);
+    assert.strictEqual(clip.handlers.load[2], func3);
+    assert.strictEqual(clip.handlers.load[3], func1);
+
+    // Act and assert even more
+    clip.off("load");  // Remove all
+    assert.strictEqual(clip.handlers.load.length, 0);
   });
 
   test("Test noFlash Event", function(assert) {

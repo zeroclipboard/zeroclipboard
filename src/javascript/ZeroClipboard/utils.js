@@ -311,12 +311,19 @@ var _vars = function (options) {
  *
  * returns the index of an element in the array, -1 if not found
  */
-var _inArray = function (elem, array) {
-  if (array.indexOf) {
-    return array.indexOf(elem);
+var _inArray = function (elem, array, fromIndex) {
+  if (typeof array.indexOf === "function") {
+    return array.indexOf(elem, fromIndex);
   }
 
-  for (var i = 0, length = array.length; i < length; i++) {
+  var i,
+      len = array.length;
+  if (typeof fromIndex === "undefined") {
+    fromIndex = 0;
+  } else if (fromIndex < 0) {
+    fromIndex = len + fromIndex;
+  }
+  for (i = fromIndex; i < len; i++) {
     if (array[i] === elem) {
       return i;
     }

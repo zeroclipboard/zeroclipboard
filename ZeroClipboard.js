@@ -198,11 +198,17 @@
     }
     return str.join("&");
   };
-  var _inArray = function(elem, array) {
-    if (array.indexOf) {
-      return array.indexOf(elem);
+  var _inArray = function(elem, array, fromIndex) {
+    if (typeof array.indexOf === "function") {
+      return array.indexOf(elem, fromIndex);
     }
-    for (var i = 0, length = array.length; i < length; i++) {
+    var i, len = array.length;
+    if (typeof fromIndex === "undefined") {
+      fromIndex = 0;
+    } else if (fromIndex < 0) {
+      fromIndex = len + fromIndex;
+    }
+    for (i = fromIndex; i < len; i++) {
       if (array[i] === elem) {
         return i;
       }
@@ -436,8 +442,9 @@
       eventName = events[i].toLowerCase().replace(/^on/, "");
       added[eventName] = true;
       if (!this.handlers[eventName]) {
-        this.handlers[eventName] = func;
+        this.handlers[eventName] = [];
       }
+      this.handlers[eventName].push(func);
     }
     if (added.noflash && flashState.global.noflash) {
       _receiveEvent.call(this, "onNoFlash", {});
@@ -456,12 +463,19 @@
   };
   ZeroClipboard.prototype.addEventListener = ZeroClipboard.prototype.on;
   ZeroClipboard.prototype.off = function(eventName, func) {
-    var events = eventName.toString().split(/\s/g);
-    for (var i = 0; i < events.length; i++) {
+    var i, len, handlers, foundIndex, events = eventName.toString().split(/\s/g);
+    for (i = 0, len = events.length; i < len; i++) {
       eventName = events[i].toLowerCase().replace(/^on/, "");
-      for (var event in this.handlers) {
-        if (event === eventName && this.handlers[event] === func) {
-          delete this.handlers[event];
+      handlers = this.handlers[eventName];
+      if (handlers && handlers.length) {
+        if (func) {
+          foundIndex = _inArray(func, handlers);
+          while (foundIndex !== -1) {
+            handlers.splice(foundIndex, 1);
+            foundIndex = _inArray(func, handlers, foundIndex);
+          }
+        } else {
+          this.handlers[eventName].length = 0;
         }
       }
     }
@@ -530,13 +544,17 @@
       this.options.text = null;
       break;
     }
-    if (this.handlers[eventName]) {
-      var func = this.handlers[eventName];
-      if (typeof func === "string" && typeof window[func] === "function") {
-        func = window[func];
-      }
-      if (typeof func === "function") {
-        _dispatchCallback(func, element, this, args, performCallbackAsync);
+    var handlers = this.handlers[eventName];
+    if (handlers && handlers.length) {
+      var i, len, func;
+      for (i = 0, len = handlers.length; i < len; i++) {
+        func = handlers[i];
+        if (typeof func === "string" && typeof window[func] === "function") {
+          func = window[func];
+        }
+        if (typeof func === "function") {
+          _dispatchCallback(func, element, this, args, performCallbackAsync);
+        }
       }
     }
   };

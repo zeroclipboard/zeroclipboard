@@ -31,8 +31,9 @@ ZeroClipboard.prototype.on = function (eventName, func) {
     eventName = events[i].toLowerCase().replace(/^on/, '');
     added[eventName] = true;
     if (!this.handlers[eventName]) {
-      this.handlers[eventName] = func;
+      this.handlers[eventName] = [];
     }
+    this.handlers[eventName].push(func);
   }
 
   // The following events must be memorized and fired immediately if relevant as they only occur
@@ -61,18 +62,27 @@ ZeroClipboard.prototype.on = function (eventName, func) {
 ZeroClipboard.prototype.addEventListener = ZeroClipboard.prototype.on;
 
 /*
- * Remove an event from the client.
+ * Remove an event listener from the client.
  *
  * returns object instance
  */
 ZeroClipboard.prototype.off = function (eventName, func) {
-  // remove user event listener for event
-  var events = eventName.toString().split(/\s/g);
-  for (var i = 0; i < events.length; i++) {
+  var i, len, handlers, foundIndex,
+      events = eventName.toString().split(/\s/g);
+  for (i = 0, len = events.length; i < len; i++) {
     eventName = events[i].toLowerCase().replace(/^on/, "");
-    for (var event in this.handlers) {
-      if (event === eventName && this.handlers[event] === func) {
-        delete this.handlers[event];
+    handlers = this.handlers[eventName];
+    if (handlers && handlers.length) {
+      if (func) {
+        foundIndex = _inArray(func, handlers);
+        while (foundIndex !== -1) {
+          handlers.splice(foundIndex, 1);
+          foundIndex = _inArray(func, handlers, foundIndex);
+        }
+      }
+      else {
+        // If no `func` was provided, remove ALL of the handlers for this event
+        this.handlers[eventName].length = 0;
       }
     }
   }
@@ -159,18 +169,23 @@ var _receiveEvent = function (eventName, args) {
       break;
   } // switch eventName
 
-  if (this.handlers[eventName]) {
-    var func = this.handlers[eventName];
+  // User defined handlers for events
+  var handlers = this.handlers[eventName];
+  if (handlers && handlers.length) {
+    var i, len, func;
+    for (i = 0, len = handlers.length; i < len; i++) {
+      func = handlers[i];
 
-    // If the user provided a string for their callback, grab that function
-    if (typeof func === 'string' && typeof window[func] === 'function') {
-      func = window[func];
+      // If the user provided a string for their callback, grab that function
+      if (typeof func === 'string' && typeof window[func] === 'function') {
+        func = window[func];
+      }
+      if (typeof func === 'function') {
+        // actual function reference
+        _dispatchCallback(func, element, this, args, performCallbackAsync);
+      }
     }
-    if (typeof func === 'function') {
-      // actual function reference
-      _dispatchCallback(func, element, this, args, performCallbackAsync);
-    }
-  } // user defined handler for event
+  }
 };
 
 /*
