@@ -1,5 +1,7 @@
 /*jshint -W106 */
+/*jshint node:true */
 module.exports = function(grunt) {
+  'use strict';
 
   // Metadata
   var pkg = grunt.file.readJSON('package.json');

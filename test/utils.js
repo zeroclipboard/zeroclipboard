@@ -1,4 +1,4 @@
-/*global _camelizeCssPropName, _getStyle, _removeClass, _addClass, _vars, _noCache, _inArray, _dispatchCallback */
+/*global _camelizeCssPropName, _getStyle, _removeClass, _addClass, _vars, _noCache, _inArray, _dispatchCallback, _extend */
 
 "use strict";
 
@@ -255,6 +255,106 @@
 
     // Stop test evaluation
     QUnit.stop();
+  });
+
+
+  test("`_extend` works on plain objects", function(assert) {
+    assert.expect(5);
+
+    // Plain objects
+    var a = {
+      "a": "apple",
+      "c": "cantalope"
+    },
+    b = {
+      "b": "banana",
+      "c": "cherry"  // cuz cantalope sucks  ;)
+    },
+    c = {
+      "a": "apple",
+      "b": "banana",
+      "c": "cherry"
+    };
+
+    assert.deepEqual(_extend({}, a), a, "actual equals expected, `target` is updated, `source` is unaffected");
+    assert.deepEqual(_extend({}, b), b, "actual equals expected, `target` is updated, `source` is unaffected");
+    assert.deepEqual(_extend({}, c), c, "actual equals expected, `target` is updated, `source` is unaffected");
+    assert.deepEqual(_extend(a, b), c, "actual equals expected");
+    assert.deepEqual(a, c, "`a` equals `c` because `_extend` updates the `target` argument");
+  });
+
+
+  test("`_extend` only copies owned properties", function(assert) {
+    assert.expect(1);
+
+    // Now prototypes...
+    var SomeClass = function() {
+      this.b = "banana";
+    };
+    SomeClass.prototype.c = "cantalope";  // cuz cantalope sucks  ;)
+
+    var a = {
+      "a": "apple",
+      "c": "cherry"
+    },
+    b = new SomeClass(),
+    c = {
+      "a": "apple",
+      "b": "banana",
+      "c": "cherry"
+    };
+
+    assert.deepEqual(_extend(a, b), c, "actual equals expected because `_extend` does not copy over prototype properties");
+  });
+
+
+  test("`_extend` only copies owned properties from Array source", function(assert) {
+    assert.expect(3);
+
+    var a = {
+      "a": "apple",
+      "b": "banana"
+    },
+    b = ["zero", "one", "two"],
+    c = {
+      "a": "apple",
+      "b": "banana",
+      "0": "zero",
+      "1": "one",
+      "2": "two"
+    };
+
+    assert.deepEqual(_extend(a, b), c, "actual equals expected because `_extend` does not copy over prototype properties");
+    assert.strictEqual("length" in a, false, "`a` should not have gained a `length` property");
+    assert.strictEqual("length" in b, true, "`b` should still have a `length` property");
+  });
+
+
+  test("`_extend` will merge multiple objects", function(assert) {
+    assert.expect(2);
+
+    var a = {
+      "a": "apple",
+      "c": "cantalope",
+      "d": "dragon fruit"
+    },
+    b = {
+      "b": "banana",
+      "c": "cherry"  // cuz cantalope sucks  ;)
+    },
+    c = {
+      "a": "apricot",
+      "b": "blueberry"
+    },
+    d = {
+      "a": "apricot",
+      "b": "blueberry",
+      "c": "cherry",
+      "d": "dragon fruit"
+    };
+
+    assert.deepEqual(_extend({}, a, b, c), d, "actual equals expected, `target` is updated, `source` is unaffected");
+    assert.deepEqual(_extend(a, b, c), d, "actual equals expected");
   });
 
 })(QUnit.module, QUnit.test);

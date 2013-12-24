@@ -18,8 +18,7 @@ var _bridge = function () {
   if (!container) {
     // Create a copy of the `client.options` object to avoid exposing
     // the `amdModuleId` and `cjsModuleId` settings
-    var opts = {};
-    for (var ko in client.options) opts[ko] = client.options[ko];
+    var opts = _extend({}, client.options);
     // Set these last to override them just in case any [v1.2.0-beta.1] users
     // are still passing them in to [v1.2.0-beta.2] (or higher)
     opts.amdModuleId = _amdModuleId;

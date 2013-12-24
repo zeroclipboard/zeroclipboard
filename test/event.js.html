@@ -21,7 +21,12 @@
   <script src="../src/javascript/ZeroClipboard/utils.js"></script>
   <script src="../src/javascript/ZeroClipboard/flash.js"></script>
   <script>
-    var _zcCounter = 1;
+    var _zcCounter = 1,
+        _defaults = {
+          hoverClass:  "zeroclipboard-is-hover",
+          activeClass: "zeroclipboard-is-active",
+          moviePath:   "ZeroClipboard.swf"
+        };
     function ZeroClipboard(elements, options) {
       // If there's a client already, return the singleton
       if (ZeroClipboard.prototype._singleton) {
@@ -29,11 +34,7 @@
       }
       ZeroClipboard.prototype._singleton = this;
 
-      this.options = QUnit.extend({
-        hoverClass:  "zeroclipboard-is-hover",
-        activeClass: "zeroclipboard-is-active",
-        moviePath:   "ZeroClipboard.swf"
-      }, options);
+      this.options = _extend({}, _defaults, options);
 
       if (typeof flashState.global.noflash !== "boolean") {
         flashState.global.noflash = !_detectFlashSupport();

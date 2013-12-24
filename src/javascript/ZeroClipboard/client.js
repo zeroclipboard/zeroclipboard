@@ -13,13 +13,8 @@ var ZeroClipboard = function (elements, options) {
 
   ZeroClipboard.prototype._singleton = this;
 
-  this.options = {};
-
-  // set the defaults
-  for (var kd in _defaults) this.options[kd] = _defaults[kd];
-
-  // override the defaults
-  for (var ko in options) this.options[ko] = options[ko];
+  // Set and override the defaults
+  this.options = _extend({}, _defaults, options);
 
   // event handlers
   this.handlers = {};

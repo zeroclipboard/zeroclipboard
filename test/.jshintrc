@@ -1,13 +1,18 @@
 {
-  "camelcase": true,
-  "indent": 2,
-  "strict": false,
-  "trailing": true,
   "boss": true,
   "browser": true,
-  "node": true,
-  "multistr": false,
+  "camelcase": true,
+  "eqeqeq": true,
+  "eqnull": true,
+  "es3": true,
+  "es5": false,
   "evil": true,
+  "globalstrict": true,
+  "indent": 2,
+  "multistr": true,
+  "strict": true,
+  "trailing": true,
+
   "globals": {
     "$": false,
     "QUnit": false

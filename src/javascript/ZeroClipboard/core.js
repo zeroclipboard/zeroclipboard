@@ -19,7 +19,7 @@ var _defaults = {
  * returns nothing
  */
 ZeroClipboard.setDefaults = function (options) {
-  for (var ko in options) _defaults[ko] = options[ko];
+  _extend(_defaults, options);
 };
 
 /*

@@ -92,7 +92,7 @@
     var clip = new ZeroClipboard();
 
     // Assert
-    assert.throws(function() {
+    assert["throws"](function() {
       // Act
       clip.glue("#d_clip_button");
     }, TypeError);

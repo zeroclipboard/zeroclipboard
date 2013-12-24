@@ -410,3 +410,38 @@ var _deprecationWarning = function(deprecatedApiName, debugEnabled) {
     }
   }
 };
+
+
+/*
+ * Shallow-copy the owned properties of one object over to another, similar to jQuery's `$.extend`.
+ * @returns the target object
+ * @private
+ */
+var _extend = function() {
+  var i, len, arg, prop, src, copy,
+      target = arguments[0] || {};
+
+  for (i = 1, len = arguments.length; i < len; i++) {
+    // Only deal with non-null/undefined values
+    if ((arg = arguments[i]) != null) {
+      // Extend the base object
+      for (prop in arg) {
+        if (arg.hasOwnProperty(prop)) {
+          src = target[prop];
+          copy = arg[prop];
+
+          // Prevent never-ending loops
+          if (target === copy) {
+            continue;
+          }
+
+          // Don't bring in undefined values
+          if (copy !== undefined) {
+            target[prop] = copy;
+          }
+        }
+      }
+    }
+  }
+  return target;
+};

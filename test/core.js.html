@@ -17,9 +17,10 @@
     // Prevent against Firefox/Firebug failing the global pollution check
     var getInterface = null;
   </script>
+  <script src="../src/javascript/ZeroClipboard/utils.js"></script>
   <script>
     var ZeroClipboard = function(elements, options) {
-      this.options = QUnit.extend(QUnit.extend({}, _defaults), options);
+      this.options = _extend({}, _defaults, options);
     };
   </script>
   <script src="../src/javascript/ZeroClipboard/core.js"></script>

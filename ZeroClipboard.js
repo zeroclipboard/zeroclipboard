@@ -251,13 +251,31 @@
       }
     }
   };
+  var _extend = function() {
+    var i, len, arg, prop, src, copy, target = arguments[0] || {};
+    for (i = 1, len = arguments.length; i < len; i++) {
+      if ((arg = arguments[i]) != null) {
+        for (prop in arg) {
+          if (arg.hasOwnProperty(prop)) {
+            src = target[prop];
+            copy = arg[prop];
+            if (target === copy) {
+              continue;
+            }
+            if (copy !== undefined) {
+              target[prop] = copy;
+            }
+          }
+        }
+      }
+    }
+    return target;
+  };
   var ZeroClipboard = function(elements, options) {
     if (elements) (ZeroClipboard.prototype._singleton || this).glue(elements);
     if (ZeroClipboard.prototype._singleton) return ZeroClipboard.prototype._singleton;
     ZeroClipboard.prototype._singleton = this;
-    this.options = {};
-    for (var kd in _defaults) this.options[kd] = _defaults[kd];
-    for (var ko in options) this.options[ko] = options[ko];
+    this.options = _extend({}, _defaults, options);
     this.handlers = {};
     if (typeof flashState.global.noflash !== "boolean") {
       flashState.global.noflash = !_detectFlashSupport();
@@ -332,7 +350,7 @@
     debug: true
   };
   ZeroClipboard.setDefaults = function(options) {
-    for (var ko in options) _defaults[ko] = options[ko];
+    _extend(_defaults, options);
   };
   ZeroClipboard.destroy = function() {
     if (ZeroClipboard.prototype._singleton) {
@@ -351,8 +369,7 @@
     var client = ZeroClipboard.prototype._singleton;
     var container = document.getElementById("global-zeroclipboard-html-bridge");
     if (!container) {
-      var opts = {};
-      for (var ko in client.options) opts[ko] = client.options[ko];
+      var opts = _extend({}, client.options);
       opts.amdModuleId = _amdModuleId;
       opts.cjsModuleId = _cjsModuleId;
       var flashvars = _vars(opts);
@@ -527,7 +544,7 @@
     elements = _prepGlue(elements);
     for (var i = 0; i < elements.length; i++) {
       if (elements[i] && elements[i].nodeType === 1) {
-        if (_inArray(elements[i], gluedElements) == -1) {
+        if (_inArray(elements[i], gluedElements) === -1) {
           gluedElements.push(elements[i]);
           _addEventHandler(elements[i], "mouseover", _elementMouseOver);
         }
@@ -540,7 +557,7 @@
     for (var i = 0; i < elements.length; i++) {
       _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
       var arrayIndex = _inArray(elements[i], gluedElements);
-      if (arrayIndex != -1) gluedElements.splice(arrayIndex, 1);
+      if (arrayIndex !== -1) gluedElements.splice(arrayIndex, 1);
     }
     return this;
   };
