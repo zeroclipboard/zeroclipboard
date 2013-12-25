@@ -3,9 +3,10 @@ ZeroClipboard.version = "<%= version %>";
 var _defaults = {
   moviePath:         "ZeroClipboard.swf",        // URL to movie
   trustedOrigins:    null,                       // Page origins that the SWF should trust (single string or array of strings)
+
+  /** @private */
   text:              null,                       // The text to be copied
-  hoverClass:        "zeroclipboard-is-hover",   // The class used to hover over the object
-  activeClass:       "zeroclipboard-is-active",  // The class used to set object active
+
   allowScriptAccess: "sameDomain",               // SWF outbound scripting policy
   useNoCache:        true,                       // Include a nocache query parameter on requests for the SWF
   forceHandCursor:   false,                      // Forcibly set the hand cursor ("pointer") for all glued elements

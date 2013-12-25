@@ -347,8 +347,6 @@
     moviePath: "ZeroClipboard.swf",
     trustedOrigins: null,
     text: null,
-    hoverClass: "zeroclipboard-is-hover",
-    activeClass: "zeroclipboard-is-active",
     allowScriptAccess: "sameDomain",
     useNoCache: true,
     forceHandCursor: false,
@@ -582,6 +580,8 @@
   function _isFlashVersionSupported(flashVersion) {
     return parseFloat(flashVersion.replace(/,/g, ".").replace(/[^0-9\.]/g, "")) >= 10;
   }
+  _defaults.hoverClass = "zeroclipboard-is-hover";
+  _defaults.activeClass = "zeroclipboard-is-active";
   ZeroClipboard.detectFlashSupport = function() {
     var debugEnabled = ZeroClipboard.prototype._singleton && ZeroClipboard.prototype._singleton.options.debug || _defaults.debug;
     _deprecationWarning("ZeroClipboard.detectFlashSupport", debugEnabled);

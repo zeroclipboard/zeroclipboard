@@ -60,7 +60,9 @@ There are default options you can set before, or when you create a new client.
 var _defaults = {
   moviePath:         "ZeroClipboard.swf",        // URL to movie
   trustedOrigins:    null,                       // Page origins that the SWF should trust (single string or array of strings)
+  /** @deprecated */
   hoverClass:        "zeroclipboard-is-hover",   // The class used to hover over the object
+  /** @deprecated */
   activeClass:       "zeroclipboard-is-active",  // The class used to set object active
   allowScriptAccess: "sameDomain",               // SWF outbound scripting policy
   useNoCache:        true,                       // Include a nocache query parameter on requests for the SWF
@@ -581,7 +583,11 @@ The current list of deprecations includes:
      - Repositioning is now handled more intelligently internally, so this method is simply no longer needed by users.
  - The `trustedDomains` config option &rarr; as of [v1.2.0], removing in [v2.0.0]
      - Use the `trustedOrigins` config option instead!
- - The `ZeroClipboard.prototype.receiveEvent` &rarr; as of [v1.2.0], removing in [v2.0.0]
+ - `ZeroClipboard.prototype.receiveEvent` &rarr; as of [v1.2.0], removing in [v2.0.0]
      - This should only be used internally, so this method will be removed from the public API.
- - The `ZeroClipboard.detectFlashSupport` &rarr; as of [v1.2.0], removing in [v2.0.0]
+ - `ZeroClipboard.detectFlashSupport` &rarr; as of [v1.2.0], removing in [v2.0.0]
      - This should only be used internally, so this method will be removed from the public API.
+ - The `hoverClass` config option &rarr; as of [v1.3.0], removing in [v2.0.0]
+     - As of [v2.0.0] (but no sooner), you will be able to use normal `:hover` CSS pseudo-class selectors instead!
+ - The `activeClass` config option &rarr; as of [v1.3.0], removing in [v2.0.0]
+     - As of [v2.0.0] (but no sooner), you will be able to use normal `:active` CSS pseudo-class selectors instead!
