@@ -37,18 +37,7 @@ Here is a working [test page](http://zeroclipboard.org/#demo) where you can try 
 
 ## Testing ZeroClipboard.swf Locally
 
-To test the page [demo page](http://zeroclipboard.org/#demo) locally. checkout the `gh-pages` branch and run `make`. This should open [localhost:3000](http://localhost:3000/)
-
-```
-git checkout gh-pages
-make
-```
-add `BRANCH=my-dev-branch` to get the assets from a certain branch
-
-```
-git checkout gh-pages
-make BRANCH=my-dev-branch
-```
+To test the page [demo page](http://zeroclipboard.org/#demo) locally, clone the [website repo](https://github.com/zeroclipboard/zeroclipboard.org).
 
 ## Support
 
