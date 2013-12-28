@@ -1,4 +1,4 @@
-/*global _camelizeCssPropName, _getStyle, _removeClass, _addClass, _vars, _noCache, _inArray, _dispatchCallback, _extend */
+/*global _camelizeCssPropName, _getStyle, _removeClass, _addClass, _vars, _noCache, _inArray, _dispatchCallback, _extend, _extractDomain, _determineScriptAccess */
 
 "use strict";
 
@@ -155,8 +155,8 @@
 
     // Arrange
     var clipOptionsEmpty = {};
-    var clipOptionsTrustedOriginsOnly = {
-      trustedOrigins: ["*"]
+    var clipOptionsTrustedDomainsOnly = {
+      trustedDomains: ["*"]
     };
     var clipOptionsAmdOnly = {
       amdModuleId: "zcAMD"
@@ -165,14 +165,14 @@
       cjsModuleId: "zcCJS"
     };
     var clipOptionsAll = {
-      trustedOrigins: ["*"],
+      trustedDomains: ["*"],
       amdModuleId: "zcAMD",
       cjsModuleId: "zcCJS"
     };
 
     // Act & Assert
     assert.strictEqual(_vars(clipOptionsEmpty), "");
-    assert.strictEqual(_vars(clipOptionsTrustedOriginsOnly), "trustedOrigins=*");
+    assert.strictEqual(_vars(clipOptionsTrustedDomainsOnly), "trustedOrigins=*");
     assert.strictEqual(_vars(clipOptionsAmdOnly), "amdModuleId=zcAMD");
     assert.strictEqual(_vars(clipOptionsCommonJsOnly), "cjsModuleId=zcCJS");
     assert.strictEqual(_vars(clipOptionsAll), "trustedOrigins=*&amdModuleId=zcAMD&cjsModuleId=zcCJS");
@@ -355,6 +355,104 @@
 
     assert.deepEqual(_extend({}, a, b, c), d, "actual equals expected, `target` is updated, `source` is unaffected");
     assert.deepEqual(_extend(a, b, c), d, "actual equals expected");
+  });
+
+
+  test("`_extractDomain` extracts domains from origins and URLs", function(assert) {
+    assert.expect(20);
+
+    // Arrange
+    var inputToExpectedMap = {
+      "": null,
+      " ": null,
+      "ZeroClipboard.swf": null,
+      "js/ZeroClipboard.swf": null,
+      "/js/ZeroClipboard.swf": null,
+      "/zeroclipboard/zeroclipboard/": null,
+      "zeroclipboard/zeroclipboard/": null,
+      "*": "*",
+      "github.com": "github.com",
+      "http://github.com": "github.com",
+      "https://github.com": "github.com",
+      "github.com:80": "github.com:80",
+      "http://github.com:80": "github.com:80",
+      "https://github.com:443": "github.com:443",
+      "http://github.com/zeroclipboard/zeroclipboard/": "github.com",
+      "https://github.com/zeroclipboard/zeroclipboard/": "github.com",
+      "http://github.com:80/zeroclipboard/zeroclipboard/": "github.com:80",
+      "https://github.com:443/zeroclipboard/zeroclipboard/": "github.com:443"
+    };
+
+    // Act & Assert
+    assert.strictEqual(_extractDomain(undefined), null, "Processing: `undefined`");
+    assert.strictEqual(_extractDomain(null), null, "Processing: `null`");
+    for (var originOrUrl in inputToExpectedMap) {
+      if (inputToExpectedMap.hasOwnProperty(originOrUrl)) {
+        assert.strictEqual(_extractDomain(originOrUrl), inputToExpectedMap[originOrUrl], "Processing: \"" + originOrUrl + "\"");
+      }
+    }
+  });
+
+
+  test("`_determineScriptAccess` determines the appropriate script access level", function(assert) {
+    // Arrange
+    var i, len, tmp;
+    var currentDomain = window.location.host || "localhost";
+    var _defaults = {
+      moviePath: "ZeroClipboard.swf",
+      trustedOrigins: null,
+      trustedDomains: [currentDomain],
+      allowScriptAccess: null
+    };
+    var inputToExpectedMap = [
+      // `allowScriptAccess` forcibly set
+      { args: [currentDomain, _extend({}, _defaults, { allowScriptAccess: "always" })], result: "always" },
+      { args: [currentDomain, _extend({}, _defaults, { allowScriptAccess: "ALWAYS" })], result: "always" },
+      { args: [currentDomain, _extend({}, _defaults, { allowScriptAccess: "samedomain" })], result: "sameDomain" },
+      { args: [currentDomain, _extend({}, _defaults, { allowScriptAccess: "sameDomain" })], result: "sameDomain" },
+      { args: [currentDomain, _extend({}, _defaults, { allowScriptAccess: "SAMEDOMAIN" })], result: "sameDomain" },
+      { args: [currentDomain, _extend({}, _defaults, { allowScriptAccess: "never" })], result: "never" },
+      { args: [currentDomain, _extend({}, _defaults, { allowScriptAccess: "NEVER" })], result: "never" },
+      // Same-domain SWF
+      { args: [currentDomain, _defaults], result: "sameDomain" },
+      { args: [currentDomain, _extend({}, _defaults, { trustedDomains: [] })], result: "never" },
+      { args: [currentDomain, _extend({}, _defaults, { trustedDomains: ["*"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _defaults, { trustedDomains: [currentDomain, "otherDomain.com"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _defaults, { trustedDomains: ["otherDomain.com"] })], result: "never" },
+      { args: [currentDomain, _extend({}, _defaults, { trustedDomains: [], trustedOrigins: [] })], result: "never" },
+      { args: [currentDomain, _extend({}, _defaults, { trustedDomains: [], trustedOrigins: ["*"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _defaults, { trustedDomains: [], trustedOrigins: ["http://" + currentDomain] })], result: "sameDomain" },
+      { args: [currentDomain, _extend({}, _defaults, { trustedDomains: [], trustedOrigins: ["http://" + currentDomain, "http://otherDomain.com"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _defaults, { trustedDomains: [], trustedOrigins: ["http://otherDomain.com"] })], result: "never" },
+      { args: [currentDomain, _extend({}, _defaults, { trustedOrigins: [] })], result: "sameDomain" },
+      { args: [currentDomain, _extend({}, _defaults, { trustedOrigins: ["*"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _defaults, { trustedOrigins: ["http://" + currentDomain] })], result: "sameDomain" },
+      { args: [currentDomain, _extend({}, _defaults, { trustedOrigins: ["http://" + currentDomain, "http://otherDomain.com"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _defaults, { trustedOrigins: ["http://otherDomain.com"] })], result: "always" },
+      // Cross-domain SWF
+      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf" })], result: "always" },
+      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: [] })], result: "never" },
+      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: ["*"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: [currentDomain, "otherDomain.com"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: ["otherDomain.com"] })], result: "never" },
+      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: [], trustedOrigins: [] })], result: "never" },
+      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: [], trustedOrigins: ["*"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: [], trustedOrigins: ["http://" + currentDomain] })], result: "always" },
+      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: [], trustedOrigins: ["http://" + currentDomain, "http://otherDomain.com"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: [], trustedOrigins: ["http://otherDomain.com"] })], result: "never" },
+      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedOrigins: [] })], result: "always" },
+      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedOrigins: ["*"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedOrigins: ["http://" + currentDomain] })], result: "always" },
+      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedOrigins: ["http://" + currentDomain, "http://otherDomain.com"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedOrigins: ["http://otherDomain.com"] })], result: "always" }
+    ];
+
+    // Act & Assert
+    assert.expect(inputToExpectedMap.length);
+    for (i = 0, len = inputToExpectedMap.length; i < len; i++) {
+      tmp = inputToExpectedMap[i];
+      assert.strictEqual(_determineScriptAccess.apply(this, tmp.args), tmp.result, "Processing: " + JSON.stringify(tmp));
+    }
   });
 
 })(QUnit.module, QUnit.test);

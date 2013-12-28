@@ -2,12 +2,11 @@ ZeroClipboard.version = "<%= version %>";
 // ZeroClipboard options defaults
 var _defaults = {
   moviePath:         "ZeroClipboard.swf",        // URL to movie
-  trustedOrigins:    null,                       // Page origins that the SWF should trust (single string or array of strings)
+  trustedDomains:    [window.location.host],     // Page domains that the SWF should trust (single string or array of strings)
 
   /** @private */
   text:              null,                       // The text to be copied
 
-  allowScriptAccess: "sameDomain",               // SWF outbound scripting policy
   useNoCache:        true,                       // Include a nocache query parameter on requests for the SWF
   forceHandCursor:   false,                      // Forcibly set the hand cursor ("pointer") for all glued elements
   zIndex:            999999999,                  // The z-index used by the Flash object. Max value (32-bit): 2147483647

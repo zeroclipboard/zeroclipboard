@@ -1,8 +1,10 @@
 # Overview
 
-The *ZeroClipboard* JavaScript library provides an easy way to copy text to the clipboard using an invisible Adobe Flash movie.  The "Zero" signifies that the library is invisible and the user interface is left entirely up to you.
+The *ZeroClipboard* JavaScript library provides an easy way to copy text to the clipboard using an invisible Adobe
+Flash movie.  The "Zero" signifies that the library is invisible and the user interface is left entirely up to you.
 
-Browsers won't let you access the clipboard directly. So this library puts a flash object on the page to proxy the clipboard for you. The library will move and resize over all the glued objects.
+Browsers won't let you access the clipboard directly. So this library puts a flash object on the page to proxy the
+clipboard for you. The library will move and resize over all the glued objects.
 
 
 ## Installation
@@ -28,7 +30,9 @@ To use the library, simply include the following JavaScript file in your page:
 <script type="text/javascript" src="ZeroClipboard.js"></script>
 ```
 
-You also need to have the "`ZeroClipboard.swf`" file available to the browser.  If this file is located in the same directory as your web page, then it will work out of the box.  However, if the SWF file is hosted elsewhere, you need to set the URL like this (place this code _after_ the script tag):
+You also need to have the "`ZeroClipboard.swf`" file available to the browser.  If this file is located in the same
+directory as your web page, then it will work out of the box.  However, if the SWF file is hosted elsewhere, you need
+to set the URL like this (place this code _after_ the script tag):
 
 ```js
 ZeroClipboard.setDefaults( { moviePath: 'http://YOURSERVER/path/ZeroClipboard.swf' } );
@@ -37,7 +41,8 @@ ZeroClipboard.setDefaults( { moviePath: 'http://YOURSERVER/path/ZeroClipboard.sw
 
 ## Clients
 
-Now you are ready to create one or more _Clients_.  A client is a single instance of the clipboard library on the page, linked to one or more DOM elements. Here is how to create a client instance:
+Now you are ready to create one or more _Clients_.  A client is a single instance of the clipboard library on the page,
+linked to one or more DOM elements. Here is how to create a client instance:
 
 ```js
 var clip = new ZeroClipboard();
@@ -58,20 +63,43 @@ There are default options you can set before, or when you create a new client.
 
 ```js
 var _defaults = {
-  moviePath:         "ZeroClipboard.swf",        // URL to movie
-  trustedOrigins:    null,                       // Page origins that the SWF should trust (single string or array of strings)
+  // URL to movie
+  moviePath: "ZeroClipboard.swf",
+
+  // SWF inbound scripting policy: page domains that the SWF should trust. (single string or array of strings)
+  trustedDomains: [window.location.host],
+
+  // Include a nocache query parameter on requests for the SWF
+  useNoCache: true,
+
+  // Forcibly set the hand cursor ("pointer") for all glued elements
+  forceHandCursor: false,
+
+  // The z-index used by the Flash object. Max value (32-bit): 2147483647
+  zIndex: 999999999,
+
+  // Debug enabled: send `console` messages with deprecation warnings, etc.
+  debug: true,
+
   /** @deprecated */
-  hoverClass:        "zeroclipboard-is-hover",   // The class used to hover over the object
+  // The class used to hover over the object
+  hoverClass: "zeroclipboard-is-hover",
+
   /** @deprecated */
-  activeClass:       "zeroclipboard-is-active",  // The class used to set object active
-  allowScriptAccess: "sameDomain",               // SWF outbound scripting policy
-  useNoCache:        true,                       // Include a nocache query parameter on requests for the SWF
-  forceHandCursor:   false,                      // Forcibly set the hand cursor ("pointer") for all glued elements
-  zIndex:            999999999,                  // The z-index used by the Flash object. Max value (32-bit): 2147483647
-  debug:             true                        // Debug enabled: send `console` messages with deprecation warnings, etc.
+  // The class used to set object active
+  activeClass: "zeroclipboard-is-active",
+
+  /** @deprecated */
+  // [Deprecated] SWF inbound scripting policy: page origins that the SWF should trust. (single string or array of strings)
+  trustedOrigins: null,
+
+  /** @deprecated */
+  // SWF outbound scripting policy. Possible values: "never", "sameDomain", "always"
+  allowScriptAccess: null
 };
 ```
-You can override the defaults using `ZeroClipboard.setDefaults({ moviePath: "new/path" })` before you create any clients.
+
+You can override the defaults by making a call like `ZeroClipboard.setDefaults({ moviePath: "new/path" });` before you create any clients.
 
 You can also set the options when creating a new client by passing an optional "options" object, e.g.  
 ```js
@@ -86,24 +114,43 @@ better in most situations as:
     `activeClass`, etc.
 
 
-### A note on the `trustedOrigins` option
+### The `trustedDomains` option: SWF inbound scripting access
 
-If your ZeroClipboard SWF is served from a different origin/domain than your page, you need to tell the SWF that it's OK to trust your page. The following is almost _**always**_ how you want to do this:
+This allows other SWF files and HTML pages from the allowed domains to access/call publicly exposed ActionScript code,
+e.g. functions shared via `ExternalInterface.addCallback`. In other words, it controls the SWF inbound scripting access.
 
-```js
-ZeroClipboard.setDefaults({
-  trustedOrigins: [window.location.protocol + "//" + window.location.host]
-});
-```
+If your ZeroClipboard SWF is served from a different origin/domain than your page, you need to tell the SWF that it's
+OK to trust your page. The default value of `[window.location.host]` is almost _**always**_ what you will want unless
+you specifically want the SWF to communicate with pages from other domains (e.g. in iframes or child windows).
+
+For more information about trusted domains, consult the _[official Flash documentation for `flash.system.Security.allowDomain(...)`](http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/Security.html#allowDomain\(\))_.
 
 
-### A note on the `allowScriptAccess` option
+### The `allowScriptAccess` option: SWF outbound scripting access
 
-For version 1.1.7 and below, the `embed` tag had the `allowScriptAccess` parameter hard-coded to `always`. This allowed the "`ZeroClipboard.swf`" file to be hosted on an external domain. However, to enhance security, versions after 1.1.7 have an option for `allowScriptAccess` with a default of `sameDomain`, which only allows "`ZeroClipboard.swf`" to be served from the same domain as the hosting page.
+This allows the SWF file to access/call JavaScript/HTML functionality of HTML pages on allowed domains, e.g. invoking
+functions via `ExternalInterface.call`. In other words, it controls the SWF outbound scripting access.
 
-If you hosted "`ZeroClipboard.swf`" on a different domain than the hosting page on version 1.1.7 or below, when you upgrade to a version above 1.1.7, you should either move "`ZeroClipboard.swf`" to the same domain as the hosting page or set the `allowScriptAccess` option to `always`.
+For version 1.1.7 and below, the `embed` tag had the `allowScriptAccess` parameter hard-coded to `always`. This allowed
+the "`ZeroClipboard.swf`" file to be hosted on an external domain. However, to enhance security, versions after 1.1.7
+have an option for `allowScriptAccess` with a default of `"sameDomain"`, which only allows "`ZeroClipboard.swf`" to be
+served from the same domain as the hosting page.
 
-For more information about `allowScriptAccess`, consult the *[official Flash documentation](http://helpx.adobe.com/flash/kb/control-access-scripts-host-web.html)*.
+If you hosted "`ZeroClipboard.swf`" on a different domain than the hosting page on version 1.1.7 or below, when you upgrade
+to a version above 1.1.7, you should either move "`ZeroClipboard.swf`" to the same domain as the hosting page or set the
+`allowScriptAccess` option to `always`.
+
+As of version 1.3.0, it is no longer necessary to set the `allowScriptAccess` configuration option as its default value
+is now `null` but the appropriate value will be determined immediately before the Flash object is embedded on the page.
+The value is based on a relationship between the current domain (`window.location.host`) and the value of the
+`trustedDomains` configuration option.
+
+**TL;DR default values:**
+ - &ge; v1.3.0: `null` _(appropriate value determined on-the-fly during embedding)_
+ - &gt; v1.1.7 &lt; v1.3.0: `"sameDomain"`
+ - &le; v1.1.7: `"always"`
+
+For more information about `allowScriptAccess`, consult the _[official Flash documentation](http://helpx.adobe.com/flash/kb/control-access-scripts-host-web.html)_.
 
 
 ### Cross-Protocol Limitations
@@ -581,8 +628,6 @@ The current list of deprecations includes:
      - Use the `forceHandCursor` config option instead!
  - `ZeroClipboard.prototype.reposition` &rarr; as of [v1.2.0], removing in [v2.0.0]
      - Repositioning is now handled more intelligently internally, so this method is simply no longer needed by users.
- - The `trustedDomains` config option &rarr; as of [v1.2.0], removing in [v2.0.0]
-     - Use the `trustedOrigins` config option instead!
  - `ZeroClipboard.prototype.receiveEvent` &rarr; as of [v1.2.0], removing in [v2.0.0]
      - This should only be used internally, so this method will be removed from the public API.
  - `ZeroClipboard.detectFlashSupport` &rarr; as of [v1.2.0], removing in [v2.0.0]
@@ -591,3 +636,7 @@ The current list of deprecations includes:
      - As of [v2.0.0] (but no sooner), you will be able to use normal `:hover` CSS pseudo-class selectors instead!
  - The `activeClass` config option &rarr; as of [v1.3.0], removing in [v2.0.0]
      - As of [v2.0.0] (but no sooner), you will be able to use normal `:active` CSS pseudo-class selectors instead!
+ - The `trustedOrigins` config option &rarr; as of [v1.3.0], removing in [v2.0.0]
+     - Use the `trustedDomains` config option instead!
+ - The `allowScriptAccess` config option &rarr; as of [v1.3.0], removing in [v2.0.0]
+     - The correct value can be intelligently calculated internally, so this option is simply no longer needed by users.

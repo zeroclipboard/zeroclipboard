@@ -267,28 +267,58 @@ var _noCache = function (path, options) {
  * returns flashvars separated by &
  */
 var _vars = function (options) {
-  var str = [];
+  var i, len, domain,
+      str = [],
+      domains = [],
+      trustedOriginsExpanded = [];
 
-  var origins = [];
+  /** @deprecated `trustedOrigins` in [v1.3.0], slated for removal in [v2.0.0]. See docs for more info. */
   if (options.trustedOrigins) {
     if (typeof options.trustedOrigins === "string") {
-      origins.push(options.trustedOrigins);
+      domains.push(options.trustedOrigins);
     }
     else if (typeof options.trustedOrigins === "object" && "length" in options.trustedOrigins) {
-      origins = origins.concat(options.trustedOrigins);
+      domains = domains.concat(options.trustedOrigins);
     }
   }
-  /** @deprecated `trustedDomains` in [v1.2.0], slated for removal in [v2.0.0]. See docs for more info. */
   if (options.trustedDomains) {
     if (typeof options.trustedDomains === "string") {
-      origins.push(options.trustedDomains);
+      domains.push(options.trustedDomains);
     }
     else if (typeof options.trustedDomains === "object" && "length" in options.trustedDomains) {
-      origins = origins.concat(options.trustedDomains);
+      domains = domains.concat(options.trustedDomains);
     }
   }
-  if (origins.length) {
-    str.push("trustedOrigins=" + encodeURIComponent(origins.join(",")));
+  if (domains.length) {
+    for (i = 0, len = domains.length; i < len; i++) {
+      if (domains.hasOwnProperty(i) && domains[i] && typeof domains[i] === "string") {
+        domain = _extractDomain(domains[i]);
+
+        if (!domain) {
+          continue;
+        }
+
+        // If we encounter a wildcard, ignore everything else as they are irrelevant
+        if (domain === "*") {
+          trustedOriginsExpanded = [domain];
+          break;
+        }
+
+        // Add the domain, relative protocol + domain, and absolute protocol + domain ("origin")
+        // because Flash Player seems to handle these inconsistently (perhaps in different versions)
+        trustedOriginsExpanded.push.apply(
+          trustedOriginsExpanded,
+          [
+            domain,
+            "//" + domain,
+            window.location.protocol + "//" + domain
+          ]
+        );
+      }
+    }
+  }
+  if (trustedOriginsExpanded.length) {
+    str.push("trustedOrigins=" + encodeURIComponent(trustedOriginsExpanded.join(",")));
   }
 
   // if ZeroClipboard is loaded as an AMD module
@@ -324,7 +354,7 @@ var _inArray = function (elem, array, fromIndex) {
     fromIndex = len + fromIndex;
   }
   for (i = fromIndex; i < len; i++) {
-    if (array[i] === elem) {
+    if (array.hasOwnProperty(i) && array[i] === elem) {
       return i;
     }
   }
@@ -452,3 +482,108 @@ var _extend = function() {
   }
   return target;
 };
+
+
+/*
+ * Extract the domain (e.g. "github.com") from an origin (e.g. "https://github.com") or
+ * URL (e.g. "https://github.com/zeroclipboard/zeroclipboard/").
+ * @returns the domain
+ * @private
+ */
+var _extractDomain = function(originOrUrl) {
+  if (originOrUrl == null) {
+    return null;
+  }
+
+  // Trim
+  originOrUrl = originOrUrl.replace(/^\s+|\s+$/g, "");
+  if (originOrUrl === "") {
+    return null;
+  }
+
+  // Strip the protocol, if any was provided
+  var protocolIndex = originOrUrl.indexOf("//");
+  originOrUrl = protocolIndex === -1 ? originOrUrl : originOrUrl.slice(protocolIndex + 2);
+
+  // Strip the path, if any was provided
+  var pathIndex = originOrUrl.indexOf("/");
+  originOrUrl = pathIndex === -1 ? originOrUrl : protocolIndex === -1 || pathIndex === 0 ? null : originOrUrl.slice(0, pathIndex);
+
+  if (originOrUrl && originOrUrl.slice(-4).toLowerCase() === ".swf") {
+    return null;
+  }
+  return originOrUrl || null;
+};
+
+
+/**
+ * Set `allowScriptAccess` based on `trustedDomains` and `window.location.host` vs. `moviePath`
+ * @private
+ */
+var _determineScriptAccess = (function() {
+  var _extractAllDomains = function(origins, resultsArray) {
+    var i, len, tmp;
+    if (origins != null && resultsArray[0] !== "*") {
+      if (typeof origins === "string") {
+        origins = [origins];
+      }
+      if (typeof origins === "object" && "length" in origins) {
+        for (i = 0, len = origins.length; i < len; i++) {
+          if (origins.hasOwnProperty(i)) {
+            tmp = _extractDomain(origins[i]);
+            if (tmp) {
+              if (tmp === "*") {
+                resultsArray.length = 0;
+                resultsArray.push("*");
+                break;
+              }
+              if (_inArray(tmp, resultsArray) === -1) {
+                resultsArray.push(tmp);
+              }
+            }
+          }
+        }
+      }
+    }
+  };
+
+  var _accessLevelLookup = {
+    "always": "always",
+    "samedomain": "sameDomain",
+    "never": "never"
+  };
+
+  return function(currentDomain, configOptions) {
+    var asaLower,
+        allowScriptAccess = configOptions.allowScriptAccess;
+
+    if (typeof allowScriptAccess === "string" && (asaLower = allowScriptAccess.toLowerCase()) && /^always|samedomain|never$/.test(asaLower)) {
+      return _accessLevelLookup[asaLower];
+    }
+    // else...
+
+    // Get SWF domain
+    var swfDomain = _extractDomain(configOptions.moviePath);
+    if (swfDomain === null) {
+      swfDomain = currentDomain;
+    }
+    // Get all trusted domains
+    var trustedDomains = [];
+    _extractAllDomains(configOptions.trustedOrigins, trustedDomains);
+    _extractAllDomains(configOptions.trustedDomains, trustedDomains);
+
+    var len = trustedDomains.length;
+    if (len > 0) {
+      if (len === 1 && trustedDomains[0] === "*") {
+        return "always";
+      }
+      if (_inArray(currentDomain, trustedDomains) !== -1) {
+        if (len === 1 && currentDomain === swfDomain) {
+          return "sameDomain";
+        }
+        return "always";
+      }
+    }
+    return "never";
+  };
+})();

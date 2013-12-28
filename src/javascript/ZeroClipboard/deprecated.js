@@ -19,7 +19,27 @@ _defaults.activeClass = "zeroclipboard-is-active";
 
 
 /*
- * @deprecated in [v1.2.0], slated for removal in [v2.0.0]. See docs for alternatives.
+ * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for alternatives.
+ *
+ * Page origins that the SWF should trust (single string or array of strings)
+ *
+ * Originally from "core.js"
+ */
+_defaults.trustedOrigins = null;
+
+
+/*
+ * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for more info.
+ *
+ * SWF outbound scripting policy
+ *
+ * Originally from "core.js"
+ */
+_defaults.allowScriptAccess = null;
+
+
+/*
+ * @deprecated in [v1.2.0], slated for removal in [v2.0.0]. See docs for more info.
  *
  * Simple Flash Detection
  *
