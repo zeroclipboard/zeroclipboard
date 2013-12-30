@@ -1,9 +1,9 @@
 /*
- * Creates a new ZeroClipboard client. from an element, or array of elements.
+ * Creates a new ZeroClipboard client; optionally, from an element or array of elements.
  *
  * returns the client instance if it's already created
  */
-var ZeroClipboard = function (elements, options) {
+var ZeroClipboard = function (elements, /** @deprecated */ options) {
 
   // If the elements exist glue
   if (elements) (ZeroClipboard.prototype._singleton || this).glue(elements);
@@ -12,6 +12,11 @@ var ZeroClipboard = function (elements, options) {
   if (ZeroClipboard.prototype._singleton) return ZeroClipboard.prototype._singleton;
 
   ZeroClipboard.prototype._singleton = this;
+
+  // Warn about use of deprecated constructor signature
+  if (options) {
+    _deprecationWarning("new ZeroClipboard(elements, options)", this.options.debug);
+  }
 
   // Set and override the defaults
   this.options = _extend({}, _defaults, options);

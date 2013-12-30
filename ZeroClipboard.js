@@ -383,6 +383,9 @@
     if (elements) (ZeroClipboard.prototype._singleton || this).glue(elements);
     if (ZeroClipboard.prototype._singleton) return ZeroClipboard.prototype._singleton;
     ZeroClipboard.prototype._singleton = this;
+    if (options) {
+      _deprecationWarning("new ZeroClipboard(elements, options)", this.options.debug);
+    }
     this.options = _extend({}, _defaults, options);
     this.handlers = {};
     if (typeof flashState.global.noflash !== "boolean") {

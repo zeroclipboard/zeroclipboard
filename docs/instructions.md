@@ -106,6 +106,8 @@ You can also set the options when creating a new client by passing an optional "
 var clip = new ZeroClipboard($("#d_clip_button"), { moviePath: "new/path" });`
 ```
 
+However, this per-client options overriding is deprecated as of v1.3.0.
+
 Whenever possible, we recommend that you change the defaults rather than changing options per client. This works out
 better in most situations as:
  1. Some options apply outside of `ZeroClipboard` instances, e.g. `debug` currently affects some static methods.
@@ -640,3 +642,6 @@ The current list of deprecations includes:
      - Use the `trustedDomains` config option instead!
  - The `allowScriptAccess` config option &rarr; as of [v1.3.0], removing in [v2.0.0]
      - The correct value can be intelligently calculated internally, so this option is simply no longer needed by users.
+ - `new ZeroClipboard(elements, options)` &rarr; as of [v1.3.0], removing in [v2.0.0]
+     - Most options actually have a global effect rather than a per-client effect, so we are removing the ability to
+       customize options per-client to help avoid confusion. The constructor `new ZeroClipboard(elements)` will remain.
