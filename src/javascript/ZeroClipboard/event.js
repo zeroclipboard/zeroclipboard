@@ -25,7 +25,7 @@ ZeroClipboard.dispatch = function (eventName, args) {
  */
 ZeroClipboard.prototype.on = function (eventName, func) {
   // add user event listener for event
-  var events = eventName.toString().split(/\s/g),
+  var events = eventName.toString().split(/\s+/),
       added = {};
   for (var i = 0, len = events.length; i < len; i++) {
     eventName = events[i].toLowerCase().replace(/^on/, '');
@@ -68,7 +68,7 @@ ZeroClipboard.prototype.addEventListener = ZeroClipboard.prototype.on;
  */
 ZeroClipboard.prototype.off = function (eventName, func) {
   var i, len, handlers, foundIndex,
-      events = eventName.toString().split(/\s/g);
+      events = eventName.toString().split(/\s+/);
   for (i = 0, len = events.length; i < len; i++) {
     eventName = events[i].toLowerCase().replace(/^on/, "");
     handlers = this.handlers[eventName];
@@ -198,7 +198,7 @@ ZeroClipboard.prototype.glue = function (elements) {
   elements = _prepGlue(elements);
 
   for (var i = 0; i < elements.length ; i++) {
-    if (elements[i] && elements[i].nodeType === 1) {
+    if (elements.hasOwnProperty(i) && elements[i] && elements[i].nodeType === 1) {
       // if the element has not been glued
       if (_inArray(elements[i], gluedElements) === -1) {
 
@@ -223,14 +223,17 @@ ZeroClipboard.prototype.unglue = function (elements) {
   elements = _prepGlue(elements);
 
   for (var i = 0; i < elements.length; i++) {
+    if (elements.hasOwnProperty(i) && elements[i] && elements[i].nodeType === 1) {
+      _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
 
-    _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
+      // get the index of the item
+      var arrayIndex = _inArray(elements[i], gluedElements);
 
-    // get the index of the item
-    var arrayIndex = _inArray(elements[i], gluedElements);
-
-    // if the index is not -1, remove from array
-    if (arrayIndex !== -1) gluedElements.splice(arrayIndex, 1);
+      // if the index is not -1, remove from array
+      if (arrayIndex !== -1) {
+        gluedElements.splice(arrayIndex, 1);
+      }
+    }
   }
 
   return this;

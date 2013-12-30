@@ -84,10 +84,10 @@
     _removeClass(div, "ass");
     assert.strictEqual(div.className, "class1 class-2 class_3");
 
-    _removeClass(div, "-");
+    _removeClass(div, "-2");
     assert.strictEqual(div.className, "class1 class-2 class_3");
 
-    _removeClass(div, " ");
+    _removeClass(div, "_3");
     assert.strictEqual(div.className, "class1 class-2 class_3");
 
     div = null;
@@ -114,39 +114,6 @@
     assert.strictEqual(div.className, "class1 class-2 class_3");
 
     div = null;
-  });
-
-
-  // TODO: Remove this test; see TODO notes in utils.js source
-  test("elements with `addClass` already use the function", function(assert) {
-    assert.expect(2);
-
-    // Arrange
-    var $div = $("<div></div>");
-
-    // Act & Assert
-    assert.strictEqual($div[0].className, "");
-    _addClass($div, "class1");
-    assert.strictEqual($div[0].className, "class1");
-
-    $div = null;
-  });
-
-
-  // TODO: Remove this test; see TODO notes in utils.js source
-  test("elements with `removeClass` already use the function", function(assert) {
-    assert.expect(2);
-
-    // Arrange
-    var $div = $("<div></div>").addClass("class1");
-
-    // Act & Assert
-    assert.strictEqual($div[0].className, "class1");
-
-    _removeClass($div, "class1");
-    assert.strictEqual($div[0].className, "");
-
-    $div = null;
   });
 
 

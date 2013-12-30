@@ -41,11 +41,8 @@
     if (prop === "cursor") {
       if (!value || value === "auto") {
         tagName = el.tagName.toLowerCase();
-        possiblePointers = [ "a" ];
-        for (i = 0, len = possiblePointers.length; i < len; i++) {
-          if (tagName === possiblePointers[i]) {
-            return "pointer";
-          }
+        if (tagName === "a") {
+          return "pointer";
         }
       }
     }
@@ -67,6 +64,9 @@
     ZeroClipboard.prototype._singleton.setCurrent(target);
   };
   var _addEventHandler = function(element, method, func) {
+    if (!element || element.nodeType !== 1) {
+      return;
+    }
     if (element.addEventListener) {
       element.addEventListener(method, func, false);
     } else if (element.attachEvent) {
@@ -74,6 +74,9 @@
     }
   };
   var _removeEventHandler = function(element, method, func) {
+    if (!element || element.nodeType !== 1) {
+      return;
+    }
     if (element.removeEventListener) {
       element.removeEventListener(method, func, false);
     } else if (element.detachEvent) {
@@ -81,8 +84,13 @@
     }
   };
   var _addClass = function(element, value) {
-    if (element.addClass) {
-      element.addClass(value);
+    if (!element || element.nodeType !== 1) {
+      return element;
+    }
+    if (element.classList) {
+      if (!element.classList.contains(value)) {
+        element.classList.add(value);
+      }
       return element;
     }
     if (value && typeof value === "string") {
@@ -104,8 +112,13 @@
     return element;
   };
   var _removeClass = function(element, value) {
-    if (element.removeClass) {
-      element.removeClass(value);
+    if (!element || element.nodeType !== 1) {
+      return element;
+    }
+    if (element.classList) {
+      if (element.classList.contains(value)) {
+        element.classList.remove(value);
+      }
       return element;
     }
     if (value && typeof value === "string" || value === undefined) {
@@ -524,7 +537,7 @@
     }
   };
   ZeroClipboard.prototype.on = function(eventName, func) {
-    var events = eventName.toString().split(/\s/g), added = {};
+    var events = eventName.toString().split(/\s+/), added = {};
     for (var i = 0, len = events.length; i < len; i++) {
       eventName = events[i].toLowerCase().replace(/^on/, "");
       added[eventName] = true;
@@ -550,7 +563,7 @@
   };
   ZeroClipboard.prototype.addEventListener = ZeroClipboard.prototype.on;
   ZeroClipboard.prototype.off = function(eventName, func) {
-    var i, len, handlers, foundIndex, events = eventName.toString().split(/\s/g);
+    var i, len, handlers, foundIndex, events = eventName.toString().split(/\s+/);
     for (i = 0, len = events.length; i < len; i++) {
       eventName = events[i].toLowerCase().replace(/^on/, "");
       handlers = this.handlers[eventName];
@@ -648,7 +661,7 @@
   ZeroClipboard.prototype.glue = function(elements) {
     elements = _prepGlue(elements);
     for (var i = 0; i < elements.length; i++) {
-      if (elements[i] && elements[i].nodeType === 1) {
+      if (elements.hasOwnProperty(i) && elements[i] && elements[i].nodeType === 1) {
         if (_inArray(elements[i], gluedElements) === -1) {
           gluedElements.push(elements[i]);
           _addEventHandler(elements[i], "mouseover", _elementMouseOver);
@@ -660,9 +673,13 @@
   ZeroClipboard.prototype.unglue = function(elements) {
     elements = _prepGlue(elements);
     for (var i = 0; i < elements.length; i++) {
-      _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
-      var arrayIndex = _inArray(elements[i], gluedElements);
-      if (arrayIndex !== -1) gluedElements.splice(arrayIndex, 1);
+      if (elements.hasOwnProperty(i) && elements[i] && elements[i].nodeType === 1) {
+        _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
+        var arrayIndex = _inArray(elements[i], gluedElements);
+        if (arrayIndex !== -1) {
+          gluedElements.splice(arrayIndex, 1);
+        }
+      }
     }
     return this;
   };

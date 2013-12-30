@@ -44,11 +44,8 @@ var _getStyle = function (el, prop) {
   if (prop === "cursor") {
     if (!value || value === "auto") {
       tagName = el.tagName.toLowerCase();
-      possiblePointers = ["a"];
-      for (i = 0, len = possiblePointers.length; i < len; i++) {
-        if (tagName === possiblePointers[i]) {
-          return "pointer";
-        }
+      if (tagName === "a") {
+        return "pointer";
       }
     }
   }
@@ -85,6 +82,10 @@ var _elementMouseOver = function (event) {
 
 // private function for adding events to the dom, IE before 9 is suckage
 var _addEventHandler = function (element, method, func) {
+  if (!element || element.nodeType !== 1) {
+    return;
+  }
+
   if (element.addEventListener) { // all browsers except IE before version 9
     element.addEventListener(method, func, false);
   } else if (element.attachEvent) { // IE before version 9
@@ -94,6 +95,10 @@ var _addEventHandler = function (element, method, func) {
 
 // private function for removing events from the dom, IE before 9 is suckage
 var _removeEventHandler = function (element, method, func) {
+  if (!element || element.nodeType !== 1) {
+    return;
+  }
+
   if (element.removeEventListener) { // all browsers except IE before version 9
     element.removeEventListener(method, func, false);
   } else if (element.detachEvent) { // IE before version 9
@@ -103,17 +108,20 @@ var _removeEventHandler = function (element, method, func) {
 
 /*
  * This private function adds a class to the passed in element.
- * paired down version of addClass from jQuery https://github.com/jquery/jquery/blob/master/speed/jquery-basis.js#L1227
  *
  * returns the element with a new class
  */
 var _addClass = function (element, value) {
 
-  // TODO: Remove this shortcut as we should only ever be receiving a normal HTML element here, which do not have `addClass` functions.
-  // TODO: Add a shortcut using the newer DOM property `classList`:  https://developer.mozilla.org/en-US/docs/Web/API/element.classList
-  // If the element has addClass already
-  if (element.addClass) {
-    element.addClass(value);
+  if (!element || element.nodeType !== 1) {
+    return element;
+  }
+
+  // If the element has `classList`
+  if (element.classList) {
+    if (!element.classList.contains(value)) {
+      element.classList.add(value);
+    }
     return element;
   }
 
@@ -142,17 +150,20 @@ var _addClass = function (element, value) {
 
 /*
  * This private function removes a class from the provided elment
- * paired down version of removeClass from jQuery https://github.com/jquery/jquery/blob/master/speed/jquery-basis.js#L1261
  *
  * returns the element without the class
  */
 var _removeClass = function (element, value) {
 
-  // TODO: Remove this shortcut as we should only ever be receiving a normal HTML element here, which do not have `removeClass` functions.
-  // TODO: Add a shortcut using the newer DOM property `classList`:  https://developer.mozilla.org/en-US/docs/Web/API/element.classList
-  // If the element has removeClass already
-  if (element.removeClass) {
-    element.removeClass(value);
+  if (!element || element.nodeType !== 1) {
+    return element;
+  }
+
+  // If the element has `classList`
+  if (element.classList) {
+    if (element.classList.contains(value)) {
+      element.classList.remove(value);
+    }
     return element;
   }
 
