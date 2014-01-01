@@ -5,115 +5,143 @@
  */
 var ZeroClipboard = function (elements, /** @deprecated */ options) {
 
-  // If the elements exist glue
-  if (elements) (ZeroClipboard.prototype._singleton || this).glue(elements);
+  // Ensure the constructor is invoked with the `new` keyword, even if the user forgets it
+  if (!(this instanceof ZeroClipboard)) {
+    return new ZeroClipboard(elements, options);
+  }
 
-  // If there's a client already, return the singleton
-  if (ZeroClipboard.prototype._singleton) return ZeroClipboard.prototype._singleton;
+  // Assign an ID to the client instance
+  this.id = "" + (clientIdCounter++);
 
-  ZeroClipboard.prototype._singleton = this;
+  // Create the meta information store for this client
+  _clientMeta[this.id] = {
+    instance: this,
+    elements: [],
+    handlers: {}
+  };
+
+  // If the elements argument exists, glue it
+  if (elements) {
+    this.glue(elements);
+  }
 
   // Warn about use of deprecated constructor signature
-  if (options) {
-    _deprecationWarning("new ZeroClipboard(elements, options)", this.options.debug);
+  if (typeof options !== "undefined") {
+    _deprecationWarning("new ZeroClipboard(elements, options)", _globalConfig.debug);
+
+    // Set and override the defaults
+    ZeroClipboard.config(options);
   }
 
-  // Set and override the defaults
-  this.options = _extend({}, _defaults, options);
-
-  // event handlers
-  this.handlers = {};
+  /** @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for more info. */
+  this.options = ZeroClipboard.config();
 
   // Flash status
-  if (typeof flashState.global.noflash !== "boolean") {
-    flashState.global.noflash = !_detectFlashSupport();
-  }
-  if (!flashState.clients.hasOwnProperty(this.options.moviePath)) {
-    flashState.clients[this.options.moviePath] = {
-      ready: false
-    };
+  if (typeof flashState.noflash !== "boolean") {
+    flashState.noflash = !_detectFlashSupport();
   }
 
   // Setup the Flash <-> JavaScript bridge
-  if (flashState.global.noflash === false) {
-    _bridge();
+  if (flashState.noflash === false && flashState.wrongflash !== true) {
+    if (flashState.bridge === null) {
+      flashState.wrongflash = false;
+      flashState.ready = false;
+      _bridge();
+    }
   }
-
 };
 
 
 /*
- * Sets the current html object that the flash object should overlay.
- * This will put the global flash object on top of the current object and set
- * the text and title from the html object.
- *
- * returns object instance
- */
-ZeroClipboard.prototype.setCurrent = function (element) {
-
-  // What element is current
-  currentElement = element;
-
-  _reposition.call(this);
-
-  // If the dom element has a title
-  var titleAttr = element.getAttribute("title");
-  if (titleAttr) {
-    this.setTitle(titleAttr);
-  }
-
-  // If the element has a pointer style, set to hand cursor
-  var useHandCursor = this.options.forceHandCursor === true || _getStyle(element, "cursor") === "pointer";
-  // Update the hand cursor state without updating the `forceHandCursor` option
-  _setHandCursor.call(this, useHandCursor);
-
-  return this;
-};
-
-/*
- * Sends a signal to the flash object to set the clipboard text.
+ * Sends a signal to the Flash object to set the clipboard text.
  *
  * returns object instance
  */
 ZeroClipboard.prototype.setText = function (newText) {
   if (newText && newText !== "") {
-    this.options.text = newText;
-    if (this.ready()) this.flashBridge.setText(newText);
+    _clipData["text/plain"] = newText;
+    if (flashState.ready === true && flashState.bridge) {
+      flashState.bridge.setText(newText);
+    }
+    else {
+      //
+      // TODO: Fix Issue #295?
+      //
+    }
   }
-
   return this;
 };
 
-/*
- * Adds a title="" attribute to the htmlBridge to give it tooltip capabiities
- *
- * returns object instance
- */
-ZeroClipboard.prototype.setTitle = function (newTitle) {
-  if (newTitle && newTitle !== "") this.htmlBridge.setAttribute("title", newTitle);
-
-  return this;
-};
 
 /*
- * Sends a signal to the flash object to change the stage size.
+ * Sends a signal to the Flash object to change the stage size/dimensions.
  *
  * returns object instance
  */
 ZeroClipboard.prototype.setSize = function (width, height) {
-  if (this.ready()) this.flashBridge.setSize(width, height);
-
+  if (flashState.ready === true && flashState.bridge) {
+    flashState.bridge.setSize(width, height);
+  }
+  else {
+    //
+    // TODO: ???
+    //
+  }
   return this;
 };
+
 
 /*
  * @private
  *
- * Sends a signal to the flash object to display the hand cursor if true.
+ * Sends a signal to the Flash object to display the hand cursor if true.
  * Does NOT update the value of the `forceHandCursor` option.
  *
  * returns nothing
  */
 var _setHandCursor = function (enabled) {
-  if (this.ready()) this.flashBridge.setHandCursor(enabled);
+  if (flashState.ready === true && flashState.bridge) {
+    flashState.bridge.setHandCursor(enabled);
+  }
+  else {
+    //
+    // TODO: ???
+    //
+  }
+};
+
+
+/*
+ * Self-destruction and clean up everything for a single client.
+ *
+ * returns nothing
+ */
+ZeroClipboard.prototype.destroy = function () {
+  // unglue all the elements
+  this.unglue();
+
+  // Remove all event handlers
+  this.off();
+
+  // Delete the client's metadata store
+  delete _clientMeta[this.id];
+};
+
+
+/*
+ * Get all clients.
+ *
+ * returns array of clients
+ */
+var _getAllClients = function () {
+  var i, len, client,
+      clients = [],
+      clientIds = _objectKeys(_clientMeta);
+  for (i = 0, len = clientIds.length; i < len; i++) {
+    client = _clientMeta[clientIds[i]].instance;
+    if (client && client instanceof ZeroClipboard) {
+      clients.push(client);
+    }
+  }
+  return clients;
 };

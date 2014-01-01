@@ -59,11 +59,7 @@ var _getStyle = function (el, prop) {
  * returns nothing
  */
 var _elementMouseOver = function (event) {
-
-  // If the singleton doesn't exist return
-  if (!ZeroClipboard.prototype._singleton) return;
-
-  // IE won't have event
+  // IE usually doesn't pass the event
   if (!event) {
     event = window.event;
   }
@@ -77,7 +73,9 @@ var _elementMouseOver = function (event) {
   } else if (event.srcElement) {
     target = event.srcElement;
   }
-  ZeroClipboard.prototype._singleton.setCurrent(target);
+
+  // Set this as the new currently active element
+  ZeroClipboard.activate(target);
 };
 
 // private function for adding events to the dom, IE before 9 is suckage
@@ -427,10 +425,10 @@ var _getSafeZIndex = function (val) {
   }
 
   if (!zIndex) {
-    if (typeof _defaults.zIndex === "number" && _defaults.zIndex > 0) {
-      zIndex = _defaults.zIndex;
+    if (typeof _globalConfig.zIndex === "number" && _globalConfig.zIndex > 0) {
+      zIndex = _globalConfig.zIndex;
     }
-    else if (typeof _defaults.zIndex === "string" && (tmp = parseInt(_defaults.zIndex, 10)) && !isNaN(tmp) && tmp > 0) {
+    else if (typeof _globalConfig.zIndex === "string" && (tmp = parseInt(_globalConfig.zIndex, 10)) && !isNaN(tmp) && tmp > 0) {
       zIndex = tmp;
     }
   }
@@ -502,7 +500,7 @@ var _extend = function() {
  * @private
  */
 var _extractDomain = function(originOrUrl) {
-  if (originOrUrl == null) {
+  if (originOrUrl == null || originOrUrl === "") {
     return null;
   }
 
@@ -598,3 +596,45 @@ var _determineScriptAccess = (function() {
     return "never";
   };
 })();
+
+
+/**
+ * Get all of an object's owned, enumerable property names, Does NOT include prototype properties.
+ * @returns an array of property names
+ * @private
+ */
+var _objectKeys = function (obj) {
+  // Avoid the impending `TypeError`
+  if (obj == null) {
+    return [];
+  }
+  if (Object.keys) {
+    return Object.keys(obj);
+  }
+  var keys = [];
+  for (var prop in obj) {
+    if (obj.hasOwnProperty(prop)) {
+      keys.push(prop);
+    }
+  }
+  return keys;
+};
+
+
+/**
+ * Remove all owned properties from an object.
+ *
+ * @returns the original object with its owned properties
+ *
+ * @private
+ */
+var _deleteOwnProperties = function(obj) {
+  if (obj) {
+    for (var prop in obj) {
+      if (obj.hasOwnProperty(prop)) {
+        delete obj[prop];
+      }
+    }
+  }
+  return obj;
+};

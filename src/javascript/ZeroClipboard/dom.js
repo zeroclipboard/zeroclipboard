@@ -11,26 +11,27 @@ var _cjsModuleId = null;
  */
 var _bridge = function () {
   var flashBridge, len;
-  var client = ZeroClipboard.prototype._singleton;
+
   // try and find the current global bridge
   var container = document.getElementById("global-zeroclipboard-html-bridge");
 
   if (!container) {
-    // Create a copy of the `client.options` object to avoid exposing
+    // Get a copy of the `_globalConfig` object to avoid exposing
     // the `amdModuleId` and `cjsModuleId` settings
-    var opts = _extend({}, client.options);
+    var opts = ZeroClipboard.config();
     // Set these last to override them just in case any [v1.2.0-beta.1] users
     // are still passing them in to [v1.2.0-beta.2] (or higher)
     opts.amdModuleId = _amdModuleId;
     opts.cjsModuleId = _cjsModuleId;
 
     // Set `allowScriptAccess` based on `trustedDomains` and `window.location.host` vs. `moviePath`
-    var allowScriptAccess = _determineScriptAccess(window.location.host, client.options);
+    var allowScriptAccess = _determineScriptAccess(window.location.host, _globalConfig);
 
     var flashvars = _vars(opts);
+    var swfUrl = _globalConfig.moviePath + _noCache(_globalConfig.moviePath, _globalConfig);
     var html = "\
       <object classid=\"clsid:d27cdb6e-ae6d-11cf-96b8-444553540000\" id=\"global-zeroclipboard-flash-bridge\" width=\"100%\" height=\"100%\"> \
-        <param name=\"movie\" value=\"" + client.options.moviePath + _noCache(client.options.moviePath, client.options) + "\"/> \
+        <param name=\"movie\" value=\"" + swfUrl + "\"/> \
         <param name=\"allowScriptAccess\" value=\"" + allowScriptAccess +  "\"/> \
         <param name=\"scale\" value=\"exactfit\"/> \
         <param name=\"loop\" value=\"false\"/> \
@@ -39,7 +40,7 @@ var _bridge = function () {
         <param name=\"bgcolor\" value=\"#ffffff\"/> \
         <param name=\"wmode\" value=\"transparent\"/> \
         <param name=\"flashvars\" value=\"" + flashvars + "\"/> \
-        <embed src=\"" + client.options.moviePath + _noCache(client.options.moviePath, client.options) + "\" \
+        <embed src=\"" + swfUrl + "\" \
           loop=\"false\" menu=\"false\" \
           quality=\"best\" bgcolor=\"#ffffff\" \
           width=\"100%\" height=\"100%\" \
@@ -62,7 +63,7 @@ var _bridge = function () {
     container.style.top = "-9999px";
     container.style.width = "15px";
     container.style.height = "15px";
-    container.style.zIndex = "" + _getSafeZIndex(client.options.zIndex);
+    container.style.zIndex = "" + _getSafeZIndex(_globalConfig.zIndex);
 
     // NOTE: Fixes https://github.com/zeroclipboard/zeroclipboard/issues/204
     // Although many web developers will tell you that the following 2 lines should be switched to
@@ -72,45 +73,27 @@ var _bridge = function () {
     document.body.appendChild(container);
     container.innerHTML = html;
   }
-
-  client.htmlBridge = container;
   
   flashBridge = document["global-zeroclipboard-flash-bridge"];
   if (flashBridge && (len = flashBridge.length)) {
     flashBridge = flashBridge[len - 1];
   }
-  client.flashBridge = flashBridge || container.children[0].lastElementChild;
+  flashState.bridge = flashBridge || container.children[0].lastElementChild;
 };
 
 /*
- * Reset the html bridge to be hidden off screen and not have title or text.
- *
- * returns object instance
+ * Get the HTML element container that wraps the Flash bridge object/element.
+ * @private
  */
-ZeroClipboard.prototype.resetBridge = function () {
-  if (this.htmlBridge) {
-    this.htmlBridge.style.left = "0px";
-    this.htmlBridge.style.top = "-9999px";
-    this.htmlBridge.removeAttribute("title");
+var _getHtmlBridge = function(flashBridge) {
+  var isFlashElement = /^object|embed$/;
+  var htmlBridge = flashBridge && flashBridge.parentNode;
+  while (htmlBridge && isFlashElement.test(htmlBridge.tagName.toLowerCase()) && htmlBridge.parentNode) {
+    htmlBridge = htmlBridge.parentNode;
   }
-  if (currentElement) {
-    _removeClass(currentElement, this.options.activeClass);
-    currentElement = null;
-  }
-  this.options.text = null;
-
-  return this;
+  return htmlBridge || null;
 };
 
-/*
- * Helper function to determine if the Flash bridge is ready. Gets this info from
- * a per-bridge status tracker.
- *
- * returns true if the Flash bridge is ready
- */
-ZeroClipboard.prototype.ready = function () {
-  return flashState.clients[this.options.moviePath].ready === true;
-};
 
 /*
  * Reposition the Flash object to cover the current element being hovered over.
@@ -121,16 +104,21 @@ var _reposition = function () {
 
   // If there is no `currentElement`, skip it
   if (currentElement) {
-    var pos = _getDOMObjectPosition(currentElement, this.options.zIndex);
+    var pos = _getDOMObjectPosition(currentElement, _globalConfig.zIndex);
 
     // new css
-    this.htmlBridge.style.top    = pos.top + "px";
-    this.htmlBridge.style.left   = pos.left + "px";
-    this.htmlBridge.style.width  = pos.width + "px";
-    this.htmlBridge.style.height = pos.height + "px";
-    this.htmlBridge.style.zIndex = pos.zIndex + 1;
+    var htmlBridge = _getHtmlBridge(flashState.bridge);
+    if (htmlBridge) {
+      htmlBridge.style.top    = pos.top + "px";
+      htmlBridge.style.left   = pos.left + "px";
+      htmlBridge.style.width  = pos.width + "px";
+      htmlBridge.style.height = pos.height + "px";
+      htmlBridge.style.zIndex = pos.zIndex + 1;
+    }
 
-    this.setSize(pos.width, pos.height);
+    if (flashState.ready === true && flashState.bridge) {
+      flashState.bridge.setSize(pos.width, pos.height);
+    }
   }
 
   return this;

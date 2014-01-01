@@ -1,67 +1,108 @@
-/*global ZeroClipboard, _defaults */
+/*global ZeroClipboard, _globalConfig:true */
 
 "use strict";
 
 (function(module, test) {
 
-  var originalMoviePath;
+  var originalConfig;
 
   module("core", {
     setup: function() {
-      originalMoviePath = _defaults.moviePath;
+      originalConfig = ZeroClipboard.config();
     },
     teardown: function() {
-      ZeroClipboard.setDefaults({
-        moviePath: originalMoviePath
-      });
+      _globalConfig = originalConfig;
     }
   });
 
-  test("Changing movie path works", function(assert) {
-    assert.expect(2);
 
-    // Arrange
-    var clip = new ZeroClipboard();
+  test("Changing `moviePath` works", function(assert) {
+    assert.expect(5);
 
     // Assert, act, assert
 
     // Test that the client has the default path
-    assert.strictEqual(clip.options.moviePath, "ZeroClipboard.swf");
+    assert.strictEqual(ZeroClipboard.config("moviePath"), "ZeroClipboard.swf");
+    assert.strictEqual(ZeroClipboard.config().moviePath, "ZeroClipboard.swf");
     // Change the path
-    clip.options.moviePath = "new/movie/path.swf";
+    var updatedConfig = ZeroClipboard.config({ moviePath: "new/movie/path.swf" });
     // Test that the client has the changed path
-    assert.strictEqual(clip.options.moviePath, "new/movie/path.swf");
+    assert.strictEqual(updatedConfig.moviePath, "new/movie/path.swf");
+    assert.strictEqual(ZeroClipboard.config("moviePath"), "new/movie/path.swf");
+    assert.strictEqual(ZeroClipboard.config().moviePath, "new/movie/path.swf");
   });
 
-  test("Set trusted origins", function(assert) {
-    assert.expect(2);
+
+  test("Changing `trustedDomains` works", function(assert) {
+    assert.expect(5);
 
     // Arrange
-    var clip = new ZeroClipboard();
+    var currentHost = window.location.host;
+    var originalValue = currentHost ? [currentHost] : [];
+    var updatedValue = currentHost ? [currentHost, "otherDomain.com"] : ["otherDomain.com"];
 
     // Assert, act, assert
-    // Test that trustedOrigins is `null`/`undefined`
-    assert.equal(clip.options.trustedOrigins, null);
+    // Test that the client has the default value
+    assert.deepEqual(ZeroClipboard.config("trustedDomains"), originalValue);
+    assert.deepEqual(ZeroClipboard.config().trustedDomains, originalValue);
     // Change the value
-    clip.options.trustedOrigins = "google.com";
-    // Test that trustedOrigins is now defined as the new value
-    assert.strictEqual(clip.options.trustedOrigins, "google.com");
+    var updatedConfig = ZeroClipboard.config({ trustedDomains: updatedValue });
+    // Test that the client has the changed value
+    assert.deepEqual(updatedConfig.trustedDomains, updatedValue);
+    assert.deepEqual(ZeroClipboard.config("trustedDomains"), updatedValue);
+    assert.deepEqual(ZeroClipboard.config().trustedDomains, updatedValue);
   });
 
+
+  /** @deprecated */
+  module("core - deprecated", {
+    setup: function() {
+      originalConfig = ZeroClipboard.config();
+      ZeroClipboard.config({ debug: false });
+    },
+    teardown: function() {
+      _globalConfig = originalConfig;
+    }
+  });
+
+
+  /** @deprecated */
+  test("Changing `trustedOrigins` works", function(assert) {
+    assert.expect(5);
+
+    // Arrange
+    var currentHost = window.location.host || "localhost";
+    var originalValue = null;
+    var updatedValue = [currentHost, "otherDomain.com"];
+
+    // Assert, act, assert
+    // Test that the client has the default value
+    assert.equal(ZeroClipboard.config("trustedOrigins"), originalValue);
+    assert.equal(ZeroClipboard.config().trustedOrigins, originalValue);
+    // Change the value
+    var updatedConfig = ZeroClipboard.config({ trustedOrigins: updatedValue });
+    // Test that the client has the changed value
+    assert.deepEqual(updatedConfig.trustedOrigins, updatedValue);
+    assert.deepEqual(ZeroClipboard.config("trustedOrigins"), updatedValue);
+    assert.deepEqual(ZeroClipboard.config().trustedOrigins, updatedValue);
+  });
+
+
+  /** @deprecated */
   test("Setting default options", function(assert) {
     assert.expect(4);
 
     // Arrange
     var newPath = "the/path";
     var scriptAccess = "always";
+    var clip = new ZeroClipboard();
 
     // Assert
-    var clip = new ZeroClipboard();
     assert.notEqual(clip.options.moviePath, newPath);
     assert.notEqual(clip.options.allowScriptAccess, scriptAccess);
 
     // Act
-    ZeroClipboard.setDefaults({
+    ZeroClipboard.config({
       moviePath: newPath,
       allowScriptAccess: scriptAccess
     });

@@ -1,4 +1,4 @@
-/*global _camelizeCssPropName, _getStyle, _removeClass, _addClass, _vars, _noCache, _inArray, _dispatchCallback, _extend, _extractDomain, _determineScriptAccess */
+/*global _camelizeCssPropName, _getStyle, _removeClass, _addClass, _vars, _noCache, _inArray, _dispatchCallback, _extend, _extractDomain, _determineScriptAccess, _objectKeys, _deleteOwnProperties */
 
 "use strict";
 
@@ -365,7 +365,7 @@
     // Arrange
     var i, len, tmp;
     var currentDomain = window.location.host || "localhost";
-    var _defaults = {
+    var _globalConfig = {
       moviePath: "ZeroClipboard.swf",
       trustedOrigins: null,
       trustedDomains: [currentDomain],
@@ -373,45 +373,45 @@
     };
     var inputToExpectedMap = [
       // `allowScriptAccess` forcibly set
-      { args: [currentDomain, _extend({}, _defaults, { allowScriptAccess: "always" })], result: "always" },
-      { args: [currentDomain, _extend({}, _defaults, { allowScriptAccess: "ALWAYS" })], result: "always" },
-      { args: [currentDomain, _extend({}, _defaults, { allowScriptAccess: "samedomain" })], result: "sameDomain" },
-      { args: [currentDomain, _extend({}, _defaults, { allowScriptAccess: "sameDomain" })], result: "sameDomain" },
-      { args: [currentDomain, _extend({}, _defaults, { allowScriptAccess: "SAMEDOMAIN" })], result: "sameDomain" },
-      { args: [currentDomain, _extend({}, _defaults, { allowScriptAccess: "never" })], result: "never" },
-      { args: [currentDomain, _extend({}, _defaults, { allowScriptAccess: "NEVER" })], result: "never" },
+      { args: [currentDomain, _extend({}, _globalConfig, { allowScriptAccess: "always" })], result: "always" },
+      { args: [currentDomain, _extend({}, _globalConfig, { allowScriptAccess: "ALWAYS" })], result: "always" },
+      { args: [currentDomain, _extend({}, _globalConfig, { allowScriptAccess: "samedomain" })], result: "sameDomain" },
+      { args: [currentDomain, _extend({}, _globalConfig, { allowScriptAccess: "sameDomain" })], result: "sameDomain" },
+      { args: [currentDomain, _extend({}, _globalConfig, { allowScriptAccess: "SAMEDOMAIN" })], result: "sameDomain" },
+      { args: [currentDomain, _extend({}, _globalConfig, { allowScriptAccess: "never" })], result: "never" },
+      { args: [currentDomain, _extend({}, _globalConfig, { allowScriptAccess: "NEVER" })], result: "never" },
       // Same-domain SWF
-      { args: [currentDomain, _defaults], result: "sameDomain" },
-      { args: [currentDomain, _extend({}, _defaults, { trustedDomains: [] })], result: "never" },
-      { args: [currentDomain, _extend({}, _defaults, { trustedDomains: ["*"] })], result: "always" },
-      { args: [currentDomain, _extend({}, _defaults, { trustedDomains: [currentDomain, "otherDomain.com"] })], result: "always" },
-      { args: [currentDomain, _extend({}, _defaults, { trustedDomains: ["otherDomain.com"] })], result: "never" },
-      { args: [currentDomain, _extend({}, _defaults, { trustedDomains: [], trustedOrigins: [] })], result: "never" },
-      { args: [currentDomain, _extend({}, _defaults, { trustedDomains: [], trustedOrigins: ["*"] })], result: "always" },
-      { args: [currentDomain, _extend({}, _defaults, { trustedDomains: [], trustedOrigins: ["http://" + currentDomain] })], result: "sameDomain" },
-      { args: [currentDomain, _extend({}, _defaults, { trustedDomains: [], trustedOrigins: ["http://" + currentDomain, "http://otherDomain.com"] })], result: "always" },
-      { args: [currentDomain, _extend({}, _defaults, { trustedDomains: [], trustedOrigins: ["http://otherDomain.com"] })], result: "never" },
-      { args: [currentDomain, _extend({}, _defaults, { trustedOrigins: [] })], result: "sameDomain" },
-      { args: [currentDomain, _extend({}, _defaults, { trustedOrigins: ["*"] })], result: "always" },
-      { args: [currentDomain, _extend({}, _defaults, { trustedOrigins: ["http://" + currentDomain] })], result: "sameDomain" },
-      { args: [currentDomain, _extend({}, _defaults, { trustedOrigins: ["http://" + currentDomain, "http://otherDomain.com"] })], result: "always" },
-      { args: [currentDomain, _extend({}, _defaults, { trustedOrigins: ["http://otherDomain.com"] })], result: "always" },
+      { args: [currentDomain, _globalConfig], result: "sameDomain" },
+      { args: [currentDomain, _extend({}, _globalConfig, { trustedDomains: [] })], result: "never" },
+      { args: [currentDomain, _extend({}, _globalConfig, { trustedDomains: ["*"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _globalConfig, { trustedDomains: [currentDomain, "otherDomain.com"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _globalConfig, { trustedDomains: ["otherDomain.com"] })], result: "never" },
+      { args: [currentDomain, _extend({}, _globalConfig, { trustedDomains: [], trustedOrigins: [] })], result: "never" },
+      { args: [currentDomain, _extend({}, _globalConfig, { trustedDomains: [], trustedOrigins: ["*"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _globalConfig, { trustedDomains: [], trustedOrigins: ["http://" + currentDomain] })], result: "sameDomain" },
+      { args: [currentDomain, _extend({}, _globalConfig, { trustedDomains: [], trustedOrigins: ["http://" + currentDomain, "http://otherDomain.com"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _globalConfig, { trustedDomains: [], trustedOrigins: ["http://otherDomain.com"] })], result: "never" },
+      { args: [currentDomain, _extend({}, _globalConfig, { trustedOrigins: [] })], result: "sameDomain" },
+      { args: [currentDomain, _extend({}, _globalConfig, { trustedOrigins: ["*"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _globalConfig, { trustedOrigins: ["http://" + currentDomain] })], result: "sameDomain" },
+      { args: [currentDomain, _extend({}, _globalConfig, { trustedOrigins: ["http://" + currentDomain, "http://otherDomain.com"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _globalConfig, { trustedOrigins: ["http://otherDomain.com"] })], result: "always" },
       // Cross-domain SWF
-      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf" })], result: "always" },
-      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: [] })], result: "never" },
-      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: ["*"] })], result: "always" },
-      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: [currentDomain, "otherDomain.com"] })], result: "always" },
-      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: ["otherDomain.com"] })], result: "never" },
-      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: [], trustedOrigins: [] })], result: "never" },
-      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: [], trustedOrigins: ["*"] })], result: "always" },
-      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: [], trustedOrigins: ["http://" + currentDomain] })], result: "always" },
-      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: [], trustedOrigins: ["http://" + currentDomain, "http://otherDomain.com"] })], result: "always" },
-      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: [], trustedOrigins: ["http://otherDomain.com"] })], result: "never" },
-      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedOrigins: [] })], result: "always" },
-      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedOrigins: ["*"] })], result: "always" },
-      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedOrigins: ["http://" + currentDomain] })], result: "always" },
-      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedOrigins: ["http://" + currentDomain, "http://otherDomain.com"] })], result: "always" },
-      { args: [currentDomain, _extend({}, _defaults, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedOrigins: ["http://otherDomain.com"] })], result: "always" }
+      { args: [currentDomain, _extend({}, _globalConfig, { moviePath: "//otherDomain.com/ZeroClipboard.swf" })], result: "always" },
+      { args: [currentDomain, _extend({}, _globalConfig, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: [] })], result: "never" },
+      { args: [currentDomain, _extend({}, _globalConfig, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: ["*"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _globalConfig, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: [currentDomain, "otherDomain.com"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _globalConfig, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: ["otherDomain.com"] })], result: "never" },
+      { args: [currentDomain, _extend({}, _globalConfig, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: [], trustedOrigins: [] })], result: "never" },
+      { args: [currentDomain, _extend({}, _globalConfig, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: [], trustedOrigins: ["*"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _globalConfig, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: [], trustedOrigins: ["http://" + currentDomain] })], result: "always" },
+      { args: [currentDomain, _extend({}, _globalConfig, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: [], trustedOrigins: ["http://" + currentDomain, "http://otherDomain.com"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _globalConfig, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedDomains: [], trustedOrigins: ["http://otherDomain.com"] })], result: "never" },
+      { args: [currentDomain, _extend({}, _globalConfig, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedOrigins: [] })], result: "always" },
+      { args: [currentDomain, _extend({}, _globalConfig, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedOrigins: ["*"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _globalConfig, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedOrigins: ["http://" + currentDomain] })], result: "always" },
+      { args: [currentDomain, _extend({}, _globalConfig, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedOrigins: ["http://" + currentDomain, "http://otherDomain.com"] })], result: "always" },
+      { args: [currentDomain, _extend({}, _globalConfig, { moviePath: "//otherDomain.com/ZeroClipboard.swf", trustedOrigins: ["http://otherDomain.com"] })], result: "always" }
     ];
 
     // Act & Assert
@@ -420,6 +420,116 @@
       tmp = inputToExpectedMap[i];
       assert.strictEqual(_determineScriptAccess.apply(this, tmp.args), tmp.result, "Processing: " + JSON.stringify(tmp));
     }
+  });
+
+
+  test("`_objectKeys` will get all owned enumerable properties", function(assert) {
+    assert.expect(6);
+
+    var a = {
+      "a": "apple",
+      "c": "cantalope",
+      "d": "dragon fruit"
+    },
+    b = {},
+    c = ["banana", "cherry"],
+    d = (function() {
+      function SomePrototype() {
+        this.protoProp = "foo";
+      }
+      function SomeClass() {
+        this.ownedProp = "bar";
+      }
+      SomeClass.prototype = new SomePrototype();
+      SomeClass.prototype.constructor = SomeClass;
+      
+      return new SomeClass();
+    })(),
+    e = null,
+    f; // = undefined;
+
+    assert.deepEqual(_objectKeys(a), ["a", "c", "d"]);
+    assert.deepEqual(_objectKeys(b), []);
+    assert.deepEqual(_objectKeys(c), ["0", "1"]);
+    assert.deepEqual(_objectKeys(d), ["ownedProp"]);
+    assert.deepEqual(_objectKeys(e), []);
+    assert.deepEqual(_objectKeys(f), []);
+  });
+
+
+  test("`_deleteOwnProperties` will delete all owned enumerable properties", function(assert) {
+    assert.expect(24);
+
+    var getProtoKeys = function(obj) {
+      var prop,
+          keys = [];
+      if (obj) {
+        for (prop in obj) {
+          if (!obj.hasOwnProperty(prop)) {
+            keys.push(prop);
+          }
+        }
+      }
+      return keys;
+    };
+
+    var a = {
+      "a": "apple",
+      "c": "cantalope",
+      "d": "dragon fruit"
+    },
+    b = {},
+    c = ["banana", "cherry"],
+    d = (function() {
+      function SomePrototype() {
+        this.protoProp = "foo";
+      }
+      function SomeClass() {
+        this.ownedProp = "bar";
+      }
+      SomeClass.prototype = new SomePrototype();
+      SomeClass.prototype.constructor = SomeClass;
+      
+      return new SomeClass();
+    })(),
+    e = null,
+    f; // = undefined;
+
+    assert.deepEqual(_objectKeys(a), ["a", "c", "d"]);
+    assert.deepEqual(getProtoKeys(a), []);
+    _deleteOwnProperties(a);
+    assert.deepEqual(_objectKeys(a), []);
+    assert.deepEqual(getProtoKeys(a), []);
+    
+    assert.deepEqual(_objectKeys(b), []);
+    assert.deepEqual(getProtoKeys(b), []);
+    _deleteOwnProperties(b);
+    assert.deepEqual(_objectKeys(b), []);
+    assert.deepEqual(getProtoKeys(b), []);
+
+    assert.deepEqual(_objectKeys(c), ["0", "1"]);
+    assert.deepEqual(getProtoKeys(c), []);
+    _deleteOwnProperties(c);
+    assert.deepEqual(_objectKeys(c), []);
+    assert.deepEqual(getProtoKeys(c), []);
+
+    assert.deepEqual(_objectKeys(d), ["ownedProp"]);
+    assert.deepEqual(getProtoKeys(d), ["protoProp", "constructor"]);
+    _deleteOwnProperties(d);
+    assert.deepEqual(_objectKeys(d), []);
+    assert.deepEqual(getProtoKeys(d), ["protoProp", "constructor"]);
+
+    assert.deepEqual(_objectKeys(e), []);
+    assert.deepEqual(getProtoKeys(e), []);
+    _deleteOwnProperties(e);
+    assert.deepEqual(_objectKeys(e), []);
+    assert.deepEqual(getProtoKeys(e), []);
+
+    assert.deepEqual(_objectKeys(f), []);
+    assert.deepEqual(getProtoKeys(f), []);
+    _deleteOwnProperties(f);
+    assert.deepEqual(_objectKeys(f), []);
+    assert.deepEqual(getProtoKeys(f), []);
   });
 
 })(QUnit.module, QUnit.test);

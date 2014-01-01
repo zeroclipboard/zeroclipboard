@@ -2,6 +2,7 @@
 
 The ZeroClipboard library provides an easy way to copy text to the clipboard using an invisible [Adobe Flash](http://en.wikipedia.org/wiki/Adobe_Flash) movie and a [JavaScript](http://en.wikipedia.org/wiki/JavaScript) interface. The "Zero" signifies that the library is invisible and the user interface is left entirely up to you.
 
+
 ## Simple Example
 
 ``` html
@@ -35,9 +36,11 @@ See the [instructions](docs/instructions.md) for more advanced options in using 
 
 Here is a working [test page](http://zeroclipboard.org/#demo) where you can try out ZeroClipboard in your browser.
 
-## Testing ZeroClipboard.swf Locally
+
+## Testing ZeroClipboard Locally
 
 To test the page [demo page](http://zeroclipboard.org/#demo) locally, clone the [website repo](https://github.com/zeroclipboard/zeroclipboard.org).
+
 
 ## Support
 
@@ -45,27 +48,11 @@ This library is fully compatible with Flash Player 10, which requires that the c
 
 Works in IE7+ and all of the evergreen browsers.
 
+
 ## Contributing
 
 see [CONTRIBUTING.md](CONTRIBUTING.md)
 
-## Known issues
-
-- Can not have different handlers for different instances of ZeroClipboard ([#90](https://github.com/zeroclipboard/zeroclipboard/issues/90))
-
-```js
-var clip1 = new ZeroClipboard(document.getElementById("copy-button-1"));
-clip1.on('complete', function() {
-  console.log('Copy button 1');
-});
-var clip2 = new ZeroClipboard(document.getElementById("copy-button-2"));
-clip2.on('complete', function() {
-  console.log('Copy button 2');
-});
-
-// click on copy-button-1 -> "Copy button 1"
-// click on copy-button-2 -> "Copy button 1"
-```
 
 ## Releases
 
@@ -73,9 +60,11 @@ Starting with version [1.1.7](https://github.com/zeroclipboard/zeroclipboard/rel
 
 see [releases](https://github.com/zeroclipboard/zeroclipboard/releases)
 
+
 ## Roadmap
 
 see [roadmap.md](docs/roadmap.md)
+
 
 ## Last Build
 

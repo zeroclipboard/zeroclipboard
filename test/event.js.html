@@ -20,50 +20,25 @@
   <script src="../src/javascript/ZeroClipboard/state.js"></script>
   <script src="../src/javascript/ZeroClipboard/utils.js"></script>
   <script src="../src/javascript/ZeroClipboard/flash.js"></script>
+  <script src="../src/javascript/ZeroClipboard/client.js"></script>
+  <script src="../src/javascript/ZeroClipboard/core.js"></script>
   <script>
-    var _zcCounter = 1,
-        _defaults = {
-          hoverClass:  "zeroclipboard-is-hover",
-          activeClass: "zeroclipboard-is-active",
-          moviePath:   "ZeroClipboard.swf"
-        };
-    function ZeroClipboard(elements, options) {
-      // If there's a client already, return the singleton
-      if (ZeroClipboard.prototype._singleton) {
-        return ZeroClipboard.prototype._singleton;
-      }
-      ZeroClipboard.prototype._singleton = this;
-
-      this.options = _extend({}, _defaults, options);
-
-      if (typeof flashState.global.noflash !== "boolean") {
-        flashState.global.noflash = !_detectFlashSupport();
-      }
-      if (!flashState.clients.hasOwnProperty(this.options.moviePath)) {
-        flashState.clients[this.options.moviePath] = {
-          ready: false
-        };
-      }
-
-      this.handlers = {};
-      this.htmlBridge = {
-        style: {
-          left: "0px"
-        },
-        getAttribute: function(key) { return "val"; },
-        setAttribute: function(key, val) { }
-      };
-      this.id = "ZC_" + _zcCounter++;
-    }
-    ZeroClipboard.prototype.setCurrent = function(el) {
-      currentElement = el;
+    // Mocks for "dom.js"
+    var _bridge = function() {
+      _extend(flashState, {
+        noflash: false,
+        wrongflash: false,
+        ready: false,
+        bridge: {
+          setHandCursor: function() { }
+        }
+      });
     };
-    ZeroClipboard.prototype.resetBridge = function() {
-      this.htmlBridge.style.left = "-9999px";
-    };
-    ZeroClipboard.prototype._singleton = null;
+    var _getHtmlBridge = function() { };
+    var _reposition = function() { };
   </script>
   <script src="../src/javascript/ZeroClipboard/event.js"></script>
+  <script src="../src/javascript/ZeroClipboard/deprecated.js"></script>
   <script src="event.js"></script>
 </head>
 <body>

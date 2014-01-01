@@ -35,23 +35,23 @@ directory as your web page, then it will work out of the box.  However, if the S
 to set the URL like this (place this code _after_ the script tag):
 
 ```js
-ZeroClipboard.setDefaults( { moviePath: 'http://YOURSERVER/path/ZeroClipboard.swf' } );
+ZeroClipboard.config( { moviePath: 'http://YOURSERVER/path/ZeroClipboard.swf' } );
 ```
 
 
 ## Clients
 
-Now you are ready to create one or more _Clients_.  A client is a single instance of the clipboard library on the page,
+Now you are ready to create one or more _clients_.  A client is a single instance of the clipboard library on the page,
 linked to one or more DOM elements. Here is how to create a client instance:
 
 ```js
-var clip = new ZeroClipboard();
+var client = new ZeroClipboard();
 ```
 
-You can also include an element or array of elements in the new client. * This example uses jQuery to find the button.
+You can also include an element or array of elements in the new client. _**This example uses jQuery to find the button._
 
 ```js
-var clip = new ZeroClipboard($("#my-button"));
+var client = new ZeroClipboard($("#my-button"));
 ```
 
 Next, you can set some options.
@@ -81,16 +81,21 @@ var _defaults = {
   // Debug enabled: send `console` messages with deprecation warnings, etc.
   debug: true,
 
+  // Sets the title of the `div` encapsulating the Flash object
+  title: null,
+
+
   /** @deprecated */
-  // The class used to hover over the object
+  // The class used to indicate that a glued element is being hovered over
   hoverClass: "zeroclipboard-is-hover",
 
   /** @deprecated */
-  // The class used to set object active
+  // The class used to indicate that a glued element is active (is being clicked)
   activeClass: "zeroclipboard-is-active",
 
   /** @deprecated */
-  // [Deprecated] SWF inbound scripting policy: page origins that the SWF should trust. (single string or array of strings)
+  // DEPRECATED!!! Use `trustedDomains` instead!
+  // SWF inbound scripting policy: page origins that the SWF should trust. (single string or array of strings)
   trustedOrigins: null,
 
   /** @deprecated */
@@ -99,14 +104,14 @@ var _defaults = {
 };
 ```
 
-You can override the defaults by making a call like `ZeroClipboard.setDefaults({ moviePath: "new/path" });` before you create any clients.
+You can override the defaults by making a call like `ZeroClipboard.config({ moviePath: "new/path" });` before you create any clients.
 
 You can also set the options when creating a new client by passing an optional "options" object, e.g.  
 ```js
-var clip = new ZeroClipboard($("#d_clip_button"), { moviePath: "new/path" });`
+var client = new ZeroClipboard($("#d_clip_button"), { moviePath: "new/path" });`
 ```
 
-However, this per-client options overriding is deprecated as of v1.3.0.
+However, this per-client options overriding is deprecated as of v1.3.0 and will be removed in v2.0.0.
 
 Whenever possible, we recommend that you change the defaults rather than changing options per client. This works out
 better in most situations as:
@@ -169,10 +174,10 @@ If you find yourself in this situation (as in [Issue #170](https://github.com/ze
 
 Setting the clipboard text can be done in 4 ways:
 
-1. Add a `dataRequested` event handler in which you call `clip.setText` to set the appropriate text. This event is triggered every time ZeroClipboard tries to inject into the clipboard. Example:
+1. Add a `dataRequested` event handler in which you call `client.setText` to set the appropriate text. This event is triggered every time ZeroClipboard tries to inject into the clipboard. Example:
 
    ```js
-   clip.on( 'dataRequested', function (client, args) {
+   client.on( 'dataRequested', function (client, args) {
       client.setText( "Copy me!" );
    });
    ```
@@ -203,14 +208,14 @@ Setting the clipboard text can be done in 4 ways:
   <button id="my-button" data-clipboard-text="Copy me!">Copy to Clipboard</button>
   ```
 
-4. Set the text via `clip.setText` property.  You can call this function at any time; when the page first loads, or later like in a `dataRequested` event handler.  Example:
+4. Set the text via `client.setText` property.  You can call this function at any time; when the page first loads, or later like in a `dataRequested` event handler.  Example:
 
   ```js
-  clip.setText( "Copy me!" );
+  client.setText( "Copy me!" );
   ```
   
-  The important caveat of using `clip.setText` is that the text it sets is **transient** and _will only be used for a single copy operation_. As such, we do not particularly
-  recommend using `clip.setText` other than inside of a `dataRequested` event handler; however, the API will not prevent you from using it in other ways.
+  The important caveat of using `client.setText` is that the text it sets is **transient** and _will only be used for a single copy operation_. As such, we do not particularly
+  recommend using `client.setText` other than inside of a `dataRequested` event handler; however, the API will not prevent you from using it in other ways.
 
 
 ### Gluing
@@ -221,10 +226,10 @@ The Flash movie receives the click event and copies the text to the clipboard.  
 
 To glue elements, you must pass an element, or array of elements to the glue function.
 
-Here is how to glue your clip library instance to a DOM element:
+Here is how to glue your client library instance to a DOM element:
 
 ```js
-clip.glue( document.getElementById('d_clip_button') );
+client.glue( document.getElementById('d_clip_button') );
 ```
 
 You can pass in a reference to the actual DOM element object itself or an array of DOM objects.  The rest all happens automatically -- the movie is created, all your options set, and it is floated above the element, awaiting clicks from the user.
@@ -239,7 +244,7 @@ You can pass in a reference to the actual DOM element object itself or an array 
 And the code:
 
 ```js
-var clip = new ZeroClipboard( $("button#my-button") );
+var client = new ZeroClipboard( $("button#my-button") );
 ```
 
 
@@ -269,7 +274,7 @@ These classes are for a DOM element with an ID: "d_clip_button".  The "zeroclipb
 The clipboard library allows you set a number of different event handlers.  These are all set by calling the `on()` method, as in this example:
 
 ```js
-clip.on( 'load', my_load_handler );
+client.on( 'load', my_load_handler );
 ```
 
 The first argument is the name of the event, and the second is a reference to your function.  The function may be passed by name (string) or an actual reference to the function object
@@ -279,7 +284,7 @@ Your custom function will be passed at least one argument -- a reference to the 
 Event handlers can be removed by calling the `off()` method, which has the same method signature as `on()`:
 
 ```js
-clip.off( 'load', my_load_handler );
+client.off( 'load', my_load_handler );
 ```
 
 
@@ -288,7 +293,7 @@ clip.off( 'load', my_load_handler );
 The `load` event is fired when the Flash movie completes loading and is ready for action.  Please note that you don't need to listen for this event to set options -- those are automatically passed to the movie if you call them before it loads.  Example use:
 
 ```js
-clip.on( 'load', function ( client, args ) {
+client.on( 'load', function ( client, args ) {
   alert( "movie has loaded" );
 });
 ```
@@ -308,7 +313,7 @@ The handler is passed these options to the `args`
 The `mouseover` event is fired when the user's mouse pointer enters the Flash movie.  You can use this to simulate a rollover effect on your DOM element, however see *CSS Effects* for an easier way to do this.  Example use:
 
 ```js
-clip.on( 'mouseover', function ( client, args ) {
+client.on( 'mouseover', function ( client, args ) {
   alert( "mouse is over movie" );
 });
 ```
@@ -334,7 +339,7 @@ The handler is passed these options to the `args`
 The `mouseout` event is fired when the user's mouse pointer leaves the Flash movie.  You can use this to simulate a rollover effect on your DOM element, however see *CSS Effects* for an easier way to do this.  Example use:
 
 ```js
-clip.on( 'mouseout', function ( client, args ) {
+client.on( 'mouseout', function ( client, args ) {
   alert( "mouse has left movie" );
 } );
 ```
@@ -360,7 +365,7 @@ The handler is passed these options to the `args`
 The `mousedown` event is fired when the user clicks on the Flash movie.  Please note that this does not guarantee that the user will release the mouse button while still over the movie (i.e. resulting in a click).  You can use this to simulate a click effect on your DOM element, however see *CSS Effects* for an easier way to do this.  Example use:
 
 ```js
-clip.on( 'mousedown', function ( client, args ) {
+client.on( 'mousedown', function ( client, args ) {
   alert( "mouse button is down" );
 } );
 ```
@@ -386,7 +391,7 @@ The handler is passed these options to the `args`
 The `mouseup` event is fired when the user releases the mouse button (having first pressed the mouse button while hovering over the movie).  Please note that this does not guarantee that the mouse cursor is still over the movie (i.e. resulting in a click).  You can use this to simulate a click effect on your DOM element, however see *CSS Effects* for an easier way to do this.  Example use:
 
 ```js
-clip.on( 'mouseup', function ( client, args ) {
+client.on( 'mouseup', function ( client, args ) {
   alert( "mouse button is up" );
 } );
 ```
@@ -412,7 +417,7 @@ The handler is passed these options to the `args`
 The `complete` event is fired when the text is successfully copied to the clipboard.  Example use:
 
 ```js
-clip.on( 'complete', function ( client, args ) {
+client.on( 'complete', function ( client, args ) {
   alert("Copied text to clipboard: " + args.text );
 } );
 ```
@@ -440,7 +445,7 @@ The handler is passed these options to the `args`
 The `noflash` event is fired when the user doesn't have flash installed on their system
 
 ```js
-clip.on( 'noflash', function ( client, args ) {
+client.on( 'noflash', function ( client, args ) {
   alert("You don't support flash");
 } );
 ```
@@ -460,7 +465,7 @@ The handler is passed these options to the `args`
 The `wrongflash` event is fired when the user has the wrong version of flash. ZeroClipboard supports version 10 and up.
 
 ```js
-clip.on( 'wrongflash', function ( client, args ) {
+client.on( 'wrongflash', function ( client, args ) {
   alert("Your flash is too old " + args.flashVersion);
 } );
 ```
@@ -477,11 +482,11 @@ The handler is passed these options to the `args`
 
 #### dataRequested
 
-On mousedown, the flash object will check and see if the `clipText` has been set. If it hasn't, then it will fire off a `dataRequested` event. If the html object has `data-clipboard-text` or `data-clipboard-target` then ZeroClipboard will take care of getting the data. However if it hasn't been set, then it will be up to you to `clip.setText` from that method. Which will complete the loop.
+On mousedown, the Flash object will check and see if the clipboard text has been set. If it hasn't, then it will fire off a `dataRequested` event. If the html object has `data-clipboard-text` or `data-clipboard-target` then ZeroClipboard will take care of getting the data. However if it hasn't been set, then it will be up to you to `client.setText` from that method. Which will complete the loop.
 
 ```js
-clip.on( 'dataRequested', function ( client, args ) {
-  clip.setText( 'Copied to clipboard.' );
+client.on( 'dataRequested', function ( client, args ) {
+  client.setText( 'Copied to clipboard.' );
 } );
 ```
 
@@ -512,7 +517,7 @@ Here is a quick example using as few calls as possible:
 
     <script type="text/javascript" src="ZeroClipboard.js"></script>
     <script type="text/javascript">
-      var clip = new ZeroClipboard( document.getElementById('d_clip_button') );
+      var client = new ZeroClipboard( document.getElementById('d_clip_button') );
     </script>
   </body>
   </html>
@@ -546,31 +551,30 @@ Here is a complete example which exercises every option and event handler:
     <div id="d_clip_button" data-clipboard-text="Copy Me!">Copy To Clipboard</div>
 
     <script type="text/javascript">
-      var clip = new ZeroClipboard( $('#d_clip_button') );
+      var client = new ZeroClipboard( $('#d_clip_button') );
 
-      clip.on( 'load', function(client) {
+      client.on( 'load', function(client) {
         // alert( "movie is loaded" );
-      } );
 
-      clip.on( 'complete', function(client, args) {
-        alert("Copied text to clipboard: " + args.text );
-      } );
+        client.on( 'complete', function(client, args) {
+          alert("Copied text to clipboard: " + args.text );
+        } );
 
-      clip.on( 'mouseover', function(client) {
-        // alert("mouse over");
-      } );
+        client.on( 'mouseover', function(client) {
+          // alert("mouse over");
+        } );
 
-      clip.on( 'mouseout', function(client) {
-        // alert("mouse out");
-      } );
+        client.on( 'mouseout', function(client) {
+          // alert("mouse out");
+        } );
 
-      clip.on( 'mousedown', function(client) {
+        client.on( 'mousedown', function(client) {
+          // alert("mouse down");
+        } );
 
-        // alert("mouse down");
-      } );
-
-      clip.on( 'mouseup', function(client) {
-        // alert("mouse up");
+        client.on( 'mouseup', function(client) {
+          // alert("mouse up");
+        } );
       } );
 
     </script>
@@ -608,7 +612,7 @@ decisions of how _your_ site should handle each of these situations.
        this transformation by utilizing the `dataRequested` event handler, e.g.  
 
       ```js
-      clip.on('dataRequested', function(client, args) {
+      client.on('dataRequested', function(client, args) {
           var text = document.getElementById('yourTextArea').value;
           var windowsText = text.replace(/\n/g, '\r\n');
           client.setText(windowsText);
@@ -622,7 +626,7 @@ decisions of how _your_ site should handle each of these situations.
 By default, ZeroClipboard will issue deprecation warnings to the developer `console`. To disable this, set the
 following option:  
 ```js
-ZeroClipboard.setDefaults({ debug: false });`
+ZeroClipboard.config({ debug: false });`
 ```
 
 The current list of deprecations includes:  
@@ -645,3 +649,20 @@ The current list of deprecations includes:
  - `new ZeroClipboard(elements, options)` &rarr; as of [v1.3.0], removing in [v2.0.0]
      - Most options actually have a global effect rather than a per-client effect, so we are removing the ability to
        customize options per-client to help avoid confusion. The constructor `new ZeroClipboard(elements)` will remain.
+ - `ZeroClipboard.prototype.addEventListener` &rarr; as of [v1.3.0], removing in [v2.0.0]
+     - Use `ZeroClipboard.prototype.on` instead!
+ - `ZeroClipboard.prototype.removeEventListener` &rarr; as of [v1.3.0], removing in [v2.0.0]
+     - Use `ZeroClipboard.prototype.off` instead!
+ - `ZeroClipboard.prototype.setCurrent` &rarr; as of [v1.3.0], removing in [v2.0.0]
+     - Use `ZeroClipboard.activate` instead!
+ - `ZeroClipboard.prototype.resetBridge` &rarr; as of [v1.3.0], removing in [v2.0.0]
+     - Use `ZeroClipboard.deactivate` instead!
+ - `ZeroClipboard.prototype.setTitle` &rarr; as of [v1.3.0], removing in [v2.0.0]
+     - Use the `title` config option instead!
+ - `ZeroClipboard.setDefaults` &rarr; as of [v1.3.0], removing in [v2.0.0]
+     - Use `ZeroClipboard.config` instead!
+ - `ZeroClipboard#handlers` &rarr; as of [v1.3.0], removed in [v1.3.0]
+     - Use the `ZeroClipboard.prototype.handlers` method instead!
+ - `ZeroClipboard.prototype.ready` &rarr; as of [v1.3.0], removing in [v2.0.0]
+     - For v1.x, use the `ZeroClipboard.prototype.on("load", ...);` instead!
+     - For v2.x, use the `ZeroClipboard.prototype.on("ready", ...);` instead!

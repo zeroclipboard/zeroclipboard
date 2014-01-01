@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>ZeroClipboard unit tests: ZeroClipboard (built)</title>
+  <title>ZeroClipboard unit tests: client.js</title>
   <link rel="stylesheet" href="../node_modules/qunitjs/qunit/qunit.css">
   <script src="../node_modules/qunitjs/qunit/qunit.js"></script>
   <script>
@@ -31,14 +31,21 @@
         __flash__addCallback = null,
         __flash__removeCallback = null;
   </script>
-  <script src="../ZeroClipboard.js"></script>
+  <script src="../src/javascript/ZeroClipboard/state.js"></script>
+  <script src="../src/javascript/ZeroClipboard/utils.js"></script>
+  <script src="../src/javascript/ZeroClipboard/flash.js"></script>
+  <script src="../src/javascript/ZeroClipboard/client.js"></script>
+  <script src="../src/javascript/ZeroClipboard/core.js"></script>
+  <script src="../src/javascript/ZeroClipboard/dom.js"></script>
+  <script src="../src/javascript/ZeroClipboard/event.js"></script>
+  <script src="../src/javascript/ZeroClipboard/deprecated.js"></script>
   <script>
     ZeroClipboard.config({
       moviePath: "../ZeroClipboard.swf"
     });
   </script>
   <script src="lib/jquery.js"></script>
-  <script src="ZeroClipboard.js"></script>
+  <script src="client.js"></script>
 </head>
 <body>
   <div id="qunit"></div>

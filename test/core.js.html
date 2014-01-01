@@ -19,9 +19,12 @@
   </script>
   <script src="../src/javascript/ZeroClipboard/utils.js"></script>
   <script>
-    var ZeroClipboard = function(elements, options) {
-      this.options = _extend({}, _defaults, options);
-    };
+    function ZeroClipboard(elements, options) {
+      // Don't need any functionality for this test suite
+
+      /** @deprecated */
+      this.options = _extend({}, _extend(_globalConfig, options));
+    }
   </script>
   <script src="../src/javascript/ZeroClipboard/core.js"></script>
   <script src="core.js"></script>
