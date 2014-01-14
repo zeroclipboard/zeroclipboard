@@ -21,8 +21,10 @@ var _bridge = function () {
     var opts = ZeroClipboard.config();
     // Set these last to override them just in case any [v1.2.0-beta.1] users
     // are still passing them in to [v1.2.0-beta.2] (or higher)
-    opts.amdModuleId = _amdModuleId;
-    opts.cjsModuleId = _cjsModuleId;
+    opts.jsModuleId =
+      (typeof _amdModuleId === "string" && _amdModuleId) ||
+      (typeof _cjsModuleId === "string" && _cjsModuleId) ||
+      null;
 
     // Set `allowScriptAccess` based on `trustedDomains` and `window.location.host` vs. `moviePath`
     var allowScriptAccess = _determineScriptAccess(window.location.host, _globalConfig);

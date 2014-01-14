@@ -117,7 +117,7 @@
   });
 
 
-  test("`_vars` builds flashvars", function(assert) {
+  test("`_vars` builds FlashVars", function(assert) {
     assert.expect(5);
 
     // Arrange
@@ -126,23 +126,22 @@
       trustedDomains: ["*"]
     };
     var clipOptionsAmdOnly = {
-      amdModuleId: "zcAMD"
+      jsModuleId: "zcAMD"
     };
     var clipOptionsCommonJsOnly = {
-      cjsModuleId: "zcCJS"
+      jsModuleId: "zcCJS"
     };
     var clipOptionsAll = {
       trustedDomains: ["*"],
-      amdModuleId: "zcAMD",
-      cjsModuleId: "zcCJS"
+      jsModuleId: "zcAMD"
     };
 
     // Act & Assert
     assert.strictEqual(_vars(clipOptionsEmpty), "");
     assert.strictEqual(_vars(clipOptionsTrustedDomainsOnly), "trustedOrigins=*");
-    assert.strictEqual(_vars(clipOptionsAmdOnly), "amdModuleId=zcAMD");
-    assert.strictEqual(_vars(clipOptionsCommonJsOnly), "cjsModuleId=zcCJS");
-    assert.strictEqual(_vars(clipOptionsAll), "trustedOrigins=*&amdModuleId=zcAMD&cjsModuleId=zcCJS");
+    assert.strictEqual(_vars(clipOptionsAmdOnly), "jsModuleId=zcAMD");
+    assert.strictEqual(_vars(clipOptionsCommonJsOnly), "jsModuleId=zcCJS");
+    assert.strictEqual(_vars(clipOptionsAll), "trustedOrigins=*&jsModuleId=zcAMD");
   });
 
 

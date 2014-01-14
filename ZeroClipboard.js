@@ -219,11 +219,8 @@
     if (trustedOriginsExpanded.length) {
       str.push("trustedOrigins=" + encodeURIComponent(trustedOriginsExpanded.join(",")));
     }
-    if (typeof options.amdModuleId === "string" && options.amdModuleId) {
-      str.push("amdModuleId=" + encodeURIComponent(options.amdModuleId));
-    }
-    if (typeof options.cjsModuleId === "string" && options.cjsModuleId) {
-      str.push("cjsModuleId=" + encodeURIComponent(options.cjsModuleId));
+    if (typeof options.jsModuleId === "string" && options.jsModuleId) {
+      str.push("jsModuleId=" + encodeURIComponent(options.jsModuleId));
     }
     return str.join("&");
   };
@@ -585,8 +582,7 @@
     var container = document.getElementById("global-zeroclipboard-html-bridge");
     if (!container) {
       var opts = ZeroClipboard.config();
-      opts.amdModuleId = _amdModuleId;
-      opts.cjsModuleId = _cjsModuleId;
+      opts.jsModuleId = typeof _amdModuleId === "string" && _amdModuleId || typeof _cjsModuleId === "string" && _cjsModuleId || null;
       var allowScriptAccess = _determineScriptAccess(window.location.host, _globalConfig);
       var flashvars = _vars(opts);
       var swfUrl = _globalConfig.moviePath + _noCache(_globalConfig.moviePath, _globalConfig);

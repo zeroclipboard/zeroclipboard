@@ -330,14 +330,9 @@ var _vars = function (options) {
     str.push("trustedOrigins=" + encodeURIComponent(trustedOriginsExpanded.join(",")));
   }
 
-  // if ZeroClipboard is loaded as an AMD module
-  if (typeof options.amdModuleId === "string" && options.amdModuleId) {
-    str.push("amdModuleId=" + encodeURIComponent(options.amdModuleId));
-  }
-
-  // if ZeroClipboard is loaded as a CommonJS module
-  if (typeof options.cjsModuleId === "string" && options.cjsModuleId) {
-    str.push("cjsModuleId=" + encodeURIComponent(options.cjsModuleId));
+  // if ZeroClipboard is loaded as an AMD/CommonJS module
+  if (typeof options.jsModuleId === "string" && options.jsModuleId) {
+    str.push("jsModuleId=" + encodeURIComponent(options.jsModuleId));
   }
 
   // join the str by &

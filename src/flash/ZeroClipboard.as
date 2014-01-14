@@ -16,22 +16,14 @@ package {
   // returns nothing
   public class ZeroClipboard extends Sprite {
 
-    // "CONSTANTS" 
+    // CONSTANTS
     // Function through which JavaScript events are dispatched normally
-    private static var normalDispatcher:String = "ZeroClipboard.dispatch";
+    private static const NORMAL_DISPATCHER:String = "ZeroClipboard.dispatch";
 
-    // Function through which JavaScript events are dispatched if using an AMD loader
-    private static var amdWrappedDispatcher:String =
-      "(function (event, args, amdModuleId) {\n" +
-      "  require([amdModuleId], function (ZeroClipboard) {\n" +
-      "    ZeroClipboard.dispatch(event, args);\n" +
-      "  });\n" +
-      "})";
-
-    // Function through which JavaScript events are dispatched if using a CommonJS module loader
-    private static var cjsWrappedDispatcher:String =
-      "(function (event, args, cjsModuleId) {\n" +
-      "  var ZeroClipboard = require(cjsModuleId);\n" +
+    // Function through which JavaScript events are dispatched if using an AMD/CommonJS module loader
+    private static const JS_MODULE_WRAPPED_DISPATCHER:String =
+      "(function (event, args, jsModuleId) {\n" +
+      "  var ZeroClipboard = require(jsModuleId);\n" +
       "  ZeroClipboard.dispatch(event, args);\n" +
       "})";
 
@@ -42,11 +34,8 @@ package {
     // The text in the clipboard
     private var clipText:String = "";
 
-    // AMD module ID or path to access the ZeroClipboard object
-    private var amdModuleId:String = null;
-
-    // CommonJS module ID or path to access the ZeroClipboard object
-    private var cjsModuleId:String = null;
+    // AMD or CommonJS module ID/path to access the ZeroClipboard object
+    private var jsModuleId:String = null;
 
     // constructor, setup event listeners and external interfaces
     public function ZeroClipboard() {
@@ -63,15 +52,10 @@ package {
         var origins:Array = flashvars.trustedOrigins.split("\\").join("\\\\").split(",");
         flash.system.Security.allowDomain.apply(null, origins);
       }
-      
-      // Enable complete AMD support (e.g. RequireJS)
-      if (flashvars.amdModuleId && typeof flashvars.amdModuleId === "string") {
-        amdModuleId = flashvars.amdModuleId.split("\\").join("\\\\");
-      }
 
-      // Enable complete CommonJS support (e.g. Browserify)
-      if (flashvars.cjsModuleId && typeof flashvars.cjsModuleId === "string") {
-        cjsModuleId = flashvars.cjsModuleId.split("\\").join("\\\\");
+      // Enable complete AMD (e.g. RequireJS) and CommonJS (e.g. Browserify) support
+      if (flashvars.jsModuleId && typeof flashvars.jsModuleId === "string") {
+        jsModuleId = flashvars.jsModuleId.split("\\").join("\\\\");
       }
 
       // invisible button covers entire stage
@@ -192,21 +176,18 @@ package {
       button.width = width;
       button.height = height;
     }
-    
+
     // dispatch
     //
     // Function through which JavaScript events are dispatched
     //
     // returns nothing
     private function dispatch(eventName:String, eventArgs:Object): void {
-      if (amdModuleId) {
-        ExternalInterface.call(ZeroClipboard.amdWrappedDispatcher, eventName, eventArgs, amdModuleId);
-      }
-      else if (cjsModuleId) {
-        ExternalInterface.call(ZeroClipboard.cjsWrappedDispatcher, eventName, eventArgs, cjsModuleId);
+      if (jsModuleId) {
+        ExternalInterface.call(ZeroClipboard.JS_MODULE_WRAPPED_DISPATCHER, eventName, eventArgs, jsModuleId);
       }
       else {
-        ExternalInterface.call(ZeroClipboard.normalDispatcher, eventName, eventArgs);
+        ExternalInterface.call(ZeroClipboard.NORMAL_DISPATCHER, eventName, eventArgs);
       }
     }
 
