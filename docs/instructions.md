@@ -587,6 +587,32 @@ window.require = curl;
 ```
 
 
+## Known Conflicts With Other Libraries
+
+### [IE locks up when using ZeroClipboard within a Bootstrap Modal](https://github.com/zeroclipboard/zeroclipboard/issues/159).
+ - **Cause:** Bootstrap's Modal has an `enforceFocus` function that tries to keep the focus on the modal.
+   However, since the ZeroClipboard container is an immediate child of the `body`, this enforcement conflicts.
+ - **Workaround:** _Targeted against [Bootstrap v3.x](https://github.com/twbs/bootstrap/blob/96a9e1bae06cb21f8cf72ec528b8e31b6ab27272/js/modal.js#L115-123)._
+
+```js
+(function($) {
+  var proto = $.fn.modal.Constructor.prototype;
+  proto.enforceFocus = function () {
+    $(document)
+      .off('focusin.bs.modal') // guard against infinite focus loop
+      .on('focusin.bs.modal', $.proxy(function (e) {
+        if (this.$element[0] !== e.target &&
+           !this.$element.has(e.target).length &&
+           /* Adding this final condition check is the only real change */
+           !$(e.target).closest('.global-zeroclipboard-container').length) {
+          this.$element.focus()
+        }
+      }, this))
+  };
+})(window.jQuery);
+```
+
+
 ## Browser Support
 
 Works in IE7+ and all of the evergreen browsers.
