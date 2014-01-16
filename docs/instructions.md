@@ -48,21 +48,21 @@ linked to one or more DOM elements. Here is how to create a client instance:
 var client = new ZeroClipboard();
 ```
 
-You can also include an element or array of elements in the new client. _**This example uses jQuery to find the button._
+You can also include an element or array of elements in the new client. _**This example uses jQuery to find "copy buttons"._
 
 ```js
-var client = new ZeroClipboard($("#my-button"));
+var client = new ZeroClipboard($(".copy-button"));
 ```
 
-Next, you can set some options.
+Next, you can set some configuration options.
 
 
-## Setting Options
+## Configuration Options
 
-There are default options you can set before, or when you create a new client.
+These are default values for the global configurations options. You should generally update these _before_ you create your clients.
 
 ```js
-var _defaults = {
+var _globalConfig = {
   // URL to movie
   moviePath: "ZeroClipboard.swf",
 
@@ -528,58 +528,51 @@ When clicked, the text "Copy me!" will be copied to the clipboard.
 
 ### Complete Example
 
-Here is a complete example which exercises every option and event handler:
+Here is a more complete example which exercises many of the configuration options and event handlers:
 
 ```html
-  <html>
+<html>
   <head>
     <style type="text/css">
-      #d_clip_button {
+      .clip_button {
         text-align: center;
         border: 1px solid black;
         background-color: #ccc;
         margin: 10px;
         padding: 10px;
       }
-      #d_clip_button.zeroclipboard-is-hover { background-color: #eee; }
-      #d_clip_button.zeroclipboard-is-active { background-color: #aaa; }
+      .clip_button.zeroclipboard-is-hover { background-color: #eee; }
+      .clip_button.zeroclipboard-is-active { background-color: #aaa; }
     </style>
   </head>
   <body>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script type="text/javascript" src="ZeroClipboard.js"></script>
 
-    <div id="d_clip_button" data-clipboard-text="Copy Me!">Copy To Clipboard</div>
+    <div class="clip_button">Copy To Clipboard</div>
+    <div class="clip_button">Copy This Too!</div>
 
     <script type="text/javascript">
-      var client = new ZeroClipboard( $('#d_clip_button') );
+      var client = new ZeroClipboard( $('.clip_button') );
 
       client.on( 'load', function(client) {
         // alert( "movie is loaded" );
 
+        client.on( 'datarequested', function(client) {
+          client.setText(this.innerHTML);
+        } );
+
         client.on( 'complete', function(client, args) {
           alert("Copied text to clipboard: " + args.text );
         } );
-
-        client.on( 'mouseover', function(client) {
-          // alert("mouse over");
-        } );
-
-        client.on( 'mouseout', function(client) {
-          // alert("mouse out");
-        } );
-
-        client.on( 'mousedown', function(client) {
-          // alert("mouse down");
-        } );
-
-        client.on( 'mouseup', function(client) {
-          // alert("mouse up");
-        } );
       } );
 
+      client.on( 'wrongflash noflash', function() {
+        ZeroClipboard.destroy();
+      } );
     </script>
   </body>
-  </html>
+</html>
 ```
 
 
