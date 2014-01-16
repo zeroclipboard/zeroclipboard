@@ -589,9 +589,11 @@ window.require = curl;
 
 ## Known Conflicts With Other Libraries
 
-### [IE locks up when using ZeroClipboard within a Bootstrap Modal](https://github.com/zeroclipboard/zeroclipboard/issues/159).
+### [IE freezes when clicking a ZeroClipboard glued element within a Bootstrap Modal](https://github.com/zeroclipboard/zeroclipboard/issues/159).
  - **Cause:** Bootstrap's Modal has an `enforceFocus` function that tries to keep the focus on the modal.
-   However, since the ZeroClipboard container is an immediate child of the `body`, this enforcement conflicts.
+   However, since the ZeroClipboard container is an immediate child of the `body`, this enforcement conflicts. Note that
+   this workaround actually _overrides_ a core Bootstrap Modal function, and as such must be kept in sync as this function
+   changes in future versions of Bootstrap.
  - **Workaround:** _Targeted against [Bootstrap v3.x](https://github.com/twbs/bootstrap/blob/96a9e1bae06cb21f8cf72ec528b8e31b6ab27272/js/modal.js#L115-123)._
 
 ```js
@@ -609,6 +611,22 @@ window.require = curl;
         }
       }, this))
   };
+})(window.jQuery);
+```
+
+### [IE freezes when clicking a ZeroClipboard glued element within a jQuery UI [Modal] Dialog](https://github.com/zeroclipboard/zeroclipboard/issues/159).
+ - **Cause:** jQuery UI's Dialog (with `{ modal: true }` set) has a `_keepFocus` function that tries to keep the focus on the modal.
+   However, since the ZeroClipboard container is an immediate child of the `body`, this enforcement conflicts. Luckily, jQuery UI offers
+   more natural extension points than Bootstrap, so the workaround is smaller and less likely to be broken in future versions.
+ - **Workaround:** _Targeted against [jQuery UI v1.10.x](https://github.com/jquery/jquery-ui/blob/457b275880b63b05b16b7c9ee6c22f29f682ebc8/ui/jquery.ui.dialog.js#L695-703)._
+
+```js
+(function($) {
+  $.widget( "ui.dialog", $.ui.dialog, {
+    _allowInteraction: function( event ) {
+      return this._super() || $( event.target ).closest( ".global-zeroclipboard-container" ).length;
+    }
+  } );
 })(window.jQuery);
 ```
 
