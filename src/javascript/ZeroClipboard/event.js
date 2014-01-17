@@ -270,18 +270,21 @@ ZeroClipboard.prototype.unglue = function (elements) {
   var meta = _clientMeta[this.id];
 
   if (meta) {
+    var gluedElements = meta.elements;
+    var arrayIndex;
+
     // if no elements were provided, unglue ALL of this client's glued elements
     if (typeof elements === "undefined") {
-      elements = meta.elements.slice(0);
+      elements = gluedElements.slice(0);
     }
-
-    elements = _prepGlue(elements);
-
-    for (var i = 0; i < elements.length; i++) {
+    else {
+      elements = _prepGlue(elements);
+    }
+    
+    for (var i = elements.length; i--; ) {
       if (elements.hasOwnProperty(i) && elements[i] && elements[i].nodeType === 1) {
         // If the element was glued to THIS client yet, remove it
-        var gluedElements = meta.elements;
-        var arrayIndex = 0;
+        arrayIndex = 0;
         while ((arrayIndex = _inArray(elements[i], gluedElements, arrayIndex)) !== -1) {
           gluedElements.splice(arrayIndex, 1);
         }
