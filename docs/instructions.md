@@ -3,8 +3,8 @@
 The *ZeroClipboard* JavaScript library provides an easy way to copy text to the clipboard using an invisible Adobe
 Flash movie.  The "Zero" signifies that the library is invisible and the user interface is left entirely up to you.
 
-Browsers won't let you access the clipboard directly. So this library puts a flash object on the page to proxy the
-clipboard for you. The library will move and resize over all the glued objects.
+Browsers won't let you access the clipboard directly. So this library puts a Flash object on the page to proxy the
+clipboard for you. The library will move and resize over all the clipped objects.
 
 
 ## Installation
@@ -72,7 +72,7 @@ var _globalConfig = {
   // Include a nocache query parameter on requests for the SWF
   useNoCache: true,
 
-  // Forcibly set the hand cursor ("pointer") for all glued elements
+  // Forcibly set the hand cursor ("pointer") for all clipped elements
   forceHandCursor: false,
 
   // The z-index used by the Flash object. Max value (32-bit): 2147483647
@@ -86,11 +86,11 @@ var _globalConfig = {
 
 
   /** @deprecated */
-  // The class used to indicate that a glued element is being hovered over
+  // The class used to indicate that a clipped element is being hovered over
   hoverClass: "zeroclipboard-is-hover",
 
   /** @deprecated */
-  // The class used to indicate that a glued element is active (is being clicked)
+  // The class used to indicate that a clipped element is active (is being clicked)
   activeClass: "zeroclipboard-is-active",
 
   /** @deprecated */
@@ -116,7 +116,7 @@ However, this per-client options overriding is deprecated as of v1.3.0 and will 
 Whenever possible, we recommend that you change the defaults rather than changing options per client. This works out
 better in most situations as:
  1. Some options apply outside of `ZeroClipboard` instances, e.g. `debug` currently affects some static methods.
- 2. If you have multiple clients glued to a shared element, having per-client options can result in confusing effects
+ 2. If you have multiple clients clipped to a shared element, having per-client options can result in confusing effects
     when that shared element is being activated, e.g. differing values for `zIndex`, `forceHandCursor`, `hoverClass`,
     `activeClass`, etc.
 
@@ -218,18 +218,18 @@ Setting the clipboard text can be done in 4 ways:
   recommend using `client.setText` other than inside of a `dataRequested` event handler; however, the API will not prevent you from using it in other ways.
 
 
-### Gluing
+### Clipping
 
-Gluing refers to the process of "linking" the Flash movie to a DOM element on the page. Since the Flash movie is completely transparent, the user sees nothing out of the ordinary.
+Clipping refers to the process of "linking" the Flash movie to a DOM element on the page. Since the Flash movie is completely transparent, the user sees nothing out of the ordinary.
 
 The Flash movie receives the click event and copies the text to the clipboard.  Also, mouse actions like hovering and mouse-down generate events that you can capture (see *[Event Handlers](#event-handlers)* below).
 
-To glue elements, you must pass an element, or array of elements to the glue function.
+To clip elements, you must pass an element, or array of elements to the `clip` function.
 
-Here is how to glue your client library instance to a DOM element:
+Here is how to clip your client library instance to a DOM element:
 
 ```js
-client.glue( document.getElementById('d_clip_button') );
+client.clip( document.getElementById('d_clip_button') );
 ```
 
 You can pass in a reference to the actual DOM element object itself or an array of DOM objects.  The rest all happens automatically -- the movie is created, all your options set, and it is floated above the element, awaiting clicks from the user.
@@ -589,7 +589,7 @@ window.require = curl;
 
 ## Known Conflicts With Other Libraries
 
-### [IE freezes when clicking a ZeroClipboard glued element within a Bootstrap Modal](https://github.com/zeroclipboard/zeroclipboard/issues/159).
+### [IE freezes when clicking a ZeroClipboard clipped element within a Bootstrap Modal](https://github.com/zeroclipboard/zeroclipboard/issues/159).
  - **Cause:** Bootstrap's Modal has an `enforceFocus` function that tries to keep the focus on the modal.
    However, since the ZeroClipboard container is an immediate child of the `body`, this enforcement conflicts. Note that
    this workaround actually _overrides_ a core Bootstrap Modal function, and as such must be kept in sync as this function
@@ -614,7 +614,7 @@ window.require = curl;
 })(window.jQuery);
 ```
 
-### [IE freezes when clicking a ZeroClipboard glued element within a jQuery UI [Modal] Dialog](https://github.com/zeroclipboard/zeroclipboard/issues/159).
+### [IE freezes when clicking a ZeroClipboard clipped element within a jQuery UI [Modal] Dialog](https://github.com/zeroclipboard/zeroclipboard/issues/159).
  - **Cause:** jQuery UI's Dialog (with `{ modal: true }` set) has a `_keepFocus` function that tries to keep the focus on the modal.
    However, since the ZeroClipboard container is an immediate child of the `body`, this enforcement conflicts. Luckily, jQuery UI offers
    more natural extension points than Bootstrap, so the workaround is smaller and less likely to be broken in future versions.
@@ -703,3 +703,7 @@ The current list of deprecations includes:
  - `ZeroClipboard.prototype.ready` &rarr; as of [v1.3.0], removing in [v2.0.0]
      - For v1.x, use the `ZeroClipboard.prototype.on("load", ...);` instead!
      - For v2.x, use the `ZeroClipboard.prototype.on("ready", ...);` instead!
+ - `ZeroClipboard.prototype.glue` &rarr; as of [v1.3.0], removing in [v2.0.0]
+     - Use `ZeroClipboard.prototype.clip` instead!
+ - `ZeroClipboard.prototype.unglue` &rarr; as of [v1.3.0], removing in [v2.0.0]
+     - Use `ZeroClipboard.prototype.unclip` instead!

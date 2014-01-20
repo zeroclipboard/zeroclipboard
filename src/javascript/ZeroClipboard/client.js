@@ -20,9 +20,9 @@ var ZeroClipboard = function (elements, /** @deprecated */ options) {
     handlers: {}
   };
 
-  // If the elements argument exists, glue it
+  // If the elements argument exists, clip it
   if (elements) {
-    this.glue(elements);
+    this.clip(elements);
   }
 
   // Warn about use of deprecated constructor signature
@@ -37,14 +37,14 @@ var ZeroClipboard = function (elements, /** @deprecated */ options) {
   this.options = ZeroClipboard.config();
 
   // Flash status
-  if (typeof flashState.noflash !== "boolean") {
-    flashState.noflash = !_detectFlashSupport();
+  if (typeof flashState.disabled !== "boolean") {
+    flashState.disabled = !_detectFlashSupport();
   }
 
   // Setup the Flash <-> JavaScript bridge
-  if (flashState.noflash === false && flashState.wrongflash !== true) {
+  if (flashState.disabled === false && flashState.outdated !== true) {
     if (flashState.bridge === null) {
-      flashState.wrongflash = false;
+      flashState.outdated = false;
       flashState.ready = false;
       _bridge();
     }
@@ -117,8 +117,8 @@ var _setHandCursor = function (enabled) {
  * returns nothing
  */
 ZeroClipboard.prototype.destroy = function () {
-  // unglue all the elements
-  this.unglue();
+  // Unclip all the elements
+  this.unclip();
 
   // Remove all event handlers
   this.off();

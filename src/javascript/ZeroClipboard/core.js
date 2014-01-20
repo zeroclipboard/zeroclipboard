@@ -10,7 +10,7 @@ var _globalConfig = {
   // Include a nocache query parameter on requests for the SWF
   useNoCache: true,
 
-  // Forcibly set the hand cursor ("pointer") for all glued elements
+  // Forcibly set the hand cursor ("pointer") for all clipped elements
   forceHandCursor: false,
 
   // The z-index used by the Flash object. Max value (32-bit): 2147483647

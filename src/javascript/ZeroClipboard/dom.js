@@ -1,9 +1,3 @@
-/* AMD module ID or path to access the ZeroClipboard object */
-var _amdModuleId = null;
-
-/* CommonJS module ID or path to access the ZeroClipboard object */
-var _cjsModuleId = null;
-
 /*
  * Find or create an htmlBridge and flashBridge for the client.
  *
@@ -88,9 +82,9 @@ var _bridge = function () {
  * @private
  */
 var _getHtmlBridge = function(flashBridge) {
-  var isFlashElement = /^object|embed$/;
+  var isFlashElement = /^OBJECT|EMBED$/;
   var htmlBridge = flashBridge && flashBridge.parentNode;
-  while (htmlBridge && isFlashElement.test(htmlBridge.tagName.toLowerCase()) && htmlBridge.parentNode) {
+  while (htmlBridge && isFlashElement.test(htmlBridge.nodeName) && htmlBridge.parentNode) {
     htmlBridge = htmlBridge.parentNode;
   }
   return htmlBridge || null;

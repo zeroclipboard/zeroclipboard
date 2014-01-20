@@ -211,12 +211,12 @@
     // Act & Assert
     // Synchronous
     assert.strictEqual(syncProof, false);
-    _dispatchCallback(syncProveIt, null, null, null, syncExec);
+    _dispatchCallback(syncProveIt, null, null, syncExec);
     assert.strictEqual(syncProof, true);
 
     // Asynchronous
     assert.strictEqual(asyncProof, false);
-    _dispatchCallback(asyncProveIt, null, null, null, asyncExec);
+    _dispatchCallback(asyncProveIt, null, null, asyncExec);
     assert.strictEqual(asyncProof, false);
 
     // Stop test evaluation

@@ -33,34 +33,34 @@
     assert.expect(2);
 
     // Arrange & Act
-    var clip = new ZeroClipboard();
+    var client = new ZeroClipboard();
 
     // Assert
-    assert.ok(clip);
-    assert.ok(clip.id);
+    assert.ok(client);
+    assert.ok(client.id);
   });
 
   test("Client without selector doesn't have elements", function(assert) {
     assert.expect(2);
 
     // Arrange & Act
-    var clip = new ZeroClipboard();
+    var client = new ZeroClipboard();
 
     // Assert
-    assert.ok(clip);
-    assert.deepEqual(clip.elements(), []);
+    assert.ok(client);
+    assert.deepEqual(client.elements(), []);
   });
 
   test("setText overrides the data-clipboard-text attribute", function(assert) {
     assert.expect(1);
 
     // Arrange
-    var clip = new ZeroClipboard();
+    var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button");
 
     // Act
-    clip.glue(currentEl);
-    clip.setText("This is the new text");
+    client.clip(currentEl);
+    client.setText("This is the new text");
     ZeroClipboard.activate(currentEl);
 
     // Assert
@@ -71,11 +71,11 @@
     assert.expect(1);
 
     // Arrange
-    var clip = new ZeroClipboard();
+    var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button");
 
     // Act
-    clip.glue(currentEl);
+    client.clip(currentEl);
     ZeroClipboard.activate(currentEl);
 
     // Assert
@@ -89,11 +89,11 @@
     assert.expect(1);
 
     // Arrange
-    var clip = new ZeroClipboard();
+    var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button_no_title");
 
     // Act
-    clip.glue(currentEl);
+    client.clip(currentEl);
     ZeroClipboard.activate(currentEl);
 
     // Assert
@@ -104,11 +104,11 @@
     assert.expect(1);
 
     // Arrange
-    var clip = new ZeroClipboard();
+    var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button");
 
     // Act
-    clip.glue(currentEl);
+    client.clip(currentEl);
     ZeroClipboard.activate(currentEl);
     ZeroClipboard.dispatch("datarequested", { flashVersion: "MAC 11,0,0" });
 
@@ -123,11 +123,11 @@
     assert.expect(1);
 
     // Arrange
-    var clip = new ZeroClipboard();
+    var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button_textarea_text");
 
     // Act
-    clip.glue(currentEl);
+    client.clip(currentEl);
     ZeroClipboard.activate(currentEl);
     ZeroClipboard.dispatch("datarequested", { flashVersion: "MAC 11,0,0" });
 
@@ -149,11 +149,11 @@
     assert.expect(1);
 
     // Arrange
-    var clip = new ZeroClipboard();
+    var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button_pre_text");
 
     // Act
-    clip.glue(currentEl);
+    client.clip(currentEl);
     ZeroClipboard.activate(currentEl);
     ZeroClipboard.dispatch("datarequested", { flashVersion: "MAC 11,0,0" });
 
@@ -175,11 +175,11 @@
     assert.expect(1);
 
     // Arrange
-    var clip = new ZeroClipboard();
+    var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button_input_text");
 
     // Act
-    clip.glue(currentEl);
+    client.clip(currentEl);
     ZeroClipboard.activate(currentEl);
     ZeroClipboard.dispatch("datarequested", { flashVersion: "MAC 11,0,0" });
 
@@ -194,11 +194,11 @@
     assert.expect(1);
 
     // Arrange
-    var clip = new ZeroClipboard();
+    var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button_no_text");
 
     // Act
-    clip.glue(currentEl);
+    client.clip(currentEl);
     ZeroClipboard.activate(currentEl);
 
     // Assert
@@ -210,24 +210,24 @@
 
     // Assert, arrange, assert, act, assert
     assert.strictEqual($(".global-zeroclipboard-container").length, 0);
-    var clip1 = new ZeroClipboard();
-    assert.ok(clip1.id);
+    var client1 = new ZeroClipboard();
+    assert.ok(client1.id);
     assert.strictEqual($(".global-zeroclipboard-container").length, 1);
-    var clip2 = new ZeroClipboard();
+    var client2 = new ZeroClipboard();
     assert.strictEqual($(".global-zeroclipboard-container").length, 1);
-    assert.notEqual(clip2.id, clip1.id);
-    assert.notEqual(clip2, clip1);
+    assert.notEqual(client2.id, client1.id);
+    assert.notEqual(client2, client1);
   });
 
   test("Calculations based on borderWidth never return NaN", function(assert) {
     assert.expect(4);
 
     // Arrange
-    var clip = new ZeroClipboard();
+    var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button");
 
     // Act
-    clip.glue(currentEl);
+    client.clip(currentEl);
     ZeroClipboard.activate(currentEl);
 
     // Assert
@@ -247,13 +247,13 @@
 
     // Assert, arrange, assert, act, assert
     assert.ok(!ZeroClipboard.prototype._singleton, "The client singleton does not exist on the prototype before creating a client");
-    var clip1 = new ZeroClipboard();
+    var client1 = new ZeroClipboard();
     assert.ok(!ZeroClipboard.prototype._singleton, "The client singleton does not exist on the prototype after creating a client");
-    assert.ok(!clip1._singleton, "The client singleton does not exist on the client instance after creating a client");
-    var clip2 = new ZeroClipboard();
+    assert.ok(!client1._singleton, "The client singleton does not exist on the client instance after creating a client");
+    var client2 = new ZeroClipboard();
     assert.ok(!ZeroClipboard.prototype._singleton, "The client singleton does not exist on the prototype after creating a second client");
-    assert.ok(!clip1._singleton, "The client singleton does not exist on the first client instance after creating a second client");
-    assert.ok(!clip2._singleton, "The client singleton does not exist on the second client instance after creating a second client");
+    assert.ok(!client1._singleton, "The client singleton does not exist on the first client instance after creating a second client");
+    assert.ok(!client2._singleton, "The client singleton does not exist on the second client instance after creating a second client");
     ZeroClipboard.destroy();
     assert.ok(!ZeroClipboard.prototype._singleton, "The client singleton does not exist on the prototype after calling `destroy`");
   });
@@ -286,7 +286,7 @@
     // Assert, arrange, assert, act, assert
     assert.ok(!ZeroClipboard.prototype._singleton, "The client singleton does not exist before creating a client");
     assert.equal(document.getElementById("global-zeroclipboard-html-bridge"), null, "The HTML bridge does not exist before creating a client");
-    var clip = new ZeroClipboard();
+    var client = new ZeroClipboard();
     assert.ok(!ZeroClipboard.prototype._singleton, "The client singleton does exist after creating a client");
     assert.notEqual(document.getElementById("global-zeroclipboard-html-bridge"), null, "The HTML bridge does exist after creating a client");
     ZeroClipboard.destroy();
@@ -318,7 +318,7 @@
     ZeroClipboard.detectFlashSupport = function() {
       return true;
     };
-    var clip = new ZeroClipboard();
+    var client = new ZeroClipboard();
 
     // Assert, act, assert
     assert.strictEqual(flashState.ready, false);
@@ -352,12 +352,12 @@
     assert.expect(2);
 
     // Arrange
-    var clip = new ZeroClipboard();
+    var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button");
 
     // Act
-    clip.glue(currentEl);
-    clip.setTitle("Click Me");
+    client.clip(currentEl);
+    client.setTitle("Click Me");
 
     // Assert
     var htmlBridge = TestUtils.getHtmlBridge();

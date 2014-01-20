@@ -6,8 +6,8 @@
 var _detectFlashSupport = function () {
   var hasFlash = false;
 
-  if (typeof flashState.noflash === "boolean") {
-    hasFlash = flashState.noflash === false;
+  if (typeof flashState.disabled === "boolean") {
+    hasFlash = flashState.disabled === false;
   }
   else {
     // IE

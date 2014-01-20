@@ -95,11 +95,11 @@
     // Arrange
     var newPath = "the/path";
     var scriptAccess = "always";
-    var clip = new ZeroClipboard();
+    var client = new ZeroClipboard();
 
     // Assert
-    assert.notEqual(clip.options.moviePath, newPath);
-    assert.notEqual(clip.options.allowScriptAccess, scriptAccess);
+    assert.notEqual(client.options.moviePath, newPath);
+    assert.notEqual(client.options.allowScriptAccess, scriptAccess);
 
     // Act
     ZeroClipboard.config({
@@ -108,9 +108,9 @@
     });
 
     // Assert
-    clip = new ZeroClipboard();
-    assert.strictEqual(clip.options.moviePath, newPath);
-    assert.strictEqual(clip.options.allowScriptAccess, scriptAccess);
+    client = new ZeroClipboard();
+    assert.strictEqual(client.options.moviePath, newPath);
+    assert.strictEqual(client.options.allowScriptAccess, scriptAccess);
   });
 
 })(QUnit.module, QUnit.test);

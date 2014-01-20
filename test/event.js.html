@@ -26,8 +26,8 @@
     // Mocks for "dom.js"
     var _bridge = function() {
       _extend(flashState, {
-        noflash: false,
-        wrongflash: false,
+        disabled: false,
+        outdated: false,
         ready: false,
         bridge: {
           setHandCursor: function() { }

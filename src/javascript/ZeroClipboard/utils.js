@@ -367,12 +367,12 @@ var _inArray = function (elem, array, fromIndex) {
 };
 
 /*
- * private _prepGlue function.
- * prepares the elements for gluing/ungluing
+ * private _prepClip function.
+ * prepares the elements for clipping/unclipping
  *
  * returns the elements
  */
-var _prepGlue = function (elements) {
+var _prepClip = function (elements) {
 
   // if elements is a string
   if (typeof elements === "string") throw new TypeError("ZeroClipboard doesn't accept query strings.");
@@ -390,13 +390,14 @@ var _prepGlue = function (elements) {
  *
  * returns nothing
  */
-var _dispatchCallback = function (func, element, instance, args, async) {
+var _dispatchCallback = function (func, context, args, async) {
   if (async) {
     window.setTimeout(function () {
-      func.call(element, instance, args);
+      func.apply(context, args);
     }, 0);
-  } else {
-    func.call(element, instance, args);
+  }
+  else {
+    func.apply(context, args);
   }
 };
 

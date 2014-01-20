@@ -48,8 +48,7 @@ _globalConfig.allowScriptAccess = null;
  * Originally from "core.js", then "flash.js"
  */
 ZeroClipboard.detectFlashSupport = function () {
-  var debugEnabled = _globalConfig.debug;
-  _deprecationWarning("ZeroClipboard.detectFlashSupport", debugEnabled);
+  _deprecationWarning("ZeroClipboard.detectFlashSupport", _globalConfig.debug);
   return _detectFlashSupport();
 };
 

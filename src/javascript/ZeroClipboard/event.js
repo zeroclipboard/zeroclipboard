@@ -12,7 +12,7 @@ ZeroClipboard.dispatch = function (eventName, args) {
     if (cleanEventName) {
       // Get an array of clients that have been glued to the `currentElement`, or
       // get ALL clients if no `currentElement` (e.g. for the global Flash events like "load", etc.)
-      var clients = currentElement ? _getAllClientsGluedToElement(currentElement) : _getAllClients();
+      var clients = currentElement ? _getAllClientsClippedToElement(currentElement) : _getAllClients();
       for (var i = 0, len = clients.length; i < len; i++) {
         _receiveEvent.call(clients[i], cleanEventName, args);
       }
@@ -27,36 +27,50 @@ ZeroClipboard.dispatch = function (eventName, args) {
  */
 ZeroClipboard.prototype.on = function (eventName, func) {
   // add user event handler for event
-  var events = eventName.toString().split(/\s+/),
+  var i, len, events,
       added = {},
       handlers = _clientMeta[this.id] && _clientMeta[this.id].handlers;
-  for (var i = 0, len = events.length; i < len; i++) {
-    eventName = events[i].toLowerCase().replace(/^on/, '');
-    added[eventName] = true;
-    if (!handlers[eventName]) {
-      handlers[eventName] = [];
+
+  if (typeof eventName === "string" && eventName) {
+    events = eventName.toLowerCase().split(/\s+/);
+  }
+  else if (typeof eventName === "object" && eventName && typeof func === "undefined") {
+    for (i in eventName) {
+      if (eventName.hasOwnProperty(i) && typeof i === "string" && i && typeof eventName[i] === "function") {
+        this.on(i, eventName[i]);
+      }
     }
-    handlers[eventName].push(func);
   }
 
-  // The following events must be memorized and fired immediately if relevant as they only occur
-  // once per Flash object load.
+  if (events && events.length) {
+    for (i = 0, len = events.length; i < len; i++) {
+      eventName = events[i].replace(/^on/, '');
+      added[eventName] = true;
+      if (!handlers[eventName]) {
+        handlers[eventName] = [];
+      }
+      handlers[eventName].push(func);
+    }
 
-  // If we don't have Flash, tell an adult
-  if (added.noflash && flashState.noflash) {
-    _receiveEvent.call(this, "onNoFlash", {});
-  }
-  // If we have old Flash,
-  if (added.wrongflash && flashState.wrongflash) {
-    _receiveEvent.call(this, "onWrongFlash", {
-      flashVersion: flashState.version
-    });
-  }
-  // If the SWF was already loaded, we're à gogo!
-  if (added.load && flashState.ready) {
-    _receiveEvent.call(this, "onLoad", {
-      flashVersion: flashState.version
-    });
+    // The following events must be memorized and fired immediately if relevant as they only occur
+    // once per Flash object load.
+
+    // If we don't have Flash, tell an adult
+    if (added.noflash && flashState.disabled) {
+      _receiveEvent.call(this, "noflash", {});
+    }
+    // If we have old Flash, cry about it
+    if (added.wrongflash && flashState.outdated) {
+      _receiveEvent.call(this, "wrongflash", {
+        flashVersion: flashState.version
+      });
+    }
+    // If the SWF was already loaded, we're à gogo!
+    if (added.load && flashState.ready) {
+      _receiveEvent.call(this, "load", {
+        flashVersion: flashState.version
+      });
+    }
   }
 
   return this;
@@ -78,6 +92,13 @@ ZeroClipboard.prototype.off = function (eventName, func) {
   }
   else if (typeof eventName === "string" && eventName) {
     events = eventName.split(/\s+/);
+  }
+  else if (typeof eventName === "object" && eventName && typeof func === "undefined") {
+    for (i in eventName) {
+      if (eventName.hasOwnProperty(i) && typeof i === "string" && i && typeof eventName[i] === "function") {
+        this.off(i, eventName[i]);
+      }
+    }
   }
 
   if (events && events.length) {
@@ -131,10 +152,11 @@ ZeroClipboard.prototype.handlers = function (eventName) {
 };
 
 
+
 /*
  * Receive an event from Flash for a specific element/client.
  *
- * returns nothing
+ * returns object instance
  */
 var _receiveEvent = function (eventName, args) {
   eventName = eventName.toLowerCase().replace(/^on/, '');
@@ -152,7 +174,7 @@ var _receiveEvent = function (eventName, args) {
           _receiveEvent.call(this, "onWrongFlash", { flashVersion: cleanVersion });
           return;
         }
-        flashState.wrongflash = false;
+        flashState.outdated = false;
         flashState.ready = true;
         flashState.version = cleanVersion;
       }
@@ -160,7 +182,7 @@ var _receiveEvent = function (eventName, args) {
 
     case 'wrongflash':
       if (cleanVersion && !_isFlashVersionSupported(cleanVersion)) {
-        flashState.wrongflash = true;
+        flashState.outdated = true;
         flashState.ready = false;
         flashState.version = cleanVersion;
       }
@@ -209,23 +231,42 @@ var _receiveEvent = function (eventName, args) {
       break;
   } // switch eventName
 
+  var context = element;
+  var eventArgs = [this, args];
+  return _dispatchClientCallbacks.call(this, eventName, context, eventArgs, performCallbackAsync);
+};
+
+
+/**
+ * Handle the actual dispatching of events to client instances.
+ *
+ * returns object instance
+ */
+var _dispatchClientCallbacks = function(eventName, context, args, async) {
   // User defined handlers for events
   var handlers = _clientMeta[this.id] && _clientMeta[this.id].handlers[eventName];
   if (handlers && handlers.length) {
-    var i, len, func;
+    var i, len, func,
+        originalContext = context || this;
     for (i = 0, len = handlers.length; i < len; i++) {
       func = handlers[i];
+      context = originalContext;
 
       // If the user provided a string for their callback, grab that function
       if (typeof func === 'string' && typeof window[func] === 'function') {
         func = window[func];
       }
+      if (typeof func === 'object' && func && typeof func.handleEvent === 'function') {
+        context = func;
+        func = func.handleEvent;
+      }
       if (typeof func === 'function') {
         // actual function reference
-        _dispatchCallback(func, element, this, args, performCallbackAsync);
+        _dispatchCallback(func, context, args, async);
       }
     }
   }
+  return this;
 };
 
 /*
@@ -233,13 +274,13 @@ var _receiveEvent = function (eventName, args) {
  *
  * returns object instance
  */
-ZeroClipboard.prototype.glue = function (elements) {
+ZeroClipboard.prototype.clip = function (elements) {
 
-  elements = _prepGlue(elements);
+  elements = _prepClip(elements);
 
   for (var i = 0; i < elements.length ; i++) {
     if (elements.hasOwnProperty(i) && elements[i] && elements[i].nodeType === 1) {
-      // If the element hasn't been glued to ANY client yet, add a metadata ID and event handler
+      // If the element hasn't been clipped to ANY client yet, add a metadata ID and event handler
       if (!elements[i].zcClippingId) {
         elements[i].zcClippingId = "zcClippingId_" + (elementIdCounter++);
         _elementMeta[elements[i].zcClippingId] = [this.id];
@@ -249,10 +290,10 @@ ZeroClipboard.prototype.glue = function (elements) {
         _elementMeta[elements[i].zcClippingId].push(this.id);
       }
 
-      // If the element hasn't been glued to THIS client yet, add it
-      var gluedElements = _clientMeta[this.id].elements;
-      if (_inArray(elements[i], gluedElements) === -1) {
-        gluedElements.push(elements[i]);
+      // If the element hasn't been clipped to THIS client yet, add it
+      var clippedElements = _clientMeta[this.id].elements;
+      if (_inArray(elements[i], clippedElements) === -1) {
+        clippedElements.push(elements[i]);
       }
     }
   }
@@ -266,30 +307,30 @@ ZeroClipboard.prototype.glue = function (elements) {
  *
  * returns object instance
  */
-ZeroClipboard.prototype.unglue = function (elements) {
+ZeroClipboard.prototype.unclip = function (elements) {
   var meta = _clientMeta[this.id];
 
   if (meta) {
-    var gluedElements = meta.elements;
+    var clippedElements = meta.elements;
     var arrayIndex;
 
-    // if no elements were provided, unglue ALL of this client's glued elements
+    // if no elements were provided, unclip ALL of this client's clipped elements
     if (typeof elements === "undefined") {
-      elements = gluedElements.slice(0);
+      elements = clippedElements.slice(0);
     }
     else {
-      elements = _prepGlue(elements);
+      elements = _prepClip(elements);
     }
     
     for (var i = elements.length; i--; ) {
       if (elements.hasOwnProperty(i) && elements[i] && elements[i].nodeType === 1) {
-        // If the element was glued to THIS client yet, remove it
+        // If the element was clipped to THIS client yet, remove it
         arrayIndex = 0;
-        while ((arrayIndex = _inArray(elements[i], gluedElements, arrayIndex)) !== -1) {
-          gluedElements.splice(arrayIndex, 1);
+        while ((arrayIndex = _inArray(elements[i], clippedElements, arrayIndex)) !== -1) {
+          clippedElements.splice(arrayIndex, 1);
         }
 
-        // If the element isn't glued to ANY other client, remove its metadata ID and event handler
+        // If the element isn't clipped to ANY other client, remove its metadata ID and event handler
         var clientIds = _elementMeta[elements[i].zcClippingId];
         if (clientIds) {
           arrayIndex = 0;
@@ -309,9 +350,9 @@ ZeroClipboard.prototype.unglue = function (elements) {
 
 
 /*
- * Get all of the elements to which this client is glued.
+ * Get all of the elements to which this client is clipped.
  *
- * returns array of glued elements
+ * returns array of clipped elements
  */
 ZeroClipboard.prototype.elements = function () {
   var meta = _clientMeta[this.id];
@@ -320,11 +361,11 @@ ZeroClipboard.prototype.elements = function () {
 
 
 /*
- * Get all of the clients that are glued to an element.
+ * Get all of the clients that are clipped to an element.
  *
  * returns array of clients
  */
-var _getAllClientsGluedToElement = function (element) {
+var _getAllClientsClippedToElement = function (element) {
   var elementMetaId, clientIds, i, len, client,
       clients = [];
   if (element && element.nodeType === 1 && (elementMetaId = element.zcClippingId) && _elementMeta.hasOwnProperty(elementMetaId)) {
