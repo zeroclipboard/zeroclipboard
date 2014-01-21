@@ -181,6 +181,23 @@
     }
   });
 
+
+  test("`swfPath` finds the expected default URL", function(assert) {
+    assert.expect(1);
+
+    // Assert, act, assert
+    var pageUrl = window.location.href.split("#")[0].split("?")[0];
+    var protocolIndex = pageUrl.lastIndexOf("//");
+    var protocol = pageUrl.slice(0, protocolIndex + 2);
+    var rootDir = protocol + pageUrl.slice(protocolIndex + 2).split("/").slice(0, -2).join("/") + "/";
+    //var zcJsUrl = rootDir + "ZeroClipboard.js";
+    var swfPathBasedOnZeroClipboardJsPath = rootDir + "ZeroClipboard.swf";
+
+    // Test that the client has the expected default URL [even if it's not correct]
+    assert.strictEqual(ZeroClipboard.config("swfPath"), swfPathBasedOnZeroClipboardJsPath);
+  });
+
+
   test("`destroy` destroys the bridge", function(assert) {
     assert.expect(3);
 

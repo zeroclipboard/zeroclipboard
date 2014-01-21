@@ -49,6 +49,16 @@ _globalConfig.useNoCache = true;
 
 
 /*
+ * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for alternatives.
+ *
+ * URL to movie
+ *
+ * Originally from "core.js"
+ */
+_globalConfig.moviePath = "ZeroClipboard.swf";
+
+
+/*
  * @deprecated in [v1.2.0], slated for removal in [v2.0.0]. See docs for more info.
  *
  * Simple Flash Detection

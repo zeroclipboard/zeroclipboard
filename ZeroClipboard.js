@@ -23,6 +23,45 @@
   var _elementMeta = {};
   var _amdModuleId = null;
   var _cjsModuleId = null;
+  var _swfPath = function() {
+    var i, jsDir, tmpJsPath, jsPath, swfPath = "ZeroClipboard.swf";
+    if (document.currentScript && (jsPath = document.currentScript.src)) {} else {
+      var scripts = Array.prototype.slice.call(document.getElementsByTagName("script"), 0);
+      if ("readyState" in scripts[0]) {
+        for (i = scripts.length; i--; ) {
+          if (scripts[i].readyState === "interactive" && (jsPath = scripts[i].src)) {
+            break;
+          }
+        }
+      } else if (document.readyState === "loading") {
+        jsPath = scripts[scripts.length - 1].src;
+      } else {
+        for (i = scripts.length; i--; ) {
+          tmpJsPath = scripts[i].src;
+          if (!tmpJsPath) {
+            jsDir = null;
+            break;
+          }
+          tmpJsPath = tmpJsPath.split("#")[0].split("?")[0];
+          tmpJsPath = tmpJsPath.slice(0, tmpJsPath.lastIndexOf("/") + 1);
+          if (jsDir == null) {
+            jsDir = tmpJsPath;
+          } else if (jsDir !== tmpJsPath) {
+            jsDir = null;
+            break;
+          }
+        }
+        if (jsDir !== null) {
+          jsPath = jsDir;
+        }
+      }
+    }
+    if (jsPath) {
+      jsPath = jsPath.split("#")[0].split("?")[0];
+      swfPath = jsPath.slice(0, jsPath.lastIndexOf("/") + 1) + swfPath;
+    }
+    return swfPath;
+  }();
   var _camelizeCssPropName = function() {
     var matcherRegex = /\-([a-z])/g, replacerFn = function(match, group) {
       return group.toUpperCase();
@@ -495,7 +534,7 @@
   };
   ZeroClipboard.version = "1.3.0-beta.2";
   var _globalConfig = {
-    moviePath: "ZeroClipboard.swf",
+    swfPath: _swfPath,
     trustedDomains: window.location.host ? [ window.location.host ] : [],
     cacheBust: true,
     forceHandCursor: false,
@@ -895,6 +934,7 @@
   _globalConfig.trustedOrigins = null;
   _globalConfig.allowScriptAccess = null;
   _globalConfig.useNoCache = true;
+  _globalConfig.moviePath = "ZeroClipboard.swf";
   ZeroClipboard.detectFlashSupport = function() {
     _deprecationWarning("ZeroClipboard.detectFlashSupport", _globalConfig.debug);
     return _detectFlashSupport();

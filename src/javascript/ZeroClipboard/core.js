@@ -1,8 +1,12 @@
 ZeroClipboard.version = "<%= version %>";
+
 // ZeroClipboard options defaults
 var _globalConfig = {
-  // URL to movie
-  moviePath: "ZeroClipboard.swf",
+  // NOTE: For versions >= v1.3.x and < v2.x, you must use `swfPath` by setting `moviePath`:
+  //   `ZeroClipboard.config({ moviePath: ZeroClipboard.config("swfPath") });`
+  // URL to movie, relative to the page. Default value will be "ZeroClipboard.swf" under the
+  // same path as the ZeroClipboard JS file.
+  swfPath: _swfPath,
 
   // SWF inbound scripting policy: page domains that the SWF should trust. (single string or array of strings)
   trustedDomains: window.location.host ? [window.location.host] : [],

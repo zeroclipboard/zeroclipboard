@@ -63,8 +63,11 @@ These are default values for the global configurations options. You should gener
 
 ```js
 var _globalConfig = {
-  // URL to movie
-  moviePath: "ZeroClipboard.swf",
+  // NOTE: For versions >= v1.3.x and < v2.x, you must use `swfPath` by setting `moviePath`:
+  //   `ZeroClipboard.config({ moviePath: ZeroClipboard.config("swfPath") });`
+  // URL to movie, relative to the page. Default value will be "ZeroClipboard.swf" under the
+  // same path as the ZeroClipboard JS file.
+  swfPath: "path/to/ZeroClipboard.swf",
 
   // SWF inbound scripting policy: page domains that the SWF should trust. (single string or array of strings)
   trustedDomains: [window.location.host],
@@ -109,6 +112,10 @@ var _globalConfig = {
   /** @deprecated */
   // Include a "nocache" query parameter on requests for the SWF
   useNoCache: true,
+
+  /** @deprecated */
+  // URL to movie
+  moviePath: "ZeroClipboard.swf"
 };
 ```
 
@@ -717,3 +724,6 @@ The current list of deprecations includes:
      - Use `ZeroClipboard.prototype.unclip` instead!
  - The `useNoCache` config option &rarr; as of [v1.3.0], removing in [v2.0.0]
      - Use the `cacheBust` config option instead!
+ - The `moviePath` config option &rarr; as of [v1.3.0], removing in [v2.0.0]
+     - Use the `swfPath` config option instead!
+     - For v1.3.x usage, do: `ZeroClipboard.config({ moviePath: ZeroClipboard.config("swfPath") });`
