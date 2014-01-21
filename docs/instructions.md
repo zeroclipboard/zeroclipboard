@@ -84,6 +84,10 @@ var _globalConfig = {
   // Sets the title of the `div` encapsulating the Flash object
   title: null,
 
+  // Setting this to `false` would allow users to handle calling `ZeroClipboard.activate(...);`
+  // themselves instead of relying on our per-element `mouseover` handler
+  autoActivate: true,
+
 
   /** @deprecated */
   // The class used to indicate that a clipped element is being hovered over

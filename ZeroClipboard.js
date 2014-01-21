@@ -501,7 +501,8 @@
     forceHandCursor: false,
     zIndex: 999999999,
     debug: true,
-    title: null
+    title: null,
+    autoActivate: true
   };
   ZeroClipboard.config = function(options) {
     if (typeof options === "object" && options !== null) {
@@ -757,7 +758,9 @@
       break;
 
      case "mouseout":
-      ZeroClipboard.deactivate();
+      if (_globalConfig.autoActivate === true) {
+        ZeroClipboard.deactivate();
+      }
       break;
 
      case "mousedown":
@@ -820,7 +823,9 @@
         if (!elements[i].zcClippingId) {
           elements[i].zcClippingId = "zcClippingId_" + elementIdCounter++;
           _elementMeta[elements[i].zcClippingId] = [ this.id ];
-          _addEventHandler(elements[i], "mouseover", _elementMouseOver);
+          if (_globalConfig.autoActivate === true) {
+            _addEventHandler(elements[i], "mouseover", _elementMouseOver);
+          }
         } else if (_inArray(this.id, _elementMeta[elements[i].zcClippingId]) === -1) {
           _elementMeta[elements[i].zcClippingId].push(this.id);
         }
@@ -855,7 +860,9 @@
               clientIds.splice(arrayIndex, 1);
             }
             if (clientIds.length === 0) {
-              _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
+              if (_globalConfig.autoActivate === true) {
+                _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
+              }
               delete elements[i].zcClippingId;
             }
           }

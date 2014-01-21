@@ -188,18 +188,24 @@ var _receiveEvent = function (eventName, args) {
       }
       break;
 
+    // NOTE: This `mouseover` event is coming from Flash, not DOM/JS
     case 'mouseover':
       _addClass(element, _globalConfig.hoverClass);
       break;
 
+    // NOTE: This `mouseout` event is coming from Flash, not DOM/JS
     case 'mouseout':
-      ZeroClipboard.deactivate();
+      if (_globalConfig.autoActivate === true) {
+        ZeroClipboard.deactivate();
+      }
       break;
 
+    // NOTE: This `mousedown` event is coming from Flash, not DOM/JS
     case 'mousedown':
       _addClass(element, _globalConfig.activeClass);
       break;
 
+    // NOTE: This `mouseup` event is coming from Flash, not DOM/JS
     case 'mouseup':
       _removeClass(element, _globalConfig.activeClass);
       break;
@@ -284,7 +290,9 @@ ZeroClipboard.prototype.clip = function (elements) {
       if (!elements[i].zcClippingId) {
         elements[i].zcClippingId = "zcClippingId_" + (elementIdCounter++);
         _elementMeta[elements[i].zcClippingId] = [this.id];
-        _addEventHandler(elements[i], "mouseover", _elementMouseOver);
+        if (_globalConfig.autoActivate === true) {
+          _addEventHandler(elements[i], "mouseover", _elementMouseOver);
+        }
       }
       else if (_inArray(this.id, _elementMeta[elements[i].zcClippingId]) === -1) {
         _elementMeta[elements[i].zcClippingId].push(this.id);
@@ -338,7 +346,9 @@ ZeroClipboard.prototype.unclip = function (elements) {
             clientIds.splice(arrayIndex, 1);
           }
           if (clientIds.length === 0) {
-            _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
+            if (_globalConfig.autoActivate === true) {
+              _removeEventHandler(elements[i], "mouseover", _elementMouseOver);
+            }
             delete elements[i].zcClippingId;
           }
         }

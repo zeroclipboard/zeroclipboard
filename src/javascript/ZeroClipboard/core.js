@@ -20,7 +20,11 @@ var _globalConfig = {
   debug: true,
 
   // Sets the title of the `div` encapsulating the Flash object
-  title: null
+  title: null,
+
+  // Setting this to `false` would allow users to handle calling `ZeroClipboard.activate(...);`
+  // themselves instead of relying on our per-element `mouseover` handler
+  autoActivate: true
 };
 
 
