@@ -132,6 +132,28 @@
     assert.strictEqual(client.handlers().customevent.length, 1);
   });
 
+  test("Registering Events with Maps", function(assert) {
+    assert.expect(6);
+
+    // Arrange
+    var client = new ZeroClipboard();
+
+    // Act
+    client.on({
+      "load": function(){},
+      "onNoFlash": function(){},
+      "onCustomEvent": function(){}
+    });
+
+    // Assert
+    assert.ok(client.handlers().load);
+    assert.ok(client.handlers().noflash);
+    assert.ok(client.handlers().customevent);
+    assert.strictEqual(client.handlers().load.length, 1);
+    assert.strictEqual(client.handlers().noflash.length, 1);
+    assert.strictEqual(client.handlers().customevent.length, 1);
+  });
+
   test("Unregistering Events", function(assert) {
     assert.expect(6);
 
@@ -164,6 +186,38 @@
     assert.deepEqual(client.handlers().customevent, []);
   });
 
+  test("Unregistering Events with Maps", function(assert) {
+    assert.expect(6);
+
+    // Arrange
+    var client = new ZeroClipboard();
+    var load = function(){};
+    var onNoFlash = function(){};
+    var onCustomEvent = function(){};
+
+    // Act
+    client.on("load", load);
+    client.on("onNoFlash", onNoFlash);
+    client.on("onCustomEvent", onCustomEvent);
+
+    // Assert
+    assert.deepEqual(client.handlers().load, [load]);
+    assert.deepEqual(client.handlers().noflash, [onNoFlash]);
+    assert.deepEqual(client.handlers().customevent, [onCustomEvent]);
+
+    // Act & Assert
+    client.off({ "load": load });
+    assert.deepEqual(client.handlers().load, []);
+
+    // Act & Assert
+    client.off({ "onNoFlash": onNoFlash });
+    assert.deepEqual(client.handlers().noflash, []);
+
+    // Act & Assert
+    client.off({ "onCustomEvent": onCustomEvent });
+    assert.deepEqual(client.handlers().customevent, []);
+  });
+
   test("Registering two events works", function(assert) {
     assert.expect(6);
 
@@ -176,6 +230,28 @@
 
     // Act
     client.on("load oncomplete", function(){});
+
+    // Assert more
+    assert.ok(client.handlers().load);
+    assert.ok(client.handlers().complete);
+    assert.strictEqual(client.handlers().load.length, 1);
+    assert.strictEqual(client.handlers().complete.length, 1);
+  });
+
+  test("Registering two events with a map works", function(assert) {
+    assert.expect(6);
+
+    // Arrange
+    var client = new ZeroClipboard();
+
+    // Assert
+    assert.ok(!client.handlers().load);
+    assert.ok(!client.handlers().complete);
+
+    // Act
+    client.on({
+      "load oncomplete": function(){}
+    });
 
     // Assert more
     assert.ok(client.handlers().load);
@@ -204,6 +280,34 @@
 
     // Act more
     client.off("load oncomplete", func);
+
+    // Assert even more
+    assert.deepEqual(client.handlers().load, []);
+    assert.deepEqual(client.handlers().complete, []);
+  });
+
+  test("Unregistering two events with a map works", function(assert) {
+    assert.expect(6);
+
+    // Arrange
+    var client = new ZeroClipboard();
+    var func = function() {};
+
+    // Assert
+    assert.ok(!client.handlers().load);
+    assert.ok(!client.handlers().complete);
+
+    // Act
+    client.on("load oncomplete", func);
+
+    // Assert more
+    assert.deepEqual(client.handlers().load, [func]);
+    assert.deepEqual(client.handlers().complete, [func]);
+
+    // Act more
+    client.off({
+      "load oncomplete": func
+    });
 
     // Assert even more
     assert.deepEqual(client.handlers().load, []);
@@ -456,6 +560,50 @@
       QUnit.start();
     } );
     QUnit.stop();
+  });
+
+  test("Test string function name as handler", function(assert) {
+    assert.expect(1);
+
+    // Arrange
+    var client = new ZeroClipboard();
+    var currentEl = document.getElementById("d_clip_button");
+    var id = client.id;
+    client.clip(currentEl);
+    window.zcLoadCallback = function(client, args) {
+      // Assert
+      assert.strictEqual(client.id, id);
+      QUnit.start();
+      delete window.zcLoadCallback;
+    };
+    client.on( 'load', 'zcLoadCallback' );
+
+    // Act
+    QUnit.stop();
+    ZeroClipboard.dispatch("load", { flashVersion: "WIN 11,9,0" });
+  });
+
+  test("Test EventListener object as handler", function(assert) {
+    assert.expect(2);
+
+    // Arrange
+    var client = new ZeroClipboard();
+    var currentEl = document.getElementById("d_clip_button");
+    var id = client.id;
+    client.clip(currentEl);
+    var eventListenerObj = {
+      handleEvent: function(client, args) {
+        // Assert
+        assert.strictEqual(client.id, id);
+        assert.strictEqual(this, eventListenerObj);
+        QUnit.start();
+      }
+    };
+    client.on( 'load', eventListenerObj );
+
+    // Act
+    QUnit.stop();
+    ZeroClipboard.dispatch("load", { flashVersion: "WIN 11,9,0" });
   });
 
   test("Test mouseover and mouseout event", function(assert) {
