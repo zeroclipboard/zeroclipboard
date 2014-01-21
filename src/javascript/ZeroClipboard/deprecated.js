@@ -39,6 +39,16 @@ _globalConfig.allowScriptAccess = null;
 
 
 /*
+ * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for alternatives.
+ *
+ * Include a "nocache" query parameter on requests for the SWF
+ *
+ * Originally from "core.js"
+ */
+_globalConfig.useNoCache = true;
+
+
+/*
  * @deprecated in [v1.2.0], slated for removal in [v2.0.0]. See docs for more info.
  *
  * Simple Flash Detection

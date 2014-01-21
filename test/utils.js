@@ -1,4 +1,4 @@
-/*global _camelizeCssPropName, _getStyle, _removeClass, _addClass, _vars, _noCache, _inArray, _dispatchCallback, _extend, _extractDomain, _determineScriptAccess, _objectKeys, _deleteOwnProperties */
+/*global _camelizeCssPropName, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _inArray, _dispatchCallback, _extend, _extractDomain, _determineScriptAccess, _objectKeys, _deleteOwnProperties */
 
 "use strict";
 
@@ -145,7 +145,7 @@
   });
 
 
-  test("`_noCache` adds cache-buster appropriately", function(assert) {
+  test("`_cacheBust` adds cache-buster appropriately", function(assert) {
     assert.expect(2);
 
     // Arrange
@@ -153,24 +153,37 @@
     var pathWithQuery = "path.com/z.swf?q=jon";
 
     // Act & Assert
-    assert.strictEqual(_noCache(pathWithoutQuery).indexOf("?nocache="), 0);
-    assert.strictEqual(_noCache(pathWithQuery).indexOf("&nocache="), 0);
+    assert.strictEqual(_cacheBust(pathWithoutQuery).indexOf("?noCache="), 0);
+    assert.strictEqual(_cacheBust(pathWithQuery).indexOf("&noCache="), 0);
   });
 
 
-  test("`_noCache` can be disabled", function(assert) {
-    assert.expect(2);
+  test("`_cacheBust` can be disabled", function(assert) {
+    assert.expect(6);
 
     // Arrange
     var pathWithoutQuery = "path.com/z.swf";
     var pathWithQuery = "path.com/z.swf?q=jon";
-    var options = {
-      useNoCache: false
+    var options1 = {
+      useNoCache: false,
+      cacheBust: true
+    };
+    var options2 = {
+      useNoCache: true,
+      cacheBust: false
+    };
+    var options3 = {
+      useNoCache: false,
+      cacheBust: false
     };
 
     // Act & Assert
-    assert.strictEqual(_noCache(pathWithoutQuery, options), "");
-    assert.strictEqual(_noCache(pathWithQuery, options), "");
+    assert.strictEqual(_cacheBust(pathWithoutQuery, options1), "");
+    assert.strictEqual(_cacheBust(pathWithQuery, options1), "");
+    assert.strictEqual(_cacheBust(pathWithoutQuery, options2), "");
+    assert.strictEqual(_cacheBust(pathWithQuery, options2), "");
+    assert.strictEqual(_cacheBust(pathWithoutQuery, options3), "");
+    assert.strictEqual(_cacheBust(pathWithQuery, options3), "");
   });
 
 

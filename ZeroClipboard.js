@@ -179,10 +179,10 @@
     }
     return info;
   };
-  var _noCache = function(path, options) {
-    var useNoCache = !(options && options.useNoCache === false);
-    if (useNoCache) {
-      return (path.indexOf("?") === -1 ? "?" : "&") + "nocache=" + new Date().getTime();
+  var _cacheBust = function(path, options) {
+    var cacheBust = options == null || options && options.cacheBust === true && options.useNoCache === true;
+    if (cacheBust) {
+      return (path.indexOf("?") === -1 ? "?" : "&") + "noCache=" + new Date().getTime();
     } else {
       return "";
     }
@@ -497,7 +497,7 @@
   var _globalConfig = {
     moviePath: "ZeroClipboard.swf",
     trustedDomains: window.location.host ? [ window.location.host ] : [],
-    useNoCache: true,
+    cacheBust: true,
     forceHandCursor: false,
     zIndex: 999999999,
     debug: true,
@@ -586,7 +586,7 @@
       opts.jsModuleId = typeof _amdModuleId === "string" && _amdModuleId || typeof _cjsModuleId === "string" && _cjsModuleId || null;
       var allowScriptAccess = _determineScriptAccess(window.location.host, _globalConfig);
       var flashvars = _vars(opts);
-      var swfUrl = _globalConfig.moviePath + _noCache(_globalConfig.moviePath, _globalConfig);
+      var swfUrl = _globalConfig.moviePath + _cacheBust(_globalConfig.moviePath, _globalConfig);
       var html = '      <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" id="global-zeroclipboard-flash-bridge" width="100%" height="100%">         <param name="movie" value="' + swfUrl + '"/>         <param name="allowScriptAccess" value="' + allowScriptAccess + '"/>         <param name="scale" value="exactfit"/>         <param name="loop" value="false"/>         <param name="menu" value="false"/>         <param name="quality" value="best" />         <param name="bgcolor" value="#ffffff"/>         <param name="wmode" value="transparent"/>         <param name="flashvars" value="' + flashvars + '"/>         <embed src="' + swfUrl + '"           loop="false" menu="false"           quality="best" bgcolor="#ffffff"           width="100%" height="100%"           name="global-zeroclipboard-flash-bridge"           allowScriptAccess="' + allowScriptAccess + '"           allowFullScreen="false"           type="application/x-shockwave-flash"           wmode="transparent"           pluginspage="http://www.macromedia.com/go/getflashplayer"           flashvars="' + flashvars + '"           scale="exactfit">         </embed>       </object>';
       container = document.createElement("div");
       container.id = "global-zeroclipboard-html-bridge";
@@ -894,6 +894,7 @@
   _globalConfig.activeClass = "zeroclipboard-is-active";
   _globalConfig.trustedOrigins = null;
   _globalConfig.allowScriptAccess = null;
+  _globalConfig.useNoCache = true;
   ZeroClipboard.detectFlashSupport = function() {
     _deprecationWarning("ZeroClipboard.detectFlashSupport", _globalConfig.debug);
     return _detectFlashSupport();

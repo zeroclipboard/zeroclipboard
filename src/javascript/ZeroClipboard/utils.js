@@ -254,16 +254,16 @@ var _getDOMObjectPosition = function (obj, defaultZIndex) {
 };
 
 /*
- * private _noCache function.
+ * private _cacheBust function.
  * Will look at a path, and will append "?noCache={time}" or "&noCache={time}" to path.
  * because ExternalInterface craps out when Flash is cached in IE.
  *
  * returns path with noCache param added
  */
-var _noCache = function (path, options) {
-  var useNoCache = !(options && options.useNoCache === false);
-  if (useNoCache) {
-    return (path.indexOf("?") === -1 ? "?" : "&") + "nocache=" + (new Date()).getTime();
+var _cacheBust = function (path, options) {
+  var cacheBust = options == null || (options && options.cacheBust === true && options.useNoCache === true);
+  if (cacheBust) {
+    return (path.indexOf("?") === -1 ? "?" : "&") + "noCache=" + (new Date()).getTime();
   } else {
     return "";
   }
@@ -271,7 +271,7 @@ var _noCache = function (path, options) {
 
 /*
  * private _vars function.
- * creates a query string for the flasvars
+ * creates a query string for the flashvars
  *
  * returns flashvars separated by &
  */

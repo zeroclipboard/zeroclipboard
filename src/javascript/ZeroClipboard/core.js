@@ -7,8 +7,8 @@ var _globalConfig = {
   // SWF inbound scripting policy: page domains that the SWF should trust. (single string or array of strings)
   trustedDomains: window.location.host ? [window.location.host] : [],
 
-  // Include a nocache query parameter on requests for the SWF
-  useNoCache: true,
+  // Include a "nocache" query parameter on requests for the SWF
+  cacheBust: true,
 
   // Forcibly set the hand cursor ("pointer") for all clipped elements
   forceHandCursor: false,

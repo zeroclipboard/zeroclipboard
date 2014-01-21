@@ -69,8 +69,8 @@ var _globalConfig = {
   // SWF inbound scripting policy: page domains that the SWF should trust. (single string or array of strings)
   trustedDomains: [window.location.host],
 
-  // Include a nocache query parameter on requests for the SWF
-  useNoCache: true,
+  // Include a "nocache" query parameter on requests for the SWF
+  cacheBust: true,
 
   // Forcibly set the hand cursor ("pointer") for all clipped elements
   forceHandCursor: false,
@@ -104,7 +104,11 @@ var _globalConfig = {
 
   /** @deprecated */
   // SWF outbound scripting policy. Possible values: "never", "sameDomain", "always"
-  allowScriptAccess: null
+  allowScriptAccess: null,
+
+  /** @deprecated */
+  // Include a "nocache" query parameter on requests for the SWF
+  useNoCache: true,
 };
 ```
 
@@ -711,3 +715,5 @@ The current list of deprecations includes:
      - Use `ZeroClipboard.prototype.clip` instead!
  - `ZeroClipboard.prototype.unglue` &rarr; as of [v1.3.0], removing in [v2.0.0]
      - Use `ZeroClipboard.prototype.unclip` instead!
+ - The `useNoCache` config option &rarr; as of [v1.3.0], removing in [v2.0.0]
+     - Use the `cacheBust` config option instead!
