@@ -59,7 +59,7 @@ var _swfPath = (function() {
     // Do nothing, assignment occurred during condition
   }
   else {
-    var scripts = Array.prototype.slice.call(document.getElementsByTagName("script"), 0);
+    var scripts = document.getElementsByTagName("script");
     // If `script` elements have the `readyState` property in this browser
     if ("readyState" in scripts[0]) {
       for (i = scripts.length; i--; ) {
