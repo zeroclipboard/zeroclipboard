@@ -225,9 +225,9 @@ ZeroClipboard.setDefaults = function (options) {
  *
  * returns object instance
  */
-ZeroClipboard.prototype.addEventListener = function() {
+ZeroClipboard.prototype.addEventListener = function (eventName, func) {
   _deprecationWarning("ZeroClipboard.prototype.addEventListener", _globalConfig.debug);
-  return this.on.apply(this, [].slice.call(arguments, 0));
+  return this.on(eventName, func);
 };
 
 
@@ -238,9 +238,9 @@ ZeroClipboard.prototype.addEventListener = function() {
  *
  * returns object instance
  */
-ZeroClipboard.prototype.removeEventListener = function() {
+ZeroClipboard.prototype.removeEventListener = function (eventName, func) {
   _deprecationWarning("ZeroClipboard.prototype.removeEventListener", _globalConfig.debug);
-  return this.off.apply(this, [].slice.call(arguments, 0));
+  return this.off(eventName, func);
 };
 
 
