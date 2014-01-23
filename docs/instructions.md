@@ -727,3 +727,9 @@ The current list of deprecations includes:
  - The `moviePath` config option &rarr; as of [v1.3.0], removing in [v2.0.0]
      - Use the `swfPath` config option instead!
      - For v1.3.x usage, do: `ZeroClipboard.config({ moviePath: ZeroClipboard.config("swfPath") });`
+ - `ZeroClipboard.dispatch` &rarr; as of [v1.3.0], removing in [v2.0.0]
+     - Use `ZeroClipboard.emit` instead!
+ - All v1.x event names &rarr; as of [v1.3.0], removing in [v2.0.0]
+     - Use the [v2.x event names](https://gist.github.com/JamesMGreene/7886534#events) instead!
+ - The v1.x event model &rarr; as of [v1.3.0], removing in [v2.0.0]
+     - Use the [v2.x event model (based on the DOM event model)](https://gist.github.com/JamesMGreene/7886534#event-handler-format) instead!

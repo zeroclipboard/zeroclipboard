@@ -17,11 +17,11 @@ The ZeroClipboard library provides an easy way to copy text to the clipboard usi
 
 ``` js
 // main.js
-var clip = new ZeroClipboard( document.getElementById("copy-button"), {
+var client = new ZeroClipboard( document.getElementById("copy-button"), {
   moviePath: "/path/to/ZeroClipboard.swf"
 } );
 
-clip.on( "load", function(client) {
+client.on( "load", function(client) {
   // alert( "movie is loaded" );
 
   client.on( "complete", function(client, args) {

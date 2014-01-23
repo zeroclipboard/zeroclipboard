@@ -11,3 +11,6 @@ In a perfect world we wouldn't need ZeroClipboard, and the browsers would just t
 ## Flash tests
 We want to setup a unit test suite for the Flash file. See Issue [#43](https://github.com/zeroclipboard/zeroclipboard/issues/43).
 
+## Mostly new API in v2.0.0
+Most of the API will be redesigned for v2.0.0 (as we did not design the v1.x API but rather inherited it.
+Feedback on the [https://gist.github.com/JamesMGreene/7886534](ZeroClipboard v2.0.0 API draft) is welcomed!

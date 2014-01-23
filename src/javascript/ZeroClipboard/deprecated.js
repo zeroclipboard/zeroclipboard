@@ -74,6 +74,33 @@ ZeroClipboard.detectFlashSupport = function () {
 
 
 /*
+ * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for alternatives.
+ *
+ * Bridge from the Flash object back to the JavaScript
+ *
+ * returns nothing
+ *
+ * Originally from "event.js"
+ */
+ZeroClipboard.dispatch = function (eventName, args) {
+  if (typeof eventName === "string" && eventName) {
+    // Sanitize the event name
+    var cleanEventName = eventName.toLowerCase().replace(/^on/, "");
+
+    // Receive event from Flash movie, forward to clients
+    if (cleanEventName) {
+      // Get an array of clients that have been glued to the `currentElement`, or
+      // get ALL clients if no `currentElement` (e.g. for the global Flash events like "load", etc.)
+      var clients = currentElement ? _getAllClientsClippedToElement(currentElement) : _getAllClients();
+      for (var i = 0, len = clients.length; i < len; i++) {
+        _receiveEvent.call(clients[i], cleanEventName, args);
+      }
+    }
+  }
+};
+
+
+/*
  * @deprecated in [v1.2.0], slated for removal in [v2.0.0]. See docs for alternatives.
  *
  * Sends a signal to the flash object to display the hand cursor if true.
@@ -228,4 +255,99 @@ ZeroClipboard.prototype.removeEventListener = function() {
 ZeroClipboard.prototype.ready = function () {
   _deprecationWarning("ZeroClipboard.prototype.ready", _globalConfig.debug);
   return flashState.ready === true;
+};
+
+
+/*
+ * @deprecated in [v1.3.0], slated for removal in [v2.0.0].
+ * @private
+ *
+ * Receive an event from Flash for a specific element/client.
+ *
+ * returns object instance
+ *
+ * Originally from "event.js"
+ */
+var _receiveEvent = function (eventName, args) {
+  eventName = eventName.toLowerCase().replace(/^on/, '');
+
+  var cleanVersion = (args && args.flashVersion && _parseFlashVersion(args.flashVersion)) || null;
+  var element = currentElement;
+  var performCallbackAsync = true;
+
+  // special behavior for certain events
+  switch (eventName) {
+    case 'load':
+      if (cleanVersion) {
+        // If the Flash version is less than 10, throw event.
+        if (!_isFlashVersionSupported(cleanVersion)) {
+          _receiveEvent.call(this, "onWrongFlash", { flashVersion: cleanVersion });
+          return;
+        }
+        flashState.outdated = false;
+        flashState.ready = true;
+        flashState.version = cleanVersion;
+      }
+      break;
+
+    case 'wrongflash':
+      if (cleanVersion && !_isFlashVersionSupported(cleanVersion)) {
+        flashState.outdated = true;
+        flashState.ready = false;
+        flashState.version = cleanVersion;
+      }
+      break;
+
+    // NOTE: This `mouseover` event is coming from Flash, not DOM/JS
+    case 'mouseover':
+      _addClass(element, _globalConfig.hoverClass);
+      break;
+
+    // NOTE: This `mouseout` event is coming from Flash, not DOM/JS
+    case 'mouseout':
+      if (_globalConfig.autoActivate === true) {
+        ZeroClipboard.deactivate();
+      }
+      break;
+
+    // NOTE: This `mousedown` event is coming from Flash, not DOM/JS
+    case 'mousedown':
+      _addClass(element, _globalConfig.activeClass);
+      break;
+
+    // NOTE: This `mouseup` event is coming from Flash, not DOM/JS
+    case 'mouseup':
+      _removeClass(element, _globalConfig.activeClass);
+      break;
+
+    case 'datarequested':
+      var targetId = element.getAttribute('data-clipboard-target'),
+          targetEl = !targetId ? null : document.getElementById(targetId);
+      if (targetEl) {
+        var textContent = targetEl.value || targetEl.textContent || targetEl.innerText;
+        if (textContent) {
+          this.setText(textContent);
+        }
+      }
+      else {
+        var defaultText = element.getAttribute('data-clipboard-text');
+        if (defaultText) {
+          this.setText(defaultText);
+        }
+      }
+
+      // This callback cannot be performed asynchronously as it would prevent the
+      // user from being able to call `.setText` successfully before the pending
+      // clipboard injection associated with this event fires.
+      performCallbackAsync = false;
+      break;
+
+    case 'complete':
+      _deleteOwnProperties(_clipData);
+      break;
+  } // switch eventName
+
+  var context = element;
+  var eventArgs = [this, args];
+  return _dispatchClientCallbacks.call(this, eventName, context, eventArgs, performCallbackAsync);
 };
