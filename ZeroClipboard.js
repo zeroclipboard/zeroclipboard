@@ -4,7 +4,7 @@
 * Copyright (c) 2014 Jon Rohan, James M. Greene
 * Licensed MIT
 * http://zeroclipboard.org/
-* v1.3.0
+* v1.3.1
 */
 (function() {
   "use strict";
@@ -26,7 +26,7 @@
   var _swfPath = function() {
     var i, jsDir, tmpJsPath, jsPath, swfPath = "ZeroClipboard.swf";
     if (document.currentScript && (jsPath = document.currentScript.src)) {} else {
-      var scripts = Array.prototype.slice.call(document.getElementsByTagName("script"), 0);
+      var scripts = document.getElementsByTagName("script");
       if ("readyState" in scripts[0]) {
         for (i = scripts.length; i--; ) {
           if (scripts[i].readyState === "interactive" && (jsPath = scripts[i].src)) {
@@ -532,7 +532,7 @@
     }
     return clients;
   };
-  ZeroClipboard.version = "1.3.0";
+  ZeroClipboard.version = "1.3.1";
   var _globalConfig = {
     swfPath: _swfPath,
     trustedDomains: window.location.host ? [ window.location.host ] : [],
@@ -914,13 +914,13 @@
     _deprecationWarning("ZeroClipboard.setDefaults", _globalConfig.debug);
     ZeroClipboard.config(options);
   };
-  ZeroClipboard.prototype.addEventListener = function() {
+  ZeroClipboard.prototype.addEventListener = function(eventName, func) {
     _deprecationWarning("ZeroClipboard.prototype.addEventListener", _globalConfig.debug);
-    return this.on.apply(this, [].slice.call(arguments, 0));
+    return this.on(eventName, func);
   };
-  ZeroClipboard.prototype.removeEventListener = function() {
+  ZeroClipboard.prototype.removeEventListener = function(eventName, func) {
     _deprecationWarning("ZeroClipboard.prototype.removeEventListener", _globalConfig.debug);
-    return this.off.apply(this, [].slice.call(arguments, 0));
+    return this.off(eventName, func);
   };
   ZeroClipboard.prototype.ready = function() {
     _deprecationWarning("ZeroClipboard.prototype.ready", _globalConfig.debug);
