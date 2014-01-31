@@ -49,13 +49,13 @@ package {
 
       // Allow the SWF object to communicate with a page on a different origin than its own (e.g. SWF served from CDN)
       if (flashvars.trustedOrigins && typeof flashvars.trustedOrigins === "string") {
-        var origins:Array = flashvars.trustedOrigins.split("\\").join("\\\\").split(",");
+        var origins:Array = ZeroClipboard.sanitizeString(flashvars.trustedOrigins).split(",");
         flash.system.Security.allowDomain.apply(null, origins);
       }
 
       // Enable complete AMD (e.g. RequireJS) and CommonJS (e.g. Browserify) support
       if (flashvars.jsModuleId && typeof flashvars.jsModuleId === "string") {
-        jsModuleId = flashvars.jsModuleId.split("\\").join("\\\\");
+        jsModuleId = ZeroClipboard.sanitizeString(flashvars.jsModuleId);
       }
 
       // invisible button covers entire stage
@@ -83,6 +83,16 @@ package {
       dispatch("load", ZeroClipboard.metaData());
     }
 
+    // sanitizeString
+    //
+    // This private function will accept a string, and return a sanitized string
+    // to avoid XSS vulnerabilities
+    //
+    // returns an XSS safe String
+    private static function sanitizeString(dirty:String): String {
+      return dirty.replace(/\\/g,"\\\\")
+    }
+
     // mouseClick
     //
     // The mouseClick private function handles clearing the clipboard, and
@@ -99,7 +109,7 @@ package {
 
       // signal to the page it is done
       dispatch("complete", ZeroClipboard.metaData(event, {
-        text: clipText.split("\\").join("\\\\")
+        text: ZeroClipboard.sanitizeString(clipText)
       }));
 
       // reset the text
