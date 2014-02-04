@@ -450,6 +450,12 @@
     }
     return obj;
   };
+  var _safeActiveElement = function() {
+    try {
+      return document.activeElement;
+    } catch (err) {}
+    return null;
+  };
   var _detectFlashSupport = function() {
     var hasFlash = false;
     if (typeof flashState.disabled === "boolean") {
@@ -996,6 +1002,9 @@
 
      case "complete":
       _deleteOwnProperties(_clipData);
+      if (element !== _safeActiveElement() && element.focus) {
+        element.focus();
+      }
       break;
     }
     var context = element;

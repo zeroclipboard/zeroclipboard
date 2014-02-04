@@ -346,6 +346,11 @@ var _receiveEvent = function (eventName, args) {
 
     case 'complete':
       _deleteOwnProperties(_clipData);
+
+      // Focus the context back on the trigger element (blur the Flash element)
+      if (element !== _safeActiveElement() && element.focus) {
+        element.focus();
+      }
       break;
   } // switch eventName
 
