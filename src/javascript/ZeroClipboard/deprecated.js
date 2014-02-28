@@ -68,7 +68,7 @@ _globalConfig.moviePath = "ZeroClipboard.swf";
  * Originally from "core.js", then "flash.js"
  */
 ZeroClipboard.detectFlashSupport = function () {
-  _deprecationWarning("ZeroClipboard.detectFlashSupport", _globalConfig.debug);
+  _deprecationWarning("ZeroClipboard.detectFlashSupport");
   return _detectFlashSupport();
 };
 
@@ -109,7 +109,7 @@ ZeroClipboard.dispatch = function (eventName, args) {
  * returns object instance
  */
 ZeroClipboard.prototype.setHandCursor = function (enabled) {
-  _deprecationWarning("ZeroClipboard.prototype.setHandCursor", _globalConfig.debug);
+  _deprecationWarning("ZeroClipboard.prototype.setHandCursor");
   enabled = typeof enabled === "boolean" ? enabled : !!enabled;
   _setHandCursor(enabled);
   _globalConfig.forceHandCursor = enabled;
@@ -126,7 +126,7 @@ ZeroClipboard.prototype.setHandCursor = function (enabled) {
  * returns object instance
  */
 ZeroClipboard.prototype.reposition = function () {
-  _deprecationWarning("ZeroClipboard.prototype.reposition", _globalConfig.debug);
+  _deprecationWarning("ZeroClipboard.prototype.reposition");
   return _reposition();
 };
 
@@ -140,7 +140,7 @@ ZeroClipboard.prototype.reposition = function () {
  * returns nothing
  */
 ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
-  _deprecationWarning("ZeroClipboard.prototype.receiveEvent", _globalConfig.debug);
+  _deprecationWarning("ZeroClipboard.prototype.receiveEvent");
   if (typeof eventName === "string" && eventName) {
     // Sanitize the event name
     var cleanEventName = eventName.toLowerCase().replace(/^on/, "");
@@ -163,7 +163,7 @@ ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
  * returns object instance
  */
 ZeroClipboard.prototype.setCurrent = function (element) {
-  _deprecationWarning("ZeroClipboard.prototype.setCurrent", _globalConfig.debug);
+  _deprecationWarning("ZeroClipboard.prototype.setCurrent");
   ZeroClipboard.activate(element);
   return this;
 };
@@ -177,7 +177,7 @@ ZeroClipboard.prototype.setCurrent = function (element) {
  * returns object instance
  */
 ZeroClipboard.prototype.resetBridge = function () {
-  _deprecationWarning("ZeroClipboard.prototype.resetBridge", _globalConfig.debug);
+  _deprecationWarning("ZeroClipboard.prototype.resetBridge");
   ZeroClipboard.deactivate();
   return this;
 };
@@ -191,7 +191,7 @@ ZeroClipboard.prototype.resetBridge = function () {
  * returns object instance
  */
 ZeroClipboard.prototype.setTitle = function (newTitle) {
-  _deprecationWarning("ZeroClipboard.prototype.setTitle", _globalConfig.debug);
+  _deprecationWarning("ZeroClipboard.prototype.setTitle");
   // If the element has a title, mimic it
   newTitle = newTitle || _globalConfig.title || (currentElement && currentElement.getAttribute("title"));
   if (newTitle) {
@@ -213,7 +213,7 @@ ZeroClipboard.prototype.setTitle = function (newTitle) {
  * returns nothing
  */
 ZeroClipboard.setDefaults = function (options) {
-  _deprecationWarning("ZeroClipboard.setDefaults", _globalConfig.debug);
+  _deprecationWarning("ZeroClipboard.setDefaults");
   ZeroClipboard.config(options);
 };
 
@@ -226,7 +226,7 @@ ZeroClipboard.setDefaults = function (options) {
  * returns object instance
  */
 ZeroClipboard.prototype.addEventListener = function (eventName, func) {
-  _deprecationWarning("ZeroClipboard.prototype.addEventListener", _globalConfig.debug);
+  _deprecationWarning("ZeroClipboard.prototype.addEventListener");
   return this.on(eventName, func);
 };
 
@@ -239,7 +239,7 @@ ZeroClipboard.prototype.addEventListener = function (eventName, func) {
  * returns object instance
  */
 ZeroClipboard.prototype.removeEventListener = function (eventName, func) {
-  _deprecationWarning("ZeroClipboard.prototype.removeEventListener", _globalConfig.debug);
+  _deprecationWarning("ZeroClipboard.prototype.removeEventListener");
   return this.off(eventName, func);
 };
 
@@ -253,7 +253,7 @@ ZeroClipboard.prototype.removeEventListener = function (eventName, func) {
  * returns true if the Flash bridge is ready
  */
 ZeroClipboard.prototype.ready = function () {
-  _deprecationWarning("ZeroClipboard.prototype.ready", _globalConfig.debug);
+  _deprecationWarning("ZeroClipboard.prototype.ready");
   return flashState.ready === true;
 };
 

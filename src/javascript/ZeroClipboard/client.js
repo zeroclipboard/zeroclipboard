@@ -27,7 +27,7 @@ var ZeroClipboard = function (elements, /** @deprecated */ options) {
 
   // Warn about use of deprecated constructor signature
   if (typeof options !== "undefined") {
-    _deprecationWarning("new ZeroClipboard(elements, options)", _globalConfig.debug);
+    _deprecationWarning("new ZeroClipboard(elements, options)");
 
     // Set and override the defaults
     ZeroClipboard.config(options);

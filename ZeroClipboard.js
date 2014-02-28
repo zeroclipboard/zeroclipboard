@@ -314,8 +314,8 @@
     }
     return zIndex || 0;
   };
-  var _deprecationWarning = function(deprecatedApiName, debugEnabled) {
-    if (deprecatedApiName && debugEnabled !== false && typeof console !== "undefined" && console && (console.warn || console.log)) {
+  var _deprecationWarning = function(deprecatedApiName) {
+    if (deprecatedApiName && _globalConfig.debug !== false && typeof console !== "undefined" && console && (console.warn || console.log)) {
       var deprecationWarning = "`" + deprecatedApiName + "` is deprecated. See docs for more info:\n" + "    https://github.com/zeroclipboard/zeroclipboard/blob/master/docs/instructions.md#deprecations";
       if (console.warn) {
         console.warn(deprecationWarning);
@@ -482,7 +482,7 @@
       this.clip(elements);
     }
     if (typeof options !== "undefined") {
-      _deprecationWarning("new ZeroClipboard(elements, options)", _globalConfig.debug);
+      _deprecationWarning("new ZeroClipboard(elements, options)");
       ZeroClipboard.config(options);
     }
     this.options = ZeroClipboard.config();
@@ -855,7 +855,7 @@
   _globalConfig.useNoCache = true;
   _globalConfig.moviePath = "ZeroClipboard.swf";
   ZeroClipboard.detectFlashSupport = function() {
-    _deprecationWarning("ZeroClipboard.detectFlashSupport", _globalConfig.debug);
+    _deprecationWarning("ZeroClipboard.detectFlashSupport");
     return _detectFlashSupport();
   };
   ZeroClipboard.dispatch = function(eventName, args) {
@@ -870,18 +870,18 @@
     }
   };
   ZeroClipboard.prototype.setHandCursor = function(enabled) {
-    _deprecationWarning("ZeroClipboard.prototype.setHandCursor", _globalConfig.debug);
+    _deprecationWarning("ZeroClipboard.prototype.setHandCursor");
     enabled = typeof enabled === "boolean" ? enabled : !!enabled;
     _setHandCursor(enabled);
     _globalConfig.forceHandCursor = enabled;
     return this;
   };
   ZeroClipboard.prototype.reposition = function() {
-    _deprecationWarning("ZeroClipboard.prototype.reposition", _globalConfig.debug);
+    _deprecationWarning("ZeroClipboard.prototype.reposition");
     return _reposition();
   };
   ZeroClipboard.prototype.receiveEvent = function(eventName, args) {
-    _deprecationWarning("ZeroClipboard.prototype.receiveEvent", _globalConfig.debug);
+    _deprecationWarning("ZeroClipboard.prototype.receiveEvent");
     if (typeof eventName === "string" && eventName) {
       var cleanEventName = eventName.toLowerCase().replace(/^on/, "");
       if (cleanEventName) {
@@ -890,17 +890,17 @@
     }
   };
   ZeroClipboard.prototype.setCurrent = function(element) {
-    _deprecationWarning("ZeroClipboard.prototype.setCurrent", _globalConfig.debug);
+    _deprecationWarning("ZeroClipboard.prototype.setCurrent");
     ZeroClipboard.activate(element);
     return this;
   };
   ZeroClipboard.prototype.resetBridge = function() {
-    _deprecationWarning("ZeroClipboard.prototype.resetBridge", _globalConfig.debug);
+    _deprecationWarning("ZeroClipboard.prototype.resetBridge");
     ZeroClipboard.deactivate();
     return this;
   };
   ZeroClipboard.prototype.setTitle = function(newTitle) {
-    _deprecationWarning("ZeroClipboard.prototype.setTitle", _globalConfig.debug);
+    _deprecationWarning("ZeroClipboard.prototype.setTitle");
     newTitle = newTitle || _globalConfig.title || currentElement && currentElement.getAttribute("title");
     if (newTitle) {
       var htmlBridge = _getHtmlBridge(flashState.bridge);
@@ -911,19 +911,19 @@
     return this;
   };
   ZeroClipboard.setDefaults = function(options) {
-    _deprecationWarning("ZeroClipboard.setDefaults", _globalConfig.debug);
+    _deprecationWarning("ZeroClipboard.setDefaults");
     ZeroClipboard.config(options);
   };
   ZeroClipboard.prototype.addEventListener = function(eventName, func) {
-    _deprecationWarning("ZeroClipboard.prototype.addEventListener", _globalConfig.debug);
+    _deprecationWarning("ZeroClipboard.prototype.addEventListener");
     return this.on(eventName, func);
   };
   ZeroClipboard.prototype.removeEventListener = function(eventName, func) {
-    _deprecationWarning("ZeroClipboard.prototype.removeEventListener", _globalConfig.debug);
+    _deprecationWarning("ZeroClipboard.prototype.removeEventListener");
     return this.off(eventName, func);
   };
   ZeroClipboard.prototype.ready = function() {
-    _deprecationWarning("ZeroClipboard.prototype.ready", _globalConfig.debug);
+    _deprecationWarning("ZeroClipboard.prototype.ready");
     return flashState.ready === true;
   };
   var _receiveEvent = function(eventName, args) {
