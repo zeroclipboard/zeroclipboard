@@ -69,7 +69,7 @@
 
     _removeClass(div, "class-3");
     assert.strictEqual(div.className, "");
-    
+
     div = null;
   });
 
@@ -123,7 +123,8 @@
     // Arrange
     var clipOptionsEmpty = {};
     var clipOptionsTrustedDomainsOnly = {
-      trustedDomains: ["*"]
+      trustedDomains: ["*"],
+      debug: false
     };
     var clipOptionsAmdOnly = {
       jsModuleId: "zcAMD"
@@ -133,7 +134,8 @@
     };
     var clipOptionsAll = {
       trustedDomains: ["*"],
-      jsModuleId: "zcAMD"
+      jsModuleId: "zcAMD",
+      debug: false
     };
 
     // Act & Assert
@@ -454,7 +456,7 @@
       }
       SomeClass.prototype = new SomePrototype();
       SomeClass.prototype.constructor = SomeClass;
-      
+
       return new SomeClass();
     })(),
     e = null,
@@ -501,7 +503,7 @@
       }
       SomeClass.prototype = new SomePrototype();
       SomeClass.prototype.constructor = SomeClass;
-      
+
       return new SomeClass();
     })(),
     e = null,
@@ -512,7 +514,7 @@
     _deleteOwnProperties(a);
     assert.deepEqual(_objectKeys(a), []);
     assert.deepEqual(getProtoKeys(a), []);
-    
+
     assert.deepEqual(_objectKeys(b), []);
     assert.deepEqual(getProtoKeys(b), []);
     _deleteOwnProperties(b);

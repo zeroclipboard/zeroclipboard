@@ -21,7 +21,7 @@ var _globalConfig = {
   zIndex: 999999999,
 
   // Debug enabled: send `console` messages with deprecation warnings, etc.
-  debug: true,
+  debug: false,
 
   // Sets the title of the `div` encapsulating the Flash object
   title: null,

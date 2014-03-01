@@ -246,6 +246,7 @@
       for (i = 0, len = domains.length; i < len; i++) {
         if (domains.hasOwnProperty(i) && domains[i] && typeof domains[i] === "string") {
           domain = _extractDomain(domains[i]);
+          _log(domain, options.debug);
           if (!domain) {
             continue;
           }
@@ -314,14 +315,14 @@
     }
     return zIndex || 0;
   };
-  var _deprecationWarning = function(deprecatedApiName) {
+  var _deprecationWarning = function(deprecatedApiName, debugEnabled) {
     if (deprecatedApiName) {
       var deprecationWarning = "`" + deprecatedApiName + "` is deprecated. See docs for more info:\n" + "    https://github.com/zeroclipboard/zeroclipboard/blob/master/docs/instructions.md#deprecations";
-      _log(deprecationWarning);
+      _log(deprecationWarning, debugEnabled);
     }
   };
-  var _log = function(message) {
-    if (message && _globalConfig.debug !== false && typeof console !== "undefined" && console && (console.warn || console.log)) {
+  var _log = function(message, debugEnabled) {
+    if (message && debugEnabled !== false && typeof console !== "undefined" && console && (console.warn || console.log)) {
       if (console.warn) {
         console.warn(message);
       } else {
@@ -487,7 +488,7 @@
       this.clip(elements);
     }
     if (typeof options !== "undefined") {
-      _deprecationWarning("new ZeroClipboard(elements, options)");
+      _deprecationWarning("new ZeroClipboard(elements, options)", _globalConfig.debug);
       ZeroClipboard.config(options);
     }
     this.options = ZeroClipboard.config();
@@ -544,7 +545,7 @@
     cacheBust: true,
     forceHandCursor: false,
     zIndex: 999999999,
-    debug: true,
+    debug: false,
     title: null,
     autoActivate: true
   };
@@ -860,7 +861,7 @@
   _globalConfig.useNoCache = true;
   _globalConfig.moviePath = "ZeroClipboard.swf";
   ZeroClipboard.detectFlashSupport = function() {
-    _deprecationWarning("ZeroClipboard.detectFlashSupport");
+    _deprecationWarning("ZeroClipboard.detectFlashSupport", _globalConfig.debug);
     return _detectFlashSupport();
   };
   ZeroClipboard.dispatch = function(eventName, args) {
@@ -875,18 +876,18 @@
     }
   };
   ZeroClipboard.prototype.setHandCursor = function(enabled) {
-    _deprecationWarning("ZeroClipboard.prototype.setHandCursor");
+    _deprecationWarning("ZeroClipboard.prototype.setHandCursor", _globalConfig.debug);
     enabled = typeof enabled === "boolean" ? enabled : !!enabled;
     _setHandCursor(enabled);
     _globalConfig.forceHandCursor = enabled;
     return this;
   };
   ZeroClipboard.prototype.reposition = function() {
-    _deprecationWarning("ZeroClipboard.prototype.reposition");
+    _deprecationWarning("ZeroClipboard.prototype.reposition", _globalConfig.debug);
     return _reposition();
   };
   ZeroClipboard.prototype.receiveEvent = function(eventName, args) {
-    _deprecationWarning("ZeroClipboard.prototype.receiveEvent");
+    _deprecationWarning("ZeroClipboard.prototype.receiveEvent", _globalConfig.debug);
     if (typeof eventName === "string" && eventName) {
       var cleanEventName = eventName.toLowerCase().replace(/^on/, "");
       if (cleanEventName) {
@@ -895,17 +896,17 @@
     }
   };
   ZeroClipboard.prototype.setCurrent = function(element) {
-    _deprecationWarning("ZeroClipboard.prototype.setCurrent");
+    _deprecationWarning("ZeroClipboard.prototype.setCurrent", _globalConfig.debug);
     ZeroClipboard.activate(element);
     return this;
   };
   ZeroClipboard.prototype.resetBridge = function() {
-    _deprecationWarning("ZeroClipboard.prototype.resetBridge");
+    _deprecationWarning("ZeroClipboard.prototype.resetBridge", _globalConfig.debug);
     ZeroClipboard.deactivate();
     return this;
   };
   ZeroClipboard.prototype.setTitle = function(newTitle) {
-    _deprecationWarning("ZeroClipboard.prototype.setTitle");
+    _deprecationWarning("ZeroClipboard.prototype.setTitle", _globalConfig.debug);
     newTitle = newTitle || _globalConfig.title || currentElement && currentElement.getAttribute("title");
     if (newTitle) {
       var htmlBridge = _getHtmlBridge(flashState.bridge);
@@ -916,19 +917,19 @@
     return this;
   };
   ZeroClipboard.setDefaults = function(options) {
-    _deprecationWarning("ZeroClipboard.setDefaults");
+    _deprecationWarning("ZeroClipboard.setDefaults", _globalConfig.debug);
     ZeroClipboard.config(options);
   };
   ZeroClipboard.prototype.addEventListener = function(eventName, func) {
-    _deprecationWarning("ZeroClipboard.prototype.addEventListener");
+    _deprecationWarning("ZeroClipboard.prototype.addEventListener", _globalConfig.debug);
     return this.on(eventName, func);
   };
   ZeroClipboard.prototype.removeEventListener = function(eventName, func) {
-    _deprecationWarning("ZeroClipboard.prototype.removeEventListener");
+    _deprecationWarning("ZeroClipboard.prototype.removeEventListener", _globalConfig.debug);
     return this.off(eventName, func);
   };
   ZeroClipboard.prototype.ready = function() {
-    _deprecationWarning("ZeroClipboard.prototype.ready");
+    _deprecationWarning("ZeroClipboard.prototype.ready", _globalConfig.debug);
     return flashState.ready === true;
   };
   var _receiveEvent = function(eventName, args) {
