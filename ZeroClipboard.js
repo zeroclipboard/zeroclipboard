@@ -315,12 +315,17 @@
     return zIndex || 0;
   };
   var _deprecationWarning = function(deprecatedApiName) {
-    if (deprecatedApiName && _globalConfig.debug !== false && typeof console !== "undefined" && console && (console.warn || console.log)) {
+    if (deprecatedApiName) {
       var deprecationWarning = "`" + deprecatedApiName + "` is deprecated. See docs for more info:\n" + "    https://github.com/zeroclipboard/zeroclipboard/blob/master/docs/instructions.md#deprecations";
+      _log(deprecationWarning);
+    }
+  };
+  var _log = function(message) {
+    if (message && _globalConfig.debug !== false && typeof console !== "undefined" && console && (console.warn || console.log)) {
       if (console.warn) {
-        console.warn(deprecationWarning);
+        console.warn(message);
       } else {
-        console.log(deprecationWarning);
+        console.log(message);
       }
     }
   };
