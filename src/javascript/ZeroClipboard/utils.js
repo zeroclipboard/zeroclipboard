@@ -303,7 +303,7 @@ var _vars = function (options) {
       if (domains.hasOwnProperty(i) && domains[i] && typeof domains[i] === "string") {
         domain = _extractDomain(domains[i]);
 
-        _log(domain, options.debug);
+        _log("Trusted domain: " + domain, options.debug);
 
         if (!domain) {
           continue;
