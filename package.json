@@ -54,7 +54,9 @@
     "grunt-chmod": "~1.0.3",
     "grunt-mxmlc": "~0.2.0",
     "grunt-template": "~0.2.1",
-    "grunt-contrib-watch": "~0.5.3"
+    "grunt-contrib-watch": "~0.5.3",
+    "flexpmd": "~1.3.0-1",
+    "grunt-flexpmd": "~0.1.2"
   },
   "main": "./ZeroClipboard.js",
   "component": {

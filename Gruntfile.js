@@ -1,10 +1,19 @@
 /*jshint -W106 */
 /*jshint node:true */
+
+var os = require('os');
+var path = require('path');
+
 module.exports = function(grunt) {
   'use strict';
 
   // Metadata
   var pkg = grunt.file.readJSON('package.json');
+
+  // Make a temp dir for Flash compilation
+  var tmpDir = os.tmpdir ? os.tmpdir() : os.tmpDir();
+  var flashTmpDir = path.join(tmpDir, 'flash');
+  var flashTmpFile = path.join(flashTmpDir, 'ZeroClipboard.as');
 
   // Shared configuration
   var localPort = 7320;  // "ZERO"
@@ -23,6 +32,11 @@ module.exports = function(grunt) {
           jshintrc: 'test/.jshintrc'
         },
         src: ['test/*.js']
+      }
+    },
+    flexpmd: {
+      flash: {
+        src: [flashTmpDir]
       }
     },
     clean: {
@@ -51,6 +65,13 @@ module.exports = function(grunt) {
           'src/javascript/end.js'
         ],
         dest: 'ZeroClipboard.js'
+      },
+      flash: {
+        src: [
+          'src/meta/source-banner.tmpl',
+          'src/flash/ZeroClipboard.as'
+        ],
+        dest: flashTmpFile
       }
     },
     uglify: {
@@ -82,7 +103,7 @@ module.exports = function(grunt) {
       },
       swf: {
         files: {
-          'ZeroClipboard.swf': ['src/flash/ZeroClipboard.as']
+          'ZeroClipboard.swf': [flashTmpFile]
         }
       }
     },
@@ -151,6 +172,7 @@ module.exports = function(grunt) {
 
   // These plugins provide necessary tasks
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-flexpmd');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -165,12 +187,14 @@ module.exports = function(grunt) {
   //
   // Task aliases and chains
   //
-
-  grunt.registerTask('unittest', ['connect', 'qunit']);
-  grunt.registerTask('test',     ['jshint', 'clean:src', 'concat', 'mxmlc', 'chmod:src', 'unittest']);
-  grunt.registerTask('travis',   ['test']);
+  grunt.registerTask('validate',     ['jshint', 'concat:flash', 'flexpmd']);
+  grunt.registerTask('build',        ['clean', 'concat', 'uglify', 'mxmlc', 'template', 'chmod']);
+  grunt.registerTask('build-travis', ['clean:src', 'concat', 'mxmlc', 'chmod:src']);
+  grunt.registerTask('test',         ['connect', 'qunit']);
 
   // Default task
-  grunt.registerTask('default',  ['jshint', 'clean', 'concat', 'uglify', 'mxmlc', 'template', 'chmod', 'unittest']);
+  grunt.registerTask('default', ['validate', 'build', 'test']);
+  // Travis CI task
+  grunt.registerTask('travis',  ['validate', 'build-travis', 'test']);
 
 };
