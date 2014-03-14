@@ -4,7 +4,7 @@
 * Copyright (c) 2014 Jon Rohan, James M. Greene
 * Licensed MIT
 * http://zeroclipboard.org/
-* v1.3.2
+* v1.3.3
 */
 (function() {
   "use strict";
@@ -532,7 +532,7 @@
     }
     return clients;
   };
-  ZeroClipboard.version = "1.3.2";
+  ZeroClipboard.version = "1.3.3";
   var _globalConfig = {
     swfPath: _swfPath,
     trustedDomains: window.location.host ? [ window.location.host ] : [],
@@ -862,7 +862,7 @@
     if (typeof eventName === "string" && eventName) {
       var cleanEventName = eventName.toLowerCase().replace(/^on/, "");
       if (cleanEventName) {
-        var clients = currentElement ? _getAllClientsClippedToElement(currentElement) : _getAllClients();
+        var clients = currentElement && _globalConfig.autoActivate === true ? _getAllClientsClippedToElement(currentElement) : _getAllClients();
         for (var i = 0, len = clients.length; i < len; i++) {
           _receiveEvent.call(clients[i], cleanEventName, args);
         }
