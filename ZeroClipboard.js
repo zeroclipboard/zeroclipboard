@@ -868,7 +868,7 @@
     if (typeof eventName === "string" && eventName) {
       var cleanEventName = eventName.toLowerCase().replace(/^on/, "");
       if (cleanEventName) {
-        var clients = currentElement ? _getAllClientsClippedToElement(currentElement) : _getAllClients();
+        var clients = currentElement && _globalConfig.autoActivate === true ? _getAllClientsClippedToElement(currentElement) : _getAllClients();
         for (var i = 0, len = clients.length; i < len; i++) {
           _receiveEvent.call(clients[i], cleanEventName, args);
         }

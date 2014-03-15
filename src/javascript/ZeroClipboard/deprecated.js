@@ -91,7 +91,9 @@ ZeroClipboard.dispatch = function (eventName, args) {
     if (cleanEventName) {
       // Get an array of clients that have been glued to the `currentElement`, or
       // get ALL clients if no `currentElement` (e.g. for the global Flash events like "load", etc.)
-      var clients = currentElement ? _getAllClientsClippedToElement(currentElement) : _getAllClients();
+      var clients = (currentElement && _globalConfig.autoActivate === true) ?
+                      _getAllClientsClippedToElement(currentElement) :
+                      _getAllClients();
       for (var i = 0, len = clients.length; i < len; i++) {
         _receiveEvent.call(clients[i], cleanEventName, args);
       }
