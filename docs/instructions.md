@@ -73,7 +73,8 @@ var _globalConfig = {
   trustedDomains: [window.location.host],
 
   // Include a "nocache" query parameter on requests for the SWF
-  cacheBust: true,
+  // defaults to true for IE and false for everything else
+  cacheBust: /MSIE/.test(navigator.userAgent) || /Trident\/[\d](?=[^\?]+).*rv:([0-9.].)/.test(navigator.userAgent) ? true : false,
 
   // Forcibly set the hand cursor ("pointer") for all clipped elements
   forceHandCursor: false,
@@ -228,7 +229,7 @@ Setting the clipboard text can be done in 4 ways:
   ```js
   client.setText( "Copy me!" );
   ```
-  
+
   The important caveat of using `client.setText` is that the text it sets is **transient** and _will only be used for a single copy operation_. As such, we do not particularly
   recommend using `client.setText` other than inside of a `dataRequested` event handler; however, the API will not prevent you from using it in other ways.
 
