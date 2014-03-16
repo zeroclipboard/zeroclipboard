@@ -60,13 +60,11 @@ var ZeroClipboard = function (elements, /** @deprecated */ options) {
 ZeroClipboard.prototype.setText = function (newText) {
   if (newText && newText !== "") {
     _clipData["text/plain"] = newText;
-    if (flashState.ready === true && flashState.bridge) {
+    if (flashState.ready === true && flashState.bridge && typeof flashState.bridge.setText === 'function') {
       flashState.bridge.setText(newText);
     }
     else {
-      //
-      // TODO: Fix Issue #295?
-      //
+      flashState.ready = false;
     }
   }
   return this;
@@ -79,13 +77,11 @@ ZeroClipboard.prototype.setText = function (newText) {
  * returns object instance
  */
 ZeroClipboard.prototype.setSize = function (width, height) {
-  if (flashState.ready === true && flashState.bridge) {
+  if (flashState.ready === true && flashState.bridge && typeof flashState.bridge.setSize === 'function') {
     flashState.bridge.setSize(width, height);
   }
   else {
-    //
-    // TODO: ???
-    //
+    flashState.ready = false;
   }
   return this;
 };
@@ -100,13 +96,11 @@ ZeroClipboard.prototype.setSize = function (width, height) {
  * returns nothing
  */
 var _setHandCursor = function (enabled) {
-  if (flashState.ready === true && flashState.bridge) {
+  if (flashState.ready === true && flashState.bridge && typeof flashState.bridge.setHandCursor === 'function') {
     flashState.bridge.setHandCursor(enabled);
   }
   else {
-    //
-    // TODO: ???
-    //
+    flashState.ready = false;
   }
 };
 
