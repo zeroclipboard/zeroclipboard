@@ -36,18 +36,30 @@ var ZeroClipboard = function (elements, /** @deprecated */ options) {
   /** @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for more info. */
   this.options = ZeroClipboard.config();
 
-  // Flash status
-  if (typeof flashState.disabled !== "boolean") {
-    flashState.disabled = !_detectFlashSupport();
-  }
 
   // Setup the Flash <-> JavaScript bridge
-  if (flashState.disabled === false && flashState.outdated !== true) {
-    if (flashState.bridge === null) {
-      flashState.outdated = false;
-      flashState.ready = false;
-      _bridge();
+  if (typeof flashState.ready !== "boolean") {
+    flashState.ready = false;
+  }
+  if (!ZeroClipboard.isFlashUnusable() && flashState.bridge === null) {
+    var _client = this;
+    var maxWait = _globalConfig.flashLoadTimeout;
+    if (typeof maxWait === "number" && maxWait >= 0) {
+      setTimeout(function() {
+        if (typeof flashState.deactivated !== "boolean") {
+          flashState.deactivated = true;
+        }
+        if (flashState.deactivated === true) {
+          _receiveEvent.call(_client, "deactivatedflash");
+        }
+      }, maxWait);
     }
+
+    // If creating a new `ZeroClipboard` instance, it is safe to ignore the `overdue` status
+    flashState.overdue = false;
+
+    // Load the SWF
+    _bridge();
   }
 };
 

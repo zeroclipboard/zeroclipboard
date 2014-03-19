@@ -8,10 +8,13 @@ var flashState = {
 
   // Flash metadata
   version: "0.0.0",
+  pluginType: "unknown",
 
   // Flash state
   disabled: null,
   outdated: null,
+  deactivated: null,
+  overdue: null,
   ready: null
 };
 

@@ -92,6 +92,11 @@ var _globalConfig = {
   // themselves instead of relying on our per-element `mouseover` handler
   autoActivate: true,
 
+  // How many milliseconds to wait for the Flash SWF to load and respond before assuming that
+  // Flash is deactivated (e.g. click-to-play) in the user's browser. If you don't care about
+  // how long it takes to load the SWF, you can set this to `null`.
+  flashLoadTimeout: 30000,
+
 
   /** @deprecated */
   // The class used to indicate that a clipped element is being hovered over
@@ -317,8 +322,8 @@ client.on( 'load', function ( client, args ) {
 The handler is passed these options to the `args`
 
 <dl>
-<dt>this</dt>
-<dd>The current element that is being provoked. if null this will be the window</dd>
+<dt>`this`</dt>
+<dd>The current element that is being provoked, if any; otherwise `window`</dd>
 <dt>flashVersion</dt>
 <dd>This property contains the users' flash version</dd>
 </dl>
@@ -337,10 +342,8 @@ client.on( 'mouseover', function ( client, args ) {
 The handler is passed these options to the `args`
 
 <dl>
-<dt>this</dt>
-<dd>The current element that is being provoked. if null this will be the window</dd>
-<dt>flashVersion</dt>
-<dd>This property contains the users' flash version</dd>
+<dt>`this`</dt>
+<dd>The current element that is being provoked, if any; otherwise `window`</dd>
 <dt>altKey</dt>
 <dd>`true` if the Alt key is active</dd>
 <dt>ctrlKey</dt>
@@ -363,10 +366,8 @@ client.on( 'mouseout', function ( client, args ) {
 The handler is passed these options to the `args`
 
 <dl>
-<dt>this</dt>
-<dd>The current element that is being provoked. if null this will be the window</dd>
-<dt>flashVersion</dt>
-<dd>This property contains the users' flash version</dd>
+<dt>`this`</dt>
+<dd>The current element that is being provoked, if any; otherwise `window`</dd>
 <dt>altKey</dt>
 <dd>`true` if the Alt key is active</dd>
 <dt>ctrlKey</dt>
@@ -389,10 +390,8 @@ client.on( 'mousedown', function ( client, args ) {
 The handler is passed these options to the `args`
 
 <dl>
-<dt>this</dt>
-<dd>The current element that is being provoked. if null this will be the window</dd>
-<dt>flashVersion</dt>
-<dd>This property contains the users' flash version</dd>
+<dt>`this`</dt>
+<dd>The current element that is being provoked, if any; otherwise `window`</dd>
 <dt>altKey</dt>
 <dd>`true` if the Alt key is active</dd>
 <dt>ctrlKey</dt>
@@ -415,16 +414,32 @@ client.on( 'mouseup', function ( client, args ) {
 The handler is passed these options to the `args`
 
 <dl>
-<dt>this</dt>
-<dd>The current element that is being provoked. if null this will be the window</dd>
-<dt>flashVersion</dt>
-<dd>This property contains the users' flash version</dd>
+<dt>`this`</dt>
+<dd>The current element that is being provoked, if any; otherwise `window`</dd>
 <dt>altKey</dt>
 <dd>`true` if the Alt key is active</dd>
 <dt>ctrlKey</dt>
 <dd>`true` on Windows and Linux if the Ctrl key is active. `true` on Mac if either the Ctrl key or the Command key is active. Otherwise, `false`.</dd>
 <dt>shiftKey</dt>
 <dd>`true` if the Shift key is active; `false` if it is inactive.</dd>
+</dl>
+
+
+#### dataRequested
+
+On mousedown, the Flash object will check and see if the clipboard text has been set. If it hasn't, then it will fire off a `dataRequested` event. If the html object has `data-clipboard-text` or `data-clipboard-target` then ZeroClipboard will take care of getting the data. However if it hasn't been set, then it will be up to you to `client.setText` from that method. Which will complete the loop.
+
+```js
+client.on( 'dataRequested', function ( client, args ) {
+  client.setText( 'Copied to clipboard.' );
+} );
+```
+
+The handler is passed these options to the `args`
+
+<dl>
+<dt>`this`</dt>
+<dd>The current element that is being provoked, if any; otherwise `window`</dd>
 </dl>
 
 
@@ -441,10 +456,8 @@ client.on( 'complete', function ( client, args ) {
 The handler is passed these options to the `args`
 
 <dl>
-<dt>this</dt>
-<dd>The current element that is being provoked. if null this will be the window</dd>
-<dt>flashVersion</dt>
-<dd>This property contains the users' flash version</dd>
+<dt>`this`</dt>
+<dd>The current element that is being provoked, if any; otherwise `window`</dd>
 <dt>altKey</dt>
 <dd>`true` if the Alt key is active</dd>
 <dt>ctrlKey</dt>
@@ -469,8 +482,8 @@ client.on( 'noflash', function ( client, args ) {
 The handler is passed these options to the `args`
 
 <dl>
-<dt>this</dt>
-<dd>The current element that is being provoked. if null this will be the window</dd>
+<dt>`this`</dt>
+<dd>`window`</dd>
 <dt>flashVersion</dt>
 <dd>This property contains the users' flash version</dd>
 </dl>
@@ -489,28 +502,67 @@ client.on( 'wrongflash', function ( client, args ) {
 The handler is passed these options to the `args`
 
 <dl>
-<dt>this</dt>
-<dd>The current element that is being provoked. if null this will be the window</dd>
+<dt>`this`</dt>
+<dd>`window`</dd>
 <dt>flashVersion</dt>
 <dd>This property contains the users' flash version</dd>
 </dl>
 
 
-#### dataRequested
+#### deactivatedflash
 
-On mousedown, the Flash object will check and see if the clipboard text has been set. If it hasn't, then it will fire off a `dataRequested` event. If the html object has `data-clipboard-text` or `data-clipboard-target` then ZeroClipboard will take care of getting the data. However if it hasn't been set, then it will be up to you to `client.setText` from that method. Which will complete the loop.
+The `deactivatedflash` event is fired when the user's installation of Flash is either too old for the browser (but
+not too old for ZeroClipboard) or if Flash objects are configured as click-to-play and the user does not authorize
+it within `_globalConfig.flashLoadTimeout` milliseconds or does not authorize it at all.
 
 ```js
-client.on( 'dataRequested', function ( client, args ) {
-  client.setText( 'Copied to clipboard.' );
+client.on( 'deactivatedflash', function ( client, args ) {
+  alert("Your flash is deactivated. It may be too old for your browser or configured as click-to-play. Version: " + args.flashVersion);
 } );
 ```
 
 The handler is passed these options to the `args`
 
 <dl>
-<dt>this</dt>
-<dd>The current element that is being provoked. if null this will be the window</dd>
+<dt>`this`</dt>
+<dd>`window`</dd>
+<dt>flashVersion</dt>
+<dd>This property contains the users' flash version</dd>
+</dl>
+
+
+#### overdueflash
+
+The `overdueflash` event is fired when the SWF loads successfully but takes longer than
+`_globalConfig.flashLoadTimeout` milliseconds to do so. This would likely be caused by
+one of the following situations:
+ 1. Too short of a `_globalConfig.flashLoadTimeout` duration configured
+ 2. Network latency
+ 3. The user's installation of Flash is configured as click-to-play but then authorized
+    by the user too late such that the SWF does not finish loading before the timeout
+    period has expired (or it may have expired before they authorized it at all).
+
+The appropriate response to this event is left up to the consumer. For instance, if they
+chose to invoke `ZeroClipboard.destroy()` in response to the earlier `deactivatedFlash` event
+but then receive this `overdueFlash` event, they may choose to "restart" their process and
+construct new ZeroClipboard client instances, or they may choose to just log the error to their
+server so they can consider increasing the allowed timeout duration in the future.
+
+This may be especially important for SPA or PJAX-based applications to consider as their users
+may remain on a single page for an extended period of time during which they _possibly_ could
+have enjoyed an improved experience if ZeroClipboard had been "restarted" after an initial hiccup.
+
+```js
+client.on( 'overdueflash', function ( client, args ) {
+  alert("Your flash loaded too slowly. Version: " + args.flashVersion);
+} );
+```
+
+The handler is passed these options to the `args`
+
+<dl>
+<dt>`this`</dt>
+<dd>`window`</dd>
 <dt>flashVersion</dt>
 <dd>This property contains the users' flash version</dd>
 </dl>

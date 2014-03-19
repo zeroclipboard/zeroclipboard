@@ -210,10 +210,8 @@ package {
     // returns an Object of extra event data
     private static function metaData(event:MouseEvent = void, extra:Object = void):Object {
 
-      // create the default options, contains flash version
-      var normalOptions:Object = {
-        flashVersion: Capabilities.version
-      };
+      // create the default options
+      var normalOptions:Object = {};
 
       // if an event is passed in, return what modifier keys are pressed
       if (event) {

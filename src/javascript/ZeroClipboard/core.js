@@ -29,7 +29,23 @@ var _globalConfig = {
 
   // Setting this to `false` would allow users to handle calling `ZeroClipboard.activate(...);`
   // themselves instead of relying on our per-element `mouseover` handler
-  autoActivate: true
+  autoActivate: true,
+
+  // How many milliseconds to wait for the Flash SWF to load and respond before assuming that
+  // Flash is deactivated (e.g. click-to-play) in the user's browser. If you don't care about
+  // how long it takes to load the SWF, you can set this to `null`.
+  flashLoadTimeout: 30000
+
+};
+
+
+/*
+ * Check if Flash is unusable for any reason: disabled, outdated, deactivated, etc.
+ *
+ * returns true if Flash should NOT be considered usable, otherwise false
+ */
+ZeroClipboard.isFlashUnusable = function() {
+  return !!(flashState.disabled || flashState.outdated || flashState.deactivated);
 };
 
 
@@ -49,7 +65,7 @@ ZeroClipboard.config = function (options) {
     // else `return undefined;`
     return;
   }
-  // Make a deep copy of the config object
+  // Return a deep copy of the config object
   var copy = {};
   for (var prop in _globalConfig) {
     if (_globalConfig.hasOwnProperty(prop)) {
@@ -95,6 +111,9 @@ ZeroClipboard.destroy = function () {
     htmlBridge.parentNode.removeChild(htmlBridge);
     flashState.ready = null;
     flashState.bridge = null;
+    // Reset the `deactivated` status in case the user wants to "try again", e.g. after receiving
+    // an `overdueFlash` event
+    flashState.deactivated = null;
   }
 };
 

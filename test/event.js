@@ -1,32 +1,32 @@
-/*global ZeroClipboard, currentElement:true, flashState:true, _detectFlashSupport:true, _extend, _clipData */
+/*global ZeroClipboard, currentElement:true, flashState:true, _extend, _clipData */
 
 "use strict";
 
 (function(module, test) {
 
-  var originalDetectFlashSupport, originalFlashState;
+  var originalFlashState, originalConfig;
 
   module("event", {
     setup: function() {
       // Store
-      originalDetectFlashSupport = _detectFlashSupport;
       originalFlashState = _extend({}, flashState);
+      originalConfig = ZeroClipboard.config();
       // Modify
-      _detectFlashSupport = function() { return true; };
       currentElement = null;
       flashState = {
         bridge: null,
         version: "0.0.0",
         disabled: null,
         outdated: null,
+        deactivated: null,
         ready: null
       };
     },
     teardown: function() {
-      _detectFlashSupport = originalDetectFlashSupport;
       ZeroClipboard.destroy();
       currentElement = null;
       flashState = originalFlashState;
+      ZeroClipboard.config(originalConfig);
     }
   });
 
@@ -466,16 +466,17 @@
   });
 
   test("Test noFlash Event", function(assert) {
-    assert.expect(1);
+    assert.expect(2);
 
     // Arrange
-    _detectFlashSupport = function() { return false; };
+    flashState.disabled = true;
     var client = new ZeroClipboard();
     var id = client.id;
 
     // Act (should auto-fire immediately but the handler will be invoked asynchronously)
     client.on( 'noFlash', function(client, args) {
       // Assert
+      assert.strictEqual(this, window);
       assert.strictEqual(client.id, id);
       QUnit.start();
     } );
@@ -483,71 +484,119 @@
   });
 
   test("Test wrongFlash Event", function(assert) {
-    assert.expect(1);
+    assert.expect(3);
 
     // Arrange
+    flashState.disabled = false;
+    flashState.outdated = true;
+    flashState.version = "9.0.0";
+    var client = new ZeroClipboard();
+    var id = client.id;
+
+    // Act
+    client.on( 'load', function(client, args) {
+      assert.ok(false, 'The `load` event should NOT have fired!');
+    } );
+    client.on( 'wrongFlash', function(client, args) {
+      // Assert
+      assert.strictEqual(this, window);
+      assert.strictEqual(client.id, id);
+      assert.strictEqual(args.flashVersion, "9.0.0");
+      QUnit.start();
+    } );
+    QUnit.stop();
+  });
+
+  test("Test deactivatedFlash Event", function(assert) {
+    assert.expect(5);
+
+    // Arrange
+    flashState.disabled = false;
+    flashState.outdated = false;
+    flashState.version = "10.0.0";
+    ZeroClipboard.config({ flashLoadTimeout: 2000 });
+    var client = new ZeroClipboard();
+    var id = client.id;
+    client.on( 'load', function(client, args) {
+      assert.ok(false, 'The `load` event should NOT have fired!');
+    } );
+    client.on( 'deactivatedFlash', function(client, args) {
+      // Assert
+      assert.strictEqual(this, window);
+      assert.strictEqual(client.id, id);
+      assert.strictEqual(flashState.deactivated, true);
+      assert.strictEqual(args.flashVersion, "10.0.0");
+      QUnit.start();
+    } );
+
+    // Act
+    setTimeout(function() {
+      assert.strictEqual(flashState.deactivated, null);
+      flashState.deactivated = true;
+    }, 1000);
+    QUnit.stop();
+    // The "deactivatedFlash" event will automatically fire in 2 seconds if the `load` event does not fire first
+  });
+
+  test("Test deactivatedFlash Event after first resolution", function(assert) {
+    assert.expect(4);
+
+    // Arrange
+    flashState.disabled = false;
+    flashState.outdated = false;
+    flashState.version = "10.0.0";
+    flashState.deactivated = true;
     var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button");
     var id = client.id;
-    client.clip(currentEl);
-    client.on( 'wrongFlash', function(client, args) {
+    client.on( 'load', function(client, args) {
+      assert.ok(false, 'The `load` event should NOT have fired!');
+    } );
+    client.on( 'deactivatedFlash', function(client, args) {
       // Assert
+      assert.strictEqual(this, window);
       assert.strictEqual(client.id, id);
+      assert.strictEqual(flashState.deactivated, true);
+      assert.strictEqual(args.flashVersion, "10.0.0");
       QUnit.start();
     } );
 
     // Act
     QUnit.stop();
-    ZeroClipboard.dispatch("load", { flashVersion: "MAC 9,0,0" });
-  });
-
-  test("Test wrongFlash Event after first load", function(assert) {
-    assert.expect(1);
-
-    // Arrange
-    flashState.disabled = false;
-    flashState.outdated = true;
-    flashState.version = "MAC 9,0,0";
-    flashState.ready = false;
-    flashState.bridge = {};
-    var client = new ZeroClipboard();
-    var id = client.id;
-
-    // Act (should auto-fire immediately but the handler will be invoked asynchronously)
-    client.on( 'wrongFlash', function(client, args) {
-      // Assert
-      assert.strictEqual(client.id, id);
-      QUnit.start();
-    } );
-    QUnit.stop();
+    // The "deactivatedFlash" event will automatically fire in 0 seconds (when the event loop gets to it)
   });
 
   test("Test load Event", function(assert) {
-    assert.expect(1);
+    assert.expect(4);
 
     // Arrange
+    flashState.version = "11.9.0";
     var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button");
     var id = client.id;
     client.clip(currentEl);
     client.on( 'load', function(client, args) {
       // Assert
+      assert.strictEqual(this, window);
       assert.strictEqual(client.id, id);
+      assert.strictEqual(flashState.deactivated, false);
+      assert.strictEqual(args.flashVersion, "11.9.0");
       QUnit.start();
     } );
 
     // Act
     QUnit.stop();
-    ZeroClipboard.dispatch("load", { flashVersion: "WIN 11,9,0" });
+    ZeroClipboard.dispatch("load");
   });
 
   test("Test load Event after first load", function(assert) {
-    assert.expect(1);
+    assert.expect(4);
 
     // Arrange
     flashState.disabled = false;
     flashState.outdated = false;
-    flashState.version = "WIN 11,9,0";
+    flashState.deactivated = false;
+    flashState.version = "11.9.0";
     flashState.ready = true;
     flashState.bridge = {};
     var client = new ZeroClipboard();
@@ -556,10 +605,54 @@
     // Act (should auto-fire immediately but the handler will be invoked asynchronously)
     client.on( 'load', function(client, args) {
       // Assert
+      assert.strictEqual(this, window);
       assert.strictEqual(client.id, id);
+      assert.strictEqual(flashState.deactivated, false);
+      assert.strictEqual(args.flashVersion, "11.9.0");
       QUnit.start();
     } );
     QUnit.stop();
+  });
+
+  test("Test overdueFlash Event", function(assert) {
+    assert.expect(9);
+
+    // Arrange
+    flashState.disabled = false;
+    flashState.outdated = false;
+    flashState.version = "10.0.0";
+    flashState.deactivated = true;
+    var client = new ZeroClipboard();
+    var currentEl = document.getElementById("d_clip_button");
+    var id = client.id;
+    client.on( 'load', function(client, args) {
+      assert.ok(false, 'The `load` event should NOT have fired!');
+    } );
+    client.on( 'deactivatedFlash', function(client, args) {
+      // Assert
+      assert.strictEqual(this, window);
+      assert.strictEqual(client.id, id);
+      assert.strictEqual(flashState.deactivated, true);
+      assert.strictEqual(args.flashVersion, "10.0.0");
+    } );
+    client.on( 'overdueFlash', function(client, args) {
+      // Assert
+      assert.strictEqual(this, window);
+      assert.strictEqual(client.id, id);
+      assert.strictEqual(flashState.deactivated, false);
+      assert.strictEqual(flashState.overdue, true);
+      assert.strictEqual(args.flashVersion, "10.0.0");
+      QUnit.start();
+    } );
+
+    // Act
+    QUnit.stop();
+    // The "deactivatedFlash" event will automatically fire in 0 seconds (when the event loop gets to it)
+
+    setTimeout(function() {
+      // Dispatch a "load" event (as if from the SWF) to trigger an "overdueFlash" event
+      ZeroClipboard.dispatch("load");
+    }, 1000);
   });
 
   test("Test string function name as handler", function(assert) {
@@ -580,7 +673,7 @@
 
     // Act
     QUnit.stop();
-    ZeroClipboard.dispatch("load", { flashVersion: "WIN 11,9,0" });
+    ZeroClipboard.dispatch("load");
   });
 
   test("Test EventListener object as handler", function(assert) {
@@ -603,7 +696,7 @@
 
     // Act
     QUnit.stop();
-    ZeroClipboard.dispatch("load", { flashVersion: "WIN 11,9,0" });
+    ZeroClipboard.dispatch("load");
   });
 
   test("Test mouseover and mouseout event", function(assert) {
@@ -617,14 +710,14 @@
 
     // Act
     QUnit.stop();
-    ZeroClipboard.dispatch("mouseover", { flashVersion: "MAC 11,0,0" });
+    ZeroClipboard.dispatch("mouseover");
 
     setTimeout(function() {
       // Assert
       assert.strictEqual(/(^| )zeroclipboard-is-hover( |$)/.test(currentEl.className), true);
 
       // Act more
-      ZeroClipboard.dispatch("mouseout", { flashVersion: "MAC 11,0,0" });
+      ZeroClipboard.dispatch("mouseout");
       
       setTimeout(function() {
         // Assert more
@@ -645,14 +738,14 @@
 
     // Act
     QUnit.stop();
-    ZeroClipboard.dispatch("mousedown", { flashVersion: "MAC 11,0,0" });
+    ZeroClipboard.dispatch("mousedown");
 
     setTimeout(function() {
       // Assert
       assert.strictEqual(/(^| )zeroclipboard-is-active( |$)/.test(currentEl.className), true);
 
       // Act more
-      ZeroClipboard.dispatch("mouseup", { flashVersion: "MAC 11,0,0" });
+      ZeroClipboard.dispatch("mouseup");
 
       setTimeout(function() {
         // Assert more
@@ -662,41 +755,55 @@
     }, 25);
   });
 
-  test("Test that the current Element is passed back to event handler", function(assert) {
-    assert.expect(9);
+  test("Test for appropriate context inside of invoked event handlers", function(assert) {
+    assert.expect(15);
 
     // Arrange
     var client = new ZeroClipboard();
-    var currentElId = "d_clip_button";
-    var currentEl = document.getElementById(currentElId);
+    var currentEl = document.getElementById("d_clip_button");
+    assert.ok(currentEl);
+    assert.strictEqual(currentEl.id, "d_clip_button");
+
     client.clip(currentEl);
     ZeroClipboard.activate(currentEl);
 
-    client.on( 'load mousedown mouseover mouseup wrongflash noflash', function(client, args) {
+    client.on( 'load noflash wrongflash deactivatedflash overdueflash', function(client, args) {
       // Assert
-      assert.strictEqual(this.id, currentElId);
+      assert.strictEqual(this, window);
+    } );
+    client.on( 'mousedown mouseover mouseup', function(client, args) {
+      // Assert
+      assert.strictEqual(this, currentEl);
+    } );
+    client.on( 'datarequested', function(client, args) {
+      // Assert
+      assert.strictEqual(this, currentEl);
+      assert.ok(_clipData["text/plain"]);
     } );
     client.on( 'complete', function(client, args) {
       // Assert
-      assert.strictEqual(this.id, currentElId);
+      assert.strictEqual(this, currentEl);
       assert.ok(!_clipData["text/plain"]);
     } );
     client.on( 'mouseout', function(client, args) {
       // Assert
-      assert.strictEqual(this.id, currentElId);
+      assert.strictEqual(this, currentEl);
       QUnit.start();
     } );
 
     // Act
     QUnit.stop();
-    ZeroClipboard.dispatch("load", { flashVersion: "MAC 11,0,0" });
-    ZeroClipboard.dispatch("wrongflash", { flashVersion: "MAC 11,0,0" });
-    ZeroClipboard.dispatch("noflash", { flashVersion: "MAC 11,0,0" });
-    ZeroClipboard.dispatch("mousedown", { flashVersion: "MAC 11,0,0" });
-    ZeroClipboard.dispatch("mouseover", { flashVersion: "MAC 11,0,0" });
-    ZeroClipboard.dispatch("mouseup", { flashVersion: "MAC 11,0,0" });
-    ZeroClipboard.dispatch("complete", { flashVersion: "MAC 11,0,0" });
-    ZeroClipboard.dispatch("mouseout", { flashVersion: "MAC 11,0,0" });
+    ZeroClipboard.dispatch("load");
+    ZeroClipboard.dispatch("noflash");
+    ZeroClipboard.dispatch("wrongflash");
+    ZeroClipboard.dispatch("deactivatedflash");
+    ZeroClipboard.dispatch("overdueflash");
+    ZeroClipboard.dispatch("mouseover");
+    ZeroClipboard.dispatch("mousedown");
+    ZeroClipboard.dispatch("mouseup");
+    ZeroClipboard.dispatch("datarequested");
+    ZeroClipboard.dispatch("complete");
+    ZeroClipboard.dispatch("mouseout");
   });
 
   test("Test onLoad Event with AMD", function(assert) {
@@ -737,10 +844,10 @@
 '  requireFn([amdModuleId], function(zero) {' +
 '    assert.strictEqual(zero, ZeroClipboard);' +
 '    assert.strictEqual(eventName, "load");' +
-'    assert.deepEqual(args, { flashVersion: "MAC 11,0,0" });' +
+'    assert.deepEqual(args, {});' +
 '    zero.dispatch(eventName, args);' +
 '  });' +
-'})("load", { flashVersion: "MAC 11,0,0" }, ' + JSON.stringify(_amdModuleId) + ');'
+'})("load", {}, ' + JSON.stringify(_amdModuleId) + ');'
     );
   });
 
@@ -779,9 +886,9 @@
 '  var zero = requireFn(cjsModuleId);' +
 '  assert.strictEqual(zero, ZeroClipboard);' +
 '  assert.strictEqual(eventName, "load");' +
-'  assert.deepEqual(args, { flashVersion: "MAC 11,0,0" });' +
+'  assert.deepEqual(args, {});' +
 '  zero.dispatch(eventName, args);' +
-'})("load", { flashVersion: "MAC 11,0,0" }, ' + JSON.stringify(_cjsModuleId) + ');'
+'})("load", {}, ' + JSON.stringify(_cjsModuleId) + ');'
     );
   });
 
@@ -791,22 +898,20 @@
   module("event - deprecated", {
     setup: function() {
       // Store
-      originalDetectFlashSupport = _detectFlashSupport;
       originalFlashState = _extend({}, flashState);
       // Modify
-      _detectFlashSupport = function() { return true; };
       currentElement = null;
       flashState = {
         bridge: null,
         version: "0.0.0",
         disabled: null,
         outdated: null,
+        deactivated: null,
         ready: null
       };
       ZeroClipboard.config({ debug: false });
     },
     teardown: function() {
-      _detectFlashSupport = originalDetectFlashSupport;
       ZeroClipboard.destroy();
       currentElement = null;
       flashState = originalFlashState;

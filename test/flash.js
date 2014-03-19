@@ -1,4 +1,4 @@
-/*global _detectFlashSupport */
+/*global flashState, _detectFlashSupport */
 
 "use strict";
 
@@ -24,8 +24,11 @@
     window.navigator.mimeTypes["application/x-shockwave-flash"] = undefined;
     window.ActiveXObject = undefined;
 
-    // Act & Assert
-    assert.strictEqual(_detectFlashSupport(), false);
+    // Act
+    _detectFlashSupport();
+
+    // Assert
+    assert.strictEqual(flashState.disabled, true);
   });
 
   test("Detecting has Flash mimetype", function(assert) {
@@ -35,8 +38,11 @@
     window.navigator.mimeTypes["application/x-shockwave-flash"] = {};
     window.ActiveXObject = function() { };
 
-    // Act & Assert
-    assert.strictEqual(_detectFlashSupport(), true);
+    // Act
+    _detectFlashSupport();
+
+    // Assert
+    assert.strictEqual(flashState.disabled, false);
   });
 
 })(QUnit.module, QUnit.test);

@@ -35,19 +35,25 @@ ZeroClipboard.prototype.on = function (eventName, func) {
 
     // If we don't have Flash, tell an adult
     if (added.noflash && flashState.disabled) {
-      _receiveEvent.call(this, "noflash", {});
+      _receiveEvent.call(this, "noflash");
     }
     // If we have old Flash, cry about it
     if (added.wrongflash && flashState.outdated) {
-      _receiveEvent.call(this, "wrongflash", {
-        flashVersion: flashState.version
-      });
+      _receiveEvent.call(this, "wrongflash");
+    }
+    // If the user or browser has Flash configured as click-to-play and they don't authorize
+    // it (or don't do so quickly enough), point fingers
+    if (added.deactivatedflash && flashState.deactivated) {
+      _receiveEvent.call(this, "deactivatedflash");
+    }
+    // If the user or browser has Flash configured as click-to-play and they don't authorize
+    // it quickly enough but then DO authorize it, tough luck
+    if (added.overdueflash && flashState.overdue) {
+      _receiveEvent.call(this, "overdueflash");
     }
     // If the SWF was already loaded, we're à gogo!
     if (added.load && flashState.ready) {
-      _receiveEvent.call(this, "load", {
-        flashVersion: flashState.version
-      });
+      _receiveEvent.call(this, "load");
     }
   }
 

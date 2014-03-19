@@ -59,21 +59,6 @@ _globalConfig.moviePath = "ZeroClipboard.swf";
 
 
 /*
- * @deprecated in [v1.2.0], slated for removal in [v2.0.0]. See docs for more info.
- *
- * Simple Flash Detection
- *
- * returns true if Flash is detected, otherwise false
- *
- * Originally from "core.js", then "flash.js"
- */
-ZeroClipboard.detectFlashSupport = function () {
-  _deprecationWarning("ZeroClipboard.detectFlashSupport", _globalConfig.debug);
-  return _detectFlashSupport();
-};
-
-
-/*
  * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for alternatives.
  *
  * Bridge from the Flash object back to the JavaScript
@@ -271,33 +256,49 @@ ZeroClipboard.prototype.ready = function () {
  * Originally from "event.js"
  */
 var _receiveEvent = function (eventName, args) {
+  args = args || {};
   eventName = eventName.toLowerCase().replace(/^on/, '');
 
-  var cleanVersion = (args && args.flashVersion && _parseFlashVersion(args.flashVersion)) || null;
   var element = currentElement;
+  var context = element;
   var performCallbackAsync = true;
 
   // special behavior for certain events
   switch (eventName) {
     case 'load':
-      if (cleanVersion) {
-        // If the Flash version is less than 10, throw event.
-        if (!_isFlashVersionSupported(cleanVersion)) {
-          _receiveEvent.call(this, "onWrongFlash", { flashVersion: cleanVersion });
-          return;
-        }
-        flashState.outdated = false;
-        flashState.ready = true;
-        flashState.version = cleanVersion;
+      // If it took longer the `_globalConfig.flashLoadTimeout` milliseconds to receive
+      // this `load` event, Flash will have been marked as "deactivated" by ZeroClipboard.
+      // If that is the case:
+      //   1. Remove the `deactivated` status (blocker)
+      //   2. Add the `overdue` status (non-blocker)
+      //   3. Fire an `overdueFlash` event instead of the `load` event
+      var isOverdue = flashState.deactivated || flashState.overdue || flashState.ready === null || flashState.bridge === null;
+
+      // SWF loaded successfully, so it shouldn't be considered `deactivated` even if it was
+      // overdue on click-to-play authorization
+      flashState.deactivated = false;
+
+      if (isOverdue) {
+        flashState.overdue = true;
+        return _receiveEvent.call(this, 'overdueFlash');
       }
+
+      flashState.ready = true;
+      context = null;
+      args.flashVersion = flashState.version;
+      break;
+
+    case 'noflash':
+      flashState.ready = false;
+      context = null;
       break;
 
     case 'wrongflash':
-      if (cleanVersion && !_isFlashVersionSupported(cleanVersion)) {
-        flashState.outdated = true;
-        flashState.ready = false;
-        flashState.version = cleanVersion;
-      }
+    case 'deactivatedflash':
+    case 'overdueflash':
+      flashState.ready = false;
+      context = null;
+      args.flashVersion = flashState.version;
       break;
 
     // NOTE: This `mouseover` event is coming from Flash, not DOM/JS
@@ -323,18 +324,20 @@ var _receiveEvent = function (eventName, args) {
       break;
 
     case 'datarequested':
-      var targetId = element.getAttribute('data-clipboard-target'),
-          targetEl = !targetId ? null : document.getElementById(targetId);
-      if (targetEl) {
-        var textContent = targetEl.value || targetEl.textContent || targetEl.innerText;
-        if (textContent) {
-          this.setText(textContent);
+      if (element) {
+        var targetId = element.getAttribute('data-clipboard-target'),
+            targetEl = !targetId ? null : document.getElementById(targetId);
+        if (targetEl) {
+          var textContent = targetEl.value || targetEl.textContent || targetEl.innerText;
+          if (textContent) {
+            this.setText(textContent);
+          }
         }
-      }
-      else {
-        var defaultText = element.getAttribute('data-clipboard-text');
-        if (defaultText) {
-          this.setText(defaultText);
+        else {
+          var defaultText = element.getAttribute('data-clipboard-text');
+          if (defaultText) {
+            this.setText(defaultText);
+          }
         }
       }
 
@@ -348,13 +351,13 @@ var _receiveEvent = function (eventName, args) {
       _deleteOwnProperties(_clipData);
 
       // Focus the context back on the trigger element (blur the Flash element)
-      if (element !== _safeActiveElement() && element.focus) {
+      if (element && element !== _safeActiveElement() && element.focus) {
         element.focus();
       }
       break;
   } // switch eventName
 
-  var context = element;
+  context = context || window;
   var eventArgs = [this, args];
   return _dispatchClientCallbacks.call(this, eventName, context, eventArgs, performCallbackAsync);
 };

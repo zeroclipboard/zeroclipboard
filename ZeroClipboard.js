@@ -12,8 +12,11 @@
   var flashState = {
     bridge: null,
     version: "0.0.0",
+    pluginType: "unknown",
     disabled: null,
     outdated: null,
+    deactivated: null,
+    overdue: null,
     ready: null
   };
   var _clipData = {};
@@ -458,28 +461,71 @@
   };
   var _detectFlashSupport = function() {
     var hasFlash = false;
-    if (typeof flashState.disabled === "boolean") {
-      hasFlash = flashState.disabled === false;
-    } else {
-      if (typeof ActiveXObject === "function") {
-        try {
-          if (new ActiveXObject("ShockwaveFlash.ShockwaveFlash")) {
-            hasFlash = true;
-          }
-        } catch (error) {}
-      }
-      if (!hasFlash && navigator.mimeTypes["application/x-shockwave-flash"]) {
+    var isActiveX = false;
+    var flashVersion = "";
+    var isPPAPI = false;
+    function parseFlashVersion(desc) {
+      var matches = desc.match(/[\d]+/g);
+      matches.length = 3;
+      return matches.join(".");
+    }
+    function isPepperFlash(flashPlayerFileName) {
+      return !!flashPlayerFileName && (flashPlayerFileName = flashPlayerFileName.toLowerCase()) && (/^(pepflashplayer\.dll|libpepflashplayer\.so|pepperflashplayer\.plugin)$/.test(flashPlayerFileName) || flashPlayerFileName.slice(-13) === "chrome.plugin");
+    }
+    function inspectPlugin(plugin) {
+      if (plugin) {
         hasFlash = true;
+        if (plugin.version) {
+          flashVersion = parseFlashVersion(plugin.version);
+        }
+        if (!flashVersion && plugin.description) {
+          flashVersion = parseFlashVersion(plugin.description);
+        }
+        if (plugin.filename) {
+          isPPAPI = isPepperFlash(plugin.filename);
+        }
       }
     }
-    return hasFlash;
+    var plugin, ax, mimeType;
+    if (navigator.plugins && navigator.plugins.length) {
+      plugin = navigator.plugins["Shockwave Flash"];
+      inspectPlugin(plugin);
+      if (navigator.plugins["Shockwave Flash 2.0"]) {
+        hasFlash = true;
+        flashVersion = "2.0.0.11";
+      }
+    } else if (navigator.mimeTypes && navigator.mimeTypes.length) {
+      mimeType = navigator.mimeTypes["application/x-shockwave-flash"];
+      plugin = mimeType && mimeType.enabledPlugin;
+      inspectPlugin(plugin);
+    } else if (typeof ActiveXObject !== "undefined") {
+      isActiveX = true;
+      try {
+        ax = new ActiveXObject("ShockwaveFlash.ShockwaveFlash.7");
+        hasFlash = true;
+        flashVersion = parseFlashVersion(ax.GetVariable("$version"));
+      } catch (e1) {
+        try {
+          ax = new ActiveXObject("ShockwaveFlash.ShockwaveFlash.6");
+          hasFlash = true;
+          flashVersion = "6.0.21";
+        } catch (e2) {
+          try {
+            ax = new ActiveXObject("ShockwaveFlash.ShockwaveFlash");
+            hasFlash = true;
+            flashVersion = parseFlashVersion(ax.GetVariable("$version"));
+          } catch (e3) {
+            isActiveX = false;
+          }
+        }
+      }
+    }
+    flashState.disabled = hasFlash !== true;
+    flashState.outdated = flashVersion && parseFloat(flashVersion) < 10;
+    flashState.version = flashVersion || "0.0.0";
+    flashState.pluginType = isPPAPI ? "pepper" : isActiveX ? "activex" : hasFlash ? "netscape" : "unknown";
   };
-  function _parseFlashVersion(flashVersion) {
-    return flashVersion.replace(/,/g, ".").replace(/[^0-9\.]/g, "");
-  }
-  function _isFlashVersionSupported(flashVersion) {
-    return parseFloat(_parseFlashVersion(flashVersion)) >= 10;
-  }
+  _detectFlashSupport();
   var ZeroClipboard = function(elements, options) {
     if (!(this instanceof ZeroClipboard)) {
       return new ZeroClipboard(elements, options);
@@ -498,15 +544,24 @@
       ZeroClipboard.config(options);
     }
     this.options = ZeroClipboard.config();
-    if (typeof flashState.disabled !== "boolean") {
-      flashState.disabled = !_detectFlashSupport();
+    if (typeof flashState.ready !== "boolean") {
+      flashState.ready = false;
     }
-    if (flashState.disabled === false && flashState.outdated !== true) {
-      if (flashState.bridge === null) {
-        flashState.outdated = false;
-        flashState.ready = false;
-        _bridge();
+    if (!ZeroClipboard.isFlashUnusable() && flashState.bridge === null) {
+      var _client = this;
+      var maxWait = _globalConfig.flashLoadTimeout;
+      if (typeof maxWait === "number" && maxWait >= 0) {
+        setTimeout(function() {
+          if (typeof flashState.deactivated !== "boolean") {
+            flashState.deactivated = true;
+          }
+          if (flashState.deactivated === true) {
+            _receiveEvent.call(_client, "deactivatedflash");
+          }
+        }, maxWait);
       }
+      flashState.overdue = false;
+      _bridge();
     }
   };
   ZeroClipboard.prototype.setText = function(newText) {
@@ -559,7 +614,11 @@
     zIndex: 999999999,
     debug: false,
     title: null,
-    autoActivate: true
+    autoActivate: true,
+    flashLoadTimeout: 3e4
+  };
+  ZeroClipboard.isFlashUnusable = function() {
+    return !!(flashState.disabled || flashState.outdated || flashState.deactivated);
   };
   ZeroClipboard.config = function(options) {
     if (typeof options === "object" && options !== null) {
@@ -602,6 +661,7 @@
       htmlBridge.parentNode.removeChild(htmlBridge);
       flashState.ready = null;
       flashState.bridge = null;
+      flashState.deactivated = null;
     }
   };
   ZeroClipboard.activate = function(element) {
@@ -711,17 +771,19 @@
         handlers[eventName].push(func);
       }
       if (added.noflash && flashState.disabled) {
-        _receiveEvent.call(this, "noflash", {});
+        _receiveEvent.call(this, "noflash");
       }
       if (added.wrongflash && flashState.outdated) {
-        _receiveEvent.call(this, "wrongflash", {
-          flashVersion: flashState.version
-        });
+        _receiveEvent.call(this, "wrongflash");
+      }
+      if (added.deactivatedflash && flashState.deactivated) {
+        _receiveEvent.call(this, "deactivatedflash");
+      }
+      if (added.overdueflash && flashState.overdue) {
+        _receiveEvent.call(this, "overdueflash");
       }
       if (added.load && flashState.ready) {
-        _receiveEvent.call(this, "load", {
-          flashVersion: flashState.version
-        });
+        _receiveEvent.call(this, "load");
       }
     }
     return this;
@@ -874,10 +936,6 @@
   _globalConfig.allowScriptAccess = null;
   _globalConfig.useNoCache = true;
   _globalConfig.moviePath = "ZeroClipboard.swf";
-  ZeroClipboard.detectFlashSupport = function() {
-    _deprecationWarning("ZeroClipboard.detectFlashSupport", _globalConfig.debug);
-    return _detectFlashSupport();
-  };
   ZeroClipboard.dispatch = function(eventName, args) {
     if (typeof eventName === "string" && eventName) {
       var cleanEventName = eventName.toLowerCase().replace(/^on/, "");
@@ -947,31 +1005,35 @@
     return flashState.ready === true;
   };
   var _receiveEvent = function(eventName, args) {
+    args = args || {};
     eventName = eventName.toLowerCase().replace(/^on/, "");
-    var cleanVersion = args && args.flashVersion && _parseFlashVersion(args.flashVersion) || null;
     var element = currentElement;
+    var context = element;
     var performCallbackAsync = true;
     switch (eventName) {
      case "load":
-      if (cleanVersion) {
-        if (!_isFlashVersionSupported(cleanVersion)) {
-          _receiveEvent.call(this, "onWrongFlash", {
-            flashVersion: cleanVersion
-          });
-          return;
-        }
-        flashState.outdated = false;
-        flashState.ready = true;
-        flashState.version = cleanVersion;
+      var isOverdue = flashState.deactivated || flashState.overdue || flashState.ready === null || flashState.bridge === null;
+      flashState.deactivated = false;
+      if (isOverdue) {
+        flashState.overdue = true;
+        return _receiveEvent.call(this, "overdueFlash");
       }
+      flashState.ready = true;
+      context = null;
+      args.flashVersion = flashState.version;
+      break;
+
+     case "noflash":
+      flashState.ready = false;
+      context = null;
       break;
 
      case "wrongflash":
-      if (cleanVersion && !_isFlashVersionSupported(cleanVersion)) {
-        flashState.outdated = true;
-        flashState.ready = false;
-        flashState.version = cleanVersion;
-      }
+     case "deactivatedflash":
+     case "overdueflash":
+      flashState.ready = false;
+      context = null;
+      args.flashVersion = flashState.version;
       break;
 
      case "mouseover":
@@ -993,16 +1055,18 @@
       break;
 
      case "datarequested":
-      var targetId = element.getAttribute("data-clipboard-target"), targetEl = !targetId ? null : document.getElementById(targetId);
-      if (targetEl) {
-        var textContent = targetEl.value || targetEl.textContent || targetEl.innerText;
-        if (textContent) {
-          this.setText(textContent);
-        }
-      } else {
-        var defaultText = element.getAttribute("data-clipboard-text");
-        if (defaultText) {
-          this.setText(defaultText);
+      if (element) {
+        var targetId = element.getAttribute("data-clipboard-target"), targetEl = !targetId ? null : document.getElementById(targetId);
+        if (targetEl) {
+          var textContent = targetEl.value || targetEl.textContent || targetEl.innerText;
+          if (textContent) {
+            this.setText(textContent);
+          }
+        } else {
+          var defaultText = element.getAttribute("data-clipboard-text");
+          if (defaultText) {
+            this.setText(defaultText);
+          }
         }
       }
       performCallbackAsync = false;
@@ -1010,12 +1074,12 @@
 
      case "complete":
       _deleteOwnProperties(_clipData);
-      if (element !== _safeActiveElement() && element.focus) {
+      if (element && element !== _safeActiveElement() && element.focus) {
         element.focus();
       }
       break;
     }
-    var context = element;
+    context = context || window;
     var eventArgs = [ this, args ];
     return _dispatchClientCallbacks.call(this, eventName, context, eventArgs, performCallbackAsync);
   };
