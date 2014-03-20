@@ -1,3 +1,8 @@
+# WARNING
+**This `master` branch contains the v2.x codebase for ZeroClipboard, which is currently in an unstable state! If you
+want to see the v1.x codebase, please see the [`1.x-master`](https://github.com/zeroclipboard/zeroclipboard/tree/1.x-master) branch instead.**
+
+
 # Overview
 
 The *ZeroClipboard* JavaScript library provides an easy way to copy text to the clipboard using an invisible Adobe
