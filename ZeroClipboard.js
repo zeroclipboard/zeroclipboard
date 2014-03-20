@@ -6,7 +6,7 @@
 * http://zeroclipboard.org/
 * v2.0.0-alpha.1
 */
-(function() {
+(function(window) {
   "use strict";
   var currentElement;
   var flashState = {
@@ -1088,10 +1088,12 @@
       _amdModuleId = module && module.id || null;
       return ZeroClipboard;
     });
-  } else if (typeof module === "object" && module && typeof module.exports === "object" && module.exports) {
+  } else if (typeof module === "object" && module && typeof module.exports === "object" && module.exports && typeof window.require === "function") {
     _cjsModuleId = module.id || null;
     module.exports = ZeroClipboard;
   } else {
     window.ZeroClipboard = ZeroClipboard;
   }
-})();
+})(function() {
+  return this;
+}());
