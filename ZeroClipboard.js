@@ -548,7 +548,7 @@
   var _globalConfig = {
     swfPath: _swfPath,
     trustedDomains: window.location.host ? [ window.location.host ] : [],
-    cacheBust: true,
+    cacheBust: /MSIE/.test(navigator.userAgent) || /Trident\/[\d](?=[^\?]+).*rv:([0-9.].)/.test(navigator.userAgent) ? true : false,
     forceHandCursor: false,
     zIndex: 999999999,
     debug: true,
