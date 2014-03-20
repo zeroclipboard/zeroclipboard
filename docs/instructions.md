@@ -697,7 +697,7 @@ window.require = curl;
 (function($) {
   $.widget( "ui.dialog", $.ui.dialog, {
     _allowInteraction: function( event ) {
-      return this._super() || $( event.target ).closest( ".global-zeroclipboard-container" ).length;
+      return this._super(event) || $( event.target ).closest( ".global-zeroclipboard-container" ).length;
     }
   } );
 })(window.jQuery);
