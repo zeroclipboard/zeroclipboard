@@ -15,12 +15,14 @@ if (typeof define === "function" && define.amd) {
       return ZeroClipboard;
     });
 }
-else if (typeof module === "object" && module && typeof module.exports === "object" && module.exports) {
+else if (typeof module === "object" && module && typeof module.exports === "object" && module.exports && typeof window.require === "function") {
   // CommonJS module loaders are required to provide an `id` property on the
   // `module` object that can be used to uniquely load this module again,
   // i.e. `require(module.id)`. This requirement is per the CommonJS modules
   // spec: "Module Context", 3.1.
   //   http://wiki.commonjs.org/articles/m/o/d/Modules_1.1.1_5572.html#Module_Context
+  //
+  // ZeroClipboard also needs to be able access itself via a globally available `require`.
 
   // Automatically set the `_cjdModuleId` value if loading via CommonJS
   _cjsModuleId = module.id || null;
@@ -31,4 +33,4 @@ else {
   window.ZeroClipboard = ZeroClipboard;
 }
 
-})();
+})((function() { return this; })());
