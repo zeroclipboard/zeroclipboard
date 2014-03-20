@@ -634,3 +634,21 @@ var _deleteOwnProperties = function(obj) {
   }
   return obj;
 };
+
+
+/**
+ * Get the currently active/focused DOM element.
+ *
+ * @returns the currently active/focused element, or `null`
+ *
+ * @private
+ */
+var _safeActiveElement = function() {
+  try {
+    return document.activeElement;
+  }
+  catch (err) {
+    // Do nothing
+  }
+  return null;
+};

@@ -444,6 +444,12 @@
     }
     return obj;
   };
+  var _safeActiveElement = function() {
+    try {
+      return document.activeElement;
+    } catch (err) {}
+    return null;
+  };
   var _detectFlashSupport = function() {
     var hasFlash = false;
     if (typeof flashState.disabled === "boolean") {
@@ -973,16 +979,18 @@
       break;
 
      case "datarequested":
-      var targetId = element.getAttribute("data-clipboard-target"), targetEl = !targetId ? null : document.getElementById(targetId);
-      if (targetEl) {
-        var textContent = targetEl.value || targetEl.textContent || targetEl.innerText;
-        if (textContent) {
-          this.setText(textContent);
-        }
-      } else {
-        var defaultText = element.getAttribute("data-clipboard-text");
-        if (defaultText) {
-          this.setText(defaultText);
+      if (element) {
+        var targetId = element.getAttribute("data-clipboard-target"), targetEl = !targetId ? null : document.getElementById(targetId);
+        if (targetEl) {
+          var textContent = targetEl.value || targetEl.textContent || targetEl.innerText;
+          if (textContent) {
+            this.setText(textContent);
+          }
+        } else {
+          var defaultText = element.getAttribute("data-clipboard-text");
+          if (defaultText) {
+            this.setText(defaultText);
+          }
         }
       }
       performCallbackAsync = false;
@@ -990,6 +998,9 @@
 
      case "complete":
       _deleteOwnProperties(_clipData);
+      if (element && element !== _safeActiveElement() && element.focus) {
+        element.focus();
+      }
       break;
     }
     var context = element;
