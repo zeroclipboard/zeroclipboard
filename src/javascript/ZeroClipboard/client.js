@@ -35,11 +35,13 @@ var ZeroClipboard = function (elements) {
     var maxWait = _globalConfig.flashLoadTimeout;
     if (typeof maxWait === "number" && maxWait >= 0) {
       setTimeout(function() {
+        // If it took longer the `_globalConfig.flashLoadTimeout` milliseconds to receive
+        // a `ready` event, consider Flash "deactivated".
         if (typeof flashState.deactivated !== "boolean") {
           flashState.deactivated = true;
         }
         if (flashState.deactivated === true) {
-          _receiveEvent.call(_client, "deactivatedflash");
+          ZeroClipboard.emit({ "type": "error", "name": "flash-deactivated", "client": _client });
         }
       }, maxWait);
     }

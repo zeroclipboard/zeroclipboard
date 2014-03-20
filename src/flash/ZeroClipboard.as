@@ -17,14 +17,14 @@ package {
   public class ZeroClipboard extends Sprite {
 
     // CONSTANTS
-    // Function through which JavaScript events are dispatched normally
-    private static const NORMAL_DISPATCHER:String = "ZeroClipboard.dispatch";
+    // Function through which JavaScript events are emitted normally
+    private static const NORMAL_EMITTER:String = "ZeroClipboard.emit";
 
-    // Function through which JavaScript events are dispatched if using an AMD/CommonJS module loader
-    private static const JS_MODULE_WRAPPED_DISPATCHER:String =
-      "(function (event, args, jsModuleId) {\n" +
+    // Function through which JavaScript events are emitted if using an AMD/CommonJS module loader
+    private static const JS_MODULE_WRAPPED_EMITTER:String =
+      "(function (eventObj, jsModuleId) {\n" +
       "  var ZeroClipboard = require(jsModuleId);\n" +
-      "  ZeroClipboard.dispatch(event, args);\n" +
+      "  return " + ZeroClipboard.NORMAL_EMITTER + "(eventObj);\n" +
       "})";
 
 
@@ -80,7 +80,7 @@ package {
       ExternalInterface.addCallback("setSize", setSize);
 
       // signal to the browser that we are ready
-      dispatch("load", ZeroClipboard.metaData());
+      emit("ready", null);
     }
 
     // sanitizeString
@@ -90,7 +90,7 @@ package {
     //
     // returns an XSS safe String
     private static function sanitizeString(dirty:String): String {
-      return dirty.replace(/\\/g,"\\\\")
+      return dirty.replace(/\\/g, "\\\\");
     }
 
     // mouseClick
@@ -105,15 +105,29 @@ package {
 
       // Linux currently doesn't use the correct clipboard buffer with the new
       // Flash 10 API, so we need to use this until we can figure out an alternative
-      flash.system.System.setClipboard(clipText);
+      var success:Boolean = true;
+      try {
+        flash.system.System.setClipboard(clipText);
+      }
+      catch (e:Error) {
+        success = false;
+      }
 
-      // signal to the page it is done
-      dispatch("complete", ZeroClipboard.metaData(event, {
-        text: ZeroClipboard.sanitizeString(clipText)
-      }));
+      // Compose a results object
+      var results:Object = {
+        success: {
+          "text/plain": success
+        },
+        data: {
+          "text/plain": ZeroClipboard.sanitizeString(clipText)
+        }
+      };
 
       // reset the text
       clipText = "";
+
+      // signal to the page that it is done
+      emit("aftercopy", results);
     }
 
     // mouseOver
@@ -122,7 +136,7 @@ package {
     //
     // returns nothing
     private function mouseOver(event:MouseEvent): void {
-      dispatch("mouseOver", ZeroClipboard.metaData(event));
+      emit("mouseover", ZeroClipboard.metaData(event));
     }
 
     // mouseOut
@@ -131,7 +145,7 @@ package {
     //
     // returns nothing
     private function mouseOut(event:MouseEvent): void {
-      dispatch("mouseOut", ZeroClipboard.metaData(event));
+      emit("mouseout", ZeroClipboard.metaData(event));
     }
 
     // mouseDown
@@ -140,12 +154,16 @@ package {
     //
     // returns nothing
     private function mouseDown(event:MouseEvent): void {
-      dispatch("mouseDown", ZeroClipboard.metaData(event));
+      emit("mousedown", ZeroClipboard.metaData(event));
 
-      // if the clipText hasn't been set
-      if (!clipText) {
-        // request data from the page
-        dispatch("dataRequested", ZeroClipboard.metaData(event));
+      // Allow for any "UI prepartion" work before the "copy" event begins
+      emit("beforecopy", null);
+
+      // request data from the page
+      var newClipText:String = emit("copy", null);
+
+      if (newClipText) {
+        clipText = newClipText;
       }
     }
 
@@ -155,7 +173,7 @@ package {
     //
     // returns nothing
     private function mouseUp(event:MouseEvent): void {
-      dispatch("mouseUp", ZeroClipboard.metaData(event));
+      emit("mouseup", ZeroClipboard.metaData(event));
     }
 
     // setText
@@ -187,17 +205,21 @@ package {
       button.height = height;
     }
 
-    // dispatch
+    // emit
     //
-    // Function through which JavaScript events are dispatched
+    // Function through which JavaScript events are emitted
     //
-    // returns nothing
-    private function dispatch(eventName:String, eventArgs:Object): void {
+    // returns nothing, or the new clipText
+    private function emit(eventType:String, eventObj:Object): String {
+      if (eventObj == null) {
+        eventObj = {};
+      }
+      eventObj.type = eventType;
       if (jsModuleId) {
-        ExternalInterface.call(ZeroClipboard.JS_MODULE_WRAPPED_DISPATCHER, eventName, eventArgs, jsModuleId);
+        return ExternalInterface.call(ZeroClipboard.JS_MODULE_WRAPPED_EMITTER, eventObj, jsModuleId);
       }
       else {
-        ExternalInterface.call(ZeroClipboard.NORMAL_DISPATCHER, eventName, eventArgs);
+        return ExternalInterface.call(ZeroClipboard.NORMAL_EMITTER, eventObj);
       }
     }
 

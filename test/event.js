@@ -119,16 +119,16 @@
     var client = new ZeroClipboard();
 
     // Act
-    client.on("load", function(){});
-    client.on("onNoFlash", function(){});
+    client.on("ready", function(){});
+    client.on("onError", function(){});
     client.on("onCustomEvent", function(){});
 
     // Assert
-    assert.ok(client.handlers().load);
-    assert.ok(client.handlers().noflash);
+    assert.ok(client.handlers().ready);
+    assert.ok(client.handlers().error);
     assert.ok(client.handlers().customevent);
-    assert.strictEqual(client.handlers().load.length, 1);
-    assert.strictEqual(client.handlers().noflash.length, 1);
+    assert.strictEqual(client.handlers().ready.length, 1);
+    assert.strictEqual(client.handlers().error.length, 1);
     assert.strictEqual(client.handlers().customevent.length, 1);
   });
 
@@ -140,17 +140,17 @@
 
     // Act
     client.on({
-      "load": function(){},
-      "onNoFlash": function(){},
+      "ready": function(){},
+      "onError": function(){},
       "onCustomEvent": function(){}
     });
 
     // Assert
-    assert.ok(client.handlers().load);
-    assert.ok(client.handlers().noflash);
+    assert.ok(client.handlers().ready);
+    assert.ok(client.handlers().error);
     assert.ok(client.handlers().customevent);
-    assert.strictEqual(client.handlers().load.length, 1);
-    assert.strictEqual(client.handlers().noflash.length, 1);
+    assert.strictEqual(client.handlers().ready.length, 1);
+    assert.strictEqual(client.handlers().error.length, 1);
     assert.strictEqual(client.handlers().customevent.length, 1);
   });
 
@@ -159,27 +159,27 @@
 
     // Arrange
     var client = new ZeroClipboard();
-    var load = function(){};
-    var onNoFlash = function(){};
+    var ready = function(){};
+    var onError = function(){};
     var onCustomEvent = function(){};
 
     // Act
-    client.on("load", load);
-    client.on("onNoFlash", onNoFlash);
+    client.on("ready", ready);
+    client.on("onError", onError);
     client.on("onCustomEvent", onCustomEvent);
 
     // Assert
-    assert.deepEqual(client.handlers().load, [load]);
-    assert.deepEqual(client.handlers().noflash, [onNoFlash]);
+    assert.deepEqual(client.handlers().ready, [ready]);
+    assert.deepEqual(client.handlers().error, [onError]);
     assert.deepEqual(client.handlers().customevent, [onCustomEvent]);
 
     // Act & Assert
-    client.off("load", load);
-    assert.deepEqual(client.handlers().load, []);
+    client.off("ready", ready);
+    assert.deepEqual(client.handlers().ready, []);
 
     // Act & Assert
-    client.off("onNoFlash", onNoFlash);
-    assert.deepEqual(client.handlers().noflash, []);
+    client.off("onError", onError);
+    assert.deepEqual(client.handlers().error, []);
 
     // Act & Assert
     client.off("onCustomEvent", onCustomEvent);
@@ -191,27 +191,27 @@
 
     // Arrange
     var client = new ZeroClipboard();
-    var load = function(){};
-    var onNoFlash = function(){};
+    var ready = function(){};
+    var onError = function(){};
     var onCustomEvent = function(){};
 
     // Act
-    client.on("load", load);
-    client.on("onNoFlash", onNoFlash);
+    client.on("ready", ready);
+    client.on("onError", onError);
     client.on("onCustomEvent", onCustomEvent);
 
     // Assert
-    assert.deepEqual(client.handlers().load, [load]);
-    assert.deepEqual(client.handlers().noflash, [onNoFlash]);
+    assert.deepEqual(client.handlers().ready, [ready]);
+    assert.deepEqual(client.handlers().error, [onError]);
     assert.deepEqual(client.handlers().customevent, [onCustomEvent]);
 
     // Act & Assert
-    client.off({ "load": load });
-    assert.deepEqual(client.handlers().load, []);
+    client.off({ "ready": ready });
+    assert.deepEqual(client.handlers().ready, []);
 
     // Act & Assert
-    client.off({ "onNoFlash": onNoFlash });
-    assert.deepEqual(client.handlers().noflash, []);
+    client.off({ "onError": onError });
+    assert.deepEqual(client.handlers().error, []);
 
     // Act & Assert
     client.off({ "onCustomEvent": onCustomEvent });
@@ -225,17 +225,17 @@
     var client = new ZeroClipboard();
 
     // Assert
-    assert.ok(!client.handlers().load);
-    assert.ok(!client.handlers().complete);
+    assert.ok(!client.handlers().ready);
+    assert.ok(!client.handlers().aftercopy);
 
     // Act
-    client.on("load oncomplete", function(){});
+    client.on("ready onaftercopy", function(){});
 
     // Assert more
-    assert.ok(client.handlers().load);
-    assert.ok(client.handlers().complete);
-    assert.strictEqual(client.handlers().load.length, 1);
-    assert.strictEqual(client.handlers().complete.length, 1);
+    assert.ok(client.handlers().ready);
+    assert.ok(client.handlers().aftercopy);
+    assert.strictEqual(client.handlers().ready.length, 1);
+    assert.strictEqual(client.handlers().aftercopy.length, 1);
   });
 
   test("Registering two events with a map works", function(assert) {
@@ -245,19 +245,19 @@
     var client = new ZeroClipboard();
 
     // Assert
-    assert.ok(!client.handlers().load);
-    assert.ok(!client.handlers().complete);
+    assert.ok(!client.handlers().ready);
+    assert.ok(!client.handlers().aftercopy);
 
     // Act
     client.on({
-      "load oncomplete": function(){}
+      "ready onaftercopy": function(){}
     });
 
     // Assert more
-    assert.ok(client.handlers().load);
-    assert.ok(client.handlers().complete);
-    assert.strictEqual(client.handlers().load.length, 1);
-    assert.strictEqual(client.handlers().complete.length, 1);
+    assert.ok(client.handlers().ready);
+    assert.ok(client.handlers().aftercopy);
+    assert.strictEqual(client.handlers().ready.length, 1);
+    assert.strictEqual(client.handlers().aftercopy.length, 1);
   });
 
   test("Unregistering two events works", function(assert) {
@@ -268,22 +268,22 @@
     var func = function() {};
 
     // Assert
-    assert.ok(!client.handlers().load);
-    assert.ok(!client.handlers().complete);
+    assert.ok(!client.handlers().ready);
+    assert.ok(!client.handlers().aftercopy);
 
     // Act
-    client.on("load oncomplete", func);
+    client.on("ready onaftercopy", func);
 
     // Assert more
-    assert.deepEqual(client.handlers().load, [func]);
-    assert.deepEqual(client.handlers().complete, [func]);
+    assert.deepEqual(client.handlers().ready, [func]);
+    assert.deepEqual(client.handlers().aftercopy, [func]);
 
     // Act more
-    client.off("load oncomplete", func);
+    client.off("ready onaftercopy", func);
 
     // Assert even more
-    assert.deepEqual(client.handlers().load, []);
-    assert.deepEqual(client.handlers().complete, []);
+    assert.deepEqual(client.handlers().ready, []);
+    assert.deepEqual(client.handlers().aftercopy, []);
   });
 
   test("Unregistering two events with a map works", function(assert) {
@@ -294,24 +294,24 @@
     var func = function() {};
 
     // Assert
-    assert.ok(!client.handlers().load);
-    assert.ok(!client.handlers().complete);
+    assert.ok(!client.handlers().ready);
+    assert.ok(!client.handlers().aftercopy);
 
     // Act
-    client.on("load oncomplete", func);
+    client.on("ready onaftercopy", func);
 
     // Assert more
-    assert.deepEqual(client.handlers().load, [func]);
-    assert.deepEqual(client.handlers().complete, [func]);
+    assert.deepEqual(client.handlers().ready, [func]);
+    assert.deepEqual(client.handlers().aftercopy, [func]);
 
     // Act more
     client.off({
-      "load oncomplete": func
+      "ready onaftercopy": func
     });
 
     // Assert even more
-    assert.deepEqual(client.handlers().load, []);
-    assert.deepEqual(client.handlers().complete, []);
+    assert.deepEqual(client.handlers().ready, []);
+    assert.deepEqual(client.handlers().aftercopy, []);
   });
 
   test("`on` can add multiple handlers for the same event", function(assert) {
@@ -323,19 +323,19 @@
     var func2 = function() {};
 
     // Assert
-    assert.ok(!client.handlers().load);
+    assert.ok(!client.handlers().ready);
 
     // Act
-    client.on("load", func1);
+    client.on("ready", func1);
 
     // Assert more
-    assert.deepEqual(client.handlers().load, [func1]);
+    assert.deepEqual(client.handlers().ready, [func1]);
 
     // Act more
-    client.on("load", func2);
+    client.on("ready", func2);
 
     // Assert even more
-    assert.deepEqual(client.handlers().load, [func1, func2]);
+    assert.deepEqual(client.handlers().ready, [func1, func2]);
   });
 
   test("`off` can remove multiple handlers for the same event", function(assert) {
@@ -348,25 +348,25 @@
     var func3 = function() {};
 
     // Assert
-    assert.ok(!client.handlers().load);
+    assert.ok(!client.handlers().ready);
 
     // Act
-    client.on("load", func1);
-    client.on("load", func2);
-    client.on("load", func3);
+    client.on("ready", func1);
+    client.on("ready", func2);
+    client.on("ready", func3);
 
     // Assert more
-    assert.deepEqual(client.handlers().load, [func1, func2, func3]);
+    assert.deepEqual(client.handlers().ready, [func1, func2, func3]);
 
     // Act and assert even more
-    client.off("load", func3);  // Remove from the end
-    assert.deepEqual(client.handlers().load, [func1, func2]);
+    client.off("ready", func3);  // Remove from the end
+    assert.deepEqual(client.handlers().ready, [func1, func2]);
 
-    client.off("load", func1);  // Remove from the start
-    assert.deepEqual(client.handlers().load, [func2]);
+    client.off("ready", func1);  // Remove from the start
+    assert.deepEqual(client.handlers().ready, [func2]);
 
-    client.off("load", func2);  // Remove the last one
-    assert.deepEqual(client.handlers().load, []);
+    client.off("ready", func2);  // Remove the last one
+    assert.deepEqual(client.handlers().ready, []);
   });
 
   test("`on` can add more than one entry of the same handler function for the same event", function(assert) {
@@ -377,14 +377,14 @@
     var func1 = function() {};
 
     // Assert
-    assert.ok(!client.handlers().load);
+    assert.ok(!client.handlers().ready);
 
     // Act
-    client.on("load", func1);
-    client.on("load", func1);
+    client.on("ready", func1);
+    client.on("ready", func1);
 
     // Assert more
-    assert.deepEqual(client.handlers().load, [func1, func1]);
+    assert.deepEqual(client.handlers().ready, [func1, func1]);
   });
 
   test("`off` will remove all entries of the same handler function for the same event", function(assert) {
@@ -395,20 +395,20 @@
     var func1 = function() {};
 
     // Assert
-    assert.ok(!client.handlers().load);
+    assert.ok(!client.handlers().ready);
 
     // Act
-    client.on("load", func1);
-    client.on("load", func1);
+    client.on("ready", func1);
+    client.on("ready", func1);
 
     // Assert more
-    assert.deepEqual(client.handlers().load, [func1, func1]);
+    assert.deepEqual(client.handlers().ready, [func1, func1]);
 
     // Act more
-    client.off("load", func1);
+    client.off("ready", func1);
 
     // Assert even more
-    assert.deepEqual(client.handlers().load, []);
+    assert.deepEqual(client.handlers().ready, []);
   });
 
   test("`off` will remove all handler functions for an event if no function is specified", function(assert) {
@@ -421,20 +421,20 @@
     var func3 = function() {};
 
     // Assert
-    assert.ok(!client.handlers().load);
+    assert.ok(!client.handlers().ready);
 
     // Act
-    client.on("load", func1);
-    client.on("load", func2);
-    client.on("load", func3);
-    client.on("load", func1);
+    client.on("ready", func1);
+    client.on("ready", func2);
+    client.on("ready", func3);
+    client.on("ready", func1);
 
     // Assert more
-    assert.deepEqual(client.handlers().load, [func1, func2, func3, func1]);
+    assert.deepEqual(client.handlers().ready, [func1, func2, func3, func1]);
 
     // Act and assert even more
-    client.off("load");  // Remove all
-    assert.deepEqual(client.handlers().load, []);
+    client.off("ready");  // Remove all
+    assert.deepEqual(client.handlers().ready, []);
   });
 
   test("`off` will remove all handler functions for all events if no event type is specified", function(assert) {
@@ -447,26 +447,26 @@
     var func3 = function() {};
 
     // Assert
-    assert.ok(!client.handlers().load);
-    assert.ok(!client.handlers().noflash);
+    assert.ok(!client.handlers().ready);
+    assert.ok(!client.handlers().error);
 
     // Act
-    client.on("load", func1);
-    client.on("load", func2);
-    client.on("noflash", func3);
+    client.on("ready", func1);
+    client.on("ready", func2);
+    client.on("error", func3);
 
     // Assert more
-    assert.deepEqual(client.handlers().load, [func1, func2]);
-    assert.deepEqual(client.handlers().noflash, [func3]);
+    assert.deepEqual(client.handlers().ready, [func1, func2]);
+    assert.deepEqual(client.handlers().error, [func3]);
 
     // Act and assert even more
     client.off();  // Remove all handlers for all types
-    assert.deepEqual(client.handlers().load, []);
-    assert.deepEqual(client.handlers().noflash, []);
+    assert.deepEqual(client.handlers().ready, []);
+    assert.deepEqual(client.handlers().error, []);
   });
 
-  test("Test noFlash Event", function(assert) {
-    assert.expect(2);
+  test("Test disabledFlash Event", function(assert) {
+    assert.expect(6);
 
     // Arrange
     flashState.disabled = true;
@@ -474,17 +474,21 @@
     var id = client.id;
 
     // Act (should auto-fire immediately but the handler will be invoked asynchronously)
-    client.on( 'noFlash', function(client, args) {
+    client.on( 'error', function(event) {
       // Assert
-      assert.strictEqual(this, window);
-      assert.strictEqual(client.id, id);
+      assert.strictEqual(this, client);
+      assert.strictEqual(this.id, id);
+      assert.strictEqual(flashState.disabled, true);
+      assert.strictEqual(event.type, "error");
+      assert.strictEqual(event.name, "flash-disabled");
+      assert.strictEqual(event.target, null);
       QUnit.start();
     } );
     QUnit.stop();
   });
 
-  test("Test wrongFlash Event", function(assert) {
-    assert.expect(3);
+  test("Test outdatedFlash Event", function(assert) {
+    assert.expect(8);
 
     // Arrange
     flashState.disabled = false;
@@ -494,21 +498,26 @@
     var id = client.id;
 
     // Act
-    client.on( 'load', function(client, args) {
-      assert.ok(false, 'The `load` event should NOT have fired!');
+    client.on( 'ready', function(event) {
+      assert.ok(false, 'The `ready` event should NOT have fired!');
     } );
-    client.on( 'wrongFlash', function(client, args) {
+    client.on( 'error', function(event) {
       // Assert
-      assert.strictEqual(this, window);
-      assert.strictEqual(client.id, id);
-      assert.strictEqual(args.flashVersion, "9.0.0");
+      assert.strictEqual(this, client);
+      assert.strictEqual(this.id, id);
+      assert.strictEqual(flashState.outdated, true);
+      assert.strictEqual(event.type, "error");
+      assert.strictEqual(event.name, "flash-outdated");
+      assert.strictEqual(event.target, null);
+      assert.strictEqual(event.version, "9.0.0");
+      assert.strictEqual(event.minimumVersion, "10.0.0");
       QUnit.start();
     } );
     QUnit.stop();
   });
 
   test("Test deactivatedFlash Event", function(assert) {
-    assert.expect(5);
+    assert.expect(10);
 
     // Arrange
     flashState.disabled = false;
@@ -517,29 +526,33 @@
     ZeroClipboard.config({ flashLoadTimeout: 2000 });
     var client = new ZeroClipboard();
     var id = client.id;
-    client.on( 'load', function(client, args) {
-      assert.ok(false, 'The `load` event should NOT have fired!');
+    client.on( 'ready', function(event) {
+      assert.ok(false, 'The `ready` event should NOT have fired!');
     } );
-    client.on( 'deactivatedFlash', function(client, args) {
+    client.on( 'error', function(event) {
       // Assert
-      assert.strictEqual(this, window);
-      assert.strictEqual(client.id, id);
+      assert.strictEqual(this, client);
+      assert.strictEqual(this.id, id);
       assert.strictEqual(flashState.deactivated, true);
-      assert.strictEqual(args.flashVersion, "10.0.0");
+      assert.strictEqual(flashState.ready, false);
+      assert.strictEqual(event.type, "error");
+      assert.strictEqual(event.name, "flash-deactivated");
+      assert.strictEqual(event.target, null);
+      assert.strictEqual(event.version, "10.0.0");
+      assert.strictEqual(event.minimumVersion, "10.0.0");
       QUnit.start();
     } );
 
     // Act
     setTimeout(function() {
       assert.strictEqual(flashState.deactivated, null);
-      flashState.deactivated = true;
-    }, 1000);
+    }, 500);
     QUnit.stop();
-    // The "deactivatedFlash" event will automatically fire in 2 seconds if the `load` event does not fire first
+    // The "deactivatedFlash" event will automatically fire in 2 seconds if the `ready` event does not fire first
   });
 
   test("Test deactivatedFlash Event after first resolution", function(assert) {
-    assert.expect(4);
+    assert.expect(8);
 
     // Arrange
     flashState.disabled = false;
@@ -549,15 +562,19 @@
     var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button");
     var id = client.id;
-    client.on( 'load', function(client, args) {
-      assert.ok(false, 'The `load` event should NOT have fired!');
+    client.on( 'ready', function(event) {
+      assert.ok(false, 'The `ready` event should NOT have fired!');
     } );
-    client.on( 'deactivatedFlash', function(client, args) {
+    client.on( 'error', function(event) {
       // Assert
-      assert.strictEqual(this, window);
-      assert.strictEqual(client.id, id);
+      assert.strictEqual(this, client);
+      assert.strictEqual(this.id, id);
       assert.strictEqual(flashState.deactivated, true);
-      assert.strictEqual(args.flashVersion, "10.0.0");
+      assert.strictEqual(event.type, "error");
+      assert.strictEqual(event.name, "flash-deactivated");
+      assert.strictEqual(event.target, null);
+      assert.strictEqual(event.version, "10.0.0");
+      assert.strictEqual(event.minimumVersion, "10.0.0");
       QUnit.start();
     } );
 
@@ -566,31 +583,35 @@
     // The "deactivatedFlash" event will automatically fire in 0 seconds (when the event loop gets to it)
   });
 
-  test("Test load Event", function(assert) {
-    assert.expect(4);
+  test("Test ready Event", function(assert) {
+    assert.expect(6);
 
     // Arrange
+    flashState.disabled = false;
+    flashState.outdated = false;
     flashState.version = "11.9.0";
     var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button");
     var id = client.id;
     client.clip(currentEl);
-    client.on( 'load', function(client, args) {
+    client.on( 'ready', function(event) {
       // Assert
-      assert.strictEqual(this, window);
-      assert.strictEqual(client.id, id);
+      assert.strictEqual(this, client);
+      assert.strictEqual(this.id, id);
+      assert.strictEqual(event.type, "ready");
+      assert.strictEqual(event.target, null);
       assert.strictEqual(flashState.deactivated, false);
-      assert.strictEqual(args.flashVersion, "11.9.0");
+      assert.strictEqual(event.version, "11.9.0");
       QUnit.start();
     } );
 
     // Act
     QUnit.stop();
-    ZeroClipboard.dispatch("load");
+    ZeroClipboard.emit("ready");
   });
 
-  test("Test load Event after first load", function(assert) {
-    assert.expect(4);
+  test("Test ready Event after first load", function(assert) {
+    assert.expect(6);
 
     // Arrange
     flashState.disabled = false;
@@ -603,19 +624,21 @@
     var id = client.id;
 
     // Act (should auto-fire immediately but the handler will be invoked asynchronously)
-    client.on( 'load', function(client, args) {
+    client.on( "ready", function(event) {
       // Assert
-      assert.strictEqual(this, window);
-      assert.strictEqual(client.id, id);
+      assert.strictEqual(this, client);
+      assert.strictEqual(this.id, id);
+      assert.strictEqual(event.type, "ready");
+      assert.strictEqual(event.target, null);
       assert.strictEqual(flashState.deactivated, false);
-      assert.strictEqual(args.flashVersion, "11.9.0");
+      assert.strictEqual(event.version, "11.9.0");
       QUnit.start();
     } );
     QUnit.stop();
   });
 
   test("Test overdueFlash Event", function(assert) {
-    assert.expect(9);
+    assert.expect(15);
 
     // Arrange
     flashState.disabled = false;
@@ -625,24 +648,30 @@
     var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button");
     var id = client.id;
-    client.on( 'load', function(client, args) {
-      assert.ok(false, 'The `load` event should NOT have fired!');
+    client.on( 'ready', function(event) {
+      assert.ok(false, 'The `ready` event should NOT have fired!');
     } );
-    client.on( 'deactivatedFlash', function(client, args) {
+    client.on( 'error', function(event) {
       // Assert
-      assert.strictEqual(this, window);
-      assert.strictEqual(client.id, id);
-      assert.strictEqual(flashState.deactivated, true);
-      assert.strictEqual(args.flashVersion, "10.0.0");
-    } );
-    client.on( 'overdueFlash', function(client, args) {
-      // Assert
-      assert.strictEqual(this, window);
-      assert.strictEqual(client.id, id);
-      assert.strictEqual(flashState.deactivated, false);
-      assert.strictEqual(flashState.overdue, true);
-      assert.strictEqual(args.flashVersion, "10.0.0");
-      QUnit.start();
+      assert.strictEqual(this, client);
+      assert.strictEqual(this.id, id);
+      if (event.name === "flash-deactivated") {
+        assert.strictEqual(event.type, "error");
+        assert.strictEqual(event.name, "flash-deactivated");
+        assert.strictEqual(flashState.deactivated, true);
+        assert.strictEqual(event.version, "10.0.0");
+        assert.strictEqual(event.minimumVersion, "10.0.0");
+      }
+      else if (event.name === "flash-overdue") {
+        assert.strictEqual(event.type, "error");
+        assert.strictEqual(event.name, "flash-overdue");
+        assert.strictEqual(flashState.deactivated, false);
+        assert.strictEqual(flashState.overdue, true);
+        assert.strictEqual(event.version, "10.0.0");
+        assert.strictEqual(event.minimumVersion, "10.0.0");
+
+        QUnit.start();
+      }
     } );
 
     // Act
@@ -650,33 +679,12 @@
     // The "deactivatedFlash" event will automatically fire in 0 seconds (when the event loop gets to it)
 
     setTimeout(function() {
-      // Dispatch a "load" event (as if from the SWF) to trigger an "overdueFlash" event
-      ZeroClipboard.dispatch("load");
+      // Emit a "ready" event (as if from the SWF) to trigger an "overdueFlash" event
+      ZeroClipboard.emit("ready");
     }, 1000);
   });
 
   test("Test string function name as handler", function(assert) {
-    assert.expect(1);
-
-    // Arrange
-    var client = new ZeroClipboard();
-    var currentEl = document.getElementById("d_clip_button");
-    var id = client.id;
-    client.clip(currentEl);
-    window.zcLoadCallback = function(client, args) {
-      // Assert
-      assert.strictEqual(client.id, id);
-      QUnit.start();
-      delete window.zcLoadCallback;
-    };
-    client.on( 'load', 'zcLoadCallback' );
-
-    // Act
-    QUnit.stop();
-    ZeroClipboard.dispatch("load");
-  });
-
-  test("Test EventListener object as handler", function(assert) {
     assert.expect(2);
 
     // Arrange
@@ -684,19 +692,43 @@
     var currentEl = document.getElementById("d_clip_button");
     var id = client.id;
     client.clip(currentEl);
+    window.zcLoadCallback = function(event) {
+      // Assert
+      assert.strictEqual(this.id, id);
+      assert.strictEqual(event.type, "ready");
+      QUnit.start();
+      delete window.zcLoadCallback;
+    };
+    client.on( "ready", "zcLoadCallback" );
+
+    // Act
+    QUnit.stop();
+    ZeroClipboard.emit("ready");
+  });
+
+  test("Test EventListener object as handler", function(assert) {
+    assert.expect(4);
+
+    // Arrange
+    var client = new ZeroClipboard();
+    var currentEl = document.getElementById("d_clip_button");
+    var id = client.id;
+    client.clip(currentEl);
     var eventListenerObj = {
-      handleEvent: function(client, args) {
+      handleEvent: function(event) {
         // Assert
-        assert.strictEqual(client.id, id);
+        assert.strictEqual(event.type, "ready");
+        assert.strictEqual(event.client, client);
+        assert.strictEqual(event.client.id, id);
         assert.strictEqual(this, eventListenerObj);
         QUnit.start();
       }
     };
-    client.on( 'load', eventListenerObj );
+    client.on( "ready", eventListenerObj );
 
     // Act
     QUnit.stop();
-    ZeroClipboard.dispatch("load");
+    ZeroClipboard.emit("ready");
   });
 
   test("Test mouseover and mouseout event", function(assert) {
@@ -710,14 +742,14 @@
 
     // Act
     QUnit.stop();
-    ZeroClipboard.dispatch("mouseover");
+    ZeroClipboard.emit("mouseover");
 
     setTimeout(function() {
       // Assert
       assert.strictEqual(/(^| )zeroclipboard-is-hover( |$)/.test(currentEl.className), true);
 
       // Act more
-      ZeroClipboard.dispatch("mouseout");
+      ZeroClipboard.emit("mouseout");
       
       setTimeout(function() {
         // Assert more
@@ -738,14 +770,14 @@
 
     // Act
     QUnit.stop();
-    ZeroClipboard.dispatch("mousedown");
+    ZeroClipboard.emit("mousedown");
 
     setTimeout(function() {
       // Assert
       assert.strictEqual(/(^| )zeroclipboard-is-active( |$)/.test(currentEl.className), true);
 
       // Act more
-      ZeroClipboard.dispatch("mouseup");
+      ZeroClipboard.emit("mouseup");
 
       setTimeout(function() {
         // Assert more
@@ -756,7 +788,7 @@
   });
 
   test("Test for appropriate context inside of invoked event handlers", function(assert) {
-    assert.expect(15);
+    assert.expect(16);
 
     // Arrange
     var client = new ZeroClipboard();
@@ -767,46 +799,47 @@
     client.clip(currentEl);
     ZeroClipboard.activate(currentEl);
 
-    client.on( 'load noflash wrongflash deactivatedflash overdueflash', function(client, args) {
+    client.on( 'ready error', function(event) {
       // Assert
-      assert.strictEqual(this, window);
+      assert.strictEqual(this, client);
     } );
-    client.on( 'mousedown mouseover mouseup', function(client, args) {
+    client.on( 'mousedown mouseover mouseup beforecopy', function(event) {
       // Assert
-      assert.strictEqual(this, currentEl);
+      assert.strictEqual(event.target, currentEl);
     } );
-    client.on( 'datarequested', function(client, args) {
+    client.on( 'copy', function(event) {
       // Assert
-      assert.strictEqual(this, currentEl);
+      assert.strictEqual(event.target, currentEl);
       assert.ok(_clipData["text/plain"]);
     } );
-    client.on( 'complete', function(client, args) {
+    client.on( 'aftercopy', function(event) {
       // Assert
-      assert.strictEqual(this, currentEl);
+      assert.strictEqual(event.target, currentEl);
       assert.ok(!_clipData["text/plain"]);
     } );
-    client.on( 'mouseout', function(client, args) {
+    client.on( 'mouseout', function(event) {
       // Assert
-      assert.strictEqual(this, currentEl);
+      assert.strictEqual(event.target, currentEl);
       QUnit.start();
     } );
 
     // Act
     QUnit.stop();
-    ZeroClipboard.dispatch("load");
-    ZeroClipboard.dispatch("noflash");
-    ZeroClipboard.dispatch("wrongflash");
-    ZeroClipboard.dispatch("deactivatedflash");
-    ZeroClipboard.dispatch("overdueflash");
-    ZeroClipboard.dispatch("mouseover");
-    ZeroClipboard.dispatch("mousedown");
-    ZeroClipboard.dispatch("mouseup");
-    ZeroClipboard.dispatch("datarequested");
-    ZeroClipboard.dispatch("complete");
-    ZeroClipboard.dispatch("mouseout");
+    ZeroClipboard.emit("ready");
+    ZeroClipboard.emit({"type":"error", "name":"flash-disabled"});
+    ZeroClipboard.emit({"type":"error", "name":"flash-outdated"});
+    ZeroClipboard.emit({"type":"error", "name":"flash-deactivated"});
+    ZeroClipboard.emit({"type":"error", "name":"flash-overdue"});
+    ZeroClipboard.emit("mouseover");
+    ZeroClipboard.emit("mousedown");
+    ZeroClipboard.emit("mouseup");
+    ZeroClipboard.emit("beforecopy");
+    ZeroClipboard.emit("copy");
+    ZeroClipboard.emit("aftercopy");
+    ZeroClipboard.emit("mouseout");
   });
 
-  test("Test onLoad Event with AMD", function(assert) {
+  test("Test onReady Event with AMD", function(assert) {
     assert.expect(4);
 
     // Arrange
@@ -831,27 +864,27 @@
     ZeroClipboard.activate(currentEl);
     var id = client.id;
 
-    client.on( "load", function(client, args) {
+    client.on( "ready", function(event) {
       // Assert
-      assert.strictEqual(client.id, id);
+      assert.strictEqual(this.id, id);
+      assert.strictEqual(event.type, "ready");
       QUnit.start();
     } );
 
     // Act
     QUnit.stop();
     eval(
-'(function(eventName, args, amdModuleId) {' +
+'(function(event, amdModuleId) {' +
 '  requireFn([amdModuleId], function(zero) {' +
 '    assert.strictEqual(zero, ZeroClipboard);' +
-'    assert.strictEqual(eventName, "load");' +
-'    assert.deepEqual(args, {});' +
-'    zero.dispatch(eventName, args);' +
+'    assert.deepEqual(event, {"type": "ready"});' +
+'    zero.emit(event);' +
 '  });' +
-'})("load", {}, ' + JSON.stringify(_amdModuleId) + ');'
+'})({"type": "ready"}, ' + JSON.stringify(_amdModuleId) + ');'
     );
   });
 
-  test("Test onLoad Event with CommonJS", function(assert) {
+  test("Test onReady Event with CommonJS", function(assert) {
     assert.expect(4);
 
     // Arrange
@@ -873,22 +906,22 @@
     ZeroClipboard.activate(currentEl);
     var id = client.id;
 
-    client.on( "load", function(client, args) {
+    client.on( "ready", function(event) {
       // Assert
-      assert.strictEqual(client.id, id);
+      assert.strictEqual(this.id, id);
+      assert.strictEqual(event.type, "ready");
       QUnit.start();
     } );
 
     // Act
     QUnit.stop();
     eval(
-'(function(eventName, args, cjsModuleId) {' +
+'(function(event, cjsModuleId) {' +
 '  var zero = requireFn(cjsModuleId);' +
 '  assert.strictEqual(zero, ZeroClipboard);' +
-'  assert.strictEqual(eventName, "load");' +
-'  assert.deepEqual(args, {});' +
-'  zero.dispatch(eventName, args);' +
-'})("load", {}, ' + JSON.stringify(_cjsModuleId) + ');'
+'  assert.deepEqual(event, {"type": "ready"});' +
+'  zero.emit(event);' +
+'})({"type": "ready"}, ' + JSON.stringify(_cjsModuleId) + ');'
     );
   });
 

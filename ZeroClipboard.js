@@ -4,7 +4,7 @@
 * Copyright (c) 2014 Jon Rohan, James M. Greene
 * Licensed MIT
 * http://zeroclipboard.org/
-* v2.0.0-alpha.1
+* v2.0.0-alpha.2
 */
 (function(window) {
   "use strict";
@@ -535,7 +535,11 @@
             flashState.deactivated = true;
           }
           if (flashState.deactivated === true) {
-            _receiveEvent.call(_client, "deactivatedflash");
+            ZeroClipboard.emit({
+              type: "error",
+              name: "flash-deactivated",
+              client: _client
+            });
           }
         }, maxWait);
       }
@@ -584,7 +588,7 @@
     }
     return clients;
   };
-  ZeroClipboard.version = "2.0.0-alpha.1";
+  ZeroClipboard.version = "2.0.0-alpha.2";
   var _globalConfig = {
     swfPath: _swfPath,
     trustedDomains: window.location.host ? [ window.location.host ] : [],
@@ -729,6 +733,189 @@
     }
     return this;
   };
+  ZeroClipboard.emit = function(event) {
+    var eventType, eventObj;
+    if (typeof event === "string" && event) {
+      eventType = event;
+    }
+    if (typeof event === "object" && event && typeof event.type === "string" && event.type) {
+      eventType = event.type;
+      eventObj = event;
+    }
+    if (!eventType) {
+      return;
+    }
+    event = _createEvent(eventType, eventObj);
+    _preprocessEvent(event);
+    if (event.type === "ready" && flashState.overdue === true) {
+      return ZeroClipboard.emit({
+        type: "error",
+        name: "flash-overdue"
+      });
+    }
+    var performCallbackAsync = !/^(before)?copy$/.test(event.type);
+    if (event.client) {
+      _dispatchClientCallbacks.call(event.client, event, performCallbackAsync);
+    } else {
+      var clients = event.target && event.target !== window && _globalConfig.autoActivate === true ? _getAllClientsClippedToElement(event.target) : _getAllClients();
+      var i, len, eventCopy;
+      for (i = 0, len = clients.length; i < len; i++) {
+        eventCopy = _extend({}, event, {
+          client: clients[i]
+        });
+        _dispatchClientCallbacks.call(clients[i], eventCopy, performCallbackAsync);
+      }
+    }
+    return event.type === "copy" ? _clipData["text/plain"] : undefined;
+  };
+  var _dispatchClientCallbacks = function(event, async) {
+    var handlers = _clientMeta[this.id] && _clientMeta[this.id].handlers[event.type];
+    if (handlers && handlers.length) {
+      var i, len, func, context, originalContext = this;
+      for (i = 0, len = handlers.length; i < len; i++) {
+        func = handlers[i];
+        context = originalContext;
+        if (typeof func === "string" && typeof window[func] === "function") {
+          func = window[func];
+        }
+        if (typeof func === "object" && func && typeof func.handleEvent === "function") {
+          context = func;
+          func = func.handleEvent;
+        }
+        if (typeof func === "function") {
+          _dispatchCallback(func, context, [ event ], async);
+        }
+      }
+    }
+    return this;
+  };
+  var _eventMessages = {
+    ready: "Flash communication is established",
+    error: {
+      "flash-disabled": "Flash is disabled or not installed",
+      "flash-outdated": "Flash is too outdated to support ZeroClipboard",
+      "flash-deactivated": "Flash is too outdated for your browser and/or is configured as click-to-activate",
+      "flash-overdue": "Flash communication was established but NOT within the acceptable time limit"
+    }
+  };
+  var _createEvent = function(eventType, event) {
+    if (!(eventType || event && event.type)) {
+      return;
+    }
+    event = event || {};
+    eventType = (eventType || event.type).toLowerCase();
+    _extend(event, {
+      type: eventType,
+      target: event.target || currentElement || null,
+      relatedTarget: event.relatedTarget || null,
+      currentTarget: flashState && flashState.bridge || null
+    });
+    var msg = _eventMessages[event.type];
+    if (event.type === "error" && event.name && msg) {
+      msg = msg[event.name];
+    }
+    if (msg) {
+      event.message = msg;
+    }
+    if (event.type === "ready") {
+      _extend(event, {
+        target: null,
+        version: flashState.version
+      });
+    }
+    if (event.type === "error") {
+      event.target = null;
+      if (/^flash-(outdated|deactivated|overdue)$/.test(event.name)) {
+        _extend(event, {
+          version: flashState.version,
+          minimumVersion: "10.0.0"
+        });
+      }
+    }
+    if (event.type === "copy") {
+      event.clipboardData = {
+        setData: function(format, data) {
+          if (typeof format === "string" && format && data != null) {
+            _clipData[format] = data;
+          }
+        },
+        clearData: function(format) {
+          if (_clipData.hasOwnProperty(format)) {
+            delete _clipData[format];
+          }
+        }
+      };
+    }
+    if (event.target && !event.relatedTarget) {
+      event.relatedTarget = _getRelatedTarget(event.target);
+    }
+    return event;
+  };
+  var _getRelatedTarget = function(targetEl) {
+    var relatedTargetId = targetEl && targetEl.getAttribute && targetEl.getAttribute("data-clipboard-target");
+    return relatedTargetId ? document.getElementById(relatedTargetId) : null;
+  };
+  var _preprocessEvent = function(event) {
+    var element = event.target || currentElement;
+    switch (event.type) {
+     case "error":
+      if (_inArray(event.name, [ "flash-disabled", "flash-outdated", "flash-deactivated", "flash-overdue" ])) {
+        _extend(flashState, {
+          disabled: event.name === "flash-disabled",
+          outdated: event.name === "flash-outdated",
+          deactivated: event.name === "flash-deactivated",
+          overdue: event.name === "flash-overdue",
+          ready: false
+        });
+      }
+      break;
+
+     case "ready":
+      var wasDeactivated = flashState.deactivated === true;
+      _extend(flashState, {
+        disabled: false,
+        outdated: false,
+        deactivated: false,
+        overdue: wasDeactivated,
+        ready: !wasDeactivated
+      });
+      break;
+
+     case "copy":
+      var textContent, targetEl = event.relatedTarget;
+      if (targetEl && (textContent = targetEl.value || targetEl.textContent || targetEl.innerText)) {
+        event.clipboardData.setData("text/plain", textContent);
+      } else if (event.target && (textContent = event.target.getAttribute("data-clipboard-text"))) {
+        event.clipboardData.setData("text/plain", textContent);
+      }
+      break;
+
+     case "aftercopy":
+      _deleteOwnProperties(_clipData);
+      if (element && element !== _safeActiveElement() && element.focus) {
+        element.focus();
+      }
+      break;
+
+     case "mouseover":
+      _addClass(element, _globalConfig.hoverClass);
+      break;
+
+     case "mouseout":
+      if (_globalConfig.autoActivate === true) {
+        ZeroClipboard.deactivate();
+      }
+      break;
+
+     case "mousedown":
+      _addClass(element, _globalConfig.activeClass);
+      break;
+
+     case "mouseup":
+      _removeClass(element, _globalConfig.activeClass);
+      break;
+    }
+  };
   ZeroClipboard.prototype.on = function(eventName, func) {
     var i, len, events, added = {}, handlers = _clientMeta[this.id] && _clientMeta[this.id].handlers;
     if (typeof eventName === "string" && eventName) {
@@ -749,20 +936,38 @@
         }
         handlers[eventName].push(func);
       }
-      if (added.noflash && flashState.disabled) {
-        _receiveEvent.call(this, "noflash");
+      if (added.ready && flashState.ready) {
+        ZeroClipboard.emit({
+          type: "ready",
+          client: this
+        });
       }
-      if (added.wrongflash && flashState.outdated) {
-        _receiveEvent.call(this, "wrongflash");
-      }
-      if (added.deactivatedflash && flashState.deactivated) {
-        _receiveEvent.call(this, "deactivatedflash");
-      }
-      if (added.overdueflash && flashState.overdue) {
-        _receiveEvent.call(this, "overdueflash");
-      }
-      if (added.load && flashState.ready) {
-        _receiveEvent.call(this, "load");
+      if (added.error) {
+        if (flashState.disabled) {
+          ZeroClipboard.emit({
+            type: "error",
+            name: "flash-disabled",
+            client: this
+          });
+        } else if (flashState.outdated) {
+          ZeroClipboard.emit({
+            type: "error",
+            name: "flash-outdated",
+            client: this
+          });
+        } else if (flashState.deactivated) {
+          ZeroClipboard.emit({
+            type: "error",
+            name: "flash-deactivated",
+            client: this
+          });
+        } else if (flashState.overdue) {
+          ZeroClipboard.emit({
+            type: "error",
+            name: "flash-overdue",
+            client: this
+          });
+        }
       }
     }
     return this;
@@ -813,27 +1018,6 @@
       }
     }
     return copy;
-  };
-  var _dispatchClientCallbacks = function(eventName, context, args, async) {
-    var handlers = _clientMeta[this.id] && _clientMeta[this.id].handlers[eventName];
-    if (handlers && handlers.length) {
-      var i, len, func, originalContext = context || this;
-      for (i = 0, len = handlers.length; i < len; i++) {
-        func = handlers[i];
-        context = originalContext;
-        if (typeof func === "string" && typeof window[func] === "function") {
-          func = window[func];
-        }
-        if (typeof func === "object" && func && typeof func.handleEvent === "function") {
-          context = func;
-          func = func.handleEvent;
-        }
-        if (typeof func === "function") {
-          _dispatchCallback(func, context, args, async);
-        }
-      }
-    }
-    return this;
   };
   ZeroClipboard.prototype.clip = function(elements) {
     elements = _prepClip(elements);
@@ -911,96 +1095,6 @@
   };
   _globalConfig.hoverClass = "zeroclipboard-is-hover";
   _globalConfig.activeClass = "zeroclipboard-is-active";
-  ZeroClipboard.dispatch = function(eventName, args) {
-    if (typeof eventName === "string" && eventName) {
-      var cleanEventName = eventName.toLowerCase().replace(/^on/, "");
-      if (cleanEventName) {
-        var clients = currentElement && _globalConfig.autoActivate === true ? _getAllClientsClippedToElement(currentElement) : _getAllClients();
-        for (var i = 0, len = clients.length; i < len; i++) {
-          _receiveEvent.call(clients[i], cleanEventName, args);
-        }
-      }
-    }
-  };
-  var _receiveEvent = function(eventName, args) {
-    args = args || {};
-    eventName = eventName.toLowerCase().replace(/^on/, "");
-    var element = currentElement;
-    var context = element;
-    var performCallbackAsync = true;
-    switch (eventName) {
-     case "load":
-      var isOverdue = flashState.deactivated || flashState.overdue || flashState.ready === null || flashState.bridge === null;
-      flashState.deactivated = false;
-      if (isOverdue) {
-        flashState.overdue = true;
-        return _receiveEvent.call(this, "overdueFlash");
-      }
-      flashState.ready = true;
-      context = null;
-      args.flashVersion = flashState.version;
-      break;
-
-     case "noflash":
-      flashState.ready = false;
-      context = null;
-      break;
-
-     case "wrongflash":
-     case "deactivatedflash":
-     case "overdueflash":
-      flashState.ready = false;
-      context = null;
-      args.flashVersion = flashState.version;
-      break;
-
-     case "mouseover":
-      _addClass(element, _globalConfig.hoverClass);
-      break;
-
-     case "mouseout":
-      if (_globalConfig.autoActivate === true) {
-        ZeroClipboard.deactivate();
-      }
-      break;
-
-     case "mousedown":
-      _addClass(element, _globalConfig.activeClass);
-      break;
-
-     case "mouseup":
-      _removeClass(element, _globalConfig.activeClass);
-      break;
-
-     case "datarequested":
-      if (element) {
-        var targetId = element.getAttribute("data-clipboard-target"), targetEl = !targetId ? null : document.getElementById(targetId);
-        if (targetEl) {
-          var textContent = targetEl.value || targetEl.textContent || targetEl.innerText;
-          if (textContent) {
-            this.setText(textContent);
-          }
-        } else {
-          var defaultText = element.getAttribute("data-clipboard-text");
-          if (defaultText) {
-            this.setText(defaultText);
-          }
-        }
-      }
-      performCallbackAsync = false;
-      break;
-
-     case "complete":
-      _deleteOwnProperties(_clipData);
-      if (element && element !== _safeActiveElement() && element.focus) {
-        element.focus();
-      }
-      break;
-    }
-    context = context || window;
-    var eventArgs = [ this, args ];
-    return _dispatchClientCallbacks.call(this, eventName, context, eventArgs, performCallbackAsync);
-  };
   if (typeof define === "function" && define.amd) {
     define([ "require", "exports", "module" ], function(require, exports, module) {
       _amdModuleId = module && module.id || null;

@@ -152,11 +152,11 @@ If you find yourself in this situation (as in [Issue #170](https://github.com/ze
 
 Setting the clipboard text can be done in 4 ways:
 
-1. Add a `dataRequested` event handler in which you call `client.setText` to set the appropriate text. This event is triggered every time ZeroClipboard tries to inject into the clipboard. Example:
+1. Add a `copy` event handler in which you call `event.clipboardData.setData` to set the appropriate text. This event is triggered every time ZeroClipboard tries to inject into the clipboard. Example:
 
    ```js
-   client.on( 'dataRequested', function (client, args) {
-      client.setText( "Copy me!" );
+   client.on( 'copy', function (event) {
+      event.clipboardData.setData( "text/plain", "Copy me!" );
    });
    ```
 
@@ -186,14 +186,14 @@ Setting the clipboard text can be done in 4 ways:
   <button id="my-button" data-clipboard-text="Copy me!">Copy to Clipboard</button>
   ```
 
-4. Set the text via `client.setText` property.  You can call this function at any time; when the page first loads, or later like in a `dataRequested` event handler.  Example:
+4. Set the text via `client.setText` property.  You can call this function at any time; when the page first loads, or later like in a `copy` event handler.  Example:
 
   ```js
   client.setText( "Copy me!" );
   ```
 
   The important caveat of using `client.setText` is that the text it sets is **transient** and _will only be used for a single copy operation_. As such, we do not particularly
-  recommend using `client.setText` other than inside of a `dataRequested` event handler; however, the API will not prevent you from using it in other ways.
+  recommend using `client.setText` other than inside of a `copy` event handler; however, the API will not prevent you from using it in other ways.
 
 
 ### Clipping
@@ -252,245 +252,297 @@ These classes are for a DOM element with an ID: "d_clip_button".  The "zeroclipb
 The clipboard library allows you set a number of different event handlers.  These are all set by calling the `on()` method, as in this example:
 
 ```js
-client.on( 'load', my_load_handler );
+client.on( 'ready', my_ready_handler );
 ```
 
-The first argument is the name of the event, and the second is a reference to your function.  The function may be passed by name (string) or an actual reference to the function object
+The first argument is the name of the event, and the second is a reference to your function.  The function may be passed by name (string) or an actual reference to the function object.
 
-Your custom function will be passed at least one argument -- a reference to the clipboard client object.  However, certain events pass additional arguments, which are described in each section below.  The following subsections describe all the available events you can hook.
+Your custom function will be passed exactly one argument: an `event` object.  The following subsections describe all the available events you can hook into and their data structures.
 
 Event handlers can be removed by calling the `off()` method, which has the same method signature as `on()`:
 
 ```js
-client.off( 'load', my_load_handler );
+client.off( 'ready', my_ready_handler );
 ```
 
 
-#### load
+#### ready
 
-The `load` event is fired when the Flash movie completes loading and is ready for action.  Please note that you don't need to listen for this event to set options -- those are automatically passed to the movie if you call them before it loads.  Example use:
+The `ready` event is fired when the Flash movie completes loading and is ready for action.  Please note that you don't need to listen for this event to set options -- those are automatically passed to the movie if you call them before it loads.  Example use:
 
 ```js
-client.on( 'load', function ( client, args ) {
-  alert( "movie has loaded" );
+client.on( 'ready', function ( event ) {
+  console.log( "movie has loaded" );
 });
 ```
 
-The handler is passed these options to the `args`
+The handler execution context is as follows:
 
 <dl>
 <dt>`this`</dt>
-<dd>The current element that is being provoked, if any; otherwise `window`</dd>
-<dt>flashVersion</dt>
-<dd>This property contains the users' flash version</dd>
+<dd>The ZeroClipboard client instance to which this event handler was attached.</dd>
+<dt>`event`</dt>
+<dd>
+  <dl>
+    <dt>`type`</dt>
+    <dd>`"ready"`</dd>
+    <dt>`message`</dt>
+    <dd>A message explaining this event</dd>
+    <dt>`target`</dt>
+    <dd>`null`</dd>
+    <dt>`currentTarget`</dt>
+    <dd>An object reference to the Flash object</dd>
+    <dt>`relatedTarget`</dt>
+    <dd>`null`</dd>
+    <dt>`version`</dt>
+    <dd>The browser's Flash Player version</dd>
+  </dl>
+</dd>
 </dl>
 
 
-#### mouseover
+#### beforecopy
 
-The `mouseover` event is fired when the user's mouse pointer enters the Flash movie.  You can use this to simulate a rollover effect on your DOM element, however see *CSS Effects* for an easier way to do this.  Example use:
+On `mousedown`, the Flash object will fire off a `beforecopy` event. This event is generally only used for "UI prepartion" if
+you want to alter anything before the `copy` event fires.
 
-```js
-client.on( 'mouseover', function ( client, args ) {
-  alert( "mouse is over movie" );
-});
-```
-
-The handler is passed these options to the `args`
-
-<dl>
-<dt>`this`</dt>
-<dd>The current element that is being provoked, if any; otherwise `window`</dd>
-<dt>altKey</dt>
-<dd>`true` if the Alt key is active</dd>
-<dt>ctrlKey</dt>
-<dd>`true` on Windows and Linux if the Ctrl key is active. `true` on Mac if either the Ctrl key or the Command key is active. Otherwise, `false`.</dd>
-<dt>shiftKey</dt>
-<dd>`true` if the Shift key is active; `false` if it is inactive.</dd>
-</dl>
-
-
-#### mouseout
-
-The `mouseout` event is fired when the user's mouse pointer leaves the Flash movie.  You can use this to simulate a rollover effect on your DOM element, however see *CSS Effects* for an easier way to do this.  Example use:
+**IMPORTANT:** Handlers of this event are expected to operate synchronously if they intend to be finished before the "copy"
+event is triggered.
 
 ```js
-client.on( 'mouseout', function ( client, args ) {
-  alert( "mouse has left movie" );
+client.on( 'beforecopy', function ( event ) {
+  console.log( 'Preparing to inject into your clipboard...' );
 } );
 ```
 
-The handler is passed these options to the `args`
+The handler execution context is as follows:
 
 <dl>
 <dt>`this`</dt>
-<dd>The current element that is being provoked, if any; otherwise `window`</dd>
-<dt>altKey</dt>
-<dd>`true` if the Alt key is active</dd>
-<dt>ctrlKey</dt>
-<dd>`true` on Windows and Linux if the Ctrl key is active. `true` on Mac if either the Ctrl key or the Command key is active. Otherwise, `false`.</dd>
-<dt>shiftKey</dt>
-<dd>`true` if the Shift key is active; `false` if it is inactive.</dd>
+<dd>The ZeroClipboard client instance to which this event handler was attached.</dd>
+<dt>`event`</dt>
+<dd>
+  <dl>
+    <dt>`type`</dt>
+    <dd>`"beforecopy"`</dd>
+    <dt>`target`</dt>
+    <dd>The current element that is being provoked, if any; otherwise `window`</dd>
+    <dt>`currentTarget`</dt>
+    <dd>An object reference to the Flash object</dd>
+    <dt>`relatedTarget`</dt>
+    <dd>An element whose ID is referred to in the `target` element's `data-clipboard-target` attribute, if any; otherwise `null`</dd>
+  </dl>
+</dd>
 </dl>
 
 
-#### mousedown
+#### copy
 
-The `mousedown` event is fired when the user clicks on the Flash movie.  Please note that this does not guarantee that the user will release the mouse button while still over the movie (i.e. resulting in a click).  You can use this to simulate a click effect on your DOM element, however see *CSS Effects* for an easier way to do this.  Example use:
+On `mousedown` (and after the `beforecopy` event), the Flash object will fire off a `copy` event. If the HTML object
+has `data-clipboard-text` or `data-clipboard-target`, then ZeroClipboard will take care of getting an initial set of
+data. It will then invoke any "copy" event handlers, in which you can call `event.clipboardData.setData` to set the
+text, which will complete the loop.
+
+**IMPORTANT:** If a handler of this event intends to modify the pending data for clipboard injection, it _MUST_ operate
+operate synchronously in order to maintain the temporarily elevated permissions granted by the user's `click` event. The
+most common "gotcha" for this restriction is if someone wants to make an asynchronous XMLHttpRequest in response to the
+`copy` event to get the data to inject &mdash; this won't work; make it a *synchronous* XMLHttpRequest instead, or do the
+work in advance before the `copy` event is fired.
 
 ```js
-client.on( 'mousedown', function ( client, args ) {
-  alert( "mouse button is down" );
+client.on( 'copy', function ( event ) {
+  event.clipboardData.setData( 'text/plain', 'Copied to clipboard.' );
 } );
 ```
 
-The handler is passed these options to the `args`
+The handler execution context is as follows:
 
 <dl>
 <dt>`this`</dt>
-<dd>The current element that is being provoked, if any; otherwise `window`</dd>
-<dt>altKey</dt>
-<dd>`true` if the Alt key is active</dd>
-<dt>ctrlKey</dt>
-<dd>`true` on Windows and Linux if the Ctrl key is active. `true` on Mac if either the Ctrl key or the Command key is active. Otherwise, `false`.</dd>
-<dt>shiftKey</dt>
-<dd>`true` if the Shift key is active; `false` if it is inactive.</dd>
+<dd>The ZeroClipboard client instance to which this event handler was attached.</dd>
+<dt>`event`</dt>
+<dd>
+  <dl>
+    <dt>`type`</dt>
+    <dd>`"copy"`</dd>
+    <dt>`target`</dt>
+    <dd>The current element that is being provoked, if any; otherwise `window`</dd>
+    <dt>`currentTarget`</dt>
+    <dd>An object reference to the Flash object</dd>
+    <dt>`relatedTarget`</dt>
+    <dd>An element whose ID is referred to in the `target` element's `data-clipboard-target` attribute, if any; otherwise `null`</dd>
+    <dt>`clipboardData`</dt>
+    <dd>
+      <dl>
+        <dt>`setData( format, data )`</dt>
+        <dd>A method to set `data` of type `format` into the pending data to be placed into the clipboard during injection</dd>
+        <dt>`clearData( format )`</dt>
+        <dd>A method to clear data of type `format` from the pending data. If `format` is omitted, _**all**_ pending data will be cleared for all formats.</dd>
+    </dd>
+  </dl>
+</dd>
 </dl>
 
 
-#### mouseup
+#### aftercopy
 
-The `mouseup` event is fired when the user releases the mouse button (having first pressed the mouse button while hovering over the movie).  Please note that this does not guarantee that the mouse cursor is still over the movie (i.e. resulting in a click).  You can use this to simulate a click effect on your DOM element, however see *CSS Effects* for an easier way to do this.  Example use:
+The `aftercopy` event is fired when the text is copied [or failed to copy] to the clipboard.
+Example use:
 
 ```js
-client.on( 'mouseup', function ( client, args ) {
-  alert( "mouse button is up" );
+client.on( 'aftercopy', function ( event ) {
+  if ( event.success['text/plain'] ) {
+    console.log( 'Copied text to clipboard: ' + event.data['text/plain'] );
+  }
+  else {
+    console.log( 'Failed to copy text to clipboard: ' + event.data['text/plain'] );
+  }
 } );
 ```
 
-The handler is passed these options to the `args`
+The handler execution context is as follows:
 
 <dl>
 <dt>`this`</dt>
-<dd>The current element that is being provoked, if any; otherwise `window`</dd>
-<dt>altKey</dt>
-<dd>`true` if the Alt key is active</dd>
-<dt>ctrlKey</dt>
-<dd>`true` on Windows and Linux if the Ctrl key is active. `true` on Mac if either the Ctrl key or the Command key is active. Otherwise, `false`.</dd>
-<dt>shiftKey</dt>
-<dd>`true` if the Shift key is active; `false` if it is inactive.</dd>
+<dd>The ZeroClipboard client instance to which this event handler was attached.</dd>
+<dt>`event`</dt>
+<dd>
+  <dl>
+    <dt>`type`</dt>
+    <dd>`"aftercopy"`</dd>
+    <dt>`target`</dt>
+    <dd>The current element that is being provoked, if any; otherwise `window`</dd>
+    <dt>`currentTarget`</dt>
+    <dd>An object reference to the Flash object</dd>
+    <dt>`relatedTarget`</dt>
+    <dd>An element whose ID is referred to in the `target` element's `data-clipboard-target` attribute, if any; otherwise `null`</dd>
+    <dt>`success`</dt>
+    <dd>An object with properties for each clipboard format that was attempted for injection. Property values are `true` or `false` depending on the results of the injection attempt.</dd>
+    <dt>`data`</dt>
+    <dd>An object with properties for each clipboard format that was attempted for injection. Property values are the data ZeroClipboard attempted to inject.</dd>
+  </dl>
+</dd>
 </dl>
 
 
-#### dataRequested
+#### error
 
-On mousedown, the Flash object will check and see if the clipboard text has been set. If it hasn't, then it will fire off a `dataRequested` event. If the html object has `data-clipboard-text` or `data-clipboard-target` then ZeroClipboard will take care of getting the data. However if it hasn't been set, then it will be up to you to `client.setText` from that method. Which will complete the loop.
+The `error` event is fired under a number of conditions, which will be detailed as sub-sections below.
+
+Some consumers may not consider all `error` types to be critical, and thus ZeroClipboard does not take it upon
+itself to implode by calling `ZeroClipboard.destroy()` under error conditions.  However, many consumers may
+want to do just that.
+
+Example usage:
 
 ```js
-client.on( 'dataRequested', function ( client, args ) {
-  client.setText( 'Copied to clipboard.' );
+client.on( 'error', function ( event ) {
+  console.log( 'ZeroClipboard error of type "' + event.name + '" occurred: ' + event.message );
 } );
 ```
 
-The handler is passed these options to the `args`
+
+##### error[name = "flash-disabled"]
+
+This type of `error` event fires when Flash Player is either not installed or not enabled in the browser.
+
+The handler execution context is as follows:
 
 <dl>
 <dt>`this`</dt>
-<dd>The current element that is being provoked, if any; otherwise `window`</dd>
+<dd>The ZeroClipboard client instance to which this event handler was attached.</dd>
+<dt>`event`</dt>
+<dd>
+  <dl>
+    <dt>`type`</dt>
+    <dd>`"error"`</dd>
+    <dt>`name`</dt>
+    <dd>`"flash-disabled"`</dd>
+    <dt>`message`</dt>
+    <dd>A message explaining this event</dd>
+    <dt>`target`</dt>
+    <dd>`null`</dd>
+    <dt>`currentTarget`</dt>
+    <dd>An object reference to the Flash object HTML element, or `null`</dd>
+    <dt>`relatedTarget`</dt>
+    <dd>`null`</dd>
+  </dl>
+</dd>
 </dl>
 
 
-#### complete
+##### error[name = "flash-outdated"]
 
-The `complete` event is fired when the text is successfully copied to the clipboard.  Example use:
+This type of `error` event fires when Flash Player is installed in the browser but the version is too old for ZeroClipboard.
+ZeroClipboard requires Flash Player 10.0.0 or above.
 
-```js
-client.on( 'complete', function ( client, args ) {
-  alert("Copied text to clipboard: " + args.text );
-} );
-```
-
-The handler is passed these options to the `args`
+The handler execution context is as follows:
 
 <dl>
 <dt>`this`</dt>
-<dd>The current element that is being provoked, if any; otherwise `window`</dd>
-<dt>altKey</dt>
-<dd>`true` if the Alt key is active</dd>
-<dt>ctrlKey</dt>
-<dd>`true` on Windows and Linux if the Ctrl key is active. `true` on Mac if either the Ctrl key or the Command key is active. Otherwise, `false`.</dd>
-<dt>shiftKey</dt>
-<dd>`true` if the Shift key is active; `false` if it is inactive.</dd>
-<dt>text</dt>
-<dd>The copied text.</dd>
+<dd>The ZeroClipboard client instance to which this event handler was attached.</dd>
+<dt>`event`</dt>
+<dd>
+  <dl>
+    <dt>`type`</dt>
+    <dd>`"error"`</dd>
+    <dt>`name`</dt>
+    <dd>`"flash-outdated"`</dd>
+    <dt>`message`</dt>
+    <dd>A message explaining this event</dd>
+    <dt>`target`</dt>
+    <dd>`null`</dd>
+    <dt>`currentTarget`</dt>
+    <dd>An object reference to the Flash object HTML element, or `null`</dd>
+    <dt>`relatedTarget`</dt>
+    <dd>`null`</dd>
+    <dt>`version`</dt>
+    <dd>The browser's Flash Player version number as a string</dd>
+    <dt>`minimumVersion`</dt>
+    <dd>The minimum required version of Flash Player for ZeroClipboard, i.e. `"10.0.0"`</dd>
+  </dl>
+</dd>
 </dl>
 
 
-#### noflash
+##### error[name = "flash-deactivated"]
 
-The `noflash` event is fired when the user doesn't have flash installed on their system
-
-```js
-client.on( 'noflash', function ( client, args ) {
-  alert("You don't support flash");
-} );
-```
-
-The handler is passed these options to the `args`
-
-<dl>
-<dt>`this`</dt>
-<dd>`window`</dd>
-<dt>flashVersion</dt>
-<dd>This property contains the users' flash version</dd>
-</dl>
-
-
-#### wrongflash
-
-The `wrongflash` event is fired when the user has the wrong version of flash. ZeroClipboard supports version 10 and up.
-
-```js
-client.on( 'wrongflash', function ( client, args ) {
-  alert("Your flash is too old " + args.flashVersion);
-} );
-```
-
-The handler is passed these options to the `args`
-
-<dl>
-<dt>`this`</dt>
-<dd>`window`</dd>
-<dt>flashVersion</dt>
-<dd>This property contains the users' flash version</dd>
-</dl>
-
-
-#### deactivatedflash
-
-The `deactivatedflash` event is fired when the user's installation of Flash is either too old for the browser (but
-not too old for ZeroClipboard) or if Flash objects are configured as click-to-play and the user does not authorize
+This type of `error` event fires when when the browser's installation of Flash Player is either too old for the browser [but
+_not_ too old for ZeroClipboard] or if Flash objects are configured as click-to-play and the user does not authorize
 it within `_globalConfig.flashLoadTimeout` milliseconds or does not authorize it at all.
 
-```js
-client.on( 'deactivatedflash', function ( client, args ) {
-  alert("Your flash is deactivated. It may be too old for your browser or configured as click-to-play. Version: " + args.flashVersion);
-} );
-```
-
-The handler is passed these options to the `args`
+The handler execution context is as follows:
 
 <dl>
 <dt>`this`</dt>
-<dd>`window`</dd>
-<dt>flashVersion</dt>
-<dd>This property contains the users' flash version</dd>
+<dd>The ZeroClipboard client instance to which this event handler was attached.</dd>
+<dt>`event`</dt>
+<dd>
+  <dl>
+    <dt>`type`</dt>
+    <dd>`"error"`</dd>
+    <dt>`name`</dt>
+    <dd>`"flash-deactivated"`</dd>
+    <dt>`message`</dt>
+    <dd>A message explaining this event</dd>
+    <dt>`target`</dt>
+    <dd>`null`</dd>
+    <dt>`currentTarget`</dt>
+    <dd>An object reference to the Flash object HTML element, or `null`</dd>
+    <dt>`relatedTarget`</dt>
+    <dd>`null`</dd>
+    <dt>`version`</dt>
+    <dd>The browser's Flash Player version number as a string</dd>
+    <dt>`minimumVersion`</dt>
+    <dd>The minimum required version of Flash Player for ZeroClipboard, i.e. `"10.0.0"`</dd>
+  </dl>
+</dd>
 </dl>
 
 
-#### overdueflash
+##### error[name = "flash-overdue"]
 
-The `overdueflash` event is fired when the SWF loads successfully but takes longer than
+This type of `error` event fires when the SWF loads successfully but takes longer than
 `_globalConfig.flashLoadTimeout` milliseconds to do so. This would likely be caused by
 one of the following situations:
  1. Too short of a `_globalConfig.flashLoadTimeout` duration configured
@@ -509,19 +561,180 @@ This may be especially important for SPA or PJAX-based applications to consider 
 may remain on a single page for an extended period of time during which they _possibly_ could
 have enjoyed an improved experience if ZeroClipboard had been "restarted" after an initial hiccup.
 
-```js
-client.on( 'overdueflash', function ( client, args ) {
-  alert("Your flash loaded too slowly. Version: " + args.flashVersion);
-} );
-```
-
-The handler is passed these options to the `args`
+The handler execution context is as follows:
 
 <dl>
 <dt>`this`</dt>
-<dd>`window`</dd>
-<dt>flashVersion</dt>
-<dd>This property contains the users' flash version</dd>
+<dd>The ZeroClipboard client instance to which this event handler was attached.</dd>
+<dt>`event`</dt>
+<dd>
+  <dl>
+    <dt>`type`</dt>
+    <dd>`"error"`</dd>
+    <dt>`name`</dt>
+    <dd>`"flash-overdue"`</dd>
+    <dt>`message`</dt>
+    <dd>A message explaining this event</dd>
+    <dt>`target`</dt>
+    <dd>`null`</dd>
+    <dt>`currentTarget`</dt>
+    <dd>An object reference to the Flash object</dd>
+    <dt>`relatedTarget`</dt>
+    <dd>`null`</dd>
+    <dt>`version`</dt>
+    <dd>The browser's Flash Player version number as a string</dd>
+    <dt>`minimumVersion`</dt>
+    <dd>The minimum required version of Flash Player for ZeroClipboard, i.e. `"10.0.0"`</dd>
+  </dl>
+</dd>
+</dl>
+
+
+#### mouseover
+
+_**DEPRECATED**_. The `mouseover` event is fired when the user's mouse pointer enters the Flash movie.  You can use this to simulate a rollover effect on your DOM element, however see *CSS Effects* for an easier way to do this.  Example use:
+
+```js
+client.on( 'mouseover', function ( event ) {
+  console.log( "mouse is over movie" );
+});
+```
+
+The handler execution context is as follows:
+
+<dl>
+<dt>`this`</dt>
+<dd>The ZeroClipboard client instance to which this event handler was attached.</dd>
+<dt>`event`</dt>
+<dd>
+  <dl>
+    <dt>`type`</dt>
+    <dd>`"mouseover"`</dd>
+    <dt>`target`</dt>
+    <dd>The current element that is being provoked, if any; otherwise `window`</dd>
+    <dt>`currentTarget`</dt>
+    <dd>An object reference to the Flash object</dd>
+    <dt>`relatedTarget`</dt>
+    <dd>An element whose ID is referred to in the `target` element's `data-clipboard-target` attribute, if any; otherwise `null`</dd>
+    <dt>`altKey`</dt>
+    <dd>`true` if the Alt key is active</dd>
+    <dt>`ctrlKey`</dt>
+    <dd>`true` on Windows and Linux if the Ctrl key is active. `true` on Mac if either the Ctrl key or the Command key is active. Otherwise, `false`.</dd>
+    <dt>`shiftKey`</dt>
+    <dd>`true` if the Shift key is active; `false` if it is inactive.</dd>
+  </dl>
+</dd>
+</dl>
+
+
+#### mouseout
+
+_**DEPRECATED**_. The `mouseout` event is fired when the user's mouse pointer leaves the Flash movie.  You can use this to simulate a rollover effect on your DOM element, however see *CSS Effects* for an easier way to do this.  Example use:
+
+```js
+client.on( 'mouseout', function ( event ) {
+  console.log( "mouse has left movie" );
+} );
+```
+
+The handler execution context is as follows:
+
+<dl>
+<dt>`this`</dt>
+<dd>The ZeroClipboard client instance to which this event handler was attached.</dd>
+<dt>`event`</dt>
+<dd>
+  <dl>
+    <dt>`type`</dt>
+    <dd>`"mouseover"`</dd>
+    <dt>`target`</dt>
+    <dd>The current element that is being provoked, if any; otherwise `window`</dd>
+    <dt>`currentTarget`</dt>
+    <dd>An object reference to the Flash object</dd>
+    <dt>`relatedTarget`</dt>
+    <dd>An element whose ID is referred to in the `target` element's `data-clipboard-target` attribute, if any; otherwise `null`</dd>
+    <dt>`altKey`</dt>
+    <dd>`true` if the Alt key is active</dd>
+    <dt>`ctrlKey`</dt>
+    <dd>`true` on Windows and Linux if the Ctrl key is active. `true` on Mac if either the Ctrl key or the Command key is active. Otherwise, `false`.</dd>
+    <dt>`shiftKey`</dt>
+    <dd>`true` if the Shift key is active; `false` if it is inactive.</dd>
+  </dl>
+</dd>
+</dl>
+
+
+#### mousedown
+
+_**DEPRECATED**_. The `mousedown` event is fired when the user clicks on the Flash movie.  Please note that this does not guarantee that the user will release the mouse button while still over the movie (i.e. resulting in a click).  You can use this to simulate a click effect on your DOM element, however see *CSS Effects* for an easier way to do this.  Example use:
+
+```js
+client.on( 'mousedown', function ( event ) {
+  console.log( "mouse button is down" );
+} );
+```
+
+The handler execution context is as follows:
+
+<dl>
+<dt>`this`</dt>
+<dd>The ZeroClipboard client instance to which this event handler was attached.</dd>
+<dt>`event`</dt>
+<dd>
+  <dl>
+    <dt>`type`</dt>
+    <dd>`"mouseover"`</dd>
+    <dt>`target`</dt>
+    <dd>The current element that is being provoked, if any; otherwise `window`</dd>
+    <dt>`currentTarget`</dt>
+    <dd>An object reference to the Flash object</dd>
+    <dt>`relatedTarget`</dt>
+    <dd>An element whose ID is referred to in the `target` element's `data-clipboard-target` attribute, if any; otherwise `null`</dd>
+    <dt>`altKey`</dt>
+    <dd>`true` if the Alt key is active</dd>
+    <dt>`ctrlKey`</dt>
+    <dd>`true` on Windows and Linux if the Ctrl key is active. `true` on Mac if either the Ctrl key or the Command key is active. Otherwise, `false`.</dd>
+    <dt>`shiftKey`</dt>
+    <dd>`true` if the Shift key is active; `false` if it is inactive.</dd>
+  </dl>
+</dd>
+</dl>
+
+
+#### mouseup
+
+_**DEPRECATED**_. The `mouseup` event is fired when the user releases the mouse button (having first pressed the mouse button while hovering over the movie).  Please note that this does not guarantee that the mouse cursor is still over the movie (i.e. resulting in a click).  You can use this to simulate a click effect on your DOM element, however see *CSS Effects* for an easier way to do this.  Example use:
+
+```js
+client.on( 'mouseup', function ( event ) {
+  console.log( "mouse button is up" );
+} );
+```
+
+The handler execution context is as follows:
+
+<dl>
+<dt>`this`</dt>
+<dd>The ZeroClipboard client instance to which this event handler was attached.</dd>
+<dt>`event`</dt>
+<dd>
+  <dl>
+    <dt>`type`</dt>
+    <dd>`"mouseover"`</dd>
+    <dt>`target`</dt>
+    <dd>The current element that is being provoked, if any; otherwise `window`</dd>
+    <dt>`currentTarget`</dt>
+    <dd>An object reference to the Flash object</dd>
+    <dt>`relatedTarget`</dt>
+    <dd>An element whose ID is referred to in the `target` element's `data-clipboard-target` attribute, if any; otherwise `null`</dd>
+    <dt>`altKey`</dt>
+    <dd>`true` if the Alt key is active</dd>
+    <dt>`ctrlKey`</dt>
+    <dd>`true` on Windows and Linux if the Ctrl key is active. `true` on Mac if either the Ctrl key or the Command key is active. Otherwise, `false`.</dd>
+    <dt>`shiftKey`</dt>
+    <dd>`true` if the Shift key is active; `false` if it is inactive.</dd>
+  </dl>
+</dd>
 </dl>
 
 
@@ -535,7 +748,7 @@ The following are complete, working examples of using the clipboard client libra
 Here is a quick example using as few calls as possible:
 
 ```html
-  <html>
+<html>
   <body>
 
     <div id="d_clip_button" data-clipboard-text="Copy Me!" title="Click to copy." style="border:1px solid black; padding:20px;">Copy To Clipboard</div>
@@ -545,7 +758,7 @@ Here is a quick example using as few calls as possible:
       var client = new ZeroClipboard( document.getElementById('d_clip_button') );
     </script>
   </body>
-  </html>
+</html>
 ```
 
 When clicked, the text "Copy me!" will be copied to the clipboard.
@@ -580,19 +793,20 @@ Here is a more complete example which exercises many of the configuration option
     <script type="text/javascript">
       var client = new ZeroClipboard( $('.clip_button') );
 
-      client.on( 'load', function(client) {
-        // alert( "movie is loaded" );
+      client.on( 'ready', function(event) {
+        // console.log( 'movie is loaded' );
 
-        client.on( 'datarequested', function(client) {
-          client.setText(this.innerHTML);
+        client.on( 'copy', function(event) {
+          event.clipboardData.setData('text/plain', event.target.innerHTML);
         } );
 
-        client.on( 'complete', function(client, args) {
-          alert("Copied text to clipboard: " + args.text );
+        client.on( 'aftercopy', function(event) {
+          console.log('Copied text to clipboard: ' + event.data['text/plain']);
         } );
       } );
 
-      client.on( 'wrongflash noflash', function() {
+      client.on( 'error', function(event) {
+        // console.log( 'ZeroClipboard error of type "' + event.name + '": ' + event.message );
         ZeroClipboard.destroy();
       } );
     </script>
@@ -675,13 +889,13 @@ decisions of how _your_ site should handle each of these situations.
      - If you want to ensure that your Windows users will be able to paste their copied text into Windows
        Notepad and have it honor line breaks, you'll need to ensure that the text uses the sequence `\r\n` instead of
        just `\n` for line breaks.  If the text to copy is based on user input (e.g. a `textarea`), then you can achieve
-       this transformation by utilizing the `dataRequested` event handler, e.g.  
+       this transformation by utilizing the `copy` event handler, e.g.  
 
       ```js
-      client.on('dataRequested', function(client, args) {
+      client.on('copy', function(event) {
           var text = document.getElementById('yourTextArea').value;
           var windowsText = text.replace(/\n/g, '\r\n');
-          client.setText(windowsText);
+          event.clipboardData.setData('text/plain', windowsText);
       });
       ```
 
@@ -700,9 +914,6 @@ The current list of deprecations includes:
      - As of [v2.0.0] (but no sooner), you will be able to use normal `:hover` CSS pseudo-class selectors instead!
  - The `activeClass` config option &rarr; as of [v1.3.0], removing in [v2.0.0]
      - As of [v2.0.0] (but no sooner), you will be able to use normal `:active` CSS pseudo-class selectors instead!
- - `ZeroClipboard.dispatch` &rarr; as of [v1.3.0], removing in [v2.0.0]
-     - Use `ZeroClipboard.emit` instead!
- - All v1.x event names &rarr; as of [v1.3.0], removing in [v2.0.0]
-     - Use the [v2.x event names](https://gist.github.com/JamesMGreene/7886534#events) instead!
- - The v1.x event model &rarr; as of [v1.3.0], removing in [v2.0.0]
-     - Use the [v2.x event model (based on the DOM event model)](https://gist.github.com/JamesMGreene/7886534#event-handler-format) instead!
+ - Adding `mouseover`/`mouseout`/`mousedown`/`mouseup` handlers via ZeroClipboard &rarr; as of [v1.3.0], removing in [v2.0.0]
+     - As of [v2.0.0] (but no sooner), you will be able to use normal event listener attaching functionality for
+       these type of non-semantic, elemental events. For example, with jQuery: `$(zcClient.elements()).on("mousedown", fn)`

@@ -10,7 +10,7 @@ The ZeroClipboard library provides an easy way to copy text to the clipboard usi
 
 ## Simple Example
 
-``` html
+```html
 <html>
   <body>
     <button id="copy-button" data-clipboard-text="Copy Me!" title="Click to copy me.">Copy to Clipboard</button>
@@ -20,17 +20,18 @@ The ZeroClipboard library provides an easy way to copy text to the clipboard usi
 </html>
 ```
 
-``` js
+```js
 // main.js
 var client = new ZeroClipboard( document.getElementById("copy-button") );
 
-client.on( "load", function(client) {
-  // alert( "movie is loaded" );
+client.on( "ready", function( readyEvent ) {
+  // alert( "ZeroClipboard SWF is ready!" );
 
-  client.on( "complete", function(client, args) {
-    // `this` is the element that was clicked
-    this.style.display = "none";
-    alert("Copied text to clipboard: " + args.text );
+  client.on( "aftercopy", function( event ) {
+    // `this` === `client`
+    // `event.target` === the element that was clicked
+    event.target.style.display = "none";
+    alert("Copied text to clipboard: " + event.data["text/plain"] );
   } );
 } );
 ```
@@ -47,7 +48,11 @@ To test the page [demo page](http://zeroclipboard.org/#demo) locally, clone the 
 
 ## Support
 
-This library is fully compatible with Flash Player 10, which requires that the clipboard copy operation be initiated by a user click event inside the Flash movie. This is achieved by automatically floating the invisible movie on top of a [DOM](http://en.wikipedia.org/wiki/Document_Object_Model) element of your choice. Standard mouse events are even propagated out to your DOM element, so you can still have rollover and mouse down effects.
+This library is fully compatible with Flash Player 10.0.0 and above, which requires that the clipboard copy
+operation be initiated by a user click event inside the Flash movie. This is achieved by
+automatically floating the invisible movie on top of a [DOM](http://en.wikipedia.org/wiki/Document_Object_Model)
+element of your choice. Standard mouse events are even propagated out to your DOM element, so you
+can still have rollover and mousedown effects.
 
 Works in IE7+ and all of the evergreen browsers.
 

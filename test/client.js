@@ -101,7 +101,7 @@
   });
 
   test("Object has data-clipboard-text", function(assert) {
-    assert.expect(1);
+    assert.expect(2);
 
     // Arrange
     var client = new ZeroClipboard();
@@ -110,17 +110,18 @@
     // Act
     client.clip(currentEl);
     ZeroClipboard.activate(currentEl);
-    ZeroClipboard.dispatch("datarequested");
+    var pendingText = ZeroClipboard.emit("copy");
 
     // Assert
     assert.strictEqual(_clipData["text/plain"], "Copy me!");
+    assert.deepEqual(pendingText, _clipData["text/plain"]);
 
     // Revert
     ZeroClipboard.deactivate();
   });
 
   test("Object has data-clipboard-target textarea", function(assert) {
-    assert.expect(1);
+    assert.expect(2);
 
     // Arrange
     var client = new ZeroClipboard();
@@ -129,7 +130,7 @@
     // Act
     client.clip(currentEl);
     ZeroClipboard.activate(currentEl);
-    ZeroClipboard.dispatch("datarequested");
+    var pendingText = ZeroClipboard.emit("copy");
 
     // Assert
     assert.strictEqual(_clipData["text/plain"].replace(/\r\n/g, '\n'),
@@ -140,13 +141,14 @@
       "cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\n"+
       "proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
     );
+    assert.deepEqual(pendingText, _clipData["text/plain"]);
 
     // Revert
     ZeroClipboard.deactivate();
   });
 
   test("Object has data-clipboard-target pre", function(assert) {
-    assert.expect(1);
+    assert.expect(2);
 
     // Arrange
     var client = new ZeroClipboard();
@@ -155,7 +157,7 @@
     // Act
     client.clip(currentEl);
     ZeroClipboard.activate(currentEl);
-    ZeroClipboard.dispatch("datarequested");
+    var pendingText = ZeroClipboard.emit("copy");
 
     // Assert
     assert.strictEqual(_clipData["text/plain"].replace(/\r\n/g, '\n'),
@@ -166,13 +168,14 @@
       "cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\n"+
       "proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
     );
+    assert.deepEqual(pendingText, _clipData["text/plain"]);
 
     // Revert
     ZeroClipboard.deactivate();
   });
 
   test("Object has data-clipboard-target input", function(assert) {
-    assert.expect(1);
+    assert.expect(2);
 
     // Arrange
     var client = new ZeroClipboard();
@@ -181,10 +184,11 @@
     // Act
     client.clip(currentEl);
     ZeroClipboard.activate(currentEl);
-    ZeroClipboard.dispatch("datarequested");
+    var pendingText = ZeroClipboard.emit("copy");
 
     // Assert
     assert.strictEqual(_clipData["text/plain"], "Clipboard Text");
+    assert.deepEqual(pendingText, _clipData["text/plain"]);
 
     // Revert
     ZeroClipboard.deactivate();
@@ -311,7 +315,7 @@
     }
   });
 
-  test("Bridge is ready after dispatching `load`", function(assert) {
+  test("Bridge is ready after emitting `ready`", function(assert) {
     assert.expect(2);
 
     // Arrange
@@ -322,8 +326,8 @@
 
     // Assert, act, assert
     assert.strictEqual(flashState.ready, false);
-    // `dispatch`-ing event handlers are async but the internal `ready` state is set synchronously
-    ZeroClipboard.dispatch("load");
+    // `emit`-ing event handlers are async (generally) but the internal `ready` state is set synchronously
+    ZeroClipboard.emit("ready");
     assert.strictEqual(flashState.ready, true);
   });
 
