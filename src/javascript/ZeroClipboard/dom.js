@@ -69,13 +69,14 @@ var _bridge = function () {
     document.body.appendChild(container);
     container.innerHTML = html;
   }
-  
+
   flashBridge = document["global-zeroclipboard-flash-bridge"];
   if (flashBridge && (len = flashBridge.length)) {
     flashBridge = flashBridge[len - 1];
   }
   flashState.bridge = flashBridge || container.children[0].lastElementChild;
 };
+
 
 /*
  * Get the HTML element container that wraps the Flash bridge object/element.
@@ -112,8 +113,11 @@ var _reposition = function () {
       htmlBridge.style.zIndex = pos.zIndex + 1;
     }
 
-    if (flashState.ready === true && flashState.bridge) {
+    if (flashState.ready === true && flashState.bridge && typeof flashState.bridge.setSize === "function") {
       flashState.bridge.setSize(pos.width, pos.height);
+    }
+    else {
+      flashState.ready = false;
     }
   }
 

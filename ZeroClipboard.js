@@ -506,22 +506,28 @@
   ZeroClipboard.prototype.setText = function(newText) {
     if (newText && newText !== "") {
       _clipData["text/plain"] = newText;
-      if (flashState.ready === true && flashState.bridge) {
+      if (flashState.ready === true && flashState.bridge && typeof flashState.bridge.setText === "function") {
         flashState.bridge.setText(newText);
-      } else {}
+      } else {
+        flashState.ready = false;
+      }
     }
     return this;
   };
   ZeroClipboard.prototype.setSize = function(width, height) {
-    if (flashState.ready === true && flashState.bridge) {
+    if (flashState.ready === true && flashState.bridge && typeof flashState.bridge.setSize === "function") {
       flashState.bridge.setSize(width, height);
-    } else {}
+    } else {
+      flashState.ready = false;
+    }
     return this;
   };
   var _setHandCursor = function(enabled) {
-    if (flashState.ready === true && flashState.bridge) {
+    if (flashState.ready === true && flashState.bridge && typeof flashState.bridge.setHandCursor === "function") {
       flashState.bridge.setHandCursor(enabled);
-    } else {}
+    } else {
+      flashState.ready = false;
+    }
   };
   ZeroClipboard.prototype.destroy = function() {
     this.unclip();
@@ -670,8 +676,10 @@
         htmlBridge.style.height = pos.height + "px";
         htmlBridge.style.zIndex = pos.zIndex + 1;
       }
-      if (flashState.ready === true && flashState.bridge) {
+      if (flashState.ready === true && flashState.bridge && typeof flashState.bridge.setSize === "function") {
         flashState.bridge.setSize(pos.width, pos.height);
+      } else {
+        flashState.ready = false;
       }
     }
     return this;
