@@ -670,21 +670,23 @@ window.require = curl;
  - **Workaround:** _Targeted against [Bootstrap v3.x](https://github.com/twbs/bootstrap/blob/96a9e1bae06cb21f8cf72ec528b8e31b6ab27272/js/modal.js#L115-123)._
 
 ```js
-(function($) {
-  var proto = $.fn.modal.Constructor.prototype;
-  proto.enforceFocus = function () {
-    $(document)
-      .off('focusin.bs.modal') // guard against infinite focus loop
-      .on('focusin.bs.modal', $.proxy(function (e) {
-        if (this.$element[0] !== e.target &&
-           !this.$element.has(e.target).length &&
-           /* Adding this final condition check is the only real change */
-           !$(e.target).closest('.global-zeroclipboard-container').length) {
-          this.$element.focus()
-        }
-      }, this))
-  };
-})(window.jQuery);
+if (/MSIE|Trident/.test(window.navigator.userAgent)) {
+  (function($) {
+    var proto = $.fn.modal.Constructor.prototype;
+    proto.enforceFocus = function () {
+      $(document)
+        .off('focusin.bs.modal') // guard against infinite focus loop
+        .on('focusin.bs.modal', $.proxy(function (e) {
+          if (this.$element[0] !== e.target &&
+             !this.$element.has(e.target).length &&
+             /* Adding this final condition check is the only real change */
+             !$(e.target).closest('.global-zeroclipboard-container').length) {
+            this.$element.focus()
+          }
+        }, this))
+    };
+  })(window.jQuery);
+}
 ```
 
 ### [IE freezes when clicking a ZeroClipboard clipped element within a jQuery UI [Modal] Dialog](https://github.com/zeroclipboard/zeroclipboard/issues/159).
@@ -694,13 +696,15 @@ window.require = curl;
  - **Workaround:** _Targeted against [jQuery UI v1.10.x](https://github.com/jquery/jquery-ui/blob/457b275880b63b05b16b7c9ee6c22f29f682ebc8/ui/jquery.ui.dialog.js#L695-703)._
 
 ```js
-(function($) {
-  $.widget( "ui.dialog", $.ui.dialog, {
-    _allowInteraction: function( event ) {
-      return this._super(event) || $( event.target ).closest( ".global-zeroclipboard-container" ).length;
-    }
-  } );
-})(window.jQuery);
+if (/MSIE|Trident/.test(window.navigator.userAgent)) {
+  (function($) {
+    $.widget( "ui.dialog", $.ui.dialog, {
+      _allowInteraction: function( event ) {
+        return this._super(event) || $( event.target ).closest( ".global-zeroclipboard-container" ).length;
+      }
+    } );
+  })(window.jQuery);
+}
 ```
 
 
