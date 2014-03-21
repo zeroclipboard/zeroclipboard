@@ -740,7 +740,7 @@ decisions of how _your_ site should handle each of these situations.
 By default, ZeroClipboard will issue deprecation warnings to the developer `console`. To disable this, set the
 following option:  
 ```js
-ZeroClipboard.config({ debug: false });`
+ZeroClipboard.config({ debug: false });
 ```
 
 The current list of deprecations includes:  
