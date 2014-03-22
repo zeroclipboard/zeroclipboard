@@ -12,8 +12,7 @@ var _globalConfig = {
   trustedDomains: window.location.host ? [window.location.host] : [],
 
   // Include a "nocache" query parameter on requests for the SWF
-  // default to true for IE and false for everyone else
-  cacheBust: /MSIE/.test(navigator.userAgent) || /Trident\/[\d](?=[^\?]+).*rv:([0-9.].)/.test(navigator.userAgent) ? true : false,
+  cacheBust: true,
 
   // Forcibly set the hand cursor ("pointer") for all clipped elements
   forceHandCursor: false,
