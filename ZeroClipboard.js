@@ -955,11 +955,6 @@
       }
     }
   };
-  ZeroClipboard.prototype.setCurrent = function(element) {
-    _deprecationWarning("ZeroClipboard.prototype.setCurrent", _globalConfig.debug);
-    ZeroClipboard.activate(element);
-    return this;
-  };
   ZeroClipboard.prototype.resetBridge = function() {
     _deprecationWarning("ZeroClipboard.prototype.resetBridge", _globalConfig.debug);
     ZeroClipboard.deactivate();

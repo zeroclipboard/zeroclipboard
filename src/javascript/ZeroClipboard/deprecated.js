@@ -113,22 +113,6 @@ ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
 /*
  * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for alternatives.
  *
- * Sets the current HTML object that the Flash object should overlay. This will put the global Flash object on top of
- * the current element; depending on the setup, this may also set the pending clipboard text data as well as the Flash
- * object's wrapping element's title attribute based on the underlying HTML element and ZeroClipboard configuration.
- *
- * returns object instance
- */
-ZeroClipboard.prototype.setCurrent = function (element) {
-  _deprecationWarning("ZeroClipboard.prototype.setCurrent", _globalConfig.debug);
-  ZeroClipboard.activate(element);
-  return this;
-};
-
-
-/*
- * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for alternatives.
- *
  * Reset the html bridge to be hidden off screen and not have title or text.
  *
  * returns object instance
