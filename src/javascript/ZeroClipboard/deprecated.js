@@ -111,20 +111,6 @@ ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
 
 
 /*
- * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for more info.
- *
- * Helper function to determine if the Flash bridge is ready. Gets this info from
- * a per-bridge status tracker.
- *
- * returns true if the Flash bridge is ready
- */
-ZeroClipboard.prototype.ready = function () {
-  _deprecationWarning("ZeroClipboard.prototype.ready", _globalConfig.debug);
-  return flashState.ready === true;
-};
-
-
-/*
  * @deprecated in [v1.3.0], slated for removal in [v2.0.0].
  * @private
  *

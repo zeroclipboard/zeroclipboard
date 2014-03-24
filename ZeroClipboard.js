@@ -955,10 +955,6 @@
       }
     }
   };
-  ZeroClipboard.prototype.ready = function() {
-    _deprecationWarning("ZeroClipboard.prototype.ready", _globalConfig.debug);
-    return flashState.ready === true;
-  };
   var _receiveEvent = function(eventName, args) {
     args = args || {};
     eventName = eventName.toLowerCase().replace(/^on/, "");

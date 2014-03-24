@@ -214,41 +214,4 @@
     assert.equal(TestUtils.getHtmlBridge(), null, "The bridge does not exist after calling `destroy`");
   });
 
-  
-  /** @deprecated */
-  module("ZeroClipboard (built) - DOM - deprecated", {
-    setup: function() {
-      // Store
-      originalFlashDetect = ZeroClipboard.isFlashUnusable;
-      // Modify
-      ZeroClipboard.isFlashUnusable = function() {
-        return false;
-      };
-      ZeroClipboard.config({ debug: false });
-    },
-    teardown: function() {
-      // Restore
-      ZeroClipboard.isFlashUnusable = originalFlashDetect;
-      ZeroClipboard.destroy();
-      ZeroClipboard.config({ debug: true });
-    }
-  });
-
-  /** @deprecated use of `client.ready()` */
-  test("Bridge is ready after dispatching `load`", function(assert) {
-    assert.expect(2);
-
-    // Arrange
-    ZeroClipboard.isFlashUnusable = function() {
-      return false;
-    };
-    var client = new ZeroClipboard();
-
-    // Assert, act, assert
-    assert.strictEqual(client.ready(), false);
-    // `dispatch`-ing event handlers are async but the internal `ready` state is set synchronously
-    ZeroClipboard.dispatch("load");
-    assert.strictEqual(client.ready(), true);
-  });
-
 })(QUnit.module, QUnit.test);
