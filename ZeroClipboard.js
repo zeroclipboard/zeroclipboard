@@ -230,22 +230,15 @@
     }
   };
   var _vars = function(options) {
-    var i, len, domain, str = [], domains = [], trustedOriginsExpanded = [];
-    if (options.trustedOrigins) {
-      if (typeof options.trustedOrigins === "string") {
-        domains.push(options.trustedOrigins);
-      } else if (typeof options.trustedOrigins === "object" && "length" in options.trustedOrigins) {
-        domains = domains.concat(options.trustedOrigins);
-      }
-    }
+    var i, len, domain, domains, str = [], trustedOriginsExpanded = [];
     if (options.trustedDomains) {
       if (typeof options.trustedDomains === "string") {
-        domains.push(options.trustedDomains);
+        domains = [ options.trustedDomains ];
       } else if (typeof options.trustedDomains === "object" && "length" in options.trustedDomains) {
-        domains = domains.concat(options.trustedDomains);
+        domains = options.trustedDomains;
       }
     }
-    if (domains.length) {
+    if (domains && domains.length) {
       for (i = 0, len = domains.length; i < len; i++) {
         if (domains.hasOwnProperty(i) && domains[i] && typeof domains[i] === "string") {
           domain = _extractDomain(domains[i]);
@@ -923,7 +916,6 @@
   };
   _globalConfig.hoverClass = "zeroclipboard-is-hover";
   _globalConfig.activeClass = "zeroclipboard-is-active";
-  _globalConfig.trustedOrigins = null;
   ZeroClipboard.dispatch = function(eventName, args) {
     if (typeof eventName === "string" && eventName) {
       var cleanEventName = eventName.toLowerCase().replace(/^on/, "");

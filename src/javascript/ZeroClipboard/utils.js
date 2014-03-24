@@ -276,29 +276,19 @@ var _cacheBust = function (path, options) {
  * returns flashvars separated by &
  */
 var _vars = function (options) {
-  var i, len, domain,
+  var i, len, domain, domains,
       str = [],
-      domains = [],
       trustedOriginsExpanded = [];
 
-  /** @deprecated `trustedOrigins` in [v1.3.0], slated for removal in [v2.0.0]. See docs for more info. */
-  if (options.trustedOrigins) {
-    if (typeof options.trustedOrigins === "string") {
-      domains.push(options.trustedOrigins);
-    }
-    else if (typeof options.trustedOrigins === "object" && "length" in options.trustedOrigins) {
-      domains = domains.concat(options.trustedOrigins);
-    }
-  }
   if (options.trustedDomains) {
     if (typeof options.trustedDomains === "string") {
-      domains.push(options.trustedDomains);
+      domains = [options.trustedDomains];
     }
     else if (typeof options.trustedDomains === "object" && "length" in options.trustedDomains) {
-      domains = domains.concat(options.trustedDomains);
+      domains = options.trustedDomains;
     }
   }
-  if (domains.length) {
+  if (domains && domains.length) {
     for (i = 0, len = domains.length; i < len; i++) {
       if (domains.hasOwnProperty(i) && domains[i] && typeof domains[i] === "string") {
         domain = _extractDomain(domains[i]);

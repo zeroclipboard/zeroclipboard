@@ -52,38 +52,4 @@
     assert.deepEqual(ZeroClipboard.config().trustedDomains, updatedValue);
   });
 
-
-  /** @deprecated */
-  module("core - deprecated", {
-    setup: function() {
-      originalConfig = ZeroClipboard.config();
-      ZeroClipboard.config({ debug: false });
-    },
-    teardown: function() {
-      _globalConfig = originalConfig;
-    }
-  });
-
-
-  /** @deprecated */
-  test("Changing `trustedOrigins` works", function(assert) {
-    assert.expect(5);
-
-    // Arrange
-    var currentHost = window.location.host || "localhost";
-    var originalValue = null;
-    var updatedValue = [currentHost, "otherDomain.com"];
-
-    // Assert, act, assert
-    // Test that the client has the default value
-    assert.equal(ZeroClipboard.config("trustedOrigins"), originalValue);
-    assert.equal(ZeroClipboard.config().trustedOrigins, originalValue);
-    // Change the value
-    var updatedConfig = ZeroClipboard.config({ trustedOrigins: updatedValue });
-    // Test that the client has the changed value
-    assert.deepEqual(updatedConfig.trustedOrigins, updatedValue);
-    assert.deepEqual(ZeroClipboard.config("trustedOrigins"), updatedValue);
-    assert.deepEqual(ZeroClipboard.config().trustedOrigins, updatedValue);
-  });
-
 })(QUnit.module, QUnit.test);
