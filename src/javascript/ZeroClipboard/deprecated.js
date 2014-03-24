@@ -113,20 +113,6 @@ ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
 /*
  * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for alternatives.
  *
- * Reset the html bridge to be hidden off screen and not have title or text.
- *
- * returns object instance
- */
-ZeroClipboard.prototype.resetBridge = function () {
-  _deprecationWarning("ZeroClipboard.prototype.resetBridge", _globalConfig.debug);
-  ZeroClipboard.deactivate();
-  return this;
-};
-
-
-/*
- * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for alternatives.
- *
  * Adds a title="..." attribute to the htmlBridge to give it tooltip capabilities
  *
  * returns object instance
