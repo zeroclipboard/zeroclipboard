@@ -251,41 +251,4 @@
     assert.strictEqual(client.ready(), true);
   });
 
-
-  /** @deprecated */
-  module("ZeroClipboard (built) - Client - deprecated", {
-    setup: function() {
-      // Store
-      originalFlashDetect = ZeroClipboard.isFlashUnusable;
-      // Modify
-      ZeroClipboard.isFlashUnusable = function() {
-        return false;
-      };
-      ZeroClipboard.config({ debug: false });
-    },
-    teardown: function() {
-      // Restore
-      ZeroClipboard.isFlashUnusable = originalFlashDetect;
-      ZeroClipboard.destroy();
-      ZeroClipboard.config({ debug: true });
-    }
-  });
-
-  /** @deprecated */
-  test("Client sets title properly", function(assert) {
-    assert.expect(2);
-
-    // Arrange
-    var client = new ZeroClipboard();
-    var currentEl = document.getElementById("d_clip_button");
-
-    // Act
-    client.clip(currentEl);
-    client.setTitle("Click Me");
-
-    // Assert
-    assert.ok(TestUtils.getHtmlBridge());
-    assert.strictEqual(TestUtils.getHtmlBridge().getAttribute("title"), "Click Me");
-  });
-
 })(QUnit.module, QUnit.test);

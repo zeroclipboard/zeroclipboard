@@ -327,42 +327,4 @@
     assert.strictEqual(flashState.ready, true);
   });
 
-
-  /** @deprecated */
-  module("client - deprecated", {
-    setup: function() {
-      // Store
-      originalFlashDetect = ZeroClipboard.isFlashUnusable;
-      // Modify
-      ZeroClipboard.isFlashUnusable = function() {
-        return false;
-      };
-      ZeroClipboard.config({ debug: false });
-    },
-    teardown: function() {
-      // Restore
-      ZeroClipboard.isFlashUnusable = originalFlashDetect;
-      ZeroClipboard.destroy();
-      ZeroClipboard.config({ debug: true });
-    }
-  });
-
-  /** @deprecated */
-  test("Client sets title properly", function(assert) {
-    assert.expect(2);
-
-    // Arrange
-    var client = new ZeroClipboard();
-    var currentEl = document.getElementById("d_clip_button");
-
-    // Act
-    client.clip(currentEl);
-    client.setTitle("Click Me");
-
-    // Assert
-    var htmlBridge = TestUtils.getHtmlBridge();
-    assert.ok(htmlBridge);
-    assert.strictEqual(htmlBridge.getAttribute("title"), "Click Me");
-  });
-
 })(QUnit.module, QUnit.test);

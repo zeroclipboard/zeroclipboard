@@ -113,28 +113,6 @@ ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
 /*
  * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for alternatives.
  *
- * Adds a title="..." attribute to the htmlBridge to give it tooltip capabilities
- *
- * returns object instance
- */
-ZeroClipboard.prototype.setTitle = function (newTitle) {
-  _deprecationWarning("ZeroClipboard.prototype.setTitle", _globalConfig.debug);
-  // If the element has a title, mimic it
-  newTitle = newTitle || _globalConfig.title || (currentElement && currentElement.getAttribute("title"));
-  if (newTitle) {
-    var htmlBridge = _getHtmlBridge(flashState.bridge);
-    if (htmlBridge) {
-      htmlBridge.setAttribute("title", newTitle);
-    }
-  }
-
-  return this;
-};
-
-
-/*
- * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for alternatives.
- *
  * Set defaults.
  *
  * returns nothing

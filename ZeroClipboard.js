@@ -955,17 +955,6 @@
       }
     }
   };
-  ZeroClipboard.prototype.setTitle = function(newTitle) {
-    _deprecationWarning("ZeroClipboard.prototype.setTitle", _globalConfig.debug);
-    newTitle = newTitle || _globalConfig.title || currentElement && currentElement.getAttribute("title");
-    if (newTitle) {
-      var htmlBridge = _getHtmlBridge(flashState.bridge);
-      if (htmlBridge) {
-        htmlBridge.setAttribute("title", newTitle);
-      }
-    }
-    return this;
-  };
   ZeroClipboard.setDefaults = function(options) {
     _deprecationWarning("ZeroClipboard.setDefaults", _globalConfig.debug);
     ZeroClipboard.config(options);
