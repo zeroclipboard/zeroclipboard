@@ -65,22 +65,6 @@
   });
 
 
-  test("Changing `moviePath` works", function(assert) {
-    assert.expect(5);
-
-    // Assert, act, assert
-
-    // Test that the client has the default path
-    assert.strictEqual(ZeroClipboard.config("moviePath"), "ZeroClipboard.swf");
-    assert.strictEqual(ZeroClipboard.config().moviePath, "ZeroClipboard.swf");
-    // Change the path
-    var updatedConfig = ZeroClipboard.config({ moviePath: "new/movie/path.swf" });
-    // Test that the client has the changed path
-    assert.strictEqual(updatedConfig.moviePath, "new/movie/path.swf");
-    assert.strictEqual(ZeroClipboard.config("moviePath"), "new/movie/path.swf");
-    assert.strictEqual(ZeroClipboard.config().moviePath, "new/movie/path.swf");
-  });
-
   /** @deprecated */
   test("Changing `trustedOrigins` works", function(assert) {
     assert.expect(5);
@@ -113,19 +97,19 @@
     var client = new ZeroClipboard();
 
     // Assert
-    assert.notEqual(client.options.moviePath, newPath);
-    assert.notEqual(client.options.allowScriptAccess, scriptAccess);
+    assert.notEqual(_globalConfig.swfPath, newPath);
+    assert.notEqual(_globalConfig.allowScriptAccess, scriptAccess);
 
     // Act
     ZeroClipboard.config({
-      moviePath: newPath,
+      swfPath: newPath,
       allowScriptAccess: scriptAccess
     });
 
     // Assert
     client = new ZeroClipboard();
-    assert.strictEqual(client.options.moviePath, newPath);
-    assert.strictEqual(client.options.allowScriptAccess, scriptAccess);
+    assert.strictEqual(_globalConfig.swfPath, newPath);
+    assert.strictEqual(_globalConfig.allowScriptAccess, scriptAccess);
   });
 
 })(QUnit.module, QUnit.test);

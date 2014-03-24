@@ -536,7 +536,7 @@ var _extractDomain = function(originOrUrl) {
 
 
 /**
- * Set `allowScriptAccess` based on `trustedDomains` and `window.location.host` vs. `moviePath`
+ * Set `allowScriptAccess` based on `trustedDomains` and `window.location.host` vs. `swfPath`
  * @private
  */
 var _determineScriptAccess = (function() {
@@ -582,7 +582,7 @@ var _determineScriptAccess = (function() {
     // else...
 
     // Get SWF domain
-    var swfDomain = _extractDomain(configOptions.moviePath);
+    var swfDomain = _extractDomain(configOptions.swfPath);
     if (swfDomain === null) {
       swfDomain = currentDomain;
     }

@@ -20,11 +20,11 @@ var _bridge = function () {
       (typeof _cjsModuleId === "string" && _cjsModuleId) ||
       null;
 
-    // Set `allowScriptAccess` based on `trustedDomains` and `window.location.host` vs. `moviePath`
+    // Set `allowScriptAccess` based on `trustedDomains` and `window.location.host` vs. `swfPath`
     var allowScriptAccess = _determineScriptAccess(window.location.host, _globalConfig);
 
     var flashvars = _vars(opts);
-    var swfUrl = _globalConfig.moviePath + _cacheBust(_globalConfig.moviePath, _globalConfig);
+    var swfUrl = _globalConfig.swfPath + _cacheBust(_globalConfig.swfPath, _globalConfig);
     var html = "\
       <object classid=\"clsid:d27cdb6e-ae6d-11cf-96b8-444553540000\" id=\"global-zeroclipboard-flash-bridge\" width=\"100%\" height=\"100%\"> \
         <param name=\"movie\" value=\"" + swfUrl + "\"/> \
