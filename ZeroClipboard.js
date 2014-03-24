@@ -927,13 +927,6 @@
       }
     }
   };
-  ZeroClipboard.prototype.setHandCursor = function(enabled) {
-    _deprecationWarning("ZeroClipboard.prototype.setHandCursor", _globalConfig.debug);
-    enabled = typeof enabled === "boolean" ? enabled : !!enabled;
-    _setHandCursor(enabled);
-    _globalConfig.forceHandCursor = enabled;
-    return this;
-  };
   var _receiveEvent = function(eventName, args) {
     args = args || {};
     eventName = eventName.toLowerCase().replace(/^on/, "");

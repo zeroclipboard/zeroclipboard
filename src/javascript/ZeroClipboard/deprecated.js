@@ -48,24 +48,6 @@ ZeroClipboard.dispatch = function (eventName, args) {
 
 
 /*
- * @deprecated in [v1.2.0], slated for removal in [v2.0.0]. See docs for alternatives.
- *
- * Sends a signal to the flash object to display the hand cursor if true.
- * Updates the value of the `forceHandCursor` option.
- *
- * returns object instance
- */
-ZeroClipboard.prototype.setHandCursor = function (enabled) {
-  _deprecationWarning("ZeroClipboard.prototype.setHandCursor", _globalConfig.debug);
-  enabled = typeof enabled === "boolean" ? enabled : !!enabled;
-  _setHandCursor(enabled);
-  _globalConfig.forceHandCursor = enabled;
-
-  return this;
-};
-
-
-/*
  * @deprecated in [v1.3.0], slated for removal in [v2.0.0].
  * @private
  *
