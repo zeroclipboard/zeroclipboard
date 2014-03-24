@@ -510,9 +510,9 @@
     flashState.pluginType = isPPAPI ? "pepper" : isActiveX ? "activex" : hasFlash ? "netscape" : "unknown";
   };
   _detectFlashSupport();
-  var ZeroClipboard = function(elements, options) {
+  var ZeroClipboard = function(elements) {
     if (!(this instanceof ZeroClipboard)) {
-      return new ZeroClipboard(elements, options);
+      return new ZeroClipboard(elements);
     }
     this.id = "" + clientIdCounter++;
     _clientMeta[this.id] = {
@@ -523,11 +523,6 @@
     if (elements) {
       this.clip(elements);
     }
-    if (typeof options !== "undefined") {
-      _deprecationWarning("new ZeroClipboard(elements, options)", _globalConfig.debug);
-      ZeroClipboard.config(options);
-    }
-    this.options = ZeroClipboard.config();
     if (typeof flashState.ready !== "boolean") {
       flashState.ready = false;
     }

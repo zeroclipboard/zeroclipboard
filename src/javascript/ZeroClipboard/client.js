@@ -3,11 +3,11 @@
  *
  * returns the client instance if it's already created
  */
-var ZeroClipboard = function (elements, /** @deprecated */ options) {
+var ZeroClipboard = function (elements) {
 
   // Ensure the constructor is invoked with the `new` keyword, even if the user forgets it
   if (!(this instanceof ZeroClipboard)) {
-    return new ZeroClipboard(elements, options);
+    return new ZeroClipboard(elements);
   }
 
   // Assign an ID to the client instance
@@ -24,17 +24,6 @@ var ZeroClipboard = function (elements, /** @deprecated */ options) {
   if (elements) {
     this.clip(elements);
   }
-
-  // Warn about use of deprecated constructor signature
-  if (typeof options !== "undefined") {
-    _deprecationWarning("new ZeroClipboard(elements, options)", _globalConfig.debug);
-
-    // Set and override the defaults
-    ZeroClipboard.config(options);
-  }
-
-  /** @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for more info. */
-  this.options = ZeroClipboard.config();
 
 
   // Setup the Flash <-> JavaScript bridge
