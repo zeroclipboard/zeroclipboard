@@ -396,16 +396,7 @@
         }
       }
     };
-    var _accessLevelLookup = {
-      always: "always",
-      samedomain: "sameDomain",
-      never: "never"
-    };
     return function(currentDomain, configOptions) {
-      var asaLower, allowScriptAccess = configOptions.allowScriptAccess;
-      if (typeof allowScriptAccess === "string" && (asaLower = allowScriptAccess.toLowerCase()) && /^always|samedomain|never$/.test(asaLower)) {
-        return _accessLevelLookup[asaLower];
-      }
       var swfDomain = _extractDomain(configOptions.swfPath);
       if (swfDomain === null) {
         swfDomain = currentDomain;
@@ -933,7 +924,6 @@
   _globalConfig.hoverClass = "zeroclipboard-is-hover";
   _globalConfig.activeClass = "zeroclipboard-is-active";
   _globalConfig.trustedOrigins = null;
-  _globalConfig.allowScriptAccess = null;
   ZeroClipboard.dispatch = function(eventName, args) {
     if (typeof eventName === "string" && eventName) {
       var cleanEventName = eventName.toLowerCase().replace(/^on/, "");

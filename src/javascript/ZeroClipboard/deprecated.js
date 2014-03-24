@@ -29,16 +29,6 @@ _globalConfig.trustedOrigins = null;
 
 
 /*
- * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for more info.
- *
- * SWF outbound scripting policy
- *
- * Originally from "core.js"
- */
-_globalConfig.allowScriptAccess = null;
-
-
-/*
  * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for alternatives.
  *
  * Bridge from the Flash object back to the JavaScript

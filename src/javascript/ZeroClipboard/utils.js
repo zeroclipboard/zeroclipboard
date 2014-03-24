@@ -566,21 +566,7 @@ var _determineScriptAccess = (function() {
     }
   };
 
-  var _accessLevelLookup = {
-    "always": "always",
-    "samedomain": "sameDomain",
-    "never": "never"
-  };
-
   return function(currentDomain, configOptions) {
-    var asaLower,
-        allowScriptAccess = configOptions.allowScriptAccess;
-
-    if (typeof allowScriptAccess === "string" && (asaLower = allowScriptAccess.toLowerCase()) && /^always|samedomain|never$/.test(asaLower)) {
-      return _accessLevelLookup[asaLower];
-    }
-    // else...
-
     // Get SWF domain
     var swfDomain = _extractDomain(configOptions.swfPath);
     if (swfDomain === null) {

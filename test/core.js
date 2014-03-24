@@ -86,30 +86,4 @@
     assert.deepEqual(ZeroClipboard.config().trustedOrigins, updatedValue);
   });
 
-
-  /** @deprecated */
-  test("Setting default options", function(assert) {
-    assert.expect(4);
-
-    // Arrange
-    var newPath = "the/path";
-    var scriptAccess = "always";
-    var client = new ZeroClipboard();
-
-    // Assert
-    assert.notEqual(_globalConfig.swfPath, newPath);
-    assert.notEqual(_globalConfig.allowScriptAccess, scriptAccess);
-
-    // Act
-    ZeroClipboard.config({
-      swfPath: newPath,
-      allowScriptAccess: scriptAccess
-    });
-
-    // Assert
-    client = new ZeroClipboard();
-    assert.strictEqual(_globalConfig.swfPath, newPath);
-    assert.strictEqual(_globalConfig.allowScriptAccess, scriptAccess);
-  });
-
 })(QUnit.module, QUnit.test);

@@ -369,18 +369,9 @@
     var _globalConfig = {
       swfPath: "ZeroClipboard.swf",
       trustedOrigins: null,
-      trustedDomains: [currentDomain],
-      allowScriptAccess: null
+      trustedDomains: [currentDomain]
     };
     var inputToExpectedMap = [
-      // `allowScriptAccess` forcibly set
-      { args: [currentDomain, _extend({}, _globalConfig, { allowScriptAccess: "always" })], result: "always" },
-      { args: [currentDomain, _extend({}, _globalConfig, { allowScriptAccess: "ALWAYS" })], result: "always" },
-      { args: [currentDomain, _extend({}, _globalConfig, { allowScriptAccess: "samedomain" })], result: "sameDomain" },
-      { args: [currentDomain, _extend({}, _globalConfig, { allowScriptAccess: "sameDomain" })], result: "sameDomain" },
-      { args: [currentDomain, _extend({}, _globalConfig, { allowScriptAccess: "SAMEDOMAIN" })], result: "sameDomain" },
-      { args: [currentDomain, _extend({}, _globalConfig, { allowScriptAccess: "never" })], result: "never" },
-      { args: [currentDomain, _extend({}, _globalConfig, { allowScriptAccess: "NEVER" })], result: "never" },
       // Same-domain SWF
       { args: [currentDomain, _globalConfig], result: "sameDomain" },
       { args: [currentDomain, _extend({}, _globalConfig, { trustedDomains: [] })], result: "never" },
