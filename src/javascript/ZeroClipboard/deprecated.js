@@ -66,19 +66,6 @@ ZeroClipboard.prototype.setHandCursor = function (enabled) {
 
 
 /*
- * @deprecated in [v1.2.0], slated for removal in [v2.0.0]. See docs for more info.
- *
- * Reposition the Flash object to cover the current element being hovered over.
- *
- * returns object instance
- */
-ZeroClipboard.prototype.reposition = function () {
-  _deprecationWarning("ZeroClipboard.prototype.reposition", _globalConfig.debug);
-  return _reposition();
-};
-
-
-/*
  * @deprecated in [v1.3.0], slated for removal in [v2.0.0].
  * @private
  *

@@ -934,10 +934,6 @@
     _globalConfig.forceHandCursor = enabled;
     return this;
   };
-  ZeroClipboard.prototype.reposition = function() {
-    _deprecationWarning("ZeroClipboard.prototype.reposition", _globalConfig.debug);
-    return _reposition();
-  };
   var _receiveEvent = function(eventName, args) {
     args = args || {};
     eventName = eventName.toLowerCase().replace(/^on/, "");
