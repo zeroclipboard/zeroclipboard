@@ -34,7 +34,7 @@ ZeroClipboard.dispatch = function (eventName, args) {
 
     // Receive event from Flash movie, forward to clients
     if (cleanEventName) {
-      // Get an array of clients that have been glued to the `currentElement`, or
+      // Get an array of clients that have been clipped to the `currentElement`, or
       // get ALL clients if no `currentElement` (e.g. for the global Flash events like "load", etc.)
       var clients = (currentElement && _globalConfig.autoActivate === true) ?
                       _getAllClientsClippedToElement(currentElement) :

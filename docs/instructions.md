@@ -5,7 +5,7 @@ want to see the v1.x codebase, please see the [`1.x-master`](https://github.com/
 
 # Overview
 
-The *ZeroClipboard* JavaScript library provides an easy way to copy text to the clipboard using an invisible Adobe
+The _ZeroClipboard_ JavaScript library provides an easy way to copy text to the clipboard using an invisible Adobe
 Flash movie.  The "Zero" signifies that the library is invisible and the user interface is left entirely up to you.
 
 Browsers won't let you access the clipboard directly. So this library puts a Flash object on the page to proxy the
@@ -68,8 +68,6 @@ These are default values for the global configurations options. You should gener
 
 ```js
 var _globalConfig = {
-  // NOTE: For versions >= v1.3.x and < v2.x, you must use `swfPath` by setting `moviePath`:
-  //   `ZeroClipboard.config({ moviePath: ZeroClipboard.config("swfPath") });`
   // URL to movie, relative to the page. Default value will be "ZeroClipboard.swf" under the
   // same path as the ZeroClipboard JS file.
   swfPath: "path/to/ZeroClipboard.swf",
@@ -108,42 +106,11 @@ var _globalConfig = {
 
   /** @deprecated */
   // The class used to indicate that a clipped element is active (is being clicked)
-  activeClass: "zeroclipboard-is-active",
-
-  /** @deprecated */
-  // DEPRECATED!!! Use `trustedDomains` instead!
-  // SWF inbound scripting policy: page origins that the SWF should trust. (single string or array of strings)
-  trustedOrigins: null,
-
-  /** @deprecated */
-  // SWF outbound scripting policy. Possible values: "never", "sameDomain", "always"
-  allowScriptAccess: null,
-
-  /** @deprecated */
-  // Include a "nocache" query parameter on requests for the SWF
-  useNoCache: true,
-
-  /** @deprecated */
-  // URL to movie
-  moviePath: "ZeroClipboard.swf"
+  activeClass: "zeroclipboard-is-active"
 };
 ```
 
 You can override the defaults by making a call like `ZeroClipboard.config({ moviePath: "new/path" });` before you create any clients.
-
-You can also set the options when creating a new client by passing an optional "options" object, e.g.  
-```js
-var client = new ZeroClipboard($("#d_clip_button"), { moviePath: "new/path" });`
-```
-
-However, this per-client options overriding is deprecated as of v1.3.0 and will be removed in v2.0.0.
-
-Whenever possible, we recommend that you change the defaults rather than changing options per client. This works out
-better in most situations as:
- 1. Some options apply outside of `ZeroClipboard` instances, e.g. `debug` currently affects some static methods.
- 2. If you have multiple clients clipped to a shared element, having per-client options can result in confusing effects
-    when that shared element is being activated, e.g. differing values for `zIndex`, `forceHandCursor`, `hoverClass`,
-    `activeClass`, etc.
 
 
 ### The `trustedDomains` option: SWF inbound scripting access
@@ -155,34 +122,20 @@ If your ZeroClipboard SWF is served from a different origin/domain than your pag
 OK to trust your page. The default value of `[window.location.host]` is almost _**always**_ what you will want unless
 you specifically want the SWF to communicate with pages from other domains (e.g. in iframes or child windows).
 
-For more information about trusted domains, consult the _[official Flash documentation for `flash.system.Security.allowDomain(...)`](http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/Security.html#allowDomain\(\))_.
+For more information about trusted domains, consult the [_official Flash documentation for `flash.system.Security.allowDomain(...)`_](http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/Security.html#allowDomain\(\)).
 
 
-### The `allowScriptAccess` option: SWF outbound scripting access
+### SWF outbound scripting access
 
-This allows the SWF file to access/call JavaScript/HTML functionality of HTML pages on allowed domains, e.g. invoking
-functions via `ExternalInterface.call`. In other words, it controls the SWF outbound scripting access.
+The `allowScriptAccess` parameter (for Flash embedding markup) allows the SWF file to access/call JavaScript/HTML functionality of
+HTML pages on allowed domains, e.g. invoking functions via `ExternalInterface.call`. In other words, it controls the SWF outbound
+scripting access.
 
-For version 1.1.7 and below, the `embed` tag had the `allowScriptAccess` parameter hard-coded to `always`. This allowed
-the "`ZeroClipboard.swf`" file to be hosted on an external domain. However, to enhance security, versions after 1.1.7
-have an option for `allowScriptAccess` with a default of `"sameDomain"`, which only allows "`ZeroClipboard.swf`" to be
-served from the same domain as the hosting page.
+As of version `v2.0.0-alpha.2`, the `allowScriptAccess` configuration option no longer exists. The appropriate value will be determined
+immediately before the Flash object is embedded on the page. The value is based on a relationship between the current
+domain (`window.location.host`) and the value of the `trustedDomains` configuration option.
 
-If you hosted "`ZeroClipboard.swf`" on a different domain than the hosting page on version 1.1.7 or below, when you upgrade
-to a version above 1.1.7, you should either move "`ZeroClipboard.swf`" to the same domain as the hosting page or set the
-`allowScriptAccess` option to `always`.
-
-As of version 1.3.0, it is no longer necessary to set the `allowScriptAccess` configuration option as its default value
-is now `null` but the appropriate value will be determined immediately before the Flash object is embedded on the page.
-The value is based on a relationship between the current domain (`window.location.host`) and the value of the
-`trustedDomains` configuration option.
-
-**TL;DR default values:**
- - &ge; v1.3.0: `null` _(appropriate value determined on-the-fly during embedding)_
- - &gt; v1.1.7 &lt; v1.3.0: `"sameDomain"`
- - &le; v1.1.7: `"always"`
-
-For more information about `allowScriptAccess`, consult the _[official Flash documentation](http://helpx.adobe.com/flash/kb/control-access-scripts-host-web.html)_.
+For more information about `allowScriptAccess`, consult the [_official Flash documentation_](http://helpx.adobe.com/flash/kb/control-access-scripts-host-web.html).
 
 
 ### Cross-Protocol Limitations
@@ -743,51 +696,10 @@ ZeroClipboard.config({ debug: false });
 ```
 
 The current list of deprecations includes:  
- - `ZeroClipboard.prototype.setHandCursor` &rarr; as of [v1.2.0], removing in [v2.0.0]
-     - Use the `forceHandCursor` config option instead!
- - `ZeroClipboard.prototype.reposition` &rarr; as of [v1.2.0], removing in [v2.0.0]
-     - Repositioning is now handled more intelligently internally, so this method is simply no longer needed by users.
- - `ZeroClipboard.prototype.receiveEvent` &rarr; as of [v1.2.0], removing in [v2.0.0]
-     - This should only be used internally, so this method will be removed from the public API.
- - `ZeroClipboard.detectFlashSupport` &rarr; as of [v1.2.0], removing in [v2.0.0]
-     - This should only be used internally, so this method will be removed from the public API.
  - The `hoverClass` config option &rarr; as of [v1.3.0], removing in [v2.0.0]
      - As of [v2.0.0] (but no sooner), you will be able to use normal `:hover` CSS pseudo-class selectors instead!
  - The `activeClass` config option &rarr; as of [v1.3.0], removing in [v2.0.0]
      - As of [v2.0.0] (but no sooner), you will be able to use normal `:active` CSS pseudo-class selectors instead!
- - The `trustedOrigins` config option &rarr; as of [v1.3.0], removing in [v2.0.0]
-     - Use the `trustedDomains` config option instead!
- - The `allowScriptAccess` config option &rarr; as of [v1.3.0], removing in [v2.0.0]
-     - The correct value can be intelligently calculated internally, so this option is simply no longer needed by users.
- - `new ZeroClipboard(elements, options)` &rarr; as of [v1.3.0], removing in [v2.0.0]
-     - Most options actually have a global effect rather than a per-client effect, so we are removing the ability to
-       customize options per-client to help avoid confusion. The constructor `new ZeroClipboard(elements)` will remain.
- - `ZeroClipboard.prototype.addEventListener` &rarr; as of [v1.3.0], removing in [v2.0.0]
-     - Use `ZeroClipboard.prototype.on` instead!
- - `ZeroClipboard.prototype.removeEventListener` &rarr; as of [v1.3.0], removing in [v2.0.0]
-     - Use `ZeroClipboard.prototype.off` instead!
- - `ZeroClipboard.prototype.setCurrent` &rarr; as of [v1.3.0], removing in [v2.0.0]
-     - Use `ZeroClipboard.activate` instead!
- - `ZeroClipboard.prototype.resetBridge` &rarr; as of [v1.3.0], removing in [v2.0.0]
-     - Use `ZeroClipboard.deactivate` instead!
- - `ZeroClipboard.prototype.setTitle` &rarr; as of [v1.3.0], removing in [v2.0.0]
-     - Use the `title` config option instead!
- - `ZeroClipboard.setDefaults` &rarr; as of [v1.3.0], removing in [v2.0.0]
-     - Use `ZeroClipboard.config` instead!
- - `ZeroClipboard#handlers` &rarr; as of [v1.3.0], removed in [v1.3.0]
-     - Use the `ZeroClipboard.prototype.handlers` method instead!
- - `ZeroClipboard.prototype.ready` &rarr; as of [v1.3.0], removing in [v2.0.0]
-     - For v1.x, use the `ZeroClipboard.prototype.on("load", ...);` instead!
-     - For v2.x, use the `ZeroClipboard.prototype.on("ready", ...);` instead!
- - `ZeroClipboard.prototype.glue` &rarr; as of [v1.3.0], removing in [v2.0.0]
-     - Use `ZeroClipboard.prototype.clip` instead!
- - `ZeroClipboard.prototype.unglue` &rarr; as of [v1.3.0], removing in [v2.0.0]
-     - Use `ZeroClipboard.prototype.unclip` instead!
- - The `useNoCache` config option &rarr; as of [v1.3.0], removing in [v2.0.0]
-     - Use the `cacheBust` config option instead!
- - The `moviePath` config option &rarr; as of [v1.3.0], removing in [v2.0.0]
-     - Use the `swfPath` config option instead!
-     - For v1.3.x usage, do: `ZeroClipboard.config({ moviePath: ZeroClipboard.config("swfPath") });`
  - `ZeroClipboard.dispatch` &rarr; as of [v1.3.0], removing in [v2.0.0]
      - Use `ZeroClipboard.emit` instead!
  - All v1.x event names &rarr; as of [v1.3.0], removing in [v2.0.0]
