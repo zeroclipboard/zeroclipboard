@@ -113,19 +113,6 @@ ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
 /*
  * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for alternatives.
  *
- * Set defaults.
- *
- * returns nothing
- */
-ZeroClipboard.setDefaults = function (options) {
-  _deprecationWarning("ZeroClipboard.setDefaults", _globalConfig.debug);
-  ZeroClipboard.config(options);
-};
-
-
-/*
- * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for alternatives.
- *
  * An original API method name, now only an alias for `on`.
  *
  * returns object instance

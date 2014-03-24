@@ -955,10 +955,6 @@
       }
     }
   };
-  ZeroClipboard.setDefaults = function(options) {
-    _deprecationWarning("ZeroClipboard.setDefaults", _globalConfig.debug);
-    ZeroClipboard.config(options);
-  };
   ZeroClipboard.prototype.addEventListener = function(eventName, func) {
     _deprecationWarning("ZeroClipboard.prototype.addEventListener", _globalConfig.debug);
     return this.on(eventName, func);
