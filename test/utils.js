@@ -161,31 +161,18 @@
 
 
   test("`_cacheBust` can be disabled", function(assert) {
-    assert.expect(6);
+    assert.expect(2);
 
     // Arrange
     var pathWithoutQuery = "path.com/z.swf";
     var pathWithQuery = "path.com/z.swf?q=jon";
-    var options1 = {
-      useNoCache: false,
-      cacheBust: true
-    };
-    var options2 = {
-      useNoCache: true,
-      cacheBust: false
-    };
-    var options3 = {
-      useNoCache: false,
+    var options = {
       cacheBust: false
     };
 
     // Act & Assert
-    assert.strictEqual(_cacheBust(pathWithoutQuery, options1), "");
-    assert.strictEqual(_cacheBust(pathWithQuery, options1), "");
-    assert.strictEqual(_cacheBust(pathWithoutQuery, options2), "");
-    assert.strictEqual(_cacheBust(pathWithQuery, options2), "");
-    assert.strictEqual(_cacheBust(pathWithoutQuery, options3), "");
-    assert.strictEqual(_cacheBust(pathWithQuery, options3), "");
+    assert.strictEqual(_cacheBust(pathWithoutQuery, options), "");
+    assert.strictEqual(_cacheBust(pathWithQuery, options), "");
   });
 
 

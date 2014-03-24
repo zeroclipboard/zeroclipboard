@@ -261,7 +261,7 @@ var _getDOMObjectPosition = function (obj, defaultZIndex) {
  * returns path with noCache param added
  */
 var _cacheBust = function (path, options) {
-  var cacheBust = options == null || (options && options.cacheBust === true && options.useNoCache === true);
+  var cacheBust = options == null || (options && options.cacheBust === true);
   if (cacheBust) {
     return (path.indexOf("?") === -1 ? "?" : "&") + "noCache=" + (new Date()).getTime();
   } else {

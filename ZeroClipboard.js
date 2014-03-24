@@ -222,7 +222,7 @@
     return info;
   };
   var _cacheBust = function(path, options) {
-    var cacheBust = options == null || options && options.cacheBust === true && options.useNoCache === true;
+    var cacheBust = options == null || options && options.cacheBust === true;
     if (cacheBust) {
       return (path.indexOf("?") === -1 ? "?" : "&") + "noCache=" + new Date().getTime();
     } else {
@@ -934,7 +934,6 @@
   _globalConfig.activeClass = "zeroclipboard-is-active";
   _globalConfig.trustedOrigins = null;
   _globalConfig.allowScriptAccess = null;
-  _globalConfig.useNoCache = true;
   ZeroClipboard.dispatch = function(eventName, args) {
     if (typeof eventName === "string" && eventName) {
       var cleanEventName = eventName.toLowerCase().replace(/^on/, "");
