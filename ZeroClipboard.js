@@ -938,15 +938,6 @@
     _deprecationWarning("ZeroClipboard.prototype.reposition", _globalConfig.debug);
     return _reposition();
   };
-  ZeroClipboard.prototype.receiveEvent = function(eventName, args) {
-    _deprecationWarning("ZeroClipboard.prototype.receiveEvent", _globalConfig.debug);
-    if (typeof eventName === "string" && eventName) {
-      var cleanEventName = eventName.toLowerCase().replace(/^on/, "");
-      if (cleanEventName) {
-        _receiveEvent.call(this, cleanEventName, args);
-      }
-    }
-  };
   var _receiveEvent = function(eventName, args) {
     args = args || {};
     eventName = eventName.toLowerCase().replace(/^on/, "");

@@ -78,28 +78,6 @@ ZeroClipboard.prototype.reposition = function () {
 };
 
 
-
-/*
- * @deprecated in [v1.2.0], slated for removal in [v2.0.0]. See docs for more info.
- *
- * Receive an event for a specific client, typically from Flash.
- *
- * returns nothing
- */
-ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
-  _deprecationWarning("ZeroClipboard.prototype.receiveEvent", _globalConfig.debug);
-  if (typeof eventName === "string" && eventName) {
-    // Sanitize the event name
-    var cleanEventName = eventName.toLowerCase().replace(/^on/, "");
-
-    // receive event from Flash movie, send to client
-    if (cleanEventName) {
-      _receiveEvent.call(this, cleanEventName, args);
-    }
-  }
-};
-
-
 /*
  * @deprecated in [v1.3.0], slated for removal in [v2.0.0].
  * @private
