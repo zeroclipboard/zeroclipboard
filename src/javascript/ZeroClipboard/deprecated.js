@@ -111,32 +111,6 @@ ZeroClipboard.prototype.receiveEvent = function (eventName, args) {
 
 
 /*
- * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for alternatives.
- *
- * An original API method name, now only an alias for `on`.
- *
- * returns object instance
- */
-ZeroClipboard.prototype.addEventListener = function (eventName, func) {
-  _deprecationWarning("ZeroClipboard.prototype.addEventListener", _globalConfig.debug);
-  return this.on(eventName, func);
-};
-
-
-/*
- * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for alternatives.
- *
- * An original API method name, now only an alias for `off`.
- *
- * returns object instance
- */
-ZeroClipboard.prototype.removeEventListener = function (eventName, func) {
-  _deprecationWarning("ZeroClipboard.prototype.removeEventListener", _globalConfig.debug);
-  return this.off(eventName, func);
-};
-
-
-/*
  * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for more info.
  *
  * Helper function to determine if the Flash bridge is ready. Gets this info from

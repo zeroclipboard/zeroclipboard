@@ -955,14 +955,6 @@
       }
     }
   };
-  ZeroClipboard.prototype.addEventListener = function(eventName, func) {
-    _deprecationWarning("ZeroClipboard.prototype.addEventListener", _globalConfig.debug);
-    return this.on(eventName, func);
-  };
-  ZeroClipboard.prototype.removeEventListener = function(eventName, func) {
-    _deprecationWarning("ZeroClipboard.prototype.removeEventListener", _globalConfig.debug);
-    return this.off(eventName, func);
-  };
   ZeroClipboard.prototype.ready = function() {
     _deprecationWarning("ZeroClipboard.prototype.ready", _globalConfig.debug);
     return flashState.ready === true;
