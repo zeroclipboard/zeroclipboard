@@ -639,9 +639,34 @@
         }
       }
     }
-    var htmlBridge = _getHtmlBridge(flashState.bridge);
-    if (htmlBridge && htmlBridge.parentNode) {
-      htmlBridge.parentNode.removeChild(htmlBridge);
+    var flashBridge = flashState.bridge;
+    if (flashBridge) {
+      var htmlBridge = _getHtmlBridge(flashBridge);
+      if (htmlBridge) {
+        if (flashState.pluginType === "activex" && "readyState" in flashBridge) {
+          flashBridge.style.display = "none";
+          (function removeSwfFromIE() {
+            if (flashBridge.readyState === 4) {
+              for (var prop in flashBridge) {
+                if (typeof flashBridge[prop] === "function") {
+                  flashBridge[prop] = null;
+                }
+              }
+              flashBridge.parentNode.removeChild(flashBridge);
+              if (htmlBridge.parentNode) {
+                htmlBridge.parentNode.removeChild(htmlBridge);
+              }
+            } else {
+              setTimeout(removeSwfFromIE, 10);
+            }
+          })();
+        } else {
+          flashBridge.parentNode.removeChild(flashBridge);
+          if (htmlBridge.parentNode) {
+            htmlBridge.parentNode.removeChild(htmlBridge);
+          }
+        }
+      }
       flashState.ready = null;
       flashState.bridge = null;
       flashState.deactivated = null;

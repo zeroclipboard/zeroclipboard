@@ -103,9 +103,39 @@ ZeroClipboard.destroy = function () {
   }
 
   // Remove the Flash bridge
-  var htmlBridge = _getHtmlBridge(flashState.bridge);
-  if (htmlBridge && htmlBridge.parentNode) {
-    htmlBridge.parentNode.removeChild(htmlBridge);
+  var flashBridge = flashState.bridge;
+  if (flashBridge) {
+    var htmlBridge = _getHtmlBridge(flashBridge);
+    if (htmlBridge) {
+      // Some extra caution is necessary to prevent Flash from causing memory leaks in oldIE
+      // NOTE: Removing the SWF in IE may not be completed synchronously
+      if (flashState.pluginType === "activex" && "readyState" in flashBridge) {
+        flashBridge.style.display = "none";
+        (function removeSwfFromIE() {
+          if (flashBridge.readyState === 4) {
+            // This step prevents memory leaks in oldIE
+            for (var prop in flashBridge) {
+              if (typeof flashBridge[prop] === "function") {
+                flashBridge[prop] = null;
+              }
+            }
+            flashBridge.parentNode.removeChild(flashBridge);
+            if (htmlBridge.parentNode) {
+              htmlBridge.parentNode.removeChild(htmlBridge);
+            }
+          }
+          else {
+            setTimeout(removeSwfFromIE, 10);
+          }
+        })();
+      }
+      else {
+        flashBridge.parentNode.removeChild(flashBridge);
+        if (htmlBridge.parentNode) {
+          htmlBridge.parentNode.removeChild(htmlBridge);
+        }
+      }
+    }
     flashState.ready = null;
     flashState.bridge = null;
     // Reset the `deactivated` status in case the user wants to "try again", e.g. after receiving
