@@ -687,29 +687,39 @@
       var allowScriptAccess = _determineScriptAccess(window.location.host, _globalConfig);
       var flashvars = _vars(opts);
       var swfUrl = _globalConfig.swfPath + _cacheBust(_globalConfig.swfPath, _globalConfig);
-      var html = '      <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" id="global-zeroclipboard-flash-bridge" width="100%" height="100%">         <param name="movie" value="' + swfUrl + '"/>         <param name="allowScriptAccess" value="' + allowScriptAccess + '"/>         <param name="scale" value="exactfit"/>         <param name="loop" value="false"/>         <param name="menu" value="false"/>         <param name="quality" value="best" />         <param name="bgcolor" value="#ffffff"/>         <param name="wmode" value="transparent"/>         <param name="flashvars" value="' + flashvars + '"/>         <embed src="' + swfUrl + '"           loop="false" menu="false"           quality="best" bgcolor="#ffffff"           width="100%" height="100%"           name="global-zeroclipboard-flash-bridge"           allowScriptAccess="' + allowScriptAccess + '"           allowFullScreen="false"           type="application/x-shockwave-flash"           wmode="transparent"           pluginspage="http://www.macromedia.com/go/getflashplayer"           flashvars="' + flashvars + '"           scale="exactfit">         </embed>       </object>';
       container = document.createElement("div");
       container.id = "global-zeroclipboard-html-bridge";
-      container.setAttribute("class", "global-zeroclipboard-container");
+      container.className = "global-zeroclipboard-container";
       container.style.position = "absolute";
       container.style.left = "0px";
       container.style.top = "-9999px";
-      container.style.width = "15px";
-      container.style.height = "15px";
+      container.style.width = "1px";
+      container.style.height = "1px";
       container.style.zIndex = "" + _getSafeZIndex(_globalConfig.zIndex);
+      var divToBeReplaced = document.createElement("div");
+      container.appendChild(divToBeReplaced);
       document.body.appendChild(container);
-      container.innerHTML = html;
+      var tmpDiv = document.createElement("div");
+      var oldIE = flashState.pluginType === "activex";
+      tmpDiv.innerHTML = '<object id="global-zeroclipboard-flash-bridge" width="100%" height="100%" ' + (oldIE ? 'classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"' : 'type="application/x-shockwave-flash" data="' + swfUrl + '"') + ">" + (oldIE ? '<param name="movie" value="' + swfUrl + '"/>' : "") + '<param name="allowScriptAccess" value="' + allowScriptAccess + '"/>' + '<param name="allowFullScreen" value="false"/>' + '<param name="scale" value="exactfit"/>' + '<param name="loop" value="false"/>' + '<param name="menu" value="false"/>' + '<param name="quality" value="best" />' + '<param name="bgcolor" value="#ffffff"/>' + '<param name="wmode" value="transparent"/>' + '<param name="flashvars" value="' + flashvars + '"/>' + "</object>";
+      flashBridge = tmpDiv.firstChild;
+      tmpDiv = null;
+      container.replaceChild(flashBridge, divToBeReplaced);
     }
-    flashBridge = document["global-zeroclipboard-flash-bridge"];
-    if (flashBridge && (len = flashBridge.length)) {
-      flashBridge = flashBridge[len - 1];
+    if (!flashBridge) {
+      flashBridge = document["global-zeroclipboard-flash-bridge"];
+      if (flashBridge && (len = flashBridge.length)) {
+        flashBridge = flashBridge[len - 1];
+      }
+      if (!flashBridge) {
+        flashBridge = container.firstChild;
+      }
     }
-    flashState.bridge = flashBridge || container.children[0].lastElementChild;
+    flashState.bridge = flashBridge || null;
   };
   var _getHtmlBridge = function(flashBridge) {
-    var isFlashElement = /^OBJECT|EMBED$/;
     var htmlBridge = flashBridge && flashBridge.parentNode;
-    while (htmlBridge && isFlashElement.test(htmlBridge.nodeName) && htmlBridge.parentNode) {
+    while (htmlBridge && htmlBridge.nodeName === "OBJECT" && htmlBridge.parentNode) {
       htmlBridge = htmlBridge.parentNode;
     }
     return htmlBridge || null;
