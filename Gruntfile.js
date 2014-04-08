@@ -99,7 +99,7 @@ module.exports = function(grunt) {
     },
     mxmlc: {
       options: {
-        rawConfig: '-static-link-runtime-shared-libraries=true'
+        rawConfig: '-target-player=11.0.0 -static-link-runtime-shared-libraries=true'
       },
       swf: {
         files: {
