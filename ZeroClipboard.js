@@ -505,7 +505,7 @@
       }
     }
     flashState.disabled = hasFlash !== true;
-    flashState.outdated = flashVersion && parseFloat(flashVersion) < 10;
+    flashState.outdated = flashVersion && parseFloat(flashVersion) < 11;
     flashState.version = flashVersion || "0.0.0";
     flashState.pluginType = isPPAPI ? "pepper" : isActiveX ? "activex" : hasFlash ? "netscape" : "unknown";
   };
@@ -801,7 +801,7 @@
         _dispatchClientCallbacks.call(clients[i], eventCopy, performCallbackAsync);
       }
     }
-    return event.type === "copy" ? _clipData["text/plain"] : undefined;
+    return event.type === "copy" ? JSON.stringify(_clipData) : undefined;
   };
   var _dispatchClientCallbacks = function(event, async) {
     var handlers = _clientMeta[this.id] && _clientMeta[this.id].handlers[event.type];
@@ -863,7 +863,7 @@
       if (/^flash-(outdated|deactivated|overdue)$/.test(event.name)) {
         _extend(event, {
           version: flashState.version,
-          minimumVersion: "10.0.0"
+          minimumVersion: "11.0.0"
         });
       }
     }
@@ -880,6 +880,13 @@
           }
         }
       };
+    }
+    if (event.type === "aftercopy" && event.serializedData) {
+      var deserializedData = JSON.parse(event.serializedData);
+      if (typeof deserializedData === "object" && deserializedData) {
+        _extend(event, deserializedData);
+      }
+      delete event.serializedData;
     }
     if (event.target && !event.relatedTarget) {
       event.relatedTarget = _getRelatedTarget(event.target);

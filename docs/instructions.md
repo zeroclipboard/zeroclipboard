@@ -474,7 +474,7 @@ The handler execution context is as follows:
 ##### error[name = "flash-outdated"]
 
 This type of `error` event fires when Flash Player is installed in the browser but the version is too old for ZeroClipboard.
-ZeroClipboard requires Flash Player 10.0.0 or above.
+ZeroClipboard requires Flash Player 11.0.0 or above.
 
 The handler execution context is as follows:
 
@@ -499,7 +499,7 @@ The handler execution context is as follows:
     <dt>`version`</dt>
     <dd>The browser's Flash Player version number as a string</dd>
     <dt>`minimumVersion`</dt>
-    <dd>The minimum required version of Flash Player for ZeroClipboard, i.e. `"10.0.0"`</dd>
+    <dd>The minimum required version of Flash Player for ZeroClipboard, i.e. `"11.0.0"`</dd>
   </dl>
 </dd>
 </dl>
@@ -534,7 +534,7 @@ The handler execution context is as follows:
     <dt>`version`</dt>
     <dd>The browser's Flash Player version number as a string</dd>
     <dt>`minimumVersion`</dt>
-    <dd>The minimum required version of Flash Player for ZeroClipboard, i.e. `"10.0.0"`</dd>
+    <dd>The minimum required version of Flash Player for ZeroClipboard, i.e. `"11.0.0"`</dd>
   </dl>
 </dd>
 </dl>
@@ -584,7 +584,7 @@ The handler execution context is as follows:
     <dt>`version`</dt>
     <dd>The browser's Flash Player version number as a string</dd>
     <dt>`minimumVersion`</dt>
-    <dd>The minimum required version of Flash Player for ZeroClipboard, i.e. `"10.0.0"`</dd>
+    <dd>The minimum required version of Flash Player for ZeroClipboard, i.e. `"11.0.0"`</dd>
   </dl>
 </dd>
 </dl>

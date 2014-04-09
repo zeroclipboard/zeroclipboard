@@ -110,11 +110,11 @@
     // Act
     client.clip(currentEl);
     ZeroClipboard.activate(currentEl);
-    var pendingText = ZeroClipboard.emit("copy");
+    var pendingText = JSON.parse(ZeroClipboard.emit("copy"));
 
     // Assert
     assert.strictEqual(_clipData["text/plain"], "Copy me!");
-    assert.deepEqual(pendingText, _clipData["text/plain"]);
+    assert.deepEqual(pendingText, _clipData);
 
     // Revert
     ZeroClipboard.deactivate();
@@ -130,7 +130,7 @@
     // Act
     client.clip(currentEl);
     ZeroClipboard.activate(currentEl);
-    var pendingText = ZeroClipboard.emit("copy");
+    var pendingText = JSON.parse(ZeroClipboard.emit("copy"));
 
     // Assert
     assert.strictEqual(_clipData["text/plain"].replace(/\r\n/g, '\n'),
@@ -141,7 +141,7 @@
       "cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\n"+
       "proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
     );
-    assert.deepEqual(pendingText, _clipData["text/plain"]);
+    assert.deepEqual(pendingText, _clipData);
 
     // Revert
     ZeroClipboard.deactivate();
@@ -157,7 +157,7 @@
     // Act
     client.clip(currentEl);
     ZeroClipboard.activate(currentEl);
-    var pendingText = ZeroClipboard.emit("copy");
+    var pendingText = JSON.parse(ZeroClipboard.emit("copy"));
 
     // Assert
     assert.strictEqual(_clipData["text/plain"].replace(/\r\n/g, '\n'),
@@ -168,7 +168,7 @@
       "cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\n"+
       "proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
     );
-    assert.deepEqual(pendingText, _clipData["text/plain"]);
+    assert.deepEqual(pendingText, _clipData);
 
     // Revert
     ZeroClipboard.deactivate();
@@ -184,11 +184,11 @@
     // Act
     client.clip(currentEl);
     ZeroClipboard.activate(currentEl);
-    var pendingText = ZeroClipboard.emit("copy");
+    var pendingText = JSON.parse(ZeroClipboard.emit("copy"));
 
     // Assert
     assert.strictEqual(_clipData["text/plain"], "Clipboard Text");
-    assert.deepEqual(pendingText, _clipData["text/plain"]);
+    assert.deepEqual(pendingText, _clipData);
 
     // Revert
     ZeroClipboard.deactivate();

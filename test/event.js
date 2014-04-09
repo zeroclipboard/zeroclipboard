@@ -493,7 +493,7 @@
     // Arrange
     flashState.disabled = false;
     flashState.outdated = true;
-    flashState.version = "9.0.0";
+    flashState.version = "10.0.0";
     var client = new ZeroClipboard();
     var id = client.id;
 
@@ -509,8 +509,8 @@
       assert.strictEqual(event.type, "error");
       assert.strictEqual(event.name, "flash-outdated");
       assert.strictEqual(event.target, null);
-      assert.strictEqual(event.version, "9.0.0");
-      assert.strictEqual(event.minimumVersion, "10.0.0");
+      assert.strictEqual(event.version, "10.0.0");
+      assert.strictEqual(event.minimumVersion, "11.0.0");
       QUnit.start();
     } );
     QUnit.stop();
@@ -522,7 +522,7 @@
     // Arrange
     flashState.disabled = false;
     flashState.outdated = false;
-    flashState.version = "10.0.0";
+    flashState.version = "11.0.0";
     ZeroClipboard.config({ flashLoadTimeout: 2000 });
     var client = new ZeroClipboard();
     var id = client.id;
@@ -538,8 +538,8 @@
       assert.strictEqual(event.type, "error");
       assert.strictEqual(event.name, "flash-deactivated");
       assert.strictEqual(event.target, null);
-      assert.strictEqual(event.version, "10.0.0");
-      assert.strictEqual(event.minimumVersion, "10.0.0");
+      assert.strictEqual(event.version, "11.0.0");
+      assert.strictEqual(event.minimumVersion, "11.0.0");
       QUnit.start();
     } );
 
@@ -557,7 +557,7 @@
     // Arrange
     flashState.disabled = false;
     flashState.outdated = false;
-    flashState.version = "10.0.0";
+    flashState.version = "11.0.0";
     flashState.deactivated = true;
     var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button");
@@ -573,8 +573,8 @@
       assert.strictEqual(event.type, "error");
       assert.strictEqual(event.name, "flash-deactivated");
       assert.strictEqual(event.target, null);
-      assert.strictEqual(event.version, "10.0.0");
-      assert.strictEqual(event.minimumVersion, "10.0.0");
+      assert.strictEqual(event.version, "11.0.0");
+      assert.strictEqual(event.minimumVersion, "11.0.0");
       QUnit.start();
     } );
 
@@ -643,7 +643,7 @@
     // Arrange
     flashState.disabled = false;
     flashState.outdated = false;
-    flashState.version = "10.0.0";
+    flashState.version = "11.0.0";
     flashState.deactivated = true;
     var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button");
@@ -659,16 +659,16 @@
         assert.strictEqual(event.type, "error");
         assert.strictEqual(event.name, "flash-deactivated");
         assert.strictEqual(flashState.deactivated, true);
-        assert.strictEqual(event.version, "10.0.0");
-        assert.strictEqual(event.minimumVersion, "10.0.0");
+        assert.strictEqual(event.version, "11.0.0");
+        assert.strictEqual(event.minimumVersion, "11.0.0");
       }
       else if (event.name === "flash-overdue") {
         assert.strictEqual(event.type, "error");
         assert.strictEqual(event.name, "flash-overdue");
         assert.strictEqual(flashState.deactivated, false);
         assert.strictEqual(flashState.overdue, true);
-        assert.strictEqual(event.version, "10.0.0");
-        assert.strictEqual(event.minimumVersion, "10.0.0");
+        assert.strictEqual(event.version, "11.0.0");
+        assert.strictEqual(event.minimumVersion, "11.0.0");
 
         QUnit.start();
       }

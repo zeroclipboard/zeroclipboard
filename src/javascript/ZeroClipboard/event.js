@@ -55,8 +55,8 @@ ZeroClipboard.emit = function (event) {
     }
   }
 
-  // For the `copy` event, be sure to return the `_clipData["text/plain"]` string to Flash to be injected into the clipboard
-  return event.type === 'copy' ? _clipData["text/plain"] : undefined;
+  // For the `copy` event, be sure to return the `_clipData` string to Flash to be injected into the clipboard
+  return event.type === 'copy' ? JSON.stringify(_clipData) : undefined;
 };
 
 
@@ -150,7 +150,7 @@ var _createEvent = function(eventType, event) {
     if (/^flash-(outdated|deactivated|overdue)$/.test(event.name)) {
       _extend(event, {
         version: flashState.version,
-        minimumVersion: '10.0.0'
+        minimumVersion: '11.0.0'
       });
     }
   }
@@ -169,6 +169,14 @@ var _createEvent = function(eventType, event) {
         }
       }
     };
+  }
+
+  if (event.type === 'aftercopy' && event.serializedData) {
+    var deserializedData = JSON.parse(event.serializedData);
+    if (typeof deserializedData === 'object' && deserializedData) {
+      _extend(event, deserializedData);
+    }
+    delete event.serializedData;
   }
 
   if (event.target && !event.relatedTarget) {

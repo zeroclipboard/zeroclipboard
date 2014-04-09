@@ -32,7 +32,7 @@ package {
     private var button:Sprite;
 
     // The text in the clipboard
-    private var clipText:String = "";
+    private var clipData:Object = {};
 
     // AMD or CommonJS module ID/path to access the ZeroClipboard object
     private var jsModuleId:String = null;
@@ -96,7 +96,7 @@ package {
     // mouseClick
     //
     // The mouseClick private function handles clearing the clipboard, and
-    // setting new clip text. It gets this from the clipText private variable.
+    // setting new clip text. It gets this from the clipData private variable.
     // Once the text has been placed in the clipboard, It then signals to the
     // Javascript that it is done.
     //
@@ -107,27 +107,27 @@ package {
       // Flash 10 API, so we need to use this until we can figure out an alternative
       var success:Boolean = true;
       try {
-        flash.system.System.setClipboard(clipText);
+        flash.system.System.setClipboard(clipData["text/plain"]);
       }
       catch (e:Error) {
         success = false;
       }
 
       // Compose a results object
-      var results:Object = {
+      var resultsObj:Object = {
         success: {
           "text/plain": success
         },
-        data: {
-          "text/plain": ZeroClipboard.sanitizeString(clipText)
-        }
+        data: clipData
       };
+      // Serialize it
+      var results:String = JSON.stringify(resultsObj);
 
       // reset the text
-      clipText = "";
+      clipData = {};
 
       // signal to the page that it is done
-      emit("aftercopy", results);
+      emit("aftercopy", { serializedData: results });
     }
 
     // mouseOver
@@ -156,14 +156,16 @@ package {
     private function mouseDown(event:MouseEvent): void {
       emit("mousedown", ZeroClipboard.metaData(event));
 
-      // Allow for any "UI prepartion" work before the "copy" event begins
+      // Allow for any "UI preparation" work before the "copy" event begins
       emit("beforecopy", null);
 
-      // request data from the page
-      var newClipText:String = emit("copy", null);
+      // Request pending clipboard data from the page
+      var serializedData:String = emit("copy", null);
 
-      if (newClipText) {
-        clipText = newClipText;
+      // Deserialize it and consume it, if viable
+      var tempData:Object = JSON.parse(serializedData);
+      if (typeof tempData === "object" && tempData && tempData["text/plain"]) {
+        clipData = tempData;
       }
     }
 
@@ -183,7 +185,7 @@ package {
     // returns nothing
     public function setText(newText:String): void {
       // set the maximum number of files allowed
-      clipText = newText;
+      clipData["text/plain"] = newText;
     }
 
     // setHandCursor
@@ -209,7 +211,7 @@ package {
     //
     // Function through which JavaScript events are emitted
     //
-    // returns nothing, or the new clipText
+    // returns nothing, or the new clipData
     private function emit(eventType:String, eventObj:Object): String {
       if (eventObj == null) {
         eventObj = {};

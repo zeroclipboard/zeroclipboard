@@ -48,13 +48,17 @@ To test the page [demo page](http://zeroclipboard.org/#demo) locally, clone the 
 
 ## Support
 
-This library is fully compatible with Flash Player 10.0.0 and above, which requires that the clipboard copy
-operation be initiated by a user click event inside the Flash movie. This is achieved by
-automatically floating the invisible movie on top of a [DOM](http://en.wikipedia.org/wiki/Document_Object_Model)
-element of your choice. Standard mouse events are even propagated out to your DOM element, so you
+This library is fully compatible with Flash Player 11.0.0 and above, which requires
+that the clipboard copy operation be initiated by a user click event inside the
+Flash movie. This is achieved by automatically floating the invisible movie on top
+of a [DOM](http://en.wikipedia.org/wiki/Document_Object_Model) element of your
+choice. Standard mouse events are even propagated out to your DOM element, so you
 can still have rollover and mousedown effects.
 
-Works in IE7+ and all of the evergreen browsers.
+Definitely works in IE8+ and all of the evergreen browsers.
+Should also work in IE7 if you provide a polyfill for the global `JSON` object, e.g.
+[JSON 2](https://github.com/douglascrockford/JSON-js/blob/master/json2.js) or
+[JSON 3](http://bestiejs.github.io/json3/).
 
 
 ## Contributing

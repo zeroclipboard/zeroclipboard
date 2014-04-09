@@ -94,7 +94,7 @@ var _detectFlashSupport = function() {
 
 
   flashState.disabled = hasFlash !== true;
-  flashState.outdated = flashVersion && (parseFloat(flashVersion) < 10.0);
+  flashState.outdated = flashVersion && (parseFloat(flashVersion) < 11.0);
   flashState.version = flashVersion || "0.0.0";
   flashState.pluginType = isPPAPI ? "pepper" : (isActiveX ? "activex" : (hasFlash ? "netscape" : "unknown"));
 
