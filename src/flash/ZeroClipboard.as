@@ -76,7 +76,6 @@ package {
 
       // external functions
       ExternalInterface.addCallback("setHandCursor", setHandCursor);
-      ExternalInterface.addCallback("setText", setText);
       ExternalInterface.addCallback("setSize", setSize);
 
       // signal to the browser that we are ready
@@ -176,16 +175,6 @@ package {
     // returns nothing
     private function mouseUp(event:MouseEvent): void {
       emit("mouseup", ZeroClipboard.metaData(event));
-    }
-
-    // setText
-    //
-    // setText gets the clipboard text to be copied from the javascript.
-    //
-    // returns nothing
-    public function setText(newText:String): void {
-      // set the maximum number of files allowed
-      clipData["text/plain"] = newText;
     }
 
     // setHandCursor

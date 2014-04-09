@@ -550,11 +550,6 @@
   ZeroClipboard.prototype.setText = function(newText) {
     if (newText && newText !== "") {
       _clipData["text/plain"] = newText;
-      if (flashState.ready === true && flashState.bridge && typeof flashState.bridge.setText === "function") {
-        flashState.bridge.setText(newText);
-      } else {
-        flashState.ready = false;
-      }
     }
     return this;
   };

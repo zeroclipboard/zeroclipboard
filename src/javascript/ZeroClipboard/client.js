@@ -56,19 +56,13 @@ var ZeroClipboard = function (elements) {
 
 
 /*
- * Sends a signal to the Flash object to set the clipboard text.
+ * Stores the pending text to inject into the clipboard.
  *
  * returns object instance
  */
 ZeroClipboard.prototype.setText = function (newText) {
   if (newText && newText !== "") {
     _clipData["text/plain"] = newText;
-    if (flashState.ready === true && flashState.bridge && typeof flashState.bridge.setText === 'function') {
-      flashState.bridge.setText(newText);
-    }
-    else {
-      flashState.ready = false;
-    }
   }
   return this;
 };
