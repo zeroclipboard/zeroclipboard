@@ -505,9 +505,42 @@ The handler execution context is as follows:
 </dl>
 
 
+##### error[name = "flash-unavailable"]
+
+This type of `error` event fires when the browser's installation of Flash Player cannot communicate bidirectionally with JavaScript.
+
+The handler execution context is as follows:
+
+<dl>
+<dt>`this`</dt>
+<dd>The ZeroClipboard client instance to which this event handler was attached.</dd>
+<dt>`event`</dt>
+<dd>
+  <dl>
+    <dt>`type`</dt>
+    <dd>`"error"`</dd>
+    <dt>`name`</dt>
+    <dd>`"flash-unavailable"`</dd>
+    <dt>`message`</dt>
+    <dd>A message explaining this event</dd>
+    <dt>`target`</dt>
+    <dd>`null`</dd>
+    <dt>`currentTarget`</dt>
+    <dd>An object reference to the Flash object HTML element, or `null`</dd>
+    <dt>`relatedTarget`</dt>
+    <dd>`null`</dd>
+    <dt>`version`</dt>
+    <dd>The browser's Flash Player version number as a string</dd>
+    <dt>`minimumVersion`</dt>
+    <dd>The minimum required version of Flash Player for ZeroClipboard, i.e. `"11.0.0"`</dd>
+  </dl>
+</dd>
+</dl>
+
+
 ##### error[name = "flash-deactivated"]
 
-This type of `error` event fires when when the browser's installation of Flash Player is either too old for the browser [but
+This type of `error` event fires when the browser's installation of Flash Player is either too old for the browser [but
 _not_ too old for ZeroClipboard] or if Flash objects are configured as click-to-play and the user does not authorize
 it within `_globalConfig.flashLoadTimeout` milliseconds or does not authorize it at all.
 
