@@ -1,8 +1,9 @@
-### ZeroClipboard Security
+# Security
 
 We try our best to keep ZeroClipboard secure but there are some rules that you should consider following to keep your site safe.
 
-#### Rules
+
+## Rules
 
 Basically, if an attacker gets access to the main window/global object via an XSS exploit, it's pretty much an instant "GAME OVER" unless **ALL** of the following are true:
  1. The `ZeroClipboard` object itself is not globally accessible.
@@ -13,7 +14,7 @@ Basically, if an attacker gets access to the main window/global object via an XS
  6. The DOM is not accessible (due to built-in support for `data-clipboard-text` and `data-clipboard-target` attributes).
 
  
-#### Examples
+## Examples
 
  1. Having `ZeroClipboard` instances globally accessible (versus encapsulated in a closure). This allows an attacker to manually call a client's `setText` method and inject their own text.
  2. As with all globally accessible functions in JavaScript, any globally accessible callback functions (hooked to events) can be overridden by an attacker. This isn't terribly dangerous but could be annoying.

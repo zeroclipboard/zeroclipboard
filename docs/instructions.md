@@ -5,11 +5,14 @@ want to see the v1.x codebase, please see the [`1.x-master`](https://github.com/
 
 # Overview
 
-The _ZeroClipboard_ JavaScript library provides an easy way to copy text to the clipboard using an invisible Adobe
-Flash movie.  The "Zero" signifies that the library is invisible and the user interface is left entirely up to you.
+The ZeroClipboard library provides an easy way to copy text to the clipboard using an invisible [Adobe Flash](http://en.wikipedia.org/wiki/Adobe_Flash) movie and a [JavaScript](http://en.wikipedia.org/wiki/JavaScript) interface. The "Zero" signifies that the library is invisible and the user interface is left entirely up to you. 
 
-Browsers won't let you access the clipboard directly. So this library puts a Flash object on the page to proxy the
-clipboard for you. The library will move and resize over all the clipped objects.
+This is achieved by automatically floating the invisible movie on top of a [DOM](http://en.wikipedia.org/wiki/Document_Object_Model) element of your choice. Standard mouse events are even propagated out to your DOM element, so you can still have rollover and mousedown effects.
+
+
+## Limitations
+
+Note that, due to browser and Flash security restrictions, this clipboard injection can _**ONLY**_ occur when the user clicks on the invisible Flash movie. A simulated `click` event from JavaScript will not suffice as this would enable [clipboard poisoning](http://www.computerworld.com/s/article/9117268/Adobe_patches_Flash_clickjacking_and_clipboard_poisoning_bugs).
 
 
 ## Installation
@@ -40,7 +43,7 @@ directory as your web page, then it will work out of the box.  However, if the S
 to set the URL like this (place this code _after_ the script tag):
 
 ```js
-ZeroClipboard.config( { moviePath: 'http://YOURSERVER/path/ZeroClipboard.swf' } );
+ZeroClipboard.config( { swfPath: 'http://YOURSERVER/path/ZeroClipboard.swf' } );
 ```
 
 
@@ -110,7 +113,7 @@ var _globalConfig = {
 };
 ```
 
-You can override the defaults by making a call like `ZeroClipboard.config({ moviePath: "new/path" });` before you create any clients.
+You can override the defaults by making a call like `ZeroClipboard.config({ swfPath: "new/path" });` before you create any clients.
 
 
 ### The `trustedDomains` option: SWF inbound scripting access
