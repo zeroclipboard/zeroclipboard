@@ -212,3 +212,20 @@ ZeroClipboard.deactivate = function() {
     currentElement = null;
   }
 };
+
+
+/*
+ * Diagnostic method that describes the state of the browser, Flash Player, and ZeroClipboard.
+ *
+ * return object
+ */
+ZeroClipboard.state = function() {
+  return {
+    browser: _pick(window.navigator, ["userAgent", "platform", "appName"]),
+    flash: _omit(flashState, ["bridge"]),
+    zeroclipboard: {
+      version:     ZeroClipboard.version,
+      config:      ZeroClipboard.config()
+    }
+  };
+};

@@ -635,3 +635,33 @@ var _safeActiveElement = function() {
   }
   return null;
 };
+
+
+/**
+ * Makes a shallow copy of `obj` (like `_extend`) but filters its properties based on a list of `keys` to keep.
+ * The inverse of `_omit`.
+ */
+var _pick = function(obj, keys) {
+  var newObj = {};
+  for (var i = 0, len = keys.length; i < len; i++) {
+    if (keys[i] in obj) {
+      newObj[keys[i]] = obj[keys[i]];
+    }
+  }
+  return newObj;
+};
+
+
+/**
+ * Makes a shallow copy of `obj` (like `_extend`) but filters its properties based on a list of `keys` to omit.
+ * The inverse of `_pick`.
+ */
+var _omit = function(obj, keys) {
+  var newObj = {};
+  for (var prop in obj) {
+    if (_inArray(prop, keys) === -1) {
+      newObj[prop] = obj[prop];
+    }
+  }
+  return newObj;
+};

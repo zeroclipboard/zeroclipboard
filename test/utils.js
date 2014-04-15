@@ -1,4 +1,4 @@
-/*global _camelizeCssPropName, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _inArray, _dispatchCallback, _extend, _extractDomain, _determineScriptAccess, _objectKeys, _deleteOwnProperties */
+/*global _camelizeCssPropName, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _inArray, _dispatchCallback, _extend, _extractDomain, _determineScriptAccess, _objectKeys, _deleteOwnProperties, _pick, _omit */
 
 "use strict";
 
@@ -486,6 +486,93 @@
     _deleteOwnProperties(f);
     assert.deepEqual(_objectKeys(f), []);
     assert.deepEqual(getProtoKeys(f), []);
+  });
+
+
+  test("`_pick` works", function(assert) {
+    assert.expect(6);
+
+    // Arrange
+    var obj1 = {};
+    var obj2 = {
+      "name": "Zero",
+      "version": "v2.x",
+      "other": "test"
+    };
+    var filter1 = [];
+    var filter2 = ["name", "version"];
+    var filter3 = ["name", "version", "other"];
+
+    var expected1x = {};
+    var expected21 = {};
+    var expected22 = {
+      "name": "Zero",
+      "version": "v2.x"
+    };
+    var expected23 = {
+      "name": "Zero",
+      "version": "v2.x",
+      "other": "test"
+    };
+
+    // Act
+    var result11 = _pick(obj1, filter1);
+    var result12 = _pick(obj1, filter2);
+    var result13 = _pick(obj1, filter3);
+    var result21 = _pick(obj2, filter1);
+    var result22 = _pick(obj2, filter2);
+    var result23 = _pick(obj2, filter3);
+
+    // Assert
+    assert.deepEqual(result11, expected1x, "An empty object cannot have any properties picked");
+    assert.deepEqual(result12, expected1x, "An empty object cannot have any properties picked");
+    assert.deepEqual(result13, expected1x, "An empty object cannot have any properties picked");
+    assert.deepEqual(result21, expected21, "An object with an empty pick list will have nothing picked");
+    assert.deepEqual(result22, expected22, "An object with a subset pick list will have only those properties picked");
+    assert.deepEqual(result23, expected23, "An object with a complete pick list will have all of its properties picked");
+  });
+
+
+  test("`_omit` works", function(assert) {
+    assert.expect(6);
+
+    // Arrange
+    var obj1 = {};
+    var obj2 = {
+      "name": "Zero",
+      "version": "v2.x",
+      "other": "test"
+    };
+    var filter1 = [];
+    var filter2 = ["name", "version"];
+    var filter3 = ["name", "version", "other"];
+
+    var expected1x = {};
+    var expected21 = {
+      "name": "Zero",
+      "version": "v2.x",
+      "other": "test"
+    };
+    var expected22 = {
+      "other": "test"
+    };
+    var expected23 = {};
+
+    // Act
+    var result11 = _omit(obj1, filter1);
+    var result12 = _omit(obj1, filter2);
+    var result13 = _omit(obj1, filter3);
+    var result21 = _omit(obj2, filter1);
+    var result22 = _omit(obj2, filter2);
+    var result23 = _omit(obj2, filter3);
+
+    // Assert
+    assert.deepEqual(result11, expected1x, "An empty object cannot have any properties picked");
+    assert.deepEqual(result12, expected1x, "An empty object cannot have any properties picked");
+    assert.deepEqual(result13, expected1x, "An empty object cannot have any properties picked");
+    assert.deepEqual(result21, expected21, "An object with an empty omit list will have everything picked");
+    assert.deepEqual(result22, expected22, "An object with a subset omit list will have everything but those properties picked");
+    assert.deepEqual(result23, expected23, "An object with a complete omit list will have nothing picked");
   });
 
 })(QUnit.module, QUnit.test);

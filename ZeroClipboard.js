@@ -439,6 +439,24 @@
     } catch (err) {}
     return null;
   };
+  var _pick = function(obj, keys) {
+    var newObj = {};
+    for (var i = 0, len = keys.length; i < len; i++) {
+      if (keys[i] in obj) {
+        newObj[keys[i]] = obj[keys[i]];
+      }
+    }
+    return newObj;
+  };
+  var _omit = function(obj, keys) {
+    var newObj = {};
+    for (var prop in obj) {
+      if (_inArray(prop, keys) === -1) {
+        newObj[prop] = obj[prop];
+      }
+    }
+    return newObj;
+  };
   var _detectFlashSupport = function() {
     var hasFlash = false;
     var isActiveX = false;
@@ -693,6 +711,16 @@
       _removeClass(currentElement, _globalConfig.activeClass);
       currentElement = null;
     }
+  };
+  ZeroClipboard.state = function() {
+    return {
+      browser: _pick(window.navigator, [ "userAgent", "platform", "appName" ]),
+      flash: _omit(flashState, [ "bridge" ]),
+      zeroclipboard: {
+        version: ZeroClipboard.version,
+        config: ZeroClipboard.config()
+      }
+    };
   };
   var _bridge = function() {
     var flashBridge, len;

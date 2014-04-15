@@ -1,4 +1,4 @@
-/*global ZeroClipboard, _globalConfig:true */
+/*global ZeroClipboard, _globalConfig:true, _objectKeys */
 
 "use strict";
 
@@ -50,6 +50,24 @@
     assert.deepEqual(updatedConfig.trustedDomains, updatedValue);
     assert.deepEqual(ZeroClipboard.config("trustedDomains"), updatedValue);
     assert.deepEqual(ZeroClipboard.config().trustedDomains, updatedValue);
+  });
+
+
+  test("`state` produces expected result", function(assert) {
+    assert.expect(8);
+
+    // Act
+    var result = ZeroClipboard.state();
+
+    // Assert
+    assert.deepEqual(_objectKeys(result), ["browser", "flash", "zeroclipboard"], "Has all expected keys");
+    assert.strictEqual(typeof result.browser, "object", ".browser is an object");
+    assert.notStrictEqual(result.browser, null, ".browser is a non-null object");
+    assert.strictEqual(typeof result.flash, "object", ".flash is an object");
+    assert.notStrictEqual(result.flash, null, ".flash is a non-null object");
+    assert.strictEqual(typeof result.zeroclipboard, "object", ".zeroclipboard is an object");
+    assert.notStrictEqual(result.zeroclipboard, null, ".zeroclipboard is a non-null object");
+    assert.deepEqual(_objectKeys(result.zeroclipboard), ["version", "config"], ".zeroclipboard has all expected keys");
   });
 
 })(QUnit.module, QUnit.test);
