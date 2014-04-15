@@ -5,10 +5,9 @@ package {
   import flash.display.StageScaleMode;
   import flash.display.StageQuality;
   import flash.display.Sprite;
-  import flash.events.*;
-  import flash.external.ExternalInterface;
+  import flash.events.Event;
+  import flash.events.MouseEvent;
   import flash.system.Security;
-  import flash.system.System;
 
 
   // ZeroClipboard
@@ -47,6 +46,9 @@ package {
       "  return ZC.emit(eventObj);\n" +
       "})";
 
+
+    // JavaScript proxy object
+    private var jsProxy:JsProxy = null;
 
     // The text in the clipboard
     private var clipData:Object = {};
@@ -87,11 +89,11 @@ package {
       this.removeEventListener(Event.ADDED_TO_STAGE, this.init);
 
       // Get the flashvars
-      var flashvars:Object = this.loaderInfo.parameters;
+      var flashvars:Object = XssUtils.filterToFlashVars(this.loaderInfo.parameters);
 
       // Allow the SWF object to communicate with a page on a different origin than its own (e.g. SWF served from CDN)
       if (flashvars.trustedOrigins && typeof flashvars.trustedOrigins === "string") {
-        var origins:Array = ZeroClipboard.sanitizeString(flashvars.trustedOrigins).split(",");
+        var origins:Array = XssUtils.sanitizeString(flashvars.trustedOrigins).split(",");
         Security.allowDomain.apply(Security, origins);
       }
 
@@ -119,10 +121,11 @@ package {
       // Add the invisible "button" to the stage!
       this.addChild(button);
 
+      // Establish a communication line with JavaScript
+      this.jsProxy = new JsProxy(ZeroClipboard.SWF_OBJECT_ID);
+
       // Only proceed if this SWF is hosted in the browser as expected
-      if (ExternalInterface.available &&
-          ExternalInterface.objectID &&
-          ExternalInterface.objectID === ZeroClipboard.SWF_OBJECT_ID) {
+      if (this.jsProxy.isComplete()) {
 
         // Add the MouseEvent listeners
         button.addEventListener(MouseEvent.CLICK, mouseClick);
@@ -132,7 +135,7 @@ package {
         button.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
 
         // Expose the external functions
-        ExternalInterface.addCallback(
+        this.jsProxy.addCallback(
           "setHandCursor",
           function(enabled:Boolean) {
             button.useHandCursor = enabled === true;
@@ -150,15 +153,6 @@ package {
       }
     }
 
-    // sanitizeString
-    //
-    // This private function will accept a string, and return a sanitized string
-    // to avoid XSS vulnerabilities
-    //
-    // returns an XSS safe String
-    private static function sanitizeString(dirty:String): String {
-      return dirty.replace(/\\/g, "\\\\");
-    }
 
     // mouseClick
     //
@@ -169,26 +163,16 @@ package {
     //
     // returns nothing
     private function mouseClick(event:MouseEvent): void {
+      var clipInjectSuccess:Object = {};  // NOPMD
 
-      // Linux currently doesn't use the correct clipboard buffer with the new
-      // Flash 10 API, so we need to use this until we can figure out an alternative
-      var success:Boolean = true;
-      try {
-        System.setClipboard(clipData["text/plain"]);
-      }
-      catch (e:Error) {
-        success = false;
-      }
+      // Inject all pending data into the user's clipboard
+      clipInjectSuccess = ClipboardInjector.inject(clipData);
 
-      // Compose a results object
-      var resultsObj:Object = {
-        success: {
-          "text/plain": success
-        },
+      // Compose and serialize a results object
+      var results:String = JSON.stringify({
+        success: clipInjectSuccess,
         data: clipData
-      };
-      // Serialize it
-      var results:String = JSON.stringify(resultsObj);
+      });
 
       // reset the text
       clipData = {};
@@ -203,7 +187,7 @@ package {
     //
     // returns nothing
     private function mouseOver(event:MouseEvent): void {
-      emit("mouseover", ZeroClipboard.metaData(event));
+      this.emit("mouseover", ZeroClipboard.metaData(event));
     }
 
     // mouseOut
@@ -212,7 +196,7 @@ package {
     //
     // returns nothing
     private function mouseOut(event:MouseEvent): void {
-      emit("mouseout", ZeroClipboard.metaData(event));
+      this.emit("mouseout", ZeroClipboard.metaData(event));
     }
 
     // mouseDown
@@ -221,13 +205,13 @@ package {
     //
     // returns nothing
     private function mouseDown(event:MouseEvent): void {
-      emit("mousedown", ZeroClipboard.metaData(event));
+      this.emit("mousedown", ZeroClipboard.metaData(event));
 
       // Allow for any "UI preparation" work before the "copy" event begins
-      emit("beforecopy");
+      this.emit("beforecopy");
 
       // Request pending clipboard data from the page
-      var serializedData:String = emit("copy");
+      var serializedData:String = this.emit("copy");
 
       // Deserialize it and consume it, if viable
       var tempData:Object = JSON.parse(serializedData);
@@ -242,20 +226,28 @@ package {
     //
     // returns nothing
     private function mouseUp(event:MouseEvent): void {
-      emit("mouseup", ZeroClipboard.metaData(event));
+      this.emit("mouseup", ZeroClipboard.metaData(event));
     }
 
     // emit
     //
     // Function through which JavaScript events are emitted
     //
-    // returns nothing, or the new clipData
+    // returns nothing, or the new "clipData" as JSON
     private function emit(eventType:String, eventObj:Object = null): String {
       if (eventObj == null) {
         eventObj = {};
       }
       eventObj.type = eventType;
-      return ExternalInterface.call(ZeroClipboard.JS_EMITTER, eventObj);
+
+      var result:String = undefined;
+      if (this.jsProxy.isComplete()) {
+        result = this.jsProxy.call(ZeroClipboard.JS_EMITTER, [eventObj]);
+      }
+      else {
+        this.jsProxy.send(ZeroClipboard.JS_EMITTER, [eventObj]);
+      }
+      return result;
     }
 
     // metaData

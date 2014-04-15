@@ -12,8 +12,7 @@ module.exports = function(grunt) {
 
   // Make a temp dir for Flash compilation
   var tmpDir = os.tmpdir ? os.tmpdir() : os.tmpDir();
-  var flashTmpDir = path.join(tmpDir, 'flash');
-  var flashTmpFile = path.join(flashTmpDir, 'ZeroClipboard.as');
+  var flashTmpDir = path.join(tmpDir, 'zcflash');
 
   // Shared configuration
   var localPort = 7320;  // "ZERO"
@@ -40,7 +39,14 @@ module.exports = function(grunt) {
       }
     },
     clean: {
-      src: ['ZeroClipboard.*'],
+      dist: ['ZeroClipboard.*'],
+      flash: {
+        options: {
+          // Force is required when trying to clean outside of the project dir
+          force: true
+        },
+        src: [flashTmpDir]
+      },
       meta: ['bower.json', 'composer.json', 'LICENSE']
     },
     concat: {
@@ -66,12 +72,33 @@ module.exports = function(grunt) {
         ],
         dest: 'ZeroClipboard.js'
       },
-      flash: {
+      flashMain: {
         src: [
           'src/meta/source-banner.tmpl',
           'src/flash/ZeroClipboard.as'
         ],
-        dest: flashTmpFile
+        dest: path.join(flashTmpDir, 'ZeroClipboard.as')
+      },
+      flashClip: {
+        src: [
+          'src/meta/source-banner.tmpl',
+          'src/flash/ClipboardInjector.as'
+        ],
+        dest: path.join(flashTmpDir, 'ClipboardInjector.as')
+      },
+      flashJs: {
+        src: [
+          'src/meta/source-banner.tmpl',
+          'src/flash/JsProxy.as'
+        ],
+        dest: path.join(flashTmpDir, 'JsProxy.as')
+      },
+      flashXss: {
+        src: [
+          'src/meta/source-banner.tmpl',
+          'src/flash/XssUtils.as'
+        ],
+        dest: path.join(flashTmpDir, 'XssUtils.as')
       }
     },
     uglify: {
@@ -103,7 +130,7 @@ module.exports = function(grunt) {
       },
       swf: {
         files: {
-          'ZeroClipboard.swf': [flashTmpFile]
+          'ZeroClipboard.swf': ['<%= concat.flashMain.dest %>']
         }
       }
     },
@@ -131,7 +158,7 @@ module.exports = function(grunt) {
       options: {
         mode: '444'
       },
-      src: ['ZeroClipboard.*'],
+      dist: ['ZeroClipboard.*'],
       meta: ['bower.json', 'composer.json', 'LICENSE']
     },
     connect: {
@@ -187,9 +214,10 @@ module.exports = function(grunt) {
   //
   // Task aliases and chains
   //
-  grunt.registerTask('validate',     ['jshint', 'concat:flash', 'flexpmd']);
+  grunt.registerTask('prep-flash',   ['clean:flash', 'concat:flashMain', 'concat:flashClip', 'concat:flashJs', 'concat:flashXss']);
+  grunt.registerTask('validate',     ['jshint', 'prep-flash', 'flexpmd']);
   grunt.registerTask('build',        ['clean', 'concat', 'uglify', 'mxmlc', 'template', 'chmod']);
-  grunt.registerTask('build-travis', ['clean:src', 'concat', 'mxmlc', 'chmod:src']);
+  grunt.registerTask('build-travis', ['clean:dist', 'concat', 'mxmlc', 'chmod:dist']);
   grunt.registerTask('test',         ['connect', 'qunit']);
 
   // Default task
