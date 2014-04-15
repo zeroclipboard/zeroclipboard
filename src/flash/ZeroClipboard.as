@@ -1,12 +1,15 @@
 package {
 
   import flash.display.Stage;
+  import flash.display.StageAlign;
+  import flash.display.StageScaleMode;
+  import flash.display.StageQuality;
   import flash.display.Sprite;
-  import flash.display.LoaderInfo;
   import flash.events.*;
   import flash.external.ExternalInterface;
-  import flash.utils.*;
-  import flash.system.Capabilities;
+  import flash.system.Security;
+  import flash.system.System;
+
 
   // ZeroClipboard
   //
@@ -14,6 +17,7 @@ package {
   // text in your clipboard when clicked
   //
   // returns nothing
+  [SWF(widthPercent="100%", heightPercent="100%", backgroundColor="#FFFFFF")]
   public class ZeroClipboard extends Sprite {
 
     // CONSTANTS
@@ -27,30 +31,59 @@ package {
       "  return " + ZeroClipboard.NORMAL_EMITTER + "(eventObj);\n" +
       "})";
 
-
-    // The button sprite
-    private var button:Sprite;
-
     // The text in the clipboard
     private var clipData:Object = {};
 
     // AMD or CommonJS module ID/path to access the ZeroClipboard object
     private var jsModuleId:String = null;
 
-    // constructor, setup event listeners and external interfaces
+    /**
+     * @constructor
+     */
     public function ZeroClipboard() {
+      // The JIT Compiler does not compile constructors, so ANY
+      // cyclomatic complexity higher than 1 is discouraged.
+      this.ctor();
+    }
 
-      // Align the stage to top left
-      stage.align = "TL";
-      stage.scaleMode = "noScale";
+    /**
+     * The real constructor.
+     *
+     * @return void
+     */
+    private function ctor(): void {
+      // If the `stage` is available, begin!
+      if (stage) {
+        this.init();
+      }
+      else {
+        // Otherwise, wait for the `stage`....
+        this.addEventListener(Event.ADDED_TO_STAGE, this.init);
+      }
+    }
+
+    /**
+     * Initialize the class when the Stage is ready.
+     *
+     * @return void
+     */
+    private function init(): void {
+      // Remove the event listener, if any
+      this.removeEventListener(Event.ADDED_TO_STAGE, this.init);
+
+      // Set the stage!
+      stage.align = StageAlign.TOP_LEFT;
+      stage.scaleMode = StageScaleMode.EXACT_FIT;
+      stage.quality = StageQuality.BEST;
+
 
       // Get the flashvars
-      var flashvars:Object = LoaderInfo( this.root.loaderInfo ).parameters;
+      var flashvars:Object = this.loaderInfo.parameters;
 
       // Allow the SWF object to communicate with a page on a different origin than its own (e.g. SWF served from CDN)
       if (flashvars.trustedOrigins && typeof flashvars.trustedOrigins === "string") {
         var origins:Array = ZeroClipboard.sanitizeString(flashvars.trustedOrigins).split(",");
-        flash.system.Security.allowDomain.apply(null, origins);
+        Security.allowDomain.apply(Security, origins);
       }
 
       // Enable complete AMD (e.g. RequireJS) and CommonJS (e.g. Browserify) support
@@ -58,14 +91,22 @@ package {
         jsModuleId = ZeroClipboard.sanitizeString(flashvars.jsModuleId);
       }
 
-      // invisible button covers entire stage
-      button = new Sprite();
-      button.buttonMode = true;
-      button.useHandCursor = false;
-      button.graphics.beginFill(0xCCFF00);
+      // Create an invisible "button" and transparently fill the entire Stage
+      var button:Sprite = new Sprite();
+      button.graphics.beginFill(0xFFFFFF);
       button.graphics.drawRect(0, 0, stage.stageWidth, stage.stageHeight);
       button.alpha = 0.0;
-      addChild(button);
+
+      // Act like a button. This includes:
+      //  - Showing a hand cursor by default
+      //  - Receiving click events
+      //  - Receiving keypress events of space/"Enter" as click
+      //    events IF AND ONLY IF the Sprite is focused.
+      button.buttonMode = true;
+      button.useHandCursor = false;
+
+      // Add the invisible "button" to the stage!
+      this.addChild(button);
 
       // Adding the event listeners
       button.addEventListener(MouseEvent.CLICK, mouseClick);
@@ -75,11 +116,15 @@ package {
       button.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
 
       // external functions
-      ExternalInterface.addCallback("setHandCursor", setHandCursor);
-      ExternalInterface.addCallback("setSize", setSize);
-
+      ExternalInterface.addCallback(
+        "setHandCursor",
+        function(enabled:Boolean) {
+          button.useHandCursor = enabled === true;
+        }
+      );
+  
       // signal to the browser that we are ready
-      emit("ready", null);
+      this.emit("ready");
     }
 
     // sanitizeString
@@ -106,7 +151,7 @@ package {
       // Flash 10 API, so we need to use this until we can figure out an alternative
       var success:Boolean = true;
       try {
-        flash.system.System.setClipboard(clipData["text/plain"]);
+        System.setClipboard(clipData["text/plain"]);
       }
       catch (e:Error) {
         success = false;
@@ -126,7 +171,7 @@ package {
       clipData = {};
 
       // signal to the page that it is done
-      emit("aftercopy", { serializedData: results });
+      this.emit("aftercopy", { serializedData: results });
     }
 
     // mouseOver
@@ -156,10 +201,10 @@ package {
       emit("mousedown", ZeroClipboard.metaData(event));
 
       // Allow for any "UI preparation" work before the "copy" event begins
-      emit("beforecopy", null);
+      emit("beforecopy");
 
       // Request pending clipboard data from the page
-      var serializedData:String = emit("copy", null);
+      var serializedData:String = emit("copy");
 
       // Deserialize it and consume it, if viable
       var tempData:Object = JSON.parse(serializedData);
@@ -177,37 +222,18 @@ package {
       emit("mouseup", ZeroClipboard.metaData(event));
     }
 
-    // setHandCursor
-    //
-    // setHandCursor will make the button cursor be a hand on hover.
-    //
-    // returns nothing
-    public function setHandCursor(enabled:Boolean): void {
-      button.useHandCursor = enabled;
-    }
-
-    // setSize
-    //
-    // Sets the size of the button to equal the size of the hovered object.
-    //
-    // returns nothing
-    public function setSize(width:Number, height:Number): void {
-      button.width = width;
-      button.height = height;
-    }
-
     // emit
     //
     // Function through which JavaScript events are emitted
     //
     // returns nothing, or the new clipData
-    private function emit(eventType:String, eventObj:Object): String {
+    private function emit(eventType:String, eventObj:Object = null): String {
       if (eventObj == null) {
         eventObj = {};
       }
       eventObj.type = eventType;
-      if (jsModuleId) {
-        return ExternalInterface.call(ZeroClipboard.JS_MODULE_WRAPPED_EMITTER, eventObj, jsModuleId);
+      if (this.jsModuleId) {
+        return ExternalInterface.call(ZeroClipboard.JS_MODULE_WRAPPED_EMITTER, eventObj, this.jsModuleId);
       }
       else {
         return ExternalInterface.call(ZeroClipboard.NORMAL_EMITTER, eventObj);

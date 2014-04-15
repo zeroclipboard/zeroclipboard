@@ -69,16 +69,15 @@ ZeroClipboard.prototype.setText = function (newText) {
 
 
 /*
- * Sends a signal to the Flash object to change the stage size/dimensions.
+ * Change the size/dimensions of the Flash object's stage.
  *
  * returns object instance
  */
 ZeroClipboard.prototype.setSize = function (width, height) {
-  if (flashState.ready === true && flashState.bridge && typeof flashState.bridge.setSize === 'function') {
-    flashState.bridge.setSize(width, height);
-  }
-  else {
-    flashState.ready = false;
+  var htmlBridge = _getHtmlBridge(flashState.bridge);
+  if (htmlBridge) {
+    htmlBridge.style.width = width + "px";
+    htmlBridge.style.height = height + "px";
   }
   return this;
 };

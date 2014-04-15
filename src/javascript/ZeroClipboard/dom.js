@@ -22,6 +22,7 @@ var _bridge = function () {
 
     // Set `allowScriptAccess` based on `trustedDomains` and `window.location.host` vs. `swfPath`
     var allowScriptAccess = _determineScriptAccess(window.location.host, _globalConfig);
+    var allowNetworking = allowScriptAccess === "never" ? "none" : "all";
 
     var flashvars = _vars(opts);
     var swfUrl = _globalConfig.swfPath + _cacheBust(_globalConfig.swfPath, _globalConfig);
@@ -54,17 +55,14 @@ var _bridge = function () {
     //  - Ambience version:     http://www.ambience.sk/flash-valid.htm
     var oldIE = flashState.pluginType === "activex";
     tmpDiv.innerHTML =
-      '<object id="global-zeroclipboard-flash-bridge" width="100%" height="100%" ' +
+      '<object id="global-zeroclipboard-flash-bridge" name="global-zeroclipboard-flash-bridge" ' +
+        'width="100%" height="100%" ' +
         (oldIE ? 'classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"' : 'type="application/x-shockwave-flash" data="' + swfUrl + '"') +
       '>' +
         (oldIE ? '<param name="movie" value="' + swfUrl + '"/>' : '') +
         '<param name="allowScriptAccess" value="' + allowScriptAccess + '"/>' +
-        '<param name="allowFullScreen" value="false"/>' +
-        '<param name="scale" value="exactfit"/>' +
-        '<param name="loop" value="false"/>' +
+        '<param name="allowNetworking" value="' + allowNetworking + '"/>' +
         '<param name="menu" value="false"/>' +
-        '<param name="quality" value="best" />' +
-        '<param name="bgcolor" value="#ffffff"/>' +
         '<param name="wmode" value="transparent"/>' +
         '<param name="flashvars" value="' + flashvars + '"/>' +
       '</object>';
@@ -89,6 +87,7 @@ var _bridge = function () {
 
   flashState.bridge = flashBridge || null;
 };
+
 
 /*
  * Get the HTML element container that wraps the Flash bridge object/element.

@@ -554,10 +554,10 @@
     return this;
   };
   ZeroClipboard.prototype.setSize = function(width, height) {
-    if (flashState.ready === true && flashState.bridge && typeof flashState.bridge.setSize === "function") {
-      flashState.bridge.setSize(width, height);
-    } else {
-      flashState.ready = false;
+    var htmlBridge = _getHtmlBridge(flashState.bridge);
+    if (htmlBridge) {
+      htmlBridge.style.width = width + "px";
+      htmlBridge.style.height = height + "px";
     }
     return this;
   };
@@ -705,6 +705,7 @@
       var opts = ZeroClipboard.config();
       opts.jsModuleId = typeof _amdModuleId === "string" && _amdModuleId || typeof _cjsModuleId === "string" && _cjsModuleId || null;
       var allowScriptAccess = _determineScriptAccess(window.location.host, _globalConfig);
+      var allowNetworking = allowScriptAccess === "never" ? "none" : "all";
       var flashvars = _vars(opts);
       var swfUrl = _globalConfig.swfPath + _cacheBust(_globalConfig.swfPath, _globalConfig);
       container = document.createElement("div");
@@ -721,7 +722,7 @@
       document.body.appendChild(container);
       var tmpDiv = document.createElement("div");
       var oldIE = flashState.pluginType === "activex";
-      tmpDiv.innerHTML = '<object id="global-zeroclipboard-flash-bridge" width="100%" height="100%" ' + (oldIE ? 'classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"' : 'type="application/x-shockwave-flash" data="' + swfUrl + '"') + ">" + (oldIE ? '<param name="movie" value="' + swfUrl + '"/>' : "") + '<param name="allowScriptAccess" value="' + allowScriptAccess + '"/>' + '<param name="allowFullScreen" value="false"/>' + '<param name="scale" value="exactfit"/>' + '<param name="loop" value="false"/>' + '<param name="menu" value="false"/>' + '<param name="quality" value="best" />' + '<param name="bgcolor" value="#ffffff"/>' + '<param name="wmode" value="transparent"/>' + '<param name="flashvars" value="' + flashvars + '"/>' + "</object>";
+      tmpDiv.innerHTML = '<object id="global-zeroclipboard-flash-bridge" name="global-zeroclipboard-flash-bridge" ' + 'width="100%" height="100%" ' + (oldIE ? 'classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"' : 'type="application/x-shockwave-flash" data="' + swfUrl + '"') + ">" + (oldIE ? '<param name="movie" value="' + swfUrl + '"/>' : "") + '<param name="allowScriptAccess" value="' + allowScriptAccess + '"/>' + '<param name="allowNetworking" value="' + allowNetworking + '"/>' + '<param name="menu" value="false"/>' + '<param name="wmode" value="transparent"/>' + '<param name="flashvars" value="' + flashvars + '"/>' + "</object>";
       flashBridge = tmpDiv.firstChild;
       tmpDiv = null;
       container.replaceChild(flashBridge, divToBeReplaced);
