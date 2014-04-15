@@ -42,7 +42,12 @@ var _globalConfig = {
  * returns true if Flash should NOT be considered usable, otherwise false
  */
 ZeroClipboard.isFlashUnusable = function() {
-  return !!(flashState.disabled || flashState.outdated || flashState.deactivated);
+  return !!(
+    flashState.disabled ||
+    flashState.outdated ||
+    flashState.unavailable ||
+    flashState.deactivated
+  );
 };
 
 

@@ -118,32 +118,18 @@
 
 
   test("`_vars` builds FlashVars", function(assert) {
-    assert.expect(5);
+    assert.expect(2);
 
     // Arrange
     var clipOptionsEmpty = {};
-    var clipOptionsTrustedDomainsOnly = {
+    var clipOptionsTrustedDomains = {
       trustedDomains: ["*"],
-      debug: false
-    };
-    var clipOptionsAmdOnly = {
-      jsModuleId: "zcAMD"
-    };
-    var clipOptionsCommonJsOnly = {
-      jsModuleId: "zcCJS"
-    };
-    var clipOptionsAll = {
-      trustedDomains: ["*"],
-      jsModuleId: "zcAMD",
       debug: false
     };
 
     // Act & Assert
     assert.strictEqual(_vars(clipOptionsEmpty), "");
-    assert.strictEqual(_vars(clipOptionsTrustedDomainsOnly), "trustedOrigins=*");
-    assert.strictEqual(_vars(clipOptionsAmdOnly), "jsModuleId=zcAMD");
-    assert.strictEqual(_vars(clipOptionsCommonJsOnly), "jsModuleId=zcCJS");
-    assert.strictEqual(_vars(clipOptionsAll), "trustedOrigins=*&jsModuleId=zcAMD");
+    assert.strictEqual(_vars(clipOptionsTrustedDomains), "trustedOrigins=*");
   });
 
 

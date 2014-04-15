@@ -10,21 +10,12 @@ var _bridge = function () {
   var container = document.getElementById("global-zeroclipboard-html-bridge");
 
   if (!container) {
-    // Get a copy of the `_globalConfig` object to avoid exposing
-    // the `amdModuleId` and `cjsModuleId` settings
-    var opts = ZeroClipboard.config();
-    // Set these last to override them just in case any [v1.2.0-beta.1] users
-    // are still passing them in to [v1.2.0-beta.2] (or higher)
-    opts.jsModuleId =
-      (typeof _amdModuleId === "string" && _amdModuleId) ||
-      (typeof _cjsModuleId === "string" && _cjsModuleId) ||
-      null;
-
-    // Set `allowScriptAccess` based on `trustedDomains` and `window.location.host` vs. `swfPath`
+    // Set `allowScriptAccess`/`allowNetworking` based on `trustedDomains` and `window.location.host` vs. `swfPath`
     var allowScriptAccess = _determineScriptAccess(window.location.host, _globalConfig);
     var allowNetworking = allowScriptAccess === "never" ? "none" : "all";
 
-    var flashvars = _vars(opts);
+    // Prepare the FlashVars and cache-busting query param
+    var flashvars = _vars(_globalConfig);
     var swfUrl = _globalConfig.swfPath + _cacheBust(_globalConfig.swfPath, _globalConfig);
 
     // Create the outer container
@@ -68,6 +59,12 @@ var _bridge = function () {
       '</object>';
     flashBridge = tmpDiv.firstChild;
     tmpDiv = null;
+
+    // Store a reference to the `ZeroClipboard` object as a DOM property
+    // on the ZeroClipboard-owned "object" element. This will help us
+    // easily avoid issues with AMD/CommonJS loaders that don't have
+    // a global `ZeroClipboard` reliably available.
+    flashBridge.ZeroClipboard = ZeroClipboard;
 
     // NOTE: Using `replaceChild` is very important!
     // - https://github.com/swfobject/swfobject/blob/562fe358216edbb36445aa62f817c1a56252950c/swfobject/src/swfobject.js

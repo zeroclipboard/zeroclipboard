@@ -819,11 +819,10 @@ Here is a more complete example which exercises many of the configuration option
 
 If using [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) with a library such as [RequireJS](http://requirejs.org/), etc., you shouldn't need to do any special configuration for ZeroClipboard to work correctly as an AMD module.
 
-However, in order to correctly dispatch events while using AMD, ZeroClipboard expects a [global `require` function](https://github.com/amdjs/amdjs-api/wiki/require) to exist. If you are using an AMD loader that does _not_ expose a global `require` function (e.g. curl.js), then you will need to add that function yourself. For example, with curl.js:
 
-```js
-window.require = curl;
-```
+## CommonJS
+
+If using [CommonJS](http://wiki.commonjs.org/wiki/Modules/1.1) with a library such as [Browserify](http://browserify.org/), [Webmake](https://github.com/medikoo/modules-webmake), etc., you shouldn't need to do any special configuration for ZeroClipboard to work correctly as an CommonJS module.
 
 
 ## Known Conflicts With Other Libraries
@@ -876,7 +875,12 @@ if (/MSIE|Trident/.test(window.navigator.userAgent)) {
 
 ## Browser Support
 
-Works in IE7+ and all of the evergreen browsers.
+This library is fully compatible with Flash Player 11.0.0 and above, which requires that the clipboard copy operation be initiated by a user click event inside the Flash movie. This is achieved by automatically floating the invisible movie on top of a [DOM](http://en.wikipedia.org/wiki/Document_Object_Model) element of your choice. Standard mouse events are even propagated out to your DOM element, so you can still have rollover and mousedown effects.
+
+Definitely works in IE8+ and all of the evergreen browsers.
+Should also work in IE7 if you provide a polyfill for the global `JSON` object, e.g.
+[JSON 2](https://github.com/douglascrockford/JSON-js/blob/master/json2.js) or
+[JSON 3](http://bestiejs.github.io/json3/).
 
 
 ## OS Considerations

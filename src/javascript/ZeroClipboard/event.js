@@ -102,6 +102,7 @@ var _eventMessages = {
   'error': {
     'flash-disabled': 'Flash is disabled or not installed',
     'flash-outdated': 'Flash is too outdated to support ZeroClipboard',
+    'flash-unavailable': 'Flash is unable to communicate bidirectionally with JavaScript',
     'flash-deactivated': 'Flash is too outdated for your browser and/or is configured as click-to-activate',
     'flash-overdue': 'Flash communication was established but NOT within the acceptable time limit'
   }
@@ -147,7 +148,7 @@ var _createEvent = function(eventType, event) {
   if (event.type === 'error') {
     event.target = null;
 
-    if (/^flash-(outdated|deactivated|overdue)$/.test(event.name)) {
+    if (/^flash-(outdated|unavailable|deactivated|overdue)$/.test(event.name)) {
       _extend(event, {
         version: flashState.version,
         minimumVersion: '11.0.0'
@@ -171,12 +172,12 @@ var _createEvent = function(eventType, event) {
     };
   }
 
-  if (event.type === 'aftercopy' && event.serializedData) {
-    var deserializedData = JSON.parse(event.serializedData);
+  if (event.type === 'aftercopy' && event.json) {
+    var deserializedData = JSON.parse(event.json);
+    delete event.json;
     if (typeof deserializedData === 'object' && deserializedData) {
       _extend(event, deserializedData);
     }
-    delete event.serializedData;
   }
 
   if (event.target && !event.relatedTarget) {
@@ -210,6 +211,7 @@ var _preprocessEvent = function (event) {
         _extend(flashState, {
           disabled:    event.name === 'flash-disabled',
           outdated:    event.name === 'flash-outdated',
+          unavailable: event.name === 'flash-unavailable',
           deactivated: event.name === 'flash-deactivated',
           overdue:     event.name === 'flash-overdue',
           ready:       false
@@ -222,6 +224,7 @@ var _preprocessEvent = function (event) {
       _extend(flashState, {
         disabled:    false,
         outdated:    false,
+        unavailable: false,
         deactivated: false,
         overdue:     wasDeactivated,
         ready:       !wasDeactivated
@@ -321,39 +324,16 @@ ZeroClipboard.prototype.on = function (eventName, func) {
       });
     }
     if (added.error) {
-      // If we don't have Flash, tell an adult
-      if (flashState.disabled) {
-        ZeroClipboard.emit({
-          type: "error",
-          name: "flash-disabled",
-          client: this
-        });
-      }
-      // If we have old Flash, cry about it
-      else if (flashState.outdated) {
-        ZeroClipboard.emit({
-          type: "error",
-          name: "flash-outdated",
-          client: this
-        });
-      }
-      // If the user or browser has Flash configured as click-to-play and they don't authorize
-      // it (or don't do so quickly enough), point fingers
-      else if (flashState.deactivated) {
-        ZeroClipboard.emit({
-          type: "error",
-          name: "flash-deactivated",
-          client: this
-        });
-      }
-      // If the user or browser has Flash configured as click-to-play and they don't authorize
-      // it quickly enough but then DO authorize it, tough luck
-      else if (flashState.overdue) {
-        ZeroClipboard.emit({
-          type: "error",
-          name: "flash-overdue",
-          client: this
-        });
+      var errorTypes = ["disabled", "outdated", "unavailable", "deactivated", "overdue"];
+      for (i = 0, len = errorTypes.length; i < len; i++) {
+        if (flashState[errorTypes[i]]) {
+          ZeroClipboard.emit({
+            type: "error",
+            name: "flash-" + errorTypes[i],
+            client: this
+          });
+          break;
+        }
       }
     }
   }

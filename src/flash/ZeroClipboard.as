@@ -21,21 +21,36 @@ package {
   public class ZeroClipboard extends Sprite {
 
     // CONSTANTS
-    // Function through which JavaScript events are emitted normally
-    private static const NORMAL_EMITTER:String = "ZeroClipboard.emit";
+    // Expected Flash object ID
+    private static const SWF_OBJECT_ID:String = "global-zeroclipboard-flash-bridge";
 
-    // Function through which JavaScript events are emitted if using an AMD/CommonJS module loader
-    private static const JS_MODULE_WRAPPED_EMITTER:String =
-      "(function (eventObj, jsModuleId) {\n" +
-      "  var ZeroClipboard = require(jsModuleId);\n" +
-      "  return " + ZeroClipboard.NORMAL_EMITTER + "(eventObj);\n" +
+    // Function through which JavaScript events are emitted.
+    // Acccounts for scenarios in which ZeroClipboard is used via AMD/CommonJS module loaders, too.
+    private static const JS_EMITTER:String =
+      "(function(eventObj) {\n" +
+      "  var objectId = '" + ZeroClipboard.SWF_OBJECT_ID + "',\n" +
+      "      ZC = null,\n" +
+      "      swf = null;\n" +
+      "  if (typeof ZeroClipboard === 'function' && typeof ZeroClipboard.emit === 'function') {\n" +
+      "    \nZC = ZeroClipboard;\n" +
+      "  }\n" +
+      "  else {\n" +
+      "    swf = document[objectId] || document.getElementById(objectId);\n" +
+      "    if (swf && typeof swf.ZeroClipboard === 'function' && typeof swf.ZeroClipboard.emit === 'function') {\n" +
+      "      ZC = swf.ZeroClipboard;\n" +
+      "    }\n" +
+      "  }\n" +
+      "  if (!ZC) {\n" +
+      "    throw new Error('ERROR: ZeroClipboard SWF could not locate ZeroClipboard JS object!\\n" +
+                           "Expected element ID: ' + objectId);\n" +
+      "  }\n" +
+      "  return ZC.emit(eventObj);\n" +
       "})";
+
 
     // The text in the clipboard
     private var clipData:Object = {};
 
-    // AMD or CommonJS module ID/path to access the ZeroClipboard object
-    private var jsModuleId:String = null;
 
     /**
      * @constructor
@@ -71,12 +86,6 @@ package {
       // Remove the event listener, if any
       this.removeEventListener(Event.ADDED_TO_STAGE, this.init);
 
-      // Set the stage!
-      stage.align = StageAlign.TOP_LEFT;
-      stage.scaleMode = StageScaleMode.EXACT_FIT;
-      stage.quality = StageQuality.BEST;
-
-
       // Get the flashvars
       var flashvars:Object = this.loaderInfo.parameters;
 
@@ -86,10 +95,10 @@ package {
         Security.allowDomain.apply(Security, origins);
       }
 
-      // Enable complete AMD (e.g. RequireJS) and CommonJS (e.g. Browserify) support
-      if (flashvars.jsModuleId && typeof flashvars.jsModuleId === "string") {
-        jsModuleId = ZeroClipboard.sanitizeString(flashvars.jsModuleId);
-      }
+      // Set the stage!
+      stage.align = StageAlign.TOP_LEFT;
+      stage.scaleMode = StageScaleMode.EXACT_FIT;
+      stage.quality = StageQuality.BEST;
 
       // Create an invisible "button" and transparently fill the entire Stage
       var button:Sprite = new Sprite();
@@ -103,28 +112,42 @@ package {
       //  - Receiving keypress events of space/"Enter" as click
       //    events IF AND ONLY IF the Sprite is focused.
       button.buttonMode = true;
+
+      // Override the hand cursor default
       button.useHandCursor = false;
 
       // Add the invisible "button" to the stage!
       this.addChild(button);
 
-      // Adding the event listeners
-      button.addEventListener(MouseEvent.CLICK, mouseClick);
-      button.addEventListener(MouseEvent.MOUSE_OVER, mouseOver);
-      button.addEventListener(MouseEvent.MOUSE_OUT, mouseOut);
-      button.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
-      button.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
+      // Only proceed if this SWF is hosted in the browser as expected
+      if (ExternalInterface.available &&
+          ExternalInterface.objectID &&
+          ExternalInterface.objectID === ZeroClipboard.SWF_OBJECT_ID) {
 
-      // external functions
-      ExternalInterface.addCallback(
-        "setHandCursor",
-        function(enabled:Boolean) {
-          button.useHandCursor = enabled === true;
-        }
-      );
-  
-      // signal to the browser that we are ready
-      this.emit("ready");
+        // Add the MouseEvent listeners
+        button.addEventListener(MouseEvent.CLICK, mouseClick);
+        button.addEventListener(MouseEvent.MOUSE_OVER, mouseOver);
+        button.addEventListener(MouseEvent.MOUSE_OUT, mouseOut);
+        button.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
+        button.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
+
+        // Expose the external functions
+        ExternalInterface.addCallback(
+          "setHandCursor",
+          function(enabled:Boolean) {
+            button.useHandCursor = enabled === true;
+          }
+        );
+
+        // Signal to the browser that we are ready
+        this.emit("ready");
+      }
+      else {
+        // Signal to the browser that something is wrong
+        this.emit("error", {
+          name: "flash-unavailable"
+        });
+      }
     }
 
     // sanitizeString
@@ -171,7 +194,7 @@ package {
       clipData = {};
 
       // signal to the page that it is done
-      this.emit("aftercopy", { serializedData: results });
+      this.emit("aftercopy", { json: results });
     }
 
     // mouseOver
@@ -232,12 +255,7 @@ package {
         eventObj = {};
       }
       eventObj.type = eventType;
-      if (this.jsModuleId) {
-        return ExternalInterface.call(ZeroClipboard.JS_MODULE_WRAPPED_EMITTER, eventObj, this.jsModuleId);
-      }
-      else {
-        return ExternalInterface.call(ZeroClipboard.NORMAL_EMITTER, eventObj);
-      }
+      return ExternalInterface.call(ZeroClipboard.JS_EMITTER, eventObj);
     }
 
     // metaData

@@ -18,6 +18,7 @@
         version: "0.0.0",
         disabled: null,
         outdated: null,
+        unavailable: null,
         deactivated: null,
         ready: null
       };
@@ -837,92 +838,6 @@
     ZeroClipboard.emit("copy");
     ZeroClipboard.emit("aftercopy");
     ZeroClipboard.emit("mouseout");
-  });
-
-  test("Test onReady Event with AMD", function(assert) {
-    assert.expect(4);
-
-    // Arrange
-    // This is a special private variable inside of ZeroClipboard, so we can
-    // only simulate its functionality here
-    var _amdModuleId = "zc";
-
-    var requireFn = (function() {
-      var amdCache = {};
-      amdCache[_amdModuleId] = ZeroClipboard;
-      return function(depIds, cb) {
-        var depVals = depIds.map(function(id) { return amdCache[id]; });
-        setTimeout(function() {
-          cb.apply(this, depVals);
-        }, 0);
-      };
-    })();
-
-    var client = new ZeroClipboard();
-    var currentEl = document.getElementById("d_clip_button");
-    client.clip(currentEl);
-    ZeroClipboard.activate(currentEl);
-    var id = client.id;
-
-    client.on( "ready", function(event) {
-      // Assert
-      assert.strictEqual(this.id, id);
-      assert.strictEqual(event.type, "ready");
-      QUnit.start();
-    } );
-
-    // Act
-    QUnit.stop();
-    eval(
-'(function(event, amdModuleId) {' +
-'  requireFn([amdModuleId], function(zero) {' +
-'    assert.strictEqual(zero, ZeroClipboard);' +
-'    assert.deepEqual(event, {"type": "ready"});' +
-'    zero.emit(event);' +
-'  });' +
-'})({"type": "ready"}, ' + JSON.stringify(_amdModuleId) + ');'
-    );
-  });
-
-  test("Test onReady Event with CommonJS", function(assert) {
-    assert.expect(4);
-
-    // Arrange
-    // This is a special private variable inside of ZeroClipboard, so we can
-    // only simulate its functionality here
-    var _cjsModuleId = "zc";
-
-    var requireFn = (function() {
-      var cjsCache = {};
-      cjsCache[_cjsModuleId] = ZeroClipboard;
-      return function(id) {
-        return cjsCache[id];
-      };
-    })();
-
-    var client = new ZeroClipboard();
-    var currentEl = document.getElementById("d_clip_button");
-    client.clip(currentEl);
-    ZeroClipboard.activate(currentEl);
-    var id = client.id;
-
-    client.on( "ready", function(event) {
-      // Assert
-      assert.strictEqual(this.id, id);
-      assert.strictEqual(event.type, "ready");
-      QUnit.start();
-    } );
-
-    // Act
-    QUnit.stop();
-    eval(
-'(function(event, cjsModuleId) {' +
-'  var zero = requireFn(cjsModuleId);' +
-'  assert.strictEqual(zero, ZeroClipboard);' +
-'  assert.deepEqual(event, {"type": "ready"});' +
-'  zero.emit(event);' +
-'})({"type": "ready"}, ' + JSON.stringify(_cjsModuleId) + ');'
-    );
   });
 
 })(QUnit.module, QUnit.test);

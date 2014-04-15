@@ -13,6 +13,7 @@ var flashState = {
   // Flash state
   disabled: null,
   outdated: null,
+  unavailable: null,
   deactivated: null,
   overdue: null,
   ready: null
@@ -46,12 +47,6 @@ var elementIdCounter = 0;
  *   _elementMeta[element.zcClippingId] = [client1.id, client2.id];
  */
 var _elementMeta = {};
-
-/* AMD module ID or path to access the ZeroClipboard object */
-var _amdModuleId = null;
-
-/* CommonJS module ID or path to access the ZeroClipboard object */
-var _cjsModuleId = null;
 
 /* The presumed location of the "ZeroClipboard.swf" file based on the location of the JS. */
 var _swfPath = (function() {

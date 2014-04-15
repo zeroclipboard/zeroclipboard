@@ -273,11 +273,11 @@ var _cacheBust = function (path, options) {
  * private _vars function.
  * creates a query string for the flashvars
  *
- * returns flashvars separated by &
+ * returns flashvars
  */
 var _vars = function (options) {
   var i, len, domain, domains,
-      str = [],
+      str = "",
       trustedOriginsExpanded = [];
 
   if (options.trustedDomains) {
@@ -318,17 +318,11 @@ var _vars = function (options) {
       }
     }
   }
+
   if (trustedOriginsExpanded.length) {
-    str.push("trustedOrigins=" + encodeURIComponent(trustedOriginsExpanded.join(",")));
+    str = "trustedOrigins=" + encodeURIComponent(trustedOriginsExpanded.join(","));
   }
-
-  // if ZeroClipboard is loaded as an AMD/CommonJS module
-  if (typeof options.jsModuleId === "string" && options.jsModuleId) {
-    str.push("jsModuleId=" + encodeURIComponent(options.jsModuleId));
-  }
-
-  // join the str by &
-  return str.join("&");
+  return str;
 };
 
 /*
