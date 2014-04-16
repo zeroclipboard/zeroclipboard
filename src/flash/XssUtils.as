@@ -12,7 +12,7 @@ package {
      * @static
     */
     public static function sanitizeString(dirty:String): String {
-      return dirty.replace(/\\/g, "\\\\");
+      return (typeof dirty === "string" && dirty) ? dirty.replace(/\\/g, "\\\\") : "";
     }
 
 

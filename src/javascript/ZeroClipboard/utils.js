@@ -293,8 +293,6 @@ var _vars = function (options) {
       if (domains.hasOwnProperty(i) && domains[i] && typeof domains[i] === "string") {
         domain = _extractDomain(domains[i]);
 
-        _log("Trusted domain: " + domain, options.debug);
-
         if (!domain) {
           continue;
         }
@@ -320,8 +318,13 @@ var _vars = function (options) {
   }
 
   if (trustedOriginsExpanded.length) {
-    str = "trustedOrigins=" + encodeURIComponent(trustedOriginsExpanded.join(","));
+    str += "trustedOrigins=" + encodeURIComponent(trustedOriginsExpanded.join(","));
   }
+
+  if (options.forceEnhancedClipboard === true) {
+    str += (str ? "&" : "") + "forceEnhancedClipboard=true";
+  }
+
   return str;
 };
 

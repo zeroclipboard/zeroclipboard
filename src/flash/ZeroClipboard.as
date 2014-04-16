@@ -50,8 +50,8 @@ package {
     // JavaScript proxy object
     private var jsProxy:JsProxy = null;
 
-    // The text in the clipboard
-    private var clipData:Object = {};
+    // Clipboard proxy object
+    private var clipboard:ClipboardInjector = null;
 
 
     /**
@@ -97,6 +97,12 @@ package {
         Security.allowDomain.apply(Security, origins);
       }
 
+      // Enable use of the fancy "Desktop" clipboard, even on Linux where it is known to suck
+      var forceEnhancedClipboard:Boolean = false;
+      if (flashvars.forceEnhancedClipboard === "true" || flashvars.forceEnhancedClipboard === true) {
+        forceEnhancedClipboard = true;
+      }
+
       // Set the stage!
       stage.align = StageAlign.TOP_LEFT;
       stage.scaleMode = StageScaleMode.EXACT_FIT;
@@ -120,6 +126,10 @@ package {
 
       // Add the invisible "button" to the stage!
       this.addChild(button);
+
+
+      // Configure the clipboard injector
+      this.clipboard = new ClipboardInjector(forceEnhancedClipboard);
 
       // Establish a communication line with JavaScript
       this.jsProxy = new JsProxy(ZeroClipboard.SWF_OBJECT_ID);
@@ -165,8 +175,17 @@ package {
     private function mouseClick(event:MouseEvent): void {
       var clipInjectSuccess:Object = {};  // NOPMD
 
+      // Allow for any "UI preparation" work before the "copy" event begins
+      this.emit("beforecopy");
+
+      // Request pending clipboard data from the page
+      var serializedData:String = this.emit("copy");
+
+      // Deserialize it and consume it, if viable
+      var clipData:Object = JSON.parse(serializedData);
+
       // Inject all pending data into the user's clipboard
-      clipInjectSuccess = ClipboardInjector.inject(clipData);
+      clipInjectSuccess = this.clipboard.inject(clipData);
 
       // Compose and serialize a results object
       var results:String = JSON.stringify({
@@ -206,18 +225,6 @@ package {
     // returns nothing
     private function mouseDown(event:MouseEvent): void {
       this.emit("mousedown", ZeroClipboard.metaData(event));
-
-      // Allow for any "UI preparation" work before the "copy" event begins
-      this.emit("beforecopy");
-
-      // Request pending clipboard data from the page
-      var serializedData:String = this.emit("copy");
-
-      // Deserialize it and consume it, if viable
-      var tempData:Object = JSON.parse(serializedData);
-      if (typeof tempData === "object" && tempData && tempData["text/plain"]) {
-        clipData = tempData;
-      }
     }
 
     // mouseUp

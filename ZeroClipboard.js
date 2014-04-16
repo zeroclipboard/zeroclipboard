@@ -241,7 +241,6 @@
       for (i = 0, len = domains.length; i < len; i++) {
         if (domains.hasOwnProperty(i) && domains[i] && typeof domains[i] === "string") {
           domain = _extractDomain(domains[i]);
-          _log("Trusted domain: " + domain, options.debug);
           if (!domain) {
             continue;
           }
@@ -254,7 +253,10 @@
       }
     }
     if (trustedOriginsExpanded.length) {
-      str = "trustedOrigins=" + encodeURIComponent(trustedOriginsExpanded.join(","));
+      str += "trustedOrigins=" + encodeURIComponent(trustedOriginsExpanded.join(","));
+    }
+    if (options.forceEnhancedClipboard === true) {
+      str += (str ? "&" : "") + "forceEnhancedClipboard=true";
     }
     return str;
   };
@@ -561,10 +563,24 @@
       _bridge();
     }
   };
-  ZeroClipboard.prototype.setText = function(newText) {
-    if (newText && newText !== "") {
-      _clipData["text/plain"] = newText;
-    }
+  ZeroClipboard.prototype.setText = function(text) {
+    ZeroClipboard.setData("text/plain", text);
+    return this;
+  };
+  ZeroClipboard.prototype.setHtml = function(html) {
+    ZeroClipboard.setData("text/html", html);
+    return this;
+  };
+  ZeroClipboard.prototype.setRichText = function(richText) {
+    ZeroClipboard.setData("application/rtf", richText);
+    return this;
+  };
+  ZeroClipboard.prototype.setData = function() {
+    ZeroClipboard.setData.apply(ZeroClipboard, Array.prototype.slice.call(arguments, 0));
+    return this;
+  };
+  ZeroClipboard.prototype.clearData = function() {
+    ZeroClipboard.clearData.apply(ZeroClipboard, Array.prototype.slice.call(arguments, 0));
     return this;
   };
   ZeroClipboard.prototype.setSize = function(width, height) {
@@ -603,6 +619,7 @@
     trustedDomains: window.location.host ? [ window.location.host ] : [],
     cacheBust: true,
     forceHandCursor: false,
+    forceEnhancedClipboard: false,
     zIndex: 999999999,
     debug: false,
     title: null,
@@ -680,6 +697,7 @@
       flashState.bridge = null;
       flashState.deactivated = null;
     }
+    ZeroClipboard.clearData();
   };
   ZeroClipboard.activate = function(element) {
     if (currentElement) {
@@ -721,6 +739,36 @@
         config: ZeroClipboard.config()
       }
     };
+  };
+  ZeroClipboard.setData = function(format, data) {
+    var dataObj;
+    if (typeof format === "object" && format && typeof data === "undefined") {
+      dataObj = format;
+      ZeroClipboard.clearData();
+    } else if (typeof format === "string" && format) {
+      dataObj = {};
+      dataObj[format] = data;
+    } else {
+      return;
+    }
+    for (var dataFormat in dataObj) {
+      if (dataObj.hasOwnProperty(dataFormat) && typeof dataObj[dataFormat] === "string" && dataObj[dataFormat]) {
+        var realDataFormat = dataFormat;
+        if (dataFormat.toLowerCase() === "text") {
+          realDataFormat = "plain/text";
+        } else if (dataFormat.toLowerCase() === "url") {
+          realDataFormat = "text/uri-list";
+        }
+        _clipData[realDataFormat] = dataObj[dataFormat];
+      }
+    }
+  };
+  ZeroClipboard.clearData = function(format) {
+    if (typeof format === "undefined") {
+      _deleteOwnProperties(_clipData);
+    } else if (typeof format === "string" && _clipData.hasOwnProperty(format)) {
+      delete _clipData[format];
+    }
   };
   var _bridge = function() {
     var flashBridge, len;
@@ -889,16 +937,8 @@
     }
     if (event.type === "copy") {
       event.clipboardData = {
-        setData: function(format, data) {
-          if (typeof format === "string" && format && data != null) {
-            _clipData[format] = data;
-          }
-        },
-        clearData: function(format) {
-          if (_clipData.hasOwnProperty(format)) {
-            delete _clipData[format];
-          }
-        }
+        setData: ZeroClipboard.setData,
+        clearData: ZeroClipboard.clearData
       };
     }
     if (event.type === "aftercopy" && event.json) {
@@ -946,16 +986,21 @@
       break;
 
      case "copy":
-      var textContent, targetEl = event.relatedTarget;
-      if (targetEl && (textContent = targetEl.value || targetEl.textContent || targetEl.innerText)) {
+      var textContent, htmlContent, targetEl = event.relatedTarget;
+      if (!(_clipData["text/html"] || _clipData["text/plain"]) && targetEl && (htmlContent = targetEl.value || targetEl.outerHTML || targetEl.innerHTML) && (textContent = targetEl.value || targetEl.textContent || targetEl.innerText)) {
+        event.clipboardData.clearData();
         event.clipboardData.setData("text/plain", textContent);
-      } else if (event.target && (textContent = event.target.getAttribute("data-clipboard-text"))) {
+        if (htmlContent !== textContent) {
+          event.clipboardData.setData("text/html", htmlContent);
+        }
+      } else if (!_clipData["text/plain"] && event.target && (textContent = event.target.getAttribute("data-clipboard-text"))) {
+        event.clipboardData.clearData();
         event.clipboardData.setData("text/plain", textContent);
       }
       break;
 
      case "aftercopy":
-      _deleteOwnProperties(_clipData);
+      ZeroClipboard.clearData();
       if (element && element !== _safeActiveElement() && element.focus) {
         element.focus();
       }

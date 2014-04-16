@@ -155,18 +155,24 @@ If you find yourself in this situation (as in [Issue #170](https://github.com/ze
 
 Setting the clipboard text can be done in 4 ways:
 
-1. Add a `copy` event handler in which you call `event.clipboardData.setData` to set the appropriate text. This event is triggered every time ZeroClipboard tries to inject into the clipboard. Example:
+1. Add a `copy` event handler in which you call `event.clipboardData.setData` to set the appropriate data. This event is triggered every time ZeroClipboard tries to inject into the clipboard. Example:
 
    ```js
-   client.on( 'copy', function (event) {
-      event.clipboardData.setData( "text/plain", "Copy me!" );
+   client.on( "copy", function (event) {
+      var clipboard = event.clipboardData;
+      clipboard.setData( "text/plain", "Copy me!" );
+      clipboard.setData( "text/html", "<b>Copy me!</b>" );
+      clipboard.setData( "application/rtf", "{\\rtf1\\ansi\n{\\b Copy me!}}" );
+      clipboard.setData( "text/x-markdown", "**Copy me!**" );
    });
    ```
 
-2. Set the text via `data-clipboard-target` attribute on the button. ZeroClipboard will look for the target element via ID and try and get the text value via `.value` or `.textContent` or `.innerText`.
+2. Set the "text/plain" [and _usually_ "text/html"] clipboard segments via `data-clipboard-target` attribute on the button. ZeroClipboard will look for the target element via ID and try to get the HTML value via `.value`, `.outerHTML`, or `.innerHTML`, and the text value via `.value`, `.textContent`, or `.innerText`. If the HTML and text values for the targeted element match, the value will only be placed into the "text/plain" segment of the clipboard (i.e. the "text/html" segment will cleared).
 
   ```html
-  <button id="my-button" data-clipboard-target="clipboard_text">Copy to Clipboard</button>
+  <button id="my-button_text" data-clipboard-target="clipboard_text">Copy to Clipboard</button>
+  <button id="my-button_textarea" data-clipboard-target="clipboard_textarea">Copy to Clipboard</button>
+  <button id="my-button_pre" data-clipboard-target="clipboard_pre">Copy to Clipboard</button>
 
   <input type="text" id="clipboard_text" value="Clipboard Text"/>
   <textarea id="clipboard_textarea">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
@@ -183,27 +189,36 @@ Setting the clipboard text can be done in 4 ways:
   proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</pre>
   ```
 
-3. Set the text via `data-clipboard-text` attribute on the button. Doing this will let ZeroClipboard take care of the rest.
+3. Set the "text/plain" clipboard segment via `data-clipboard-text` attribute on the button. Doing this will let ZeroClipboard take care of the rest.
 
   ```html
   <button id="my-button" data-clipboard-text="Copy me!">Copy to Clipboard</button>
   ```
 
-4. Set the text via `client.setText` property.  You can call this function at any time; when the page first loads, or later like in a `copy` event handler.  Example:
+4. Set the data via the `ZeroClipboard.setData` (any segment, including custom data) method.  You can call this function at any time: when the page first loads, or later like in a `copy` event handler.  Example:
+
+  ```js
+  ZeroClipboard.setData( "Copy me!" );
+  ```
+
+  The important caveat of using `ZeroClipboard.setData` is that the data it sets is **transient** and _will only be used for a single copy operation_. As such, we do not particularly
+  recommend using `ZeroClipboard.setData` (and friends) other than inside of a `copy` event handler; however, the API will not prevent you from using it in other ways.
+
+5. Set the data via the `client.setText` ("text/plain" segment), `client.setHtml` ("text/html" segment), `client.setRichText` ("application/rtf" segment), or `client.setData` (any segment, including custom data) methods.  You can call this function at any time: when the page first loads, or later like in a `copy` event handler.  Example:
 
   ```js
   client.setText( "Copy me!" );
   ```
 
-  The important caveat of using `client.setText` is that the text it sets is **transient** and _will only be used for a single copy operation_. As such, we do not particularly
-  recommend using `client.setText` other than inside of a `copy` event handler; however, the API will not prevent you from using it in other ways.
+  The important caveat of using `client.setData` (and friends) is that the data it sets is **transient** and _will only be used for a single copy operation_. As such, we do not particularly
+  recommend using `client.setData` (and friends) other than inside of a `copy` event handler; however, the API will not prevent you from using it in other ways.
 
 
 ### Clipping
 
 Clipping refers to the process of "linking" the Flash movie to a DOM element on the page. Since the Flash movie is completely transparent, the user sees nothing out of the ordinary.
 
-The Flash movie receives the click event and copies the text to the clipboard.  Also, mouse actions like hovering and mouse-down generate events that you can capture (see *[Event Handlers](#event-handlers)* below).
+The Flash movie receives the click event and copies the text to the clipboard.  Also, mouse actions like hovering and `mousedown` generate events that you can capture (see [_Event Handlers_](#event-handlers) below).
 
 To clip elements, you must pass an element, or array of elements to the `clip` function.
 
@@ -800,7 +815,7 @@ Here is a quick example using as few calls as possible:
 When clicked, the text "Copy me!" will be copied to the clipboard.
 
 
-### Complete Example
+### A More Complete Example
 
 Here is a more complete example which exercises many of the configuration options and event handlers:
 

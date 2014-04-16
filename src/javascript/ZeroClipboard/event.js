@@ -159,16 +159,8 @@ var _createEvent = function(eventType, event) {
   // Add all of the special properties and methods for a `copy` event
   if (event.type === 'copy') {
     event.clipboardData = {
-      setData: function(format, data) {
-        if (typeof format === 'string' && format && data != null) {
-          _clipData[format] = data;
-        }
-      },
-      clearData: function(format) {
-        if (_clipData.hasOwnProperty(format)) {
-          delete _clipData[format];
-        }
-      }
+      setData: ZeroClipboard.setData,
+      clearData: ZeroClipboard.clearData
     };
   }
 
@@ -233,18 +225,29 @@ var _preprocessEvent = function (event) {
 
     case 'copy':
       var textContent,
+          htmlContent,
           targetEl = event.relatedTarget;
-      if (targetEl && (textContent = targetEl.value || targetEl.textContent || targetEl.innerText)) {
+      if (
+        !(_clipData["text/html"] || _clipData["text/plain"]) &&
+        targetEl &&
+        (htmlContent = targetEl.value || targetEl.outerHTML || targetEl.innerHTML) &&
+        (textContent = targetEl.value || targetEl.textContent || targetEl.innerText)
+      ) {
+        event.clipboardData.clearData();
         event.clipboardData.setData("text/plain", textContent);
+        if (htmlContent !== textContent) {
+          event.clipboardData.setData("text/html", htmlContent);
+        }
       }
-      else if (event.target && (textContent = event.target.getAttribute('data-clipboard-text'))) {
+      else if (!_clipData["text/plain"] && event.target && (textContent = event.target.getAttribute("data-clipboard-text"))) {
+        event.clipboardData.clearData();
         event.clipboardData.setData("text/plain", textContent);
       }
       break;
 
     case 'aftercopy':
       // If the copy has [or should have] occurred, clear out all of the data
-      _deleteOwnProperties(_clipData);
+      ZeroClipboard.clearData();
 
       // Focus the context back on the trigger element (blur the Flash element)
       if (element && element !== _safeActiveElement() && element.focus) {
@@ -305,7 +308,7 @@ ZeroClipboard.prototype.on = function (eventName, func) {
 
   if (events && events.length) {
     for (i = 0, len = events.length; i < len; i++) {
-      eventName = events[i].replace(/^on/, '');
+      eventName = events[i].replace(/^on/, "");
       added[eventName] = true;
       if (!handlers[eventName]) {
         handlers[eventName] = [];

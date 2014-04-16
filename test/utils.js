@@ -118,18 +118,35 @@
 
 
   test("`_vars` builds FlashVars", function(assert) {
-    assert.expect(2);
+    assert.expect(6);
 
     // Arrange
     var clipOptionsEmpty = {};
     var clipOptionsTrustedDomains = {
+      trustedDomains: ["*"]
+    };
+    var clipOptionsEnhancedClipboardFalse = {
+      forceEnhancedClipboard: false
+    };
+    var clipOptionsEnhancedClipboardTrue = {
+      forceEnhancedClipboard: true
+    };
+    var clipOptionsTrustedDomainsPlusEnhancedClipboardFalse = {
       trustedDomains: ["*"],
-      debug: false
+      forceEnhancedClipboard: false
+    };
+    var clipOptionsTrustedDomainsPlusEnhancedClipboardTrue = {
+      trustedDomains: ["*"],
+      forceEnhancedClipboard: true
     };
 
     // Act & Assert
     assert.strictEqual(_vars(clipOptionsEmpty), "");
     assert.strictEqual(_vars(clipOptionsTrustedDomains), "trustedOrigins=*");
+    assert.strictEqual(_vars(clipOptionsEnhancedClipboardFalse), "");
+    assert.strictEqual(_vars(clipOptionsEnhancedClipboardTrue), "forceEnhancedClipboard=true");
+    assert.strictEqual(_vars(clipOptionsTrustedDomainsPlusEnhancedClipboardFalse), "trustedOrigins=*");
+    assert.strictEqual(_vars(clipOptionsTrustedDomainsPlusEnhancedClipboardTrue), "trustedOrigins=*&forceEnhancedClipboard=true");
   });
 
 

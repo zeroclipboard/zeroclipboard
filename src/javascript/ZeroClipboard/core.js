@@ -15,6 +15,9 @@ var _globalConfig = {
   // Forcibly set the hand cursor ("pointer") for all clipped elements
   forceHandCursor: false,
 
+  // Enable use of the fancy "Desktop" clipboard, even on Linux where it is known to suck
+  forceEnhancedClipboard: false,
+
   // The z-index used by the Flash object. Max value (32-bit): 2147483647
   zIndex: 999999999,
 
@@ -147,6 +150,9 @@ ZeroClipboard.destroy = function () {
     // an `overdueFlash` event
     flashState.deactivated = null;
   }
+
+  // Clear out any pending data
+  ZeroClipboard.clearData();
 };
 
 
@@ -228,4 +234,62 @@ ZeroClipboard.state = function() {
       config:      ZeroClipboard.config()
     }
   };
+};
+
+
+/**
+ * Set the pending data for clipboard injection.
+ *
+ * @return undefined
+ * @static
+ */
+ZeroClipboard.setData = function(format, data) {
+  var dataObj;
+
+  if (typeof format === "object" && format && typeof data === "undefined") {
+    dataObj = format;
+
+    // Clear out existing pending data if an object is provided
+    ZeroClipboard.clearData();
+  }
+  else if (typeof format === "string" && format) {
+    dataObj = {};
+    dataObj[format] = data;
+  }
+  else {
+    return;
+  }
+
+  // Copy over owned properties with non-empty string values
+  for (var dataFormat in dataObj) {
+    if (dataObj.hasOwnProperty(dataFormat) && typeof dataObj[dataFormat] === "string" && dataObj[dataFormat]) {
+      var realDataFormat = dataFormat;
+
+      // Standardize two oldIE clipboard format names to modern MIME type format names
+      if (dataFormat.toLowerCase() === "text") {
+        realDataFormat = "plain/text";
+      }
+      else if (dataFormat.toLowerCase() === "url") {
+        realDataFormat = "text/uri-list";
+      }
+
+      _clipData[realDataFormat] = dataObj[dataFormat];
+    }
+  }
+};
+
+
+/**
+ * Clear the pending data for clipboard injection.
+ *
+ * @return undefined
+ * @static
+ */
+ZeroClipboard.clearData = function(format) {
+  if (typeof format === "undefined") {
+    _deleteOwnProperties(_clipData);
+  }
+  else if (typeof format === "string" && _clipData.hasOwnProperty(format)) {
+    delete _clipData[format];
+  }
 };

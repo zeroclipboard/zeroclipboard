@@ -55,15 +55,57 @@ var ZeroClipboard = function (elements) {
 };
 
 
-/*
- * Stores the pending text to inject into the clipboard.
+/**
+ * Stores the pending plain text to inject into the clipboard.
  *
- * returns object instance
+ * @return object instance
  */
-ZeroClipboard.prototype.setText = function (newText) {
-  if (newText && newText !== "") {
-    _clipData["text/plain"] = newText;
-  }
+ZeroClipboard.prototype.setText = function (text) {
+  ZeroClipboard.setData("text/plain", text);
+  return this;
+};
+
+
+/**
+ * Stores the pending HTML text to inject into the clipboard.
+ *
+ * @return object instance
+ */
+ZeroClipboard.prototype.setHtml = function (html) {
+  ZeroClipboard.setData("text/html", html);
+  return this;
+};
+
+
+/**
+ * Stores the pending rich text (RTF) to inject into the clipboard.
+ *
+ * @return object instance
+ */
+ZeroClipboard.prototype.setRichText = function (richText) {
+  ZeroClipboard.setData("application/rtf", richText);
+  return this;
+};
+
+
+/**
+ * Stores the pending data to inject into the clipboard.
+ *
+ * @return object instance
+ */
+ZeroClipboard.prototype.setData = function () {
+  ZeroClipboard.setData.apply(ZeroClipboard, Array.prototype.slice.call(arguments, 0));
+  return this;
+};
+
+
+/**
+ * Clears the pending data to inject into the clipboard.
+ *
+ * @return object instance
+ */
+ZeroClipboard.prototype.clearData = function () {
+  ZeroClipboard.clearData.apply(ZeroClipboard, Array.prototype.slice.call(arguments, 0));
   return this;
 };
 

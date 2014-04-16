@@ -1,4 +1,4 @@
-/*global ZeroClipboard, _globalConfig:true, _objectKeys */
+/*global ZeroClipboard, _globalConfig:true, _clipData, _objectKeys, _deleteOwnProperties */
 
 "use strict";
 
@@ -12,6 +12,7 @@
     },
     teardown: function() {
       _globalConfig = originalConfig;
+      _deleteOwnProperties(_clipData);
     }
   });
 
@@ -68,6 +69,52 @@
     assert.strictEqual(typeof result.zeroclipboard, "object", ".zeroclipboard is an object");
     assert.notStrictEqual(result.zeroclipboard, null, ".zeroclipboard is a non-null object");
     assert.deepEqual(_objectKeys(result.zeroclipboard), ["version", "config"], ".zeroclipboard has all expected keys");
+  });
+
+
+  test("`setData` works", function(assert) {
+    assert.expect(4);
+
+    // Assert, Act, repeat ad nauseam
+    assert.deepEqual(_clipData, {}, "`_clipData` is empty");
+
+    ZeroClipboard.setData("text/plain", "zc4evar");
+    assert.deepEqual(_clipData, { "text/plain": "zc4evar" }, "`_clipData` contains expected text");
+
+    ZeroClipboard.setData("text/x-markdown", "**ZeroClipboard**");
+    assert.deepEqual(_clipData, { "text/plain": "zc4evar", "text/x-markdown": "**ZeroClipboard**" }, "`_clipData` contains expected text and custom format");
+
+    ZeroClipboard.setData({ "text/html": "<b>Win</b>" });
+    assert.deepEqual(_clipData, { "text/html": "<b>Win</b>" }, "`_clipData` contains expected HTML and cleared out old data because an object was passed in");
+  });
+
+
+  test("`clearData` works", function(assert) {
+    assert.expect(4);
+
+    // Assert
+    assert.deepEqual(_clipData, {}, "`_clipData` is empty");
+
+    // Arrange & Assert
+    _clipData["text/plain"] = "zc4evar";
+    _clipData["text/html"] = "<b>Win</b>";
+    _clipData["text/x-markdown"] = "**ZeroClipboard**";
+    assert.deepEqual(_clipData, {
+      "text/plain": "zc4evar",
+      "text/html": "<b>Win</b>",
+      "text/x-markdown": "**ZeroClipboard**"
+    }, "`_clipData` contains all expected data");
+
+    // Act & Assert
+    ZeroClipboard.clearData("text/html");
+    assert.deepEqual(_clipData, {
+      "text/plain": "zc4evar",
+      "text/x-markdown": "**ZeroClipboard**"
+    }, "`_clipData` had 'text/html' successfully removed");
+
+    // Act & Assert
+    ZeroClipboard.clearData();
+    assert.deepEqual(_clipData, {}, "`_clipData` had all data successfully removed");
   });
 
 })(QUnit.module, QUnit.test);
