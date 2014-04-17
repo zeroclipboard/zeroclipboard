@@ -4,7 +4,7 @@
 * Copyright (c) 2014 Jon Rohan, James M. Greene
 * Licensed MIT
 * http://zeroclipboard.org/
-* v2.0.0-beta.2
+* v2.0.0-beta.3
 */
 (function(window) {
   "use strict";
@@ -613,7 +613,7 @@
     }
     return clients;
   };
-  ZeroClipboard.version = "2.0.0-beta.2";
+  ZeroClipboard.version = "2.0.0-beta.3";
   var _globalConfig = {
     swfPath: _swfPath,
     trustedDomains: window.location.host ? [ window.location.host ] : [],
