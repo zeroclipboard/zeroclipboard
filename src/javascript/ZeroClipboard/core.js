@@ -230,8 +230,8 @@ ZeroClipboard.state = function() {
     browser: _pick(window.navigator, ["userAgent", "platform", "appName"]),
     flash: _omit(flashState, ["bridge"]),
     zeroclipboard: {
-      version:     ZeroClipboard.version,
-      config:      ZeroClipboard.config()
+      version: ZeroClipboard.version,
+      config: ZeroClipboard.config()
     }
   };
 };
@@ -262,18 +262,8 @@ ZeroClipboard.setData = function(format, data) {
 
   // Copy over owned properties with non-empty string values
   for (var dataFormat in dataObj) {
-    if (dataObj.hasOwnProperty(dataFormat) && typeof dataObj[dataFormat] === "string" && dataObj[dataFormat]) {
-      var realDataFormat = dataFormat;
-
-      // Standardize two oldIE clipboard format names to modern MIME type format names
-      if (dataFormat.toLowerCase() === "text") {
-        realDataFormat = "plain/text";
-      }
-      else if (dataFormat.toLowerCase() === "url") {
-        realDataFormat = "text/uri-list";
-      }
-
-      _clipData[realDataFormat] = dataObj[dataFormat];
+    if (dataFormat && dataObj.hasOwnProperty(dataFormat) && typeof dataObj[dataFormat] === "string" && dataObj[dataFormat]) {
+      _clipData[dataFormat] = dataObj[dataFormat];
     }
   }
 };
@@ -286,9 +276,12 @@ ZeroClipboard.setData = function(format, data) {
  * @static
  */
 ZeroClipboard.clearData = function(format) {
+  // If no format is passed, delete all of the pending data
   if (typeof format === "undefined") {
     _deleteOwnProperties(_clipData);
+    _clipDataFormatMap = null;
   }
+  // Otherwise, delete only the pending data of the specified format
   else if (typeof format === "string" && _clipData.hasOwnProperty(format)) {
     delete _clipData[format];
   }

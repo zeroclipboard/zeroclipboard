@@ -1,4 +1,4 @@
-/*global ZeroClipboard, _clipData, flashState */
+/*global ZeroClipboard, _clipData, _clipDataFormatMap, flashState */
 
 "use strict";
 
@@ -67,8 +67,8 @@
     client.setText("zc4evar");
     assert.deepEqual(_clipData, { "text/plain": "zc4evar" }, "`_clipData` contains expected text");
 
-    client.setText("**ZeroClipboard**");
-    assert.deepEqual(_clipData, { "text/plain": "**ZeroClipboard**" }, "`_clipData` contains expected updated text");
+    client.setText("ZeroClipboard");
+    assert.deepEqual(_clipData, { "text/plain": "ZeroClipboard" }, "`_clipData` contains expected updated text");
 
     _clipData["text/html"] = "<b>Win</b>";
     client.setText("goodbye");
@@ -130,8 +130,8 @@
     client.setData("text/plain", "zc4evar");
     assert.deepEqual(_clipData, { "text/plain": "zc4evar" }, "`_clipData` contains expected text");
 
-    client.setData("text/x-markdown", "**ZeroClipboard**");
-    assert.deepEqual(_clipData, { "text/plain": "zc4evar", "text/x-markdown": "**ZeroClipboard**" }, "`_clipData` contains expected text and custom format");
+    client.setData("text/html", "<i>ZeroClipboard</i>");
+    assert.deepEqual(_clipData, { "text/plain": "zc4evar", "text/html": "<i>ZeroClipboard</i>" }, "`_clipData` contains expected text and custom format");
 
     client.setData({ "text/html": "<b>Win</b>" });
     assert.deepEqual(_clipData, { "text/html": "<b>Win</b>" }, "`_clipData` contains expected HTML and cleared out old data because an object was passed in");
@@ -149,20 +149,20 @@
 
     // Arrange & Assert
     _clipData["text/plain"] = "zc4evar";
+    _clipData["application/rtf"] = "{\\rtf1\\ansi\n{\\i Foo}}";
     _clipData["text/html"] = "<b>Win</b>";
-    _clipData["text/x-markdown"] = "**ZeroClipboard**";
     assert.deepEqual(_clipData, {
       "text/plain": "zc4evar",
-      "text/html": "<b>Win</b>",
-      "text/x-markdown": "**ZeroClipboard**"
+      "application/rtf": "{\\rtf1\\ansi\n{\\i Foo}}",
+      "text/html": "<b>Win</b>"
     }, "`_clipData` contains all expected data");
 
     // Act & Assert
-    client.clearData("text/html");
+    client.clearData("application/rtf");
     assert.deepEqual(_clipData, {
       "text/plain": "zc4evar",
-      "text/x-markdown": "**ZeroClipboard**"
-    }, "`_clipData` had 'text/html' successfully removed");
+      "text/html": "<b>Win</b>"
+    }, "`_clipData` had 'application/rtf' successfully removed");
 
     // Act & Assert
     client.clearData();
@@ -171,7 +171,7 @@
 
 
   test("`setText` overrides the data-clipboard-text attribute", function(assert) {
-    assert.expect(2);
+    assert.expect(3);
 
     // Arrange
     var client = new ZeroClipboard();
@@ -181,16 +181,17 @@
     client.clip(currentEl);
     client.setText("This is the new text");
     ZeroClipboard.activate(currentEl);
-    var pendingText = JSON.parse(ZeroClipboard.emit("copy"));
+    var pendingText = ZeroClipboard.emit("copy");
 
     // Assert
     assert.deepEqual(_clipData, { "text/plain": "This is the new text" });
-    assert.deepEqual(pendingText, _clipData);
+    assert.deepEqual(pendingText, { "text": "This is the new text" });
+    assert.deepEqual(_clipDataFormatMap, { "text": "text/plain" });
   });
 
 
   test("`setText` overrides data-clipboard-target pre", function(assert) {
-    assert.expect(2);
+    assert.expect(3);
 
     // Arrange
     var client = new ZeroClipboard();
@@ -200,16 +201,17 @@
     client.clip(currentEl);
     client.setText("This is the new text");
     ZeroClipboard.activate(currentEl);
-    var pendingText = JSON.parse(ZeroClipboard.emit("copy"));
+    var pendingText = ZeroClipboard.emit("copy");
 
     // Assert
     assert.deepEqual(_clipData, { "text/plain": "This is the new text" });
-    assert.deepEqual(pendingText, _clipData);
+    assert.deepEqual(pendingText, { "text": "This is the new text" });
+    assert.deepEqual(_clipDataFormatMap, { "text": "text/plain" });
   });
 
 
   test("`setHtml` overrides data-clipboard-target pre", function(assert) {
-    assert.expect(2);
+    assert.expect(3);
 
     // Arrange
     var client = new ZeroClipboard();
@@ -219,16 +221,17 @@
     client.clip(currentEl);
     client.setHtml("This is the new HTML");
     ZeroClipboard.activate(currentEl);
-    var pendingText = JSON.parse(ZeroClipboard.emit("copy"));
+    var pendingText = ZeroClipboard.emit("copy");
 
     // Assert
     assert.deepEqual(_clipData, { "text/html": "This is the new HTML" });
-    assert.deepEqual(pendingText, _clipData);
+    assert.deepEqual(pendingText, { "html": "This is the new HTML" });
+    assert.deepEqual(_clipDataFormatMap, { "html": "text/html" });
   });
 
 
   test("`setText` AND `setHtml` override data-clipboard-target pre", function(assert) {
-    assert.expect(2);
+    assert.expect(3);
 
     // Arrange
     var client = new ZeroClipboard();
@@ -239,14 +242,18 @@
     client.setText("This is the new text");
     client.setHtml("This is the new HTML");
     ZeroClipboard.activate(currentEl);
-    var pendingText = JSON.parse(ZeroClipboard.emit("copy"));
+    var pendingText = ZeroClipboard.emit("copy");
 
     // Assert
     assert.deepEqual(_clipData, {
       "text/plain": "This is the new text",
       "text/html": "This is the new HTML"
     });
-    assert.deepEqual(pendingText, _clipData);
+    assert.deepEqual(pendingText, {
+      "text": "This is the new text",
+      "html": "This is the new HTML"
+    });
+    assert.deepEqual(_clipDataFormatMap, { "text": "text/plain", "html": "text/html" });
   });
 
 
@@ -286,7 +293,7 @@
 
 
   test("Object has data-clipboard-text", function(assert) {
-    assert.expect(2);
+    assert.expect(3);
 
     // Arrange
     var client = new ZeroClipboard();
@@ -295,11 +302,12 @@
     // Act
     client.clip(currentEl);
     ZeroClipboard.activate(currentEl);
-    var pendingText = JSON.parse(ZeroClipboard.emit("copy"));
+    var pendingText = ZeroClipboard.emit("copy");
 
     // Assert
-    assert.strictEqual(_clipData["text/plain"], "Copy me!");
-    assert.deepEqual(pendingText, _clipData);
+    assert.deepEqual(_clipData, { "text/plain": "Copy me!" });
+    assert.deepEqual(pendingText, { "text": "Copy me!" });
+    assert.deepEqual(_clipDataFormatMap, { "text": "text/plain" });
 
     // Revert
     ZeroClipboard.deactivate();
@@ -307,27 +315,28 @@
 
 
   test("Object has data-clipboard-target textarea", function(assert) {
-    assert.expect(2);
+    assert.expect(3);
 
     // Arrange
     var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button_textarea_text");
-
-    // Act
-    client.clip(currentEl);
-    ZeroClipboard.activate(currentEl);
-    var pendingText = JSON.parse(ZeroClipboard.emit("copy"));
-
-    // Assert
-    assert.strictEqual(_clipData["text/plain"].replace(/\r\n/g, '\n'),
+    var expectedText =
       "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\n"+
       "tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\n"+
       "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\n"+
       "consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\n"+
       "cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\n"+
-      "proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-    );
-    assert.deepEqual(pendingText, _clipData);
+      "proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+
+    // Act
+    client.clip(currentEl);
+    ZeroClipboard.activate(currentEl);
+    var pendingText = ZeroClipboard.emit("copy");
+
+    // Assert
+    assert.strictEqual(_clipData["text/plain"].replace(/\r\n/g, '\n'), expectedText);
+    assert.strictEqual(pendingText.text.replace(/\r\n/g, '\n'), expectedText);
+    assert.deepEqual(_clipDataFormatMap, { "text": "text/plain" });
 
     // Revert
     ZeroClipboard.deactivate();
@@ -335,31 +344,19 @@
 
 
   test("Object has data-clipboard-target pre", function(assert) {
-    assert.expect(3);
+    assert.expect(5);
 
     // Arrange
     var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button_pre_text");
-
-    // Act
-    client.clip(currentEl);
-    ZeroClipboard.activate(currentEl);
-    var pendingText = JSON.parse(ZeroClipboard.emit("copy"));
-
-    // Assert
-    assert.strictEqual(_clipData["text/plain"].replace(/\r\n/g, '\n'),
+    var expectedText =
       "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\n"+
       "tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\n"+
       "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\n"+
       "consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\n"+
       "cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\n"+
-      "proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-    );
-    assert.strictEqual(
-      _clipData["text/html"]
-        .replace(/\r\n/g, '\n')
-        .replace(/<\/?pre(?:\s+[^>]*)?>/gi, function($0) { return $0.toLowerCase(); }),
-
+      "proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+    var expectedHtml =
       "<pre id=\"clipboard_pre\">"+
       "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\n"+
       "tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\n"+
@@ -367,9 +364,29 @@
       "consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\n"+
       "cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\n"+
       "proident, sunt in culpa qui officia deserunt mollit anim id est laborum."+
-      "</pre>"
+      "</pre>";
+
+    // Act
+    client.clip(currentEl);
+    ZeroClipboard.activate(currentEl);
+    var pendingText =  ZeroClipboard.emit("copy");
+
+    // Assert
+    assert.strictEqual(_clipData["text/plain"].replace(/\r\n/g, '\n'), expectedText);
+    assert.strictEqual(
+      _clipData["text/html"]
+        .replace(/\r\n/g, '\n')
+        .replace(/<\/?pre(?:\s+[^>]*)?>/gi, function($0) { return $0.toLowerCase(); }),
+      expectedHtml
     );
-    assert.deepEqual(pendingText, _clipData);
+    assert.strictEqual(pendingText.text.replace(/\r\n/g, '\n'), expectedText);
+    assert.strictEqual(
+      pendingText.html
+        .replace(/\r\n/g, '\n')
+        .replace(/<\/?pre(?:\s+[^>]*)?>/gi, function($0) { return $0.toLowerCase(); }),
+      expectedHtml
+    );
+    assert.deepEqual(_clipDataFormatMap, { "text": "text/plain", "html": "text/html" });
 
     // Revert
     ZeroClipboard.deactivate();
@@ -377,7 +394,7 @@
 
 
   test("Object has data-clipboard-target input", function(assert) {
-    assert.expect(2);
+    assert.expect(3);
 
     // Arrange
     var client = new ZeroClipboard();
@@ -386,11 +403,12 @@
     // Act
     client.clip(currentEl);
     ZeroClipboard.activate(currentEl);
-    var pendingText = JSON.parse(ZeroClipboard.emit("copy"));
+    var pendingText = ZeroClipboard.emit("copy");
 
     // Assert
-    assert.strictEqual(_clipData["text/plain"], "Clipboard Text");
-    assert.deepEqual(pendingText, _clipData);
+    assert.deepEqual(_clipData, { "text/plain": "Clipboard Text" });
+    assert.deepEqual(pendingText, { "text": "Clipboard Text" });
+    assert.deepEqual(_clipDataFormatMap, { "text": "text/plain" });
 
     // Revert
     ZeroClipboard.deactivate();

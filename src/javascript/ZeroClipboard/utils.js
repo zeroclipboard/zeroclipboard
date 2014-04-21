@@ -668,3 +668,80 @@ var _omit = function(obj, keys) {
   }
   return newObj;
 };
+
+
+/**
+ * Map the data format names of the "clipData" to Flash-friendly names.
+ */
+var _mapClipDataToFlash = function(clipData) {
+  var newClipData = {},
+      formatMap = {};
+  if (!(typeof clipData === "object" && clipData)) {
+    return;
+  }
+
+  for (var dataFormat in clipData) {
+    if (dataFormat && clipData.hasOwnProperty(dataFormat) && typeof clipData[dataFormat] === "string" && clipData[dataFormat]) {
+      // Standardize the allowed clipboard segment names to reduce complexity on the Flash side
+      switch (dataFormat.toLowerCase()) {
+        case "text/plain":
+        case "text":
+        case "air:text":
+        case "flash:text":
+          newClipData.text = clipData[dataFormat];
+          formatMap.text = dataFormat;
+          break;
+        case "text/html":
+        case "html":
+        case "air:html":
+        case "flash:html":
+          newClipData.html = clipData[dataFormat];
+          formatMap.html = dataFormat;
+          break;
+        case "application/rtf":
+        case "text/rtf":
+        case "rtf":
+        case "richtext":
+        case "air:rtf":
+        case "flash:rtf":
+          newClipData.rtf = clipData[dataFormat];
+          formatMap.rtf = dataFormat;
+          break;
+        default:
+          // Just ignore it: the Flash clipboard cannot handle any other formats
+          break;
+      }
+    }
+  }
+  return { data: newClipData, formatMap: formatMap };
+};
+
+
+/**
+ * Map the data format names from Flash-friendly names back to their original "clipData" names (via a format mapping).
+ */
+var _mapClipResultsFromFlash = function(clipResults, formatMap) {
+  if (!(typeof clipResults === "object" && clipResults && typeof formatMap === "object" && formatMap)) {
+    return clipResults;
+  }
+
+  var newResults = {};
+
+  for (var prop in clipResults) {
+    if (!(prop === "success" || prop === "data")) {
+      newResults[prop] = clipResults[prop];
+      continue;
+    }
+
+    newResults[prop] = {};
+
+    // Standardize the allowed clipboard segment names to reduce complexity on the Flash side
+    var tmpHash = clipResults[prop];
+    for (var dataFormat in tmpHash) {
+      if (dataFormat && tmpHash.hasOwnProperty(dataFormat) && formatMap.hasOwnProperty(dataFormat)) {
+        newResults[prop][formatMap[dataFormat]] = tmpHash[dataFormat];
+      }
+    }
+  }
+  return newResults;
+};

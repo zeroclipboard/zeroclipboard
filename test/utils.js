@@ -1,4 +1,4 @@
-/*global _camelizeCssPropName, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _inArray, _dispatchCallback, _extend, _extractDomain, _determineScriptAccess, _objectKeys, _deleteOwnProperties, _pick, _omit */
+/*global _camelizeCssPropName, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _inArray, _dispatchCallback, _extend, _extractDomain, _determineScriptAccess, _objectKeys, _deleteOwnProperties, _pick, _omit, _mapClipDataToFlash, _mapClipResultsFromFlash */
 
 "use strict";
 
@@ -590,6 +590,74 @@
     assert.deepEqual(result21, expected21, "An object with an empty omit list will have everything picked");
     assert.deepEqual(result22, expected22, "An object with a subset omit list will have everything but those properties picked");
     assert.deepEqual(result23, expected23, "An object with a complete omit list will have nothing picked");
+  });
+
+
+  test("`_mapClipDataToFlash` works", function(assert) {
+    assert.expect(1);
+
+    // Arrange
+    var clipData = {
+      "text/plain": "Zero",
+      "text/html": "<b>Zero</b>"
+    };
+    var expectedOutput = {
+      data: {
+        "text": "Zero",
+        "html": "<b>Zero</b>"
+      },
+      formatMap: {
+        "text": "text/plain",
+        "html": "text/html"
+      }
+    };
+
+    // Act
+    var actual = _mapClipDataToFlash(clipData);
+
+    // Assert
+    assert.deepEqual(actual, expectedOutput, "Converted keys to Flash-friendly names and provided a format map");
+  });
+
+
+  test("`_mapClipResultsFromFlash` works", function(assert) {
+    assert.expect(2);
+
+    // Arrange
+    var clipResults = {
+      type: "aftercopy",
+      success: {
+        "text": true,
+        "html": false
+      },
+      data: {
+        "text": "Zero",
+        "html": "<b>Zero</b>"
+      }
+    };
+    var formatMap = {
+      "text": "text/plain",
+      "html": "text/html"
+    };
+    var expectedOutput = {
+      type: "aftercopy",
+      success: {
+        "text/plain": true,
+        "text/html": false
+      },
+      data: {
+        "text/plain": "Zero",
+        "text/html": "<b>Zero</b>"
+      }
+    };
+
+    // Act & Assert
+    var thisWontChange = _mapClipResultsFromFlash(clipResults, null);
+    assert.deepEqual(thisWontChange, clipResults, "Should return the original object if it cannot map it");
+
+    // Act & Assert
+    var revisedClipResults = _mapClipResultsFromFlash(clipResults, formatMap);
+    assert.deepEqual(revisedClipResults, expectedOutput, "Should reverse the key mapping process");
   });
 
 })(QUnit.module, QUnit.test);

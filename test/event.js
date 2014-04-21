@@ -1,4 +1,4 @@
-/*global ZeroClipboard, currentElement:true, flashState:true, _extend, _clipData */
+/*global ZeroClipboard, currentElement:true, flashState:true, _extend, _clipData, _importClipDataFromFlash, _exportClipDataForFlash */
 
 "use strict";
 
@@ -751,7 +751,7 @@
 
       // Act more
       ZeroClipboard.emit("mouseout");
-      
+
       setTimeout(function() {
         // Assert more
         assert.strictEqual(/(^| )zeroclipboard-is-hover( |$)/.test(currentEl.className), false);

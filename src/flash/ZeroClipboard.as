@@ -173,31 +173,30 @@ package {
     //
     // returns nothing
     private function mouseClick(event:MouseEvent): void {
+      var clipData:Object;  // NOPMD
       var clipInjectSuccess:Object = {};  // NOPMD
 
       // Allow for any "UI preparation" work before the "copy" event begins
       this.emit("beforecopy");
 
       // Request pending clipboard data from the page
-      var serializedData:String = this.emit("copy");
-
-      // Deserialize it and consume it, if viable
-      var clipData:Object = JSON.parse(serializedData);
+      clipData = this.emit("copy");
 
       // Inject all pending data into the user's clipboard
       clipInjectSuccess = this.clipboard.inject(clipData);
 
-      // Compose and serialize a results object
-      var results:String = JSON.stringify({
-        success: clipInjectSuccess,
-        data: clipData
-      });
+      // Compose and serialize a results object, send it back to the page
+      this.emit(
+        "aftercopy",
+        {
+          success: clipInjectSuccess,
+          data: clipData
+        }
+      );
+    }
 
-      // reset the text
-      clipData = {};
-
-      // signal to the page that it is done
-      this.emit("aftercopy", { json: results });
+    private function _log(msg:String, data:String): void {
+      this.jsProxy.call("console.log", [msg + ": " + data]);
     }
 
     // mouseOver
@@ -240,14 +239,17 @@ package {
     //
     // Function through which JavaScript events are emitted
     //
-    // returns nothing, or the new "clipData" as JSON
-    private function emit(eventType:String, eventObj:Object = null): String {
+    // returns nothing, or the new "clipData" object
+    private function emit(
+      eventType:String,
+      eventObj:Object = null  // NOPMD
+    ): Object {  // NOPMD
       if (eventObj == null) {
         eventObj = {};
       }
       eventObj.type = eventType;
 
-      var result:String = undefined;
+      var result:Object = undefined;  // NOPMD
       if (this.jsProxy.isComplete()) {
         result = this.jsProxy.call(ZeroClipboard.JS_EMITTER, [eventObj]);
       }

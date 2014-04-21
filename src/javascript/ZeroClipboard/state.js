@@ -19,8 +19,9 @@ var flashState = {
   ready: null
 };
 
-/* Keep track of data for the pending clipboard transaction. */
+/* Keep track of data and formats for the pending clipboard transaction. */
 var _clipData = {};
+var _clipDataFormatMap = null;
 
 /* Keep track of the ZeroClipboard client instance counter. */
 var clientIdCounter = 0;

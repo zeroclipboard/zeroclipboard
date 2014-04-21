@@ -21,6 +21,7 @@
     ready: null
   };
   var _clipData = {};
+  var _clipDataFormatMap = null;
   var clientIdCounter = 0;
   var _clientMeta = {};
   var elementIdCounter = 0;
@@ -459,6 +460,70 @@
     }
     return newObj;
   };
+  var _mapClipDataToFlash = function(clipData) {
+    var newClipData = {}, formatMap = {};
+    if (!(typeof clipData === "object" && clipData)) {
+      return;
+    }
+    for (var dataFormat in clipData) {
+      if (dataFormat && clipData.hasOwnProperty(dataFormat) && typeof clipData[dataFormat] === "string" && clipData[dataFormat]) {
+        switch (dataFormat.toLowerCase()) {
+         case "text/plain":
+         case "text":
+         case "air:text":
+         case "flash:text":
+          newClipData.text = clipData[dataFormat];
+          formatMap.text = dataFormat;
+          break;
+
+         case "text/html":
+         case "html":
+         case "air:html":
+         case "flash:html":
+          newClipData.html = clipData[dataFormat];
+          formatMap.html = dataFormat;
+          break;
+
+         case "application/rtf":
+         case "text/rtf":
+         case "rtf":
+         case "richtext":
+         case "air:rtf":
+         case "flash:rtf":
+          newClipData.rtf = clipData[dataFormat];
+          formatMap.rtf = dataFormat;
+          break;
+
+         default:
+          break;
+        }
+      }
+    }
+    return {
+      data: newClipData,
+      formatMap: formatMap
+    };
+  };
+  var _mapClipResultsFromFlash = function(clipResults, formatMap) {
+    if (!(typeof clipResults === "object" && clipResults && typeof formatMap === "object" && formatMap)) {
+      return clipResults;
+    }
+    var newResults = {};
+    for (var prop in clipResults) {
+      if (!(prop === "success" || prop === "data")) {
+        newResults[prop] = clipResults[prop];
+        continue;
+      }
+      newResults[prop] = {};
+      var tmpHash = clipResults[prop];
+      for (var dataFormat in tmpHash) {
+        if (dataFormat && tmpHash.hasOwnProperty(dataFormat) && formatMap.hasOwnProperty(dataFormat)) {
+          newResults[prop][formatMap[dataFormat]] = tmpHash[dataFormat];
+        }
+      }
+    }
+    return newResults;
+  };
   var _detectFlashSupport = function() {
     var hasFlash = false;
     var isActiveX = false;
@@ -752,20 +817,15 @@
       return;
     }
     for (var dataFormat in dataObj) {
-      if (dataObj.hasOwnProperty(dataFormat) && typeof dataObj[dataFormat] === "string" && dataObj[dataFormat]) {
-        var realDataFormat = dataFormat;
-        if (dataFormat.toLowerCase() === "text") {
-          realDataFormat = "plain/text";
-        } else if (dataFormat.toLowerCase() === "url") {
-          realDataFormat = "text/uri-list";
-        }
-        _clipData[realDataFormat] = dataObj[dataFormat];
+      if (dataFormat && dataObj.hasOwnProperty(dataFormat) && typeof dataObj[dataFormat] === "string" && dataObj[dataFormat]) {
+        _clipData[dataFormat] = dataObj[dataFormat];
       }
     }
   };
   ZeroClipboard.clearData = function(format) {
     if (typeof format === "undefined") {
       _deleteOwnProperties(_clipData);
+      _clipDataFormatMap = null;
     } else if (typeof format === "string" && _clipData.hasOwnProperty(format)) {
       delete _clipData[format];
     }
@@ -868,7 +928,13 @@
         _dispatchClientCallbacks.call(clients[i], eventCopy, performCallbackAsync);
       }
     }
-    return event.type === "copy" ? JSON.stringify(_clipData) : undefined;
+    var returnVal;
+    if (event.type === "copy") {
+      var tmp = _mapClipDataToFlash(_clipData);
+      returnVal = tmp.data;
+      _clipDataFormatMap = tmp.formatMap;
+    }
+    return returnVal;
   };
   var _dispatchClientCallbacks = function(event, async) {
     var handlers = _clientMeta[this.id] && _clientMeta[this.id].handlers[event.type];
@@ -941,12 +1007,8 @@
         clearData: ZeroClipboard.clearData
       };
     }
-    if (event.type === "aftercopy" && event.json) {
-      var deserializedData = JSON.parse(event.json);
-      delete event.json;
-      if (typeof deserializedData === "object" && deserializedData) {
-        _extend(event, deserializedData);
-      }
+    if (event.type === "aftercopy") {
+      event = _mapClipResultsFromFlash(event, _clipDataFormatMap);
     }
     if (event.target && !event.relatedTarget) {
       event.relatedTarget = _getRelatedTarget(event.target);

@@ -142,7 +142,7 @@
     assert.strictEqual(/^-?[0-9\.]+px$/.test(htmlBridge.style.width), true);
     assert.strictEqual(/^-?[0-9\.]+px$/.test(htmlBridge.style.height), true);
   });
-  
+
   test("No more client singleton!", function(assert) {
     assert.expect(7);
 

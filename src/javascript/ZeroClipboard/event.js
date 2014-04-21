@@ -25,7 +25,7 @@ ZeroClipboard.emit = function (event) {
   _preprocessEvent(event);
 
   // If this was a Flash "ready" event that was overdue, bail out and fire an "error" event instead
-  if (event.type === 'ready' && flashState.overdue === true) {
+  if (event.type === "ready" && flashState.overdue === true) {
     return ZeroClipboard.emit({ "type": "error", "name": "flash-overdue" });
   }
 
@@ -55,8 +55,15 @@ ZeroClipboard.emit = function (event) {
     }
   }
 
-  // For the `copy` event, be sure to return the `_clipData` string to Flash to be injected into the clipboard
-  return event.type === 'copy' ? JSON.stringify(_clipData) : undefined;
+  var returnVal;
+
+  // For the `copy` event, be sure to return the `_clipData` to Flash to be injected into the clipboard
+  if (event.type === "copy") {
+    var tmp = _mapClipDataToFlash(_clipData);
+    returnVal = tmp.data;
+    _clipDataFormatMap = tmp.formatMap;
+  }
+  return returnVal;
 };
 
 
@@ -164,12 +171,8 @@ var _createEvent = function(eventType, event) {
     };
   }
 
-  if (event.type === 'aftercopy' && event.json) {
-    var deserializedData = JSON.parse(event.json);
-    delete event.json;
-    if (typeof deserializedData === 'object' && deserializedData) {
-      _extend(event, deserializedData);
-    }
+  if (event.type === 'aftercopy') {
+    event = _mapClipResultsFromFlash(event, _clipDataFormatMap);
   }
 
   if (event.target && !event.relatedTarget) {
@@ -474,7 +477,7 @@ ZeroClipboard.prototype.unclip = function (elements) {
     else {
       elements = _prepClip(elements);
     }
-    
+
     for (var i = elements.length; i--; ) {
       if (elements.hasOwnProperty(i) && elements[i] && elements[i].nodeType === 1) {
         // If the element was clipped to THIS client yet, remove it
