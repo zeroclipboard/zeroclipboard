@@ -649,11 +649,7 @@
     return this;
   };
   ZeroClipboard.prototype.setSize = function(width, height) {
-    var htmlBridge = _getHtmlBridge(flashState.bridge);
-    if (htmlBridge) {
-      htmlBridge.style.width = width + "px";
-      htmlBridge.style.height = height + "px";
-    }
+    _setSize(width, height);
     return this;
   };
   var _setHandCursor = function(enabled) {
@@ -887,13 +883,15 @@
         htmlBridge.style.height = pos.height + "px";
         htmlBridge.style.zIndex = pos.zIndex + 1;
       }
-      if (flashState.ready === true && flashState.bridge && typeof flashState.bridge.setSize === "function") {
-        flashState.bridge.setSize(pos.width, pos.height);
-      } else {
-        flashState.ready = false;
-      }
+      _setSize(pos.width, pos.height);
     }
-    return this;
+  };
+  var _setSize = function(width, height) {
+    var htmlBridge = _getHtmlBridge(flashState.bridge);
+    if (htmlBridge) {
+      htmlBridge.style.width = width + "px";
+      htmlBridge.style.height = height + "px";
+    }
   };
   ZeroClipboard.emit = function(event) {
     var eventType, eventObj;

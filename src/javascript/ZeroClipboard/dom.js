@@ -102,7 +102,7 @@ var _getHtmlBridge = function(flashBridge) {
 /*
  * Reposition the Flash object to cover the current element being hovered over.
  *
- * returns object instance
+ * returns nothing
  */
 var _reposition = function () {
 
@@ -120,12 +120,20 @@ var _reposition = function () {
       htmlBridge.style.zIndex = pos.zIndex + 1;
     }
 
-    if (flashState.ready === true && flashState.bridge && typeof flashState.bridge.setSize === 'function') {
-      flashState.bridge.setSize(pos.width, pos.height);
-    } else {
-      flashState.ready = false;
-    }
+    _setSize(pos.width, pos.height);
   }
+};
 
-  return this;
+
+/*
+ * Change the size/dimensions of the Flash object's stage.
+ *
+ * returns nothing
+ */
+var _setSize = function (width, height) {
+  var htmlBridge = _getHtmlBridge(flashState.bridge);
+  if (htmlBridge) {
+    htmlBridge.style.width = width + "px";
+    htmlBridge.style.height = height + "px";
+  }
 };

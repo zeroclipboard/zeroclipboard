@@ -116,11 +116,7 @@ ZeroClipboard.prototype.clearData = function () {
  * returns object instance
  */
 ZeroClipboard.prototype.setSize = function (width, height) {
-  var htmlBridge = _getHtmlBridge(flashState.bridge);
-  if (htmlBridge) {
-    htmlBridge.style.width = width + "px";
-    htmlBridge.style.height = height + "px";
-  }
+  _setSize(width, height);
   return this;
 };
 
