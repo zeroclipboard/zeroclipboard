@@ -781,9 +781,10 @@
   ZeroClipboard.deactivate = function() {
     var htmlBridge = _getHtmlBridge(flashState.bridge);
     if (htmlBridge) {
+      htmlBridge.removeAttribute("title");
       htmlBridge.style.left = "0px";
       htmlBridge.style.top = "-9999px";
-      htmlBridge.removeAttribute("title");
+      _setSize(1, 1);
     }
     if (currentElement) {
       _removeClass(currentElement, _globalConfig.hoverClass);
