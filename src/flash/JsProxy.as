@@ -15,7 +15,47 @@ package {
 
 
     /**
+     * @constructor
+     */
+    public function JsProxy(expectedObjectId:String = null) {
+      // The JIT Compiler does not compile constructors, so any
+      // cyclomatic complexity higher than 1 is discouraged.
+      this.ctor(expectedObjectId);
+    }
+
+
+    /**
+     * The real constructor.
+     *
+     * @return `undefined`
+     */
+    private function ctor(expectedObjectId:String = null): void {
+      // Do we authoritatively know that this Flash object is hosted in a browser?
+      this.hosted = ExternalInterface.available === true &&
+        ExternalInterface.objectID &&
+        (expectedObjectId ? (expectedObjectId === ExternalInterface.objectID) : true);
+
+      // Can we retrieve values from JavaScript?
+      // Try this regardless of the return value of `ExternalInterface.call`.
+      try {
+        this.bidirectional = ExternalInterface.call("(function() { return true; })") === true;
+      }
+      catch (e:Error) {
+        // We do NOT authoritatively know if this Flash object is hosted in a browser,
+        // nor if JavaScript is disabled.
+        this.bidirectional = false;
+      }
+
+      // If hosted but cannot bidirectionally communicate with JavaScript,
+      // then JavaScript is disabled on the page!
+      this.disabled = this.hosted && !this.bidirectional;
+    }
+
+
+    /**
      * Are we authoritatively certain that we can execute JavaScript bidirectionally?
+     *
+     * @return Boolean
      */
     public function isComplete(): Boolean {
       return this.hosted && this.bidirectional;
@@ -28,7 +68,7 @@ package {
      * This will execute the JavaScript ONLY if ExternalInterface is completely
      * available (hosted in the browser AND supporting bidirectional communication).
      *
-     * @return void
+     * @return `undefined`
      */
     public function addCallback(functionName:String, closure:Function): void {
       if (this.isComplete()) {
@@ -46,9 +86,9 @@ package {
      * @example
      * var jsProxy:JsProxy = new JsProxy("global-zeroclipboard-flash-bridge");
      * var result:Object = jsProxy.call("ZeroClipboard.emit", [{ type: "copy" }]);
-     * jsProxy.call("(function(eventObj) { return ZeroClipboard.emit(eventObj); })", [{ type: "ready"}])
+     * jsProxy.call("(function(eventObj) { return ZeroClipboard.emit(eventObj); })", [{ type: "ready"}]);
      *
-     * @return anything... or nothing
+     * @return `undefined`, or anything
      */
     public function call(
       jsFuncExpr:String,
@@ -74,7 +114,7 @@ package {
      * the JavaScript is not executed (i.e. if JavaScript is disabled, or if
      * the SWF is not allowed to communicate with JavaScript on its host page).
      *
-     * @return void
+     * @return `undefined`
      */
     public function send(jsFuncExpr:String, args:Array = null): void {
       if (jsFuncExpr) {
@@ -95,44 +135,6 @@ package {
           navigateToURL(new URLRequest("javascript:" + jsFuncExpr + "(" + argsStr + ");"), "_self");
         }
       }
-    }
-
-
-    /**
-     * @constructor
-     */
-    public function JsProxy(expectedObjectId:String = null) {
-      // The JIT Compiler does not compile constructors, so any
-      // cyclomatic complexity higher than 1 is discouraged.
-      this.ctor(expectedObjectId);
-    }
-
-
-    /**
-     * The real constructor.
-     *
-     * @return void
-     */
-    private function ctor(expectedObjectId:String = null): void {
-      // Do we authoritatively know that this Flash object is hosted in a browser?
-      this.hosted = ExternalInterface.available === true &&
-        ExternalInterface.objectID &&
-        (expectedObjectId ? (expectedObjectId === ExternalInterface.objectID) : true);
-
-      // Can we retrieve values from JavaScript?
-      // Try this regardless of the return value of `ExternalInterface.call`.
-      try {
-        this.bidirectional = ExternalInterface.call("(function() { return true; })") === true;
-      }
-      catch (e:Error) {
-        // We do NOT authoritatively know if this Flash object is hosted in a browser,
-        // nor if JavaScript is disabled.
-        this.bidirectional = false;
-      }
-
-      // If hosted but cannot bidirectionally communicate with JavaScript,
-      // then JavaScript is disabled on the page!
-      this.disabled = this.hosted && !this.bidirectional;
     }
   }
 }

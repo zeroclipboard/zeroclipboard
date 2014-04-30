@@ -30,7 +30,7 @@ package {
     /**
      * The real constructor.
      *
-     * @return void
+     * @return `undefined`
      */
     private function ctor(forceEnhancedClipboard:Boolean = false): void {
       // Should we use the fancy "Desktop" clipboard for expanded text support (e.g. HTML, RTF, etc.)?
@@ -40,6 +40,8 @@ package {
 
     /**
      * Inject data into the user's clipboard.
+     *
+     * @return A clipboard "results" object
      */
     public function inject(
       clipData:Object  // NOPMD
@@ -71,9 +73,9 @@ package {
 
 
     /**
-     * Inject plain text into the System clipboard (i.e. Flash 9+ Clipboard)
+     * Inject plain text into the System clipboard (i.e. Flash 9+ Clipboard).
      *
-     * @return void
+     * @return `undefined`
      */
     private function injectPlainTextOnly(
       clipData:Object,  // NOPMD
@@ -93,9 +95,9 @@ package {
 
 
     /**
-     * Inject plain text, HTML, and RTF into the Desktop clipboard (i.e. Flash 10+ Clipboard)
+     * Inject plain text, HTML, and RTF into the Desktop clipboard (i.e. Flash 10+ Clipboard).
      *
-     * @return void
+     * @return `undefined`
      */
     private function injectEnhancedData(
       clipData:Object,  // NOPMD
