@@ -1,4 +1,5 @@
 
+
 // The AMDJS logic branch is evaluated first to avoid potential confusion over
 // the CommonJS syntactical sugar offered by AMD.
 if (typeof define === "function" && define.amd) {
@@ -14,4 +15,7 @@ else {
   window.ZeroClipboard = ZeroClipboard;
 }
 
-})((function() { return this; })());
+})((function() {
+  /*jshint strict: false */
+  return this;
+})());

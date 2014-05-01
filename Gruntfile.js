@@ -18,15 +18,16 @@ module.exports = function(grunt) {
   var localPort = 7320;  // "ZERO"
 
   // Project configuration.
-  grunt.initConfig({
+  var config = {
     // Task configuration
     jshint: {
       options: {
         jshintrc: true
       },
       Gruntfile: ["Gruntfile.js"],
-      js: ["src/javascript/ZeroClipboard/**/*.js"],
-      test: ["test/*.js"]
+      js: ["src/javascript/**/*.js", "!src/javascript/start.js", "!src/javascript/end.js"],
+      test: ["test/**/*.js"],
+      dist: ["dist/*.js", "!dist/*.min.js"]
     },
     flexpmd: {
       flash: {
@@ -34,7 +35,7 @@ module.exports = function(grunt) {
       }
     },
     clean: {
-      dist: ["ZeroClipboard.*"],
+      dist: ["ZeroClipboard.*", "dist/ZeroClipboard.*"],
       flash: {
         options: {
           // Force is required when trying to clean outside of the project dir
@@ -46,63 +47,84 @@ module.exports = function(grunt) {
     },
     concat: {
       options: {
-        stripBanners: true,
+        stripBanners: false,
         process: {
           data: pkg
         }
       },
-      js: {
+      core: {
         src: [
           "src/meta/source-banner.tmpl",
           "src/javascript/start.js",
-          "src/javascript/ZeroClipboard/state.js",
-          "src/javascript/ZeroClipboard/utils.js",
-          "src/javascript/ZeroClipboard/flash.js",
-          "src/javascript/ZeroClipboard/client.js",
-          "src/javascript/ZeroClipboard/core.js",
-          "src/javascript/ZeroClipboard/dom.js",
-          "src/javascript/ZeroClipboard/event.js",
-          "src/javascript/ZeroClipboard/deprecated.js",
+          "src/javascript/shared/state.js",
+          "src/javascript/shared/private.js",
+          "src/javascript/core/state.js",
+          "src/javascript/core/private.js",
+          "src/javascript/core/api.js",
           "src/javascript/end.js"
         ],
-        dest: "ZeroClipboard.js"
+        dest: "dist/ZeroClipboard.Core.js"
       },
-      flashMain: {
+      client: {
         src: [
           "src/meta/source-banner.tmpl",
-          "src/flash/ZeroClipboard.as"
+          "src/javascript/start.js",
+          "src/javascript/shared/state.js",
+          "src/javascript/shared/private.js",
+          "src/javascript/core/state.js",
+          "src/javascript/core/private.js",
+          "src/javascript/core/api.js",
+          "src/javascript/client/state.js",
+          "src/javascript/client/private.js",
+          "src/javascript/client/api.js",
+          "src/javascript/end.js"
         ],
-        dest: path.join(flashTmpDir, "ZeroClipboard.as")
+        dest: "dist/ZeroClipboard.js"
       },
-      flashClip: {
-        src: [
-          "src/meta/source-banner.tmpl",
-          "src/flash/ClipboardInjector.as"
-        ],
-        dest: path.join(flashTmpDir, "ClipboardInjector.as")
-      },
-      flashJs: {
-        src: [
-          "src/meta/source-banner.tmpl",
-          "src/flash/JsProxy.as"
-        ],
-        dest: path.join(flashTmpDir, "JsProxy.as")
-      },
-      flashXss: {
-        src: [
-          "src/meta/source-banner.tmpl",
-          "src/flash/XssUtils.as"
-        ],
-        dest: path.join(flashTmpDir, "XssUtils.as")
+      flash: {
+        files: [
+          {
+            src: [
+              "src/meta/source-banner.tmpl",
+              "src/flash/ZeroClipboard.as"
+            ],
+            dest: path.join(flashTmpDir, "ZeroClipboard.as")
+          },
+          {
+            src: [
+              "src/meta/source-banner.tmpl",
+              "src/flash/ClipboardInjector.as"
+            ],
+            dest: path.join(flashTmpDir, "ClipboardInjector.as")
+          },
+          {
+            src: [
+              "src/meta/source-banner.tmpl",
+              "src/flash/JsProxy.as"
+            ],
+            dest: path.join(flashTmpDir, "JsProxy.as")
+          },
+          {
+            src: [
+              "src/meta/source-banner.tmpl",
+              "src/flash/XssUtils.as"
+            ],
+            dest: path.join(flashTmpDir, "XssUtils.as")
+          }
+        ]
       }
     },
     uglify: {
       options: {
-        preserveComments: "some",
         report: "min"
       },
       js: {
         options: {
+          preserveComments: function(node, comment) {
+            return comment &&
+              comment.type === "comment2" &&
+              /^(!|\*|\*!)\r?\n/.test(comment.value);
+          },
           beautify: {
             beautify: true,
             // `indent_level` requires jshint -W106
@@ -111,12 +133,40 @@ module.exports = function(grunt) {
           mangle: false,
           compress: false
         },
-        src: ["ZeroClipboard.js"],
-        dest: "ZeroClipboard.js"
+        files: [
+          {
+            src: ["<%= concat.core.dest %>"],
+            dest: "<%= concat.core.dest %>"
+          },
+          {
+            src: ["<%= concat.client.dest %>"],
+            dest: "<%= concat.client.dest %>"
+          }
+        ]
       },
       minjs: {
-        src: ["ZeroClipboard.js"],
-        dest: "ZeroClipboard.min.js"
+        options: {
+          preserveComments: function(node, comment) {
+            return comment &&
+              comment.type === "comment2" &&
+              /^(!|\*!)\r?\n/.test(comment.value);
+          },
+          sourceMap: true,
+          // Bundles the contents of "`src`" into the "`dest`.map" source map file. This way,
+          // consumers only need to host the "*.min.js" and "*.min.map" files rather than
+          // needing to host all three files: "*.js", "*.min.js", and "*.min.map".
+          sourceMapIncludeSources: true
+        },
+        files: [
+          {
+            src: ["<%= concat.core.dest %>"],
+            dest: "dist/ZeroClipboard.Core.min.js"
+          },
+          {
+            src: ["<%= concat.client.dest %>"],
+            dest: "dist/ZeroClipboard.min.js"
+          }
+        ]
       }
     },
     mxmlc: {
@@ -125,7 +175,7 @@ module.exports = function(grunt) {
       },
       swf: {
         files: {
-          "ZeroClipboard.swf": ["<%= concat.flashMain.dest %>"]
+          "dist/ZeroClipboard.swf": ["<%= concat.flash.files[0].dest %>"]
         }
       }
     },
@@ -153,7 +203,7 @@ module.exports = function(grunt) {
       options: {
         mode: "444"
       },
-      dist: ["ZeroClipboard.*"],
+      dist: ["dist/ZeroClipboard.*"],
       meta: ["bower.json", "composer.json", "LICENSE"]
     },
     connect: {
@@ -164,12 +214,31 @@ module.exports = function(grunt) {
       }
     },
     qunit: {
-      file: ["test/**/*.js.html"],
+      file: [
+        "test/shared/private.tests.js.html",
+        "test/core/private.tests.js.html",
+        "test/core/api.tests.js.html",
+        "test/client/private.tests.js.html",
+        "test/client/api.tests.js.html",
+        "test/built/ZeroClipboard.Core.tests.js.html",
+        "test/built/ZeroClipboard.tests.js.html"
+        //"test/**/*.tests.js.html"
+      ],
       http: {
         options: {
-          urls: grunt.file.expand(["test/**/*.js.html"]).map(function(testPage) {
-            return "http://localhost:" + localPort + "/" + testPage + "?noglobals=true";
-          })
+          urls:
+            grunt.file.expand([
+              "test/shared/private.tests.js.html",
+              "test/core/private.tests.js.html",
+              "test/core/api.tests.js.html",
+              "test/client/private.tests.js.html",
+              "test/client/api.tests.js.html",
+              "test/built/ZeroClipboard.Core.tests.js.html",
+              "test/built/ZeroClipboard.tests.js.html"
+              //"test/**/*.tests.js.html"
+            ]).map(function(testPage) {
+              return "http://localhost:" + localPort + "/" + testPage + "?noglobals=true";
+            })
         }
       }
     },
@@ -190,7 +259,8 @@ module.exports = function(grunt) {
         tasks: ["jshint:test", "unittest"]
       }
     }
-  });
+  };
+  grunt.initConfig(config);
 
   // These plugins provide necessary tasks
   grunt.loadNpmTasks("grunt-contrib-jshint");
@@ -209,11 +279,12 @@ module.exports = function(grunt) {
   //
   // Task aliases and chains
   //
-  grunt.registerTask("prep-flash",   ["clean:flash", "concat:flashMain", "concat:flashClip", "concat:flashJs", "concat:flashXss"]);
-  grunt.registerTask("validate",     ["jshint", "prep-flash", "flexpmd"]);
-  grunt.registerTask("build",        ["clean", "concat", "uglify", "mxmlc", "template", "chmod"]);
-  grunt.registerTask("build-travis", ["clean:dist", "concat", "mxmlc", "chmod:dist"]);
-  grunt.registerTask("test",         ["connect", "qunit"]);
+  grunt.registerTask("jshint-prebuild", ["jshint:Gruntfile", "jshint:js", "jshint:test"]);
+  grunt.registerTask("prep-flash",      ["clean:flash", "concat:flash"]);
+  grunt.registerTask("validate",        ["jshint-prebuild", "prep-flash", "flexpmd"]);
+  grunt.registerTask("build",           ["clean", "concat", "jshint:dist", "uglify", "mxmlc", "template", "chmod"]);
+  grunt.registerTask("build-travis",    ["clean:dist", "concat", "jshint:dist", "mxmlc", "chmod:dist"]);
+  grunt.registerTask("test",            ["connect", "qunit"]);
 
   // Default task
   grunt.registerTask("default", ["validate", "build", "test"]);

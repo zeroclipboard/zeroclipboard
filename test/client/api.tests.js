@@ -1,15 +1,324 @@
-/*global ZeroClipboard, _currentElement:true, _flashState:true, _extend, _clipData */
+/*global ZeroClipboard, _currentElement:true, _flashState:true, _extend, _clipData, _clipDataFormatMap */
 
 (function(module, test) {
   "use strict";
 
-  var originalFlashState, originalConfig;
+  var originalFlashState, originalConfig, originalFlashDetect;
 
-  module("event", {
+
+  module("client/api.js unit tests - constructor and bridge", {
+    setup: function() {
+      // Store
+      originalFlashDetect = ZeroClipboard.isFlashUnusable;
+      originalConfig = ZeroClipboard.config();
+      // Modify
+      ZeroClipboard.isFlashUnusable = function() {
+        return false;
+      };
+      ZeroClipboard.config({ swfPath: originalConfig.swfPath.replace(/\/(?:src|test)\/.*$/i, "/dist/ZeroClipboard.swf") });
+    },
+    teardown: function() {
+      // Restore
+      ZeroClipboard.destroy();
+      ZeroClipboard.isFlashUnusable = originalFlashDetect;
+      ZeroClipboard.config(originalConfig);
+    }
+  });
+
+
+  test("Client is created properly by `ZeroClipboard`", function(assert) {
+    assert.expect(3);
+
+    // Arrange & Act
+    var client = new ZeroClipboard();
+
+    // Assert
+    assert.ok(client);
+    assert.ok(client.id);
+    assert.strictEqual(client instanceof ZeroClipboard, true);
+  });
+
+
+  test("New client is not the same client (no singleton) but does share the same bridge", function(assert) {
+    assert.expect(6);
+
+    // Assert, arrange, assert, act, assert
+    assert.strictEqual($(".global-zeroclipboard-container").length, 0);
+    var client1 = new ZeroClipboard();
+    assert.ok(client1.id);
+    assert.strictEqual($(".global-zeroclipboard-container").length, 1);
+    var client2 = new ZeroClipboard();
+    assert.strictEqual($(".global-zeroclipboard-container").length, 1);
+    assert.notEqual(client2.id, client1.id);
+    assert.notEqual(client2, client1);
+  });
+
+
+  test("No more client singleton!", function(assert) {
+    assert.expect(7);
+
+    // Arrange
+    ZeroClipboard.isFlashUnusable = function() {
+      return false;
+    };
+
+    // Assert, arrange, assert, act, assert
+    assert.ok(!ZeroClipboard.prototype._singleton, "The client singleton does not exist on the prototype before creating a client");
+    var client1 = new ZeroClipboard();
+    assert.ok(!ZeroClipboard.prototype._singleton, "The client singleton does not exist on the prototype after creating a client");
+    assert.ok(!client1._singleton, "The client singleton does not exist on the client instance after creating a client");
+    var client2 = new ZeroClipboard();
+    assert.ok(!ZeroClipboard.prototype._singleton, "The client singleton does not exist on the prototype after creating a second client");
+    assert.ok(!client1._singleton, "The client singleton does not exist on the first client instance after creating a second client");
+    assert.ok(!client2._singleton, "The client singleton does not exist on the second client instance after creating a second client");
+    ZeroClipboard.destroy();
+    assert.ok(!ZeroClipboard.prototype._singleton, "The client singleton does not exist on the prototype after calling `destroy`");
+  });
+
+
+  test("`destroy` clears up the client", function(assert) {
+    assert.expect(6);
+
+    // Arrange
+    ZeroClipboard.isFlashUnusable = function() {
+      return false;
+    };
+
+    // Assert, arrange, assert, act, assert
+    assert.ok(!ZeroClipboard.prototype._singleton, "The client singleton does not exist before creating a client");
+    assert.equal(document.getElementById("global-zeroclipboard-html-bridge"), null, "The HTML bridge does not exist before creating a client");
+    /*jshint nonew:false */
+    new ZeroClipboard();
+    assert.ok(!ZeroClipboard.prototype._singleton, "The client singleton does exist after creating a client");
+    assert.notEqual(document.getElementById("global-zeroclipboard-html-bridge"), null, "The HTML bridge does exist after creating a client");
+    ZeroClipboard.destroy();
+    assert.ok(!ZeroClipboard.prototype._singleton, "The client singleton does not exist after calling `destroy`");
+    assert.equal(document.getElementById("global-zeroclipboard-html-bridge"), null, "The HTML bridge does not exist after calling `destroy`");
+  });
+
+
+  module("client/api.js unit tests - clipboard", {
+    setup: function() {
+      // Store
+      originalConfig = ZeroClipboard.config();
+      // Modify
+      ZeroClipboard.config({ swfPath: originalConfig.swfPath.replace(/\/(?:src|test)\/.*$/i, "/dist/ZeroClipboard.swf") });
+    },
+    teardown: function() {
+      ZeroClipboard.destroy();
+      ZeroClipboard.config(originalConfig);
+    }
+  });
+
+
+  test("`setText` works", function(assert) {
+    assert.expect(4);
+
+    // Arrange
+    var client = new ZeroClipboard();
+
+    // Assert, Act, repeat ad nauseam
+    assert.deepEqual(_clipData, {}, "`_clipData` is empty");
+
+    client.setText("zc4evar");
+    assert.deepEqual(_clipData, { "text/plain": "zc4evar" }, "`_clipData` contains expected text");
+
+    client.setText("ZeroClipboard");
+    assert.deepEqual(_clipData, { "text/plain": "ZeroClipboard" }, "`_clipData` contains expected updated text");
+
+    _clipData["text/html"] = "<b>Win</b>";
+    client.setText("goodbye");
+    assert.deepEqual(_clipData, { "text/plain": "goodbye", "text/html": "<b>Win</b>" }, "`_clipData` contains expected updated text AND the other data");
+  });
+
+
+  test("`setHtml` works", function(assert) {
+    assert.expect(4);
+
+    // Arrange
+    var client = new ZeroClipboard();
+
+    // Assert, Act, repeat ad nauseam
+    assert.deepEqual(_clipData, {}, "`_clipData` is empty");
+
+    client.setHtml("zc4evar");
+    assert.deepEqual(_clipData, { "text/html": "zc4evar" }, "`_clipData` contains expected HTML");
+
+    client.setHtml("<b>ZeroClipboard</b>");
+    assert.deepEqual(_clipData, { "text/html": "<b>ZeroClipboard</b>" }, "`_clipData` contains expected updated HTML");
+
+    _clipData["text/plain"] = "blah";
+    client.setHtml("<i>goodbye</i>");
+    assert.deepEqual(_clipData, { "text/html": "<i>goodbye</i>", "text/plain": "blah" }, "`_clipData` contains expected updated HTML AND the other data");
+  });
+
+
+  test("`setRichText` works", function(assert) {
+    assert.expect(4);
+
+    // Arrange
+    var client = new ZeroClipboard();
+
+    // Assert, Act, repeat ad nauseam
+    assert.deepEqual(_clipData, {}, "`_clipData` is empty");
+
+    client.setRichText("zc4evar");
+    assert.deepEqual(_clipData, { "application/rtf": "zc4evar" }, "`_clipData` contains expected RTF");
+
+    client.setRichText("{\\rtf1\\ansi\n{\\b ZeroClipboard}}");
+    assert.deepEqual(_clipData, { "application/rtf": "{\\rtf1\\ansi\n{\\b ZeroClipboard}}" }, "`_clipData` contains expected updated RTF");
+
+    _clipData["text/plain"] = "blah";
+    client.setRichText("{\\rtf1\\ansi\n{\\i Foo}}");
+    assert.deepEqual(_clipData, { "application/rtf": "{\\rtf1\\ansi\n{\\i Foo}}", "text/plain": "blah" }, "`_clipData` contains expected updated RTF AND the other data");
+  });
+
+
+  test("`setData` works", function(assert) {
+    assert.expect(4);
+
+    // Arrange
+    var client = new ZeroClipboard();
+
+    // Assert, Act, repeat ad nauseam
+    assert.deepEqual(_clipData, {}, "`_clipData` is empty");
+
+    client.setData("text/plain", "zc4evar");
+    assert.deepEqual(_clipData, { "text/plain": "zc4evar" }, "`_clipData` contains expected text");
+
+    client.setData("text/html", "<i>ZeroClipboard</i>");
+    assert.deepEqual(_clipData, { "text/plain": "zc4evar", "text/html": "<i>ZeroClipboard</i>" }, "`_clipData` contains expected text and custom format");
+
+    client.setData({ "text/html": "<b>Win</b>" });
+    assert.deepEqual(_clipData, { "text/html": "<b>Win</b>" }, "`_clipData` contains expected HTML and cleared out old data because an object was passed in");
+  });
+
+
+  test("`clearData` works", function(assert) {
+    assert.expect(4);
+
+    // Arrange
+    var client = new ZeroClipboard();
+
+    // Assert
+    assert.deepEqual(_clipData, {}, "`_clipData` is empty");
+
+    // Arrange & Assert
+    _clipData["text/plain"] = "zc4evar";
+    _clipData["application/rtf"] = "{\\rtf1\\ansi\n{\\i Foo}}";
+    _clipData["text/html"] = "<b>Win</b>";
+    assert.deepEqual(_clipData, {
+      "text/plain": "zc4evar",
+      "application/rtf": "{\\rtf1\\ansi\n{\\i Foo}}",
+      "text/html": "<b>Win</b>"
+    }, "`_clipData` contains all expected data");
+
+    // Act & Assert
+    client.clearData("application/rtf");
+    assert.deepEqual(_clipData, {
+      "text/plain": "zc4evar",
+      "text/html": "<b>Win</b>"
+    }, "`_clipData` had 'application/rtf' successfully removed");
+
+    // Act & Assert
+    client.clearData();
+    assert.deepEqual(_clipData, {}, "`_clipData` had all data successfully removed");
+  });
+
+
+  test("`setText` overrides the data-clipboard-text attribute", function(assert) {
+    assert.expect(3);
+
+    // Arrange
+    var client = new ZeroClipboard();
+    var currentEl = document.getElementById("d_clip_button");
+
+    // Act
+    client.clip(currentEl);
+    client.setText("This is the new text");
+    ZeroClipboard.activate(currentEl);
+    var pendingText = ZeroClipboard.emit("copy");
+
+    // Assert
+    assert.deepEqual(_clipData, { "text/plain": "This is the new text" });
+    assert.deepEqual(pendingText, { "text": "This is the new text" });
+    assert.deepEqual(_clipDataFormatMap, { "text": "text/plain" });
+  });
+
+
+  test("`setText` overrides data-clipboard-target pre", function(assert) {
+    assert.expect(3);
+
+    // Arrange
+    var client = new ZeroClipboard();
+    var currentEl = document.getElementById("d_clip_button_pre_text");
+
+    // Act
+    client.clip(currentEl);
+    client.setText("This is the new text");
+    ZeroClipboard.activate(currentEl);
+    var pendingText = ZeroClipboard.emit("copy");
+
+    // Assert
+    assert.deepEqual(_clipData, { "text/plain": "This is the new text" });
+    assert.deepEqual(pendingText, { "text": "This is the new text" });
+    assert.deepEqual(_clipDataFormatMap, { "text": "text/plain" });
+  });
+
+
+  test("`setHtml` overrides data-clipboard-target pre", function(assert) {
+    assert.expect(3);
+
+    // Arrange
+    var client = new ZeroClipboard();
+    var currentEl = document.getElementById("d_clip_button_pre_text");
+
+    // Act
+    client.clip(currentEl);
+    client.setHtml("This is the new HTML");
+    ZeroClipboard.activate(currentEl);
+    var pendingText = ZeroClipboard.emit("copy");
+
+    // Assert
+    assert.deepEqual(_clipData, { "text/html": "This is the new HTML" });
+    assert.deepEqual(pendingText, { "html": "This is the new HTML" });
+    assert.deepEqual(_clipDataFormatMap, { "html": "text/html" });
+  });
+
+
+  test("`setText` AND `setHtml` override data-clipboard-target pre", function(assert) {
+    assert.expect(3);
+
+    // Arrange
+    var client = new ZeroClipboard();
+    var currentEl = document.getElementById("d_clip_button_pre_text");
+
+    // Act
+    client.clip(currentEl);
+    client.setText("This is the new text");
+    client.setHtml("This is the new HTML");
+    ZeroClipboard.activate(currentEl);
+    var pendingText = ZeroClipboard.emit("copy");
+
+    // Assert
+    assert.deepEqual(_clipData, {
+      "text/plain": "This is the new text",
+      "text/html": "This is the new HTML"
+    });
+    assert.deepEqual(pendingText, {
+      "text": "This is the new text",
+      "html": "This is the new HTML"
+    });
+    assert.deepEqual(_clipDataFormatMap, { "text": "text/plain", "html": "text/html" });
+  });
+
+
+  module("client/api.js unit tests - event", {
     setup: function() {
       // Store
       originalFlashState = _extend({}, _flashState);
       originalConfig = ZeroClipboard.config();
+      originalFlashDetect = ZeroClipboard.isFlashUnusable;
       // Modify
       _currentElement = null;
       _flashState = {
@@ -21,14 +330,17 @@
         deactivated: null,
         ready: null
       };
+      //ZeroClipboard.config({ swfPath: originalConfig.swfPath.replace(/\/(?:src|test)\/.*$/i, "/dist/ZeroClipboard.swf") });
     },
     teardown: function() {
       ZeroClipboard.destroy();
       _currentElement = null;
       _flashState = originalFlashState;
       ZeroClipboard.config(originalConfig);
+      ZeroClipboard.isFlashUnusable = originalFlashDetect;
     }
   });
+
 
   test("Clip element after new client", function(assert) {
     assert.expect(4);
@@ -44,6 +356,7 @@
     assert.strictEqual("zcClippingId" in target, true);
     assert.deepEqual(client.elements(), [target]);
   });
+
 
   test("unclip element removes items", function(assert) {
     assert.expect(12);
@@ -84,18 +397,6 @@
     assert.deepEqual(client.elements(), [targets[0]]);
   });
 
-  test("Clip element with query string throws TypeError", function(assert) {
-    assert.expect(1);
-
-    // Arrange
-    var client = new ZeroClipboard();
-
-    // Assert
-    assert["throws"](function() {
-      // Act
-      client.clip("#d_clip_button");
-    }, TypeError);
-  });
 
   test("Element won't be clipped twice", function(assert) {
     assert.expect(3);
@@ -111,6 +412,7 @@
     client.clip(currentEl);
     assert.deepEqual(client.elements(), [currentEl]);
   });
+
 
   test("Registering Events", function(assert) {
     assert.expect(6);
@@ -131,6 +433,7 @@
     assert.strictEqual(client.handlers().error.length, 1);
     assert.strictEqual(client.handlers().customevent.length, 1);
   });
+
 
   test("Registering Events with Maps", function(assert) {
     assert.expect(6);
@@ -153,6 +456,7 @@
     assert.strictEqual(client.handlers().error.length, 1);
     assert.strictEqual(client.handlers().customevent.length, 1);
   });
+
 
   test("Unregistering Events", function(assert) {
     assert.expect(6);
@@ -186,6 +490,7 @@
     assert.deepEqual(client.handlers().customevent, []);
   });
 
+
   test("Unregistering Events with Maps", function(assert) {
     assert.expect(6);
 
@@ -218,6 +523,7 @@
     assert.deepEqual(client.handlers().customevent, []);
   });
 
+
   test("Registering two events works", function(assert) {
     assert.expect(6);
 
@@ -237,6 +543,7 @@
     assert.strictEqual(client.handlers().ready.length, 1);
     assert.strictEqual(client.handlers().aftercopy.length, 1);
   });
+
 
   test("Registering two events with a map works", function(assert) {
     assert.expect(6);
@@ -259,6 +566,7 @@
     assert.strictEqual(client.handlers().ready.length, 1);
     assert.strictEqual(client.handlers().aftercopy.length, 1);
   });
+
 
   test("Unregistering two events works", function(assert) {
     assert.expect(6);
@@ -285,6 +593,7 @@
     assert.deepEqual(client.handlers().ready, []);
     assert.deepEqual(client.handlers().aftercopy, []);
   });
+
 
   test("Unregistering two events with a map works", function(assert) {
     assert.expect(6);
@@ -314,6 +623,7 @@
     assert.deepEqual(client.handlers().aftercopy, []);
   });
 
+
   test("`on` can add multiple handlers for the same event", function(assert) {
     assert.expect(3);
 
@@ -337,6 +647,7 @@
     // Assert even more
     assert.deepEqual(client.handlers().ready, [func1, func2]);
   });
+
 
   test("`off` can remove multiple handlers for the same event", function(assert) {
     assert.expect(5);
@@ -369,6 +680,7 @@
     assert.deepEqual(client.handlers().ready, []);
   });
 
+
   test("`on` can add more than one entry of the same handler function for the same event", function(assert) {
     assert.expect(2);
 
@@ -386,6 +698,7 @@
     // Assert more
     assert.deepEqual(client.handlers().ready, [func1, func1]);
   });
+
 
   test("`off` will remove all entries of the same handler function for the same event", function(assert) {
     assert.expect(3);
@@ -410,6 +723,7 @@
     // Assert even more
     assert.deepEqual(client.handlers().ready, []);
   });
+
 
   test("`off` will remove all handler functions for an event if no function is specified", function(assert) {
     assert.expect(3);
@@ -436,6 +750,7 @@
     client.off("ready");  // Remove all
     assert.deepEqual(client.handlers().ready, []);
   });
+
 
   test("`off` will remove all handler functions for all events if no event type is specified", function(assert) {
     assert.expect(6);
@@ -465,6 +780,7 @@
     assert.deepEqual(client.handlers().error, []);
   });
 
+
   test("Test disabledFlash Event", function(assert) {
     assert.expect(6);
 
@@ -486,6 +802,7 @@
     } );
     QUnit.stop();
   });
+
 
   test("Test outdatedFlash Event", function(assert) {
     assert.expect(8);
@@ -515,6 +832,7 @@
     } );
     QUnit.stop();
   });
+
 
   test("Test deactivatedFlash Event", function(assert) {
     assert.expect(10);
@@ -551,6 +869,7 @@
     // The "deactivatedFlash" event will automatically fire in 2 seconds if the `ready` event does not fire first
   });
 
+
   test("Test deactivatedFlash Event after first resolution", function(assert) {
     assert.expect(8);
 
@@ -582,6 +901,7 @@
     // The "deactivatedFlash" event will automatically fire in 0 seconds (when the event loop gets to it)
   });
 
+
   test("Test ready Event", function(assert) {
     assert.expect(6);
 
@@ -609,6 +929,7 @@
     ZeroClipboard.emit("ready");
   });
 
+
   test("Test ready Event after first load", function(assert) {
     assert.expect(6);
 
@@ -635,6 +956,7 @@
     } );
     QUnit.stop();
   });
+
 
   test("Test overdueFlash Event", function(assert) {
     assert.expect(15);
@@ -682,6 +1004,7 @@
     }, 1000);
   });
 
+
   test("Test string function name as handler", function(assert) {
     assert.expect(2);
 
@@ -703,6 +1026,7 @@
     QUnit.stop();
     ZeroClipboard.emit("ready");
   });
+
 
   test("Test EventListener object as handler", function(assert) {
     assert.expect(4);
@@ -729,61 +1053,83 @@
     ZeroClipboard.emit("ready");
   });
 
+
   test("Test mouseover and mouseout event", function(assert) {
-    assert.expect(2);
+    assert.expect(3);
 
     // Arrange
-    var client = new ZeroClipboard();
+    var hoverClassRegex = /(^| )zeroclipboard-is-hover( |$)/;
     var currentEl = document.getElementById("d_clip_button");
+    var client = new ZeroClipboard();
     client.clip(currentEl);
-    ZeroClipboard.activate(currentEl);
-
+    
     // Act
     QUnit.stop();
+    assert.strictEqual(hoverClassRegex.test(currentEl.className), false, "no hover before `mouseover`");
+    ZeroClipboard.activate(currentEl);
     ZeroClipboard.emit("mouseover");
 
     setTimeout(function() {
       // Assert
-      assert.strictEqual(/(^| )zeroclipboard-is-hover( |$)/.test(currentEl.className), true);
+      assert.strictEqual(hoverClassRegex.test(currentEl.className), true, "hover after `mouseover`");
 
       // Act more
-      ZeroClipboard.emit("mouseout");
+      ZeroClipboard.emit({
+        type: "mouseout",
+        relatedTarget: { nodeType: 1, tagName: "fake", nodeName: "FAKE" }
+      });
 
       setTimeout(function() {
         // Assert more
-        assert.strictEqual(/(^| )zeroclipboard-is-hover( |$)/.test(currentEl.className), false);
+        assert.strictEqual(hoverClassRegex.test(currentEl.className), false, "no hover after `mouseout`");
         QUnit.start();
       }, 25);
     }, 25);
   });
 
+
   test("Test mousedown and mouseup event", function(assert) {
-    assert.expect(2);
+    assert.expect(3);
 
     // Arrange
-    var client = new ZeroClipboard();
+    var activeClassRegex = /(^| )zeroclipboard-is-active( |$)/;
     var currentEl = document.getElementById("d_clip_button");
+    var client = new ZeroClipboard();
     client.clip(currentEl);
-    ZeroClipboard.activate(currentEl);
+    // Emit `mouseover` to cause `ZeroClipboard.activate` as well as adding the other mouse handlers
+    ZeroClipboard.emit("mouseover");
+    //ZeroClipboard.activate(currentEl);
 
     // Act
     QUnit.stop();
-    ZeroClipboard.emit("mousedown");
-
     setTimeout(function() {
-      // Assert
-      assert.strictEqual(/(^| )zeroclipboard-is-active( |$)/.test(currentEl.className), true);
-
-      // Act more
-      ZeroClipboard.emit("mouseup");
+      assert.strictEqual(activeClassRegex.test(currentEl.className), false, "deactivated before `mousedown`");
+      ZeroClipboard.emit("mousedown");
 
       setTimeout(function() {
-        // Assert more
-        assert.strictEqual(/(^| )zeroclipboard-is-active( |$)/.test(currentEl.className), false);
-        QUnit.start();
+        // Assert
+        assert.strictEqual(activeClassRegex.test(currentEl.className), true, "activated after `mousedown`");
+
+        // Act more
+        ZeroClipboard.emit("mouseup");
+
+        setTimeout(function() {
+          // Assert more
+          assert.strictEqual(activeClassRegex.test(currentEl.className), false, "deactivated after `mouseup`");
+
+          ZeroClipboard.emit({
+            type: "mouseout",
+            relatedTarget: { nodeType: 1, tagName: "fake", nodeName: "FAKE" }
+          });
+
+          setTimeout(function() {
+            QUnit.start();
+          }, 25);
+        }, 25);
       }, 25);
     }, 25);
   });
+
 
   test("Test for appropriate context inside of invoked event handlers", function(assert) {
     assert.expect(16);
@@ -836,5 +1182,32 @@
     ZeroClipboard.emit("aftercopy");
     ZeroClipboard.emit("mouseout");
   });
+
+
+  module("client/api.js unit tests - element clipping", {
+    setup: function() {
+      // Store
+      originalConfig = ZeroClipboard.config();
+      // Modify
+      ZeroClipboard.config({ swfPath: originalConfig.swfPath.replace(/\/(?:src|test)\/.*$/i, "/dist/ZeroClipboard.swf") });
+    },
+    teardown: function() {
+      ZeroClipboard.destroy();
+      ZeroClipboard.config(originalConfig);
+    }
+  });
+
+
+  test("Client without selector doesn't have elements", function(assert) {
+    assert.expect(2);
+
+    // Arrange & Act
+    var client = new ZeroClipboard();
+
+    // Assert
+    assert.ok(client);
+    assert.deepEqual(client.elements(), []);
+  });
+
 
 })(QUnit.module, QUnit.test);

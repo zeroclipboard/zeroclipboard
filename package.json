@@ -57,12 +57,13 @@
     "grunt-template": "^0.2.3",
     "grunt-contrib-watch": "^0.6.1",
     "flexpmd": "^1.3.0-1",
-    "grunt-flexpmd": "^0.1.2"
+    "grunt-flexpmd": "^0.1.2",
+    "jquery": "^1.11.1"
   },
-  "main": "./ZeroClipboard.js",
+  "main": "./dist/ZeroClipboard.js",
   "component": {
     "scripts": {
-      "zeroclipboard": "ZeroClipboard.js"
+      "zeroclipboard": "./dist/ZeroClipboard.js"
     }
   },
   "scripts": {

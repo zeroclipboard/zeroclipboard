@@ -71,34 +71,42 @@ These are default values for the global configurations options. You should gener
 
 ```js
 var _globalConfig = {
-  // URL to movie, relative to the page. Default value will be "ZeroClipboard.swf" under the
-  // same path as the ZeroClipboard JS file.
-  swfPath: "path/to/ZeroClipboard.swf",
 
-  // SWF inbound scripting policy: page domains that the SWF should trust. (single string or array of strings)
-  trustedDomains: [window.location.host],
+  // SWF URL, relative to the page. Default value will be "ZeroClipboard.swf"
+  // under the same path as the ZeroClipboard JS file.
+  swfPath: _swfPath,
 
-  // Include a "nocache" query parameter on requests for the SWF
+  // SWF inbound scripting policy: page domains that the SWF should trust.
+  // (single string, or array of strings)
+  trustedDomains: window.location.host ? [window.location.host] : [],
+
+  // Include a "nocache" query parameter on requests for the SWF.
   cacheBust: true,
 
-  // Forcibly set the hand cursor ("pointer") for all clipped elements
-  forceHandCursor: false,
-
-  // The z-index used by the Flash object. Max value (32-bit): 2147483647
-  zIndex: 999999999,
-
-  // Sets the title of the `div` encapsulating the Flash object
-  title: null,
-
-  // Setting this to `false` would allow users to handle calling `ZeroClipboard.activate(...);`
-  // themselves instead of relying on our per-element `mouseover` handler
-  autoActivate: true,
+  // Enable use of the fancy "Desktop" clipboard, even on Linux where it is
+  // known to suck.
+  forceEnhancedClipboard: false,
 
   // How many milliseconds to wait for the Flash SWF to load and respond before assuming that
   // Flash is deactivated (e.g. click-to-play) in the user's browser. If you don't care about
   // how long it takes to load the SWF, you can set this to `null`.
   flashLoadTimeout: 30000,
 
+  // Forcibly set the hand cursor ("pointer") for all clipped elements.
+  forceHandCursor: false,
+
+  // Sets the title of the `div` encapsulating the Flash object.
+  title: null,
+
+  // The z-index used by the Flash object.
+  // Max value (32-bit): 2147483647.
+  zIndex: 999999999,
+
+
+
+  // Setting this to `false` would allow users to handle calling `ZeroClipboard.activate(...);`
+  // themselves instead of relying on our per-element `mouseover` handler
+  autoActivate: true,
 
   /** @deprecated */
   // The class used to indicate that a clipped element is being hovered over

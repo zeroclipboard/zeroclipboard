@@ -10,7 +10,7 @@
   "freeze": true,
   "immed": true,
   "indent": 2,
-  "latedef": false,   /* IDEAL: `true` */
+  "latedef": true,
   "newcap": true,
   "noarg": true,
   "noempty": true,
@@ -18,13 +18,13 @@
   "nonew": true,
   "plusplus": false,
   "quotmark": "double",
-  "undef": false,     /* IDEAL: `true` */
-  "unused": false,    /* IDEAL: `true` */
-  "strict": false,    /* IDEAL: `true` */
+  "undef": true,
+  "unused": true,
+  "strict": true,
   "trailing": true,
   "maxparams": 4,
   "maxdepth": 5,
-  "maxstatements": 25,
+  "maxstatements": false,
   "maxlen": false,    /* IDEAL: 120? */
 
 
@@ -58,5 +58,13 @@
   "noyield": false,
 
   /* Environments */
-  "browser": true
+  "browser": true,
+
+  /* Global variables */
+  "globals": {
+    /* AMD */
+    "define": false,
+    /* CommonJS */
+    "module": false
+  }
 }

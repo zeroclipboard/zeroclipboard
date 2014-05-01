@@ -11,12 +11,13 @@
     (function() {
       var queryParams = "?noglobals=true";
       QUnit.testSuites([
-        "utils.js.html" + queryParams,
-        "flash.js.html" + queryParams,
-        "core.js.html" + queryParams,
-        "event.js.html" + queryParams,
-        "client.js.html" + queryParams,
-        "ZeroClipboard.js.html" + queryParams
+        "shared/private.tests.js.html" + queryParams,
+        "core/private.tests.js.html" + queryParams,
+        "core/api.tests.js.html" + queryParams,
+        "client/private.tests.js.html" + queryParams,
+        "client/api.tests.js.html" + queryParams,
+        "built/ZeroClipboard.Core.tests.js.html" + queryParams,
+        "built/ZeroClipboard.tests.js.html" + queryParams
       ]);
     })();
   </script>

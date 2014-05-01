@@ -3,6 +3,8 @@
 (function(module, test) {
   "use strict";
 
+  var originalConfig, originalFlashDetect;
+
   // Helper functions
   var TestUtils = {
     getHtmlBridge: function() {
@@ -10,21 +12,79 @@
     }
   };
 
-  var originalFlashDetect;
 
-  module("ZeroClipboard (built) - Client", {
+  module("ZeroClipboard.js (built) unit tests - Core", {
     setup: function() {
       // Store
+      originalConfig = ZeroClipboard.config();
       originalFlashDetect = ZeroClipboard.isFlashUnusable;
       // Modify
       ZeroClipboard.isFlashUnusable = function() {
         return false;
       };
+      ZeroClipboard.config({ swfPath: originalConfig.swfPath.replace(/\/(?:src|test)\/.*$/i, "/dist/ZeroClipboard.swf") });
     },
     teardown: function() {
       // Restore
-      ZeroClipboard.isFlashUnusable = originalFlashDetect;
       ZeroClipboard.destroy();
+      ZeroClipboard.config(originalConfig);
+      ZeroClipboard.isFlashUnusable = originalFlashDetect;
+    }
+  });
+
+
+  test("`swfPath` finds the expected default URL", function(assert) {
+    assert.expect(1);
+
+    // Assert, act, assert
+    var rootOrigin = window.location.protocol + "//" + window.location.host + "/";
+    var indexOfTest = window.location.pathname.toLowerCase().indexOf("/test/");
+    var rootDir = window.location.pathname.slice(1, indexOfTest + 1);
+    var rootPath = rootOrigin + rootDir;
+    //var zcJsUrl = rootPath + "dist/ZeroClipboard.js";
+    var swfPathBasedOnZeroClipboardJsPath = rootPath + "dist/ZeroClipboard.swf";
+
+    // Test that the client has the expected default URL [even if it's not correct]
+    assert.strictEqual(ZeroClipboard.config("swfPath"), swfPathBasedOnZeroClipboardJsPath);
+  });
+
+
+  test("`destroy` destroys the bridge", function(assert) {
+    assert.expect(3);
+
+    // Arrange
+    ZeroClipboard.isFlashUnusable = function() {
+      return false;
+    };
+
+    // Assert, arrange, assert, act, assert
+    assert.equal(TestUtils.getHtmlBridge(), null, "The bridge does not exist before creating a client");
+    /*jshint nonew:false */
+    new ZeroClipboard();
+    assert.notEqual(TestUtils.getHtmlBridge(), null, "The bridge does exist after creating a client");
+    ZeroClipboard.destroy();
+    assert.equal(TestUtils.getHtmlBridge(), null, "The bridge does not exist after calling `destroy`");
+  });
+
+
+
+
+  module("ZeroClipboard.js (built) unit tests - Client", {
+    setup: function() {
+      // Store
+      originalConfig = ZeroClipboard.config();
+      originalFlashDetect = ZeroClipboard.isFlashUnusable;
+      // Modify
+      ZeroClipboard.isFlashUnusable = function() {
+        return false;
+      };
+      ZeroClipboard.config({ swfPath: originalConfig.swfPath.replace(/\/(?:src|test)\/.*$/i, "/dist/ZeroClipboard.swf") });
+    },
+    teardown: function() {
+      // Restore
+      ZeroClipboard.destroy();
+      ZeroClipboard.config(originalConfig);
+      ZeroClipboard.isFlashUnusable = originalFlashDetect;
     }
   });
 
@@ -163,55 +223,5 @@
     assert.ok(!ZeroClipboard.prototype._singleton, "The client singleton does not exist on the prototype after calling `destroy`");
   });
 
-
-  module("ZeroClipboard (built) - Core", {
-    setup: function() {
-      // Store
-      originalFlashDetect = ZeroClipboard.isFlashUnusable;
-      // Modify
-      ZeroClipboard.isFlashUnusable = function() {
-        return false;
-      };
-    },
-    teardown: function() {
-      // Restore
-      ZeroClipboard.isFlashUnusable = originalFlashDetect;
-      ZeroClipboard.destroy();
-    }
-  });
-
-
-  test("`swfPath` finds the expected default URL", function(assert) {
-    assert.expect(1);
-
-    // Assert, act, assert
-    var pageUrl = window.location.href.split("#")[0].split("?")[0];
-    var protocolIndex = pageUrl.lastIndexOf("//");
-    var protocol = pageUrl.slice(0, protocolIndex + 2);
-    var rootDir = protocol + pageUrl.slice(protocolIndex + 2).split("/").slice(0, -2).join("/") + "/";
-    //var zcJsUrl = rootDir + "ZeroClipboard.js";
-    var swfPathBasedOnZeroClipboardJsPath = rootDir + "ZeroClipboard.swf";
-
-    // Test that the client has the expected default URL [even if it's not correct]
-    assert.strictEqual(ZeroClipboard.config("swfPath"), swfPathBasedOnZeroClipboardJsPath);
-  });
-
-
-  test("`destroy` destroys the bridge", function(assert) {
-    assert.expect(3);
-
-    // Arrange
-    ZeroClipboard.isFlashUnusable = function() {
-      return false;
-    };
-
-    // Assert, arrange, assert, act, assert
-    assert.equal(TestUtils.getHtmlBridge(), null, "The bridge does not exist before creating a client");
-    /*jshint nonew:false */
-    new ZeroClipboard();
-    assert.notEqual(TestUtils.getHtmlBridge(), null, "The bridge does exist after creating a client");
-    ZeroClipboard.destroy();
-    assert.equal(TestUtils.getHtmlBridge(), null, "The bridge does not exist after calling `destroy`");
-  });
 
 })(QUnit.module, QUnit.test);
