@@ -46,10 +46,10 @@ var _globalConfig = {
  */
 ZeroClipboard.isFlashUnusable = function() {
   return !!(
-    flashState.disabled ||
-    flashState.outdated ||
-    flashState.unavailable ||
-    flashState.deactivated
+    _flashState.disabled ||
+    _flashState.outdated ||
+    _flashState.unavailable ||
+    _flashState.deactivated
   );
 };
 
@@ -111,13 +111,13 @@ ZeroClipboard.destroy = function () {
   }
 
   // Remove the Flash bridge
-  var flashBridge = flashState.bridge;
+  var flashBridge = _flashState.bridge;
   if (flashBridge) {
     var htmlBridge = _getHtmlBridge(flashBridge);
     if (htmlBridge) {
       // Some extra caution is necessary to prevent Flash from causing memory leaks in oldIE
       // NOTE: Removing the SWF in IE may not be completed synchronously
-      if (flashState.pluginType === "activex" && "readyState" in flashBridge) {
+      if (_flashState.pluginType === "activex" && "readyState" in flashBridge) {
         flashBridge.style.display = "none";
         (function removeSwfFromIE() {
           if (flashBridge.readyState === 4) {
@@ -144,11 +144,11 @@ ZeroClipboard.destroy = function () {
         }
       }
     }
-    flashState.ready = null;
-    flashState.bridge = null;
+    _flashState.ready = null;
+    _flashState.bridge = null;
     // Reset the `deactivated` status in case the user wants to "try again", e.g. after receiving
     // an `overdueFlash` event
-    flashState.deactivated = null;
+    _flashState.deactivated = null;
   }
 
   // Clear out any pending data
@@ -165,13 +165,13 @@ ZeroClipboard.destroy = function () {
  */
 ZeroClipboard.activate = function(element) {
   // "Ignore" the currently active element
-  if (currentElement) {
-    _removeClass(currentElement, _globalConfig.hoverClass);
-    _removeClass(currentElement, _globalConfig.activeClass);
+  if (_currentElement) {
+    _removeClass(_currentElement, _globalConfig.hoverClass);
+    _removeClass(_currentElement, _globalConfig.activeClass);
   }
 
   // Mark the element as currently activated
-  currentElement = element;
+  _currentElement = element;
 
   // Add the hover class
   _addClass(element, _globalConfig.hoverClass);
@@ -182,7 +182,7 @@ ZeroClipboard.activate = function(element) {
   // If the element has a title, mimic it
   var newTitle = _globalConfig.title || element.getAttribute("title");
   if (newTitle) {
-    var htmlBridge = _getHtmlBridge(flashState.bridge);
+    var htmlBridge = _getHtmlBridge(_flashState.bridge);
     if (htmlBridge) {
       htmlBridge.setAttribute("title", newTitle);
     }
@@ -204,7 +204,7 @@ ZeroClipboard.activate = function(element) {
  */
 ZeroClipboard.deactivate = function() {
   // Hide the Flash object off-screen
-  var htmlBridge = _getHtmlBridge(flashState.bridge);
+  var htmlBridge = _getHtmlBridge(_flashState.bridge);
   if (htmlBridge) {
     htmlBridge.removeAttribute("title");
     htmlBridge.style.left = "0px";
@@ -213,10 +213,10 @@ ZeroClipboard.deactivate = function() {
   }
 
   // "Ignore" the currently active element
-  if (currentElement) {
-    _removeClass(currentElement, _globalConfig.hoverClass);
-    _removeClass(currentElement, _globalConfig.activeClass);
-    currentElement = null;
+  if (_currentElement) {
+    _removeClass(_currentElement, _globalConfig.hoverClass);
+    _removeClass(_currentElement, _globalConfig.activeClass);
+    _currentElement = null;
   }
 };
 
@@ -229,7 +229,7 @@ ZeroClipboard.deactivate = function() {
 ZeroClipboard.state = function() {
   return {
     browser: _pick(window.navigator, ["userAgent", "platform", "appName"]),
-    flash: _omit(flashState, ["bridge"]),
+    flash: _omit(_flashState, ["bridge"]),
     zeroclipboard: {
       version: ZeroClipboard.version,
       config: ZeroClipboard.config()

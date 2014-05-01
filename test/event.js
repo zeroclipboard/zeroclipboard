@@ -1,4 +1,4 @@
-/*global ZeroClipboard, currentElement:true, flashState:true, _extend, _clipData, _importClipDataFromFlash, _exportClipDataForFlash */
+/*global ZeroClipboard, _currentElement:true, _flashState:true, _extend, _clipData, _importClipDataFromFlash, _exportClipDataForFlash */
 
 "use strict";
 
@@ -9,11 +9,11 @@
   module("event", {
     setup: function() {
       // Store
-      originalFlashState = _extend({}, flashState);
+      originalFlashState = _extend({}, _flashState);
       originalConfig = ZeroClipboard.config();
       // Modify
-      currentElement = null;
-      flashState = {
+      _currentElement = null;
+      _flashState = {
         bridge: null,
         version: "0.0.0",
         disabled: null,
@@ -25,8 +25,8 @@
     },
     teardown: function() {
       ZeroClipboard.destroy();
-      currentElement = null;
-      flashState = originalFlashState;
+      _currentElement = null;
+      _flashState = originalFlashState;
       ZeroClipboard.config(originalConfig);
     }
   });
@@ -470,7 +470,7 @@
     assert.expect(6);
 
     // Arrange
-    flashState.disabled = true;
+    _flashState.disabled = true;
     var client = new ZeroClipboard();
     var id = client.id;
 
@@ -479,7 +479,7 @@
       // Assert
       assert.strictEqual(this, client);
       assert.strictEqual(this.id, id);
-      assert.strictEqual(flashState.disabled, true);
+      assert.strictEqual(_flashState.disabled, true);
       assert.strictEqual(event.type, "error");
       assert.strictEqual(event.name, "flash-disabled");
       assert.strictEqual(event.target, null);
@@ -492,9 +492,9 @@
     assert.expect(8);
 
     // Arrange
-    flashState.disabled = false;
-    flashState.outdated = true;
-    flashState.version = "10.0.0";
+    _flashState.disabled = false;
+    _flashState.outdated = true;
+    _flashState.version = "10.0.0";
     var client = new ZeroClipboard();
     var id = client.id;
 
@@ -506,7 +506,7 @@
       // Assert
       assert.strictEqual(this, client);
       assert.strictEqual(this.id, id);
-      assert.strictEqual(flashState.outdated, true);
+      assert.strictEqual(_flashState.outdated, true);
       assert.strictEqual(event.type, "error");
       assert.strictEqual(event.name, "flash-outdated");
       assert.strictEqual(event.target, null);
@@ -521,9 +521,9 @@
     assert.expect(10);
 
     // Arrange
-    flashState.disabled = false;
-    flashState.outdated = false;
-    flashState.version = "11.0.0";
+    _flashState.disabled = false;
+    _flashState.outdated = false;
+    _flashState.version = "11.0.0";
     ZeroClipboard.config({ flashLoadTimeout: 2000 });
     var client = new ZeroClipboard();
     var id = client.id;
@@ -534,8 +534,8 @@
       // Assert
       assert.strictEqual(this, client);
       assert.strictEqual(this.id, id);
-      assert.strictEqual(flashState.deactivated, true);
-      assert.strictEqual(flashState.ready, false);
+      assert.strictEqual(_flashState.deactivated, true);
+      assert.strictEqual(_flashState.ready, false);
       assert.strictEqual(event.type, "error");
       assert.strictEqual(event.name, "flash-deactivated");
       assert.strictEqual(event.target, null);
@@ -546,7 +546,7 @@
 
     // Act
     setTimeout(function() {
-      assert.strictEqual(flashState.deactivated, null);
+      assert.strictEqual(_flashState.deactivated, null);
     }, 500);
     QUnit.stop();
     // The "deactivatedFlash" event will automatically fire in 2 seconds if the `ready` event does not fire first
@@ -556,10 +556,10 @@
     assert.expect(8);
 
     // Arrange
-    flashState.disabled = false;
-    flashState.outdated = false;
-    flashState.version = "11.0.0";
-    flashState.deactivated = true;
+    _flashState.disabled = false;
+    _flashState.outdated = false;
+    _flashState.version = "11.0.0";
+    _flashState.deactivated = true;
     var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button");
     var id = client.id;
@@ -570,7 +570,7 @@
       // Assert
       assert.strictEqual(this, client);
       assert.strictEqual(this.id, id);
-      assert.strictEqual(flashState.deactivated, true);
+      assert.strictEqual(_flashState.deactivated, true);
       assert.strictEqual(event.type, "error");
       assert.strictEqual(event.name, "flash-deactivated");
       assert.strictEqual(event.target, null);
@@ -588,9 +588,9 @@
     assert.expect(6);
 
     // Arrange
-    flashState.disabled = false;
-    flashState.outdated = false;
-    flashState.version = "11.9.0";
+    _flashState.disabled = false;
+    _flashState.outdated = false;
+    _flashState.version = "11.9.0";
     var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button");
     var id = client.id;
@@ -601,7 +601,7 @@
       assert.strictEqual(this.id, id);
       assert.strictEqual(event.type, "ready");
       assert.strictEqual(event.target, null);
-      assert.strictEqual(flashState.deactivated, false);
+      assert.strictEqual(_flashState.deactivated, false);
       assert.strictEqual(event.version, "11.9.0");
       QUnit.start();
     } );
@@ -615,12 +615,12 @@
     assert.expect(6);
 
     // Arrange
-    flashState.disabled = false;
-    flashState.outdated = false;
-    flashState.deactivated = false;
-    flashState.version = "11.9.0";
-    flashState.ready = true;
-    flashState.bridge = {};
+    _flashState.disabled = false;
+    _flashState.outdated = false;
+    _flashState.deactivated = false;
+    _flashState.version = "11.9.0";
+    _flashState.ready = true;
+    _flashState.bridge = {};
     var client = new ZeroClipboard();
     var id = client.id;
 
@@ -631,7 +631,7 @@
       assert.strictEqual(this.id, id);
       assert.strictEqual(event.type, "ready");
       assert.strictEqual(event.target, null);
-      assert.strictEqual(flashState.deactivated, false);
+      assert.strictEqual(_flashState.deactivated, false);
       assert.strictEqual(event.version, "11.9.0");
       QUnit.start();
     } );
@@ -642,10 +642,10 @@
     assert.expect(15);
 
     // Arrange
-    flashState.disabled = false;
-    flashState.outdated = false;
-    flashState.version = "11.0.0";
-    flashState.deactivated = true;
+    _flashState.disabled = false;
+    _flashState.outdated = false;
+    _flashState.version = "11.0.0";
+    _flashState.deactivated = true;
     var client = new ZeroClipboard();
     var currentEl = document.getElementById("d_clip_button");
     var id = client.id;
@@ -659,15 +659,15 @@
       if (event.name === "flash-deactivated") {
         assert.strictEqual(event.type, "error");
         assert.strictEqual(event.name, "flash-deactivated");
-        assert.strictEqual(flashState.deactivated, true);
+        assert.strictEqual(_flashState.deactivated, true);
         assert.strictEqual(event.version, "11.0.0");
         assert.strictEqual(event.minimumVersion, "11.0.0");
       }
       else if (event.name === "flash-overdue") {
         assert.strictEqual(event.type, "error");
         assert.strictEqual(event.name, "flash-overdue");
-        assert.strictEqual(flashState.deactivated, false);
-        assert.strictEqual(flashState.overdue, true);
+        assert.strictEqual(_flashState.deactivated, false);
+        assert.strictEqual(_flashState.overdue, true);
         assert.strictEqual(event.version, "11.0.0");
         assert.strictEqual(event.minimumVersion, "11.0.0");
 

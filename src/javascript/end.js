@@ -1,3 +1,4 @@
+
 // The AMDJS logic branch is evaluated first to avoid potential confusion over
 // the CommonJS syntactical sugar offered by AMD.
 if (typeof define === "function" && define.amd) {

@@ -1,8 +1,8 @@
 /* Keep track of the current element that is being hovered. */
-var currentElement;
+var _currentElement;
 
 /* Keep track of the state of the Flash object. */
-var flashState = {
+var _flashState = {
   // Flash object reference
   bridge: null,
 
@@ -24,7 +24,7 @@ var _clipData = {};
 var _clipDataFormatMap = null;
 
 /* Keep track of the ZeroClipboard client instance counter. */
-var clientIdCounter = 0;
+var _clientIdCounter = 0;
 
 /*
  * Keep track of the state of the client instances.
@@ -39,7 +39,7 @@ var clientIdCounter = 0;
 var _clientMeta = {};
 
 /* Keep track of the ZeroClipboard clipped elements counter. */
-var elementIdCounter = 0;
+var _elementIdCounter = 0;
 
 /*
  * Keep track of the state of the clipped element relationships to clients.
@@ -53,11 +53,9 @@ var _elementMeta = {};
 var _swfPath = (function() {
   var i, jsDir, tmpJsPath, jsPath,
       swfPath = "ZeroClipboard.swf";
-  // If this browser offers the `currentScript` feature
-  if (document.currentScript && (jsPath = document.currentScript.src)) {
-    // Do nothing, assignment occurred during condition
-  }
-  else {
+  // Try to leverage the `currentScript` feature
+  if (!(document.currentScript && (jsPath = document.currentScript.src))) {
+    // If it it not available, then seek the script out instead...
     var scripts = document.getElementsByTagName("script");
     // If `script` elements have the `readyState` property in this browser
     if ("readyState" in scripts[0]) {

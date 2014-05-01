@@ -1,4 +1,4 @@
-/*global ZeroClipboard, _clipData, _clipDataFormatMap, flashState */
+/*global ZeroClipboard, _clipData, _clipDataFormatMap, _flashState */
 
 "use strict";
 
@@ -555,10 +555,10 @@
     var client = new ZeroClipboard();
 
     // Assert, act, assert
-    assert.strictEqual(flashState.ready, false);
+    assert.strictEqual(_flashState.ready, false);
     // `emit`-ing event handlers are async (generally) but the internal `ready` state is set synchronously
     ZeroClipboard.emit("ready");
-    assert.strictEqual(flashState.ready, true);
+    assert.strictEqual(_flashState.ready, true);
   });
 
 })(QUnit.module, QUnit.test);

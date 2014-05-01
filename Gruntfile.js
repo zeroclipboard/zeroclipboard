@@ -1,18 +1,18 @@
 /*jshint -W106 */
-/*jshint node:true */
+/*jshint node:true, maxstatements: false, maxlen: false */
 
-var os = require('os');
-var path = require('path');
+var os = require("os");
+var path = require("path");
 
 module.exports = function(grunt) {
-  'use strict';
+  "use strict";
 
   // Metadata
-  var pkg = grunt.file.readJSON('package.json');
+  var pkg = grunt.file.readJSON("package.json");
 
   // Make a temp dir for Flash compilation
   var tmpDir = os.tmpdir ? os.tmpdir() : os.tmpDir();
-  var flashTmpDir = path.join(tmpDir, 'zcflash');
+  var flashTmpDir = path.join(tmpDir, "zcflash");
 
   // Shared configuration
   var localPort = 7320;  // "ZERO"
@@ -22,15 +22,15 @@ module.exports = function(grunt) {
     // Task configuration
     jshint: {
       options: {
-        jshintrc: '.jshintrc'
+        jshintrc: ".jshintrc"
       },
-      Gruntfile: ['Gruntfile.js'],
-      js: ['src/javascript/ZeroClipboard/**/*.js'],
+      Gruntfile: ["Gruntfile.js"],
+      js: ["src/javascript/ZeroClipboard/**/*.js"],
       test: {
         options: {
-          jshintrc: 'test/.jshintrc'
+          jshintrc: "test/.jshintrc"
         },
-        src: ['test/*.js']
+        src: ["test/*.js"]
       }
     },
     flexpmd: {
@@ -39,7 +39,7 @@ module.exports = function(grunt) {
       }
     },
     clean: {
-      dist: ['ZeroClipboard.*'],
+      dist: ["ZeroClipboard.*"],
       flash: {
         options: {
           // Force is required when trying to clean outside of the project dir
@@ -47,7 +47,7 @@ module.exports = function(grunt) {
         },
         src: [flashTmpDir]
       },
-      meta: ['bower.json', 'composer.json', 'LICENSE']
+      meta: ["bower.json", "composer.json", "LICENSE"]
     },
     concat: {
       options: {
@@ -58,53 +58,53 @@ module.exports = function(grunt) {
       },
       js: {
         src: [
-          'src/meta/source-banner.tmpl',
-          'src/javascript/start.js',
-          'src/javascript/ZeroClipboard/state.js',
-          'src/javascript/ZeroClipboard/utils.js',
-          'src/javascript/ZeroClipboard/flash.js',
-          'src/javascript/ZeroClipboard/client.js',
-          'src/javascript/ZeroClipboard/core.js',
-          'src/javascript/ZeroClipboard/dom.js',
-          'src/javascript/ZeroClipboard/event.js',
-          'src/javascript/ZeroClipboard/deprecated.js',
-          'src/javascript/end.js'
+          "src/meta/source-banner.tmpl",
+          "src/javascript/start.js",
+          "src/javascript/ZeroClipboard/state.js",
+          "src/javascript/ZeroClipboard/utils.js",
+          "src/javascript/ZeroClipboard/flash.js",
+          "src/javascript/ZeroClipboard/client.js",
+          "src/javascript/ZeroClipboard/core.js",
+          "src/javascript/ZeroClipboard/dom.js",
+          "src/javascript/ZeroClipboard/event.js",
+          "src/javascript/ZeroClipboard/deprecated.js",
+          "src/javascript/end.js"
         ],
-        dest: 'ZeroClipboard.js'
+        dest: "ZeroClipboard.js"
       },
       flashMain: {
         src: [
-          'src/meta/source-banner.tmpl',
-          'src/flash/ZeroClipboard.as'
+          "src/meta/source-banner.tmpl",
+          "src/flash/ZeroClipboard.as"
         ],
-        dest: path.join(flashTmpDir, 'ZeroClipboard.as')
+        dest: path.join(flashTmpDir, "ZeroClipboard.as")
       },
       flashClip: {
         src: [
-          'src/meta/source-banner.tmpl',
-          'src/flash/ClipboardInjector.as'
+          "src/meta/source-banner.tmpl",
+          "src/flash/ClipboardInjector.as"
         ],
-        dest: path.join(flashTmpDir, 'ClipboardInjector.as')
+        dest: path.join(flashTmpDir, "ClipboardInjector.as")
       },
       flashJs: {
         src: [
-          'src/meta/source-banner.tmpl',
-          'src/flash/JsProxy.as'
+          "src/meta/source-banner.tmpl",
+          "src/flash/JsProxy.as"
         ],
-        dest: path.join(flashTmpDir, 'JsProxy.as')
+        dest: path.join(flashTmpDir, "JsProxy.as")
       },
       flashXss: {
         src: [
-          'src/meta/source-banner.tmpl',
-          'src/flash/XssUtils.as'
+          "src/meta/source-banner.tmpl",
+          "src/flash/XssUtils.as"
         ],
-        dest: path.join(flashTmpDir, 'XssUtils.as')
+        dest: path.join(flashTmpDir, "XssUtils.as")
       }
     },
     uglify: {
       options: {
-        preserveComments: 'some',
-        report: 'min'
+        preserveComments: "some",
+        report: "min"
       },
       js: {
         options: {
@@ -116,21 +116,21 @@ module.exports = function(grunt) {
           mangle: false,
           compress: false
         },
-        src: ['ZeroClipboard.js'],
-        dest: 'ZeroClipboard.js'
+        src: ["ZeroClipboard.js"],
+        dest: "ZeroClipboard.js"
       },
       minjs: {
-        src: ['ZeroClipboard.js'],
-        dest: 'ZeroClipboard.min.js'
+        src: ["ZeroClipboard.js"],
+        dest: "ZeroClipboard.min.js"
       }
     },
     mxmlc: {
       options: {
-        rawConfig: '-target-player=11.0.0 -static-link-runtime-shared-libraries=true'
+        rawConfig: "-target-player=11.0.0 -static-link-runtime-shared-libraries=true"
       },
       swf: {
         files: {
-          'ZeroClipboard.swf': ['<%= concat.flashMain.dest %>']
+          "ZeroClipboard.swf": ["<%= concat.flashMain.dest %>"]
         }
       }
     },
@@ -140,26 +140,26 @@ module.exports = function(grunt) {
       },
       bower: {
         files: {
-          'bower.json': ['src/meta/bower.json.tmpl']
+          "bower.json": ["src/meta/bower.json.tmpl"]
         }
       },
       composer: {
         files: {
-          'composer.json': ['src/meta/composer.json.tmpl']
+          "composer.json": ["src/meta/composer.json.tmpl"]
         }
       },
       LICENSE: {
         files: {
-          'LICENSE': ['src/meta/LICENSE.tmpl']
+          "LICENSE": ["src/meta/LICENSE.tmpl"]
         }
       }
     },
     chmod: {
       options: {
-        mode: '444'
+        mode: "444"
       },
-      dist: ['ZeroClipboard.*'],
-      meta: ['bower.json', 'composer.json', 'LICENSE']
+      dist: ["ZeroClipboard.*"],
+      meta: ["bower.json", "composer.json", "LICENSE"]
     },
     connect: {
       server: {
@@ -169,11 +169,11 @@ module.exports = function(grunt) {
       }
     },
     qunit: {
-      file: ['test/**/*.js.html'],
+      file: ["test/**/*.js.html"],
       http: {
         options: {
-          urls: grunt.file.expand(['test/**/*.js.html']).map(function(testPage) {
-            return 'http://localhost:' + localPort + '/' + testPage + '?noglobals=true';
+          urls: grunt.file.expand(["test/**/*.js.html"]).map(function(testPage) {
+            return "http://localhost:" + localPort + "/" + testPage + "?noglobals=true";
           })
         }
       }
@@ -183,46 +183,46 @@ module.exports = function(grunt) {
         spawn: false
       },
       Gruntfile: {
-        files: '<%= jshint.Gruntfile %>',
-        tasks: ['jshint:Gruntfile']
+        files: "<%= jshint.Gruntfile %>",
+        tasks: ["jshint:Gruntfile"]
       },
       js: {
-        files: '<%= jshint.js %>',
-        tasks: ['jshint:js', 'unittest']
+        files: "<%= jshint.js %>",
+        tasks: ["jshint:js", "unittest"]
       },
       test: {
-        files: '<%= jshint.test %>',
-        tasks: ['jshint:test', 'unittest']
+        files: "<%= jshint.test %>",
+        tasks: ["jshint:test", "unittest"]
       }
     }
   });
 
   // These plugins provide necessary tasks
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-flexpmd');
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-mxmlc');
-  grunt.loadNpmTasks('grunt-template');
-  grunt.loadNpmTasks('grunt-chmod');
-  grunt.loadNpmTasks('grunt-contrib-connect');
-  grunt.loadNpmTasks('grunt-contrib-qunit');
-  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks("grunt-contrib-jshint");
+  grunt.loadNpmTasks("grunt-flexpmd");
+  grunt.loadNpmTasks("grunt-contrib-clean");
+  grunt.loadNpmTasks("grunt-contrib-concat");
+  grunt.loadNpmTasks("grunt-contrib-uglify");
+  grunt.loadNpmTasks("grunt-mxmlc");
+  grunt.loadNpmTasks("grunt-template");
+  grunt.loadNpmTasks("grunt-chmod");
+  grunt.loadNpmTasks("grunt-contrib-connect");
+  grunt.loadNpmTasks("grunt-contrib-qunit");
+  grunt.loadNpmTasks("grunt-contrib-watch");
 
 
   //
   // Task aliases and chains
   //
-  grunt.registerTask('prep-flash',   ['clean:flash', 'concat:flashMain', 'concat:flashClip', 'concat:flashJs', 'concat:flashXss']);
-  grunt.registerTask('validate',     ['jshint', 'prep-flash', 'flexpmd']);
-  grunt.registerTask('build',        ['clean', 'concat', 'uglify', 'mxmlc', 'template', 'chmod']);
-  grunt.registerTask('build-travis', ['clean:dist', 'concat', 'mxmlc', 'chmod:dist']);
-  grunt.registerTask('test',         ['connect', 'qunit']);
+  grunt.registerTask("prep-flash",   ["clean:flash", "concat:flashMain", "concat:flashClip", "concat:flashJs", "concat:flashXss"]);
+  grunt.registerTask("validate",     ["jshint", "prep-flash", "flexpmd"]);
+  grunt.registerTask("build",        ["clean", "concat", "uglify", "mxmlc", "template", "chmod"]);
+  grunt.registerTask("build-travis", ["clean:dist", "concat", "mxmlc", "chmod:dist"]);
+  grunt.registerTask("test",         ["connect", "qunit"]);
 
   // Default task
-  grunt.registerTask('default', ['validate', 'build', 'test']);
+  grunt.registerTask("default", ["validate", "build", "test"]);
   // Travis CI task
-  grunt.registerTask('travis',  ['validate', 'build-travis', 'test']);
+  grunt.registerTask("travis",  ["validate", "build-travis", "test"]);
 
 };

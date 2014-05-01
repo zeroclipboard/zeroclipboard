@@ -1,4 +1,4 @@
-/*global _camelizeCssPropName, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _inArray, _dispatchCallback, _extend, _extractDomain, _determineScriptAccess, _objectKeys, _deleteOwnProperties, _pick, _omit, _mapClipDataToFlash, _mapClipResultsFromFlash */
+/*global _camelizeCssPropName, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _inArray, _dispatchCallback, _extend, _extractDomain, _determineScriptAccess, _objectKeys, _deleteOwnProperties, _pick, _omit, _mapClipDataToFlash, _mapClipResultsFromFlash, _args */
 
 "use strict";
 
@@ -658,6 +658,37 @@
     // Act & Assert
     var revisedClipResults = _mapClipResultsFromFlash(clipResults, formatMap);
     assert.deepEqual(revisedClipResults, expectedOutput, "Should reverse the key mapping process");
+  });
+
+
+  test("`_args` works", function(assert) {
+    assert.expect(4);
+
+    // Arrange
+    var _arguments = function() {
+      return arguments;
+    };
+    var fn = function() {};
+    var expectedOutput1 = [1, 2, 3];
+    var expectedOutput2 = [fn];
+    var expectedOutput3 = [{ foo: 'bar' }];
+    var expectedOutput4 = [[1, 2, 3]];
+    var inputArgs1 = _arguments(1, 2, 3);
+    var inputArgs2 = _arguments(fn);
+    var inputArgs3 = _arguments({ foo: 'bar' });
+    var inputArgs4 = _arguments([1, 2, 3]);
+
+    // Act
+    var actualOutput1 = _args(inputArgs1);
+    var actualOutput2 = _args(inputArgs2);
+    var actualOutput3 = _args(inputArgs3);
+    var actualOutput4 = _args(inputArgs4);
+
+    // Arrange
+    assert.deepEqual(actualOutput1, expectedOutput1);
+    assert.deepEqual(actualOutput2, expectedOutput2);
+    assert.deepEqual(actualOutput3, expectedOutput3);
+    assert.deepEqual(actualOutput4, expectedOutput4);
   });
 
 })(QUnit.module, QUnit.test);

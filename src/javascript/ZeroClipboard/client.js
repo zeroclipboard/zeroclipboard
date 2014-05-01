@@ -11,7 +11,7 @@ var ZeroClipboard = function (elements) {
   }
 
   // Assign an ID to the client instance
-  this.id = "" + (clientIdCounter++);
+  this.id = "" + (_clientIdCounter++);
 
   // Create the meta information store for this client
   _clientMeta[this.id] = {
@@ -27,27 +27,27 @@ var ZeroClipboard = function (elements) {
 
 
   // Setup the Flash <-> JavaScript bridge
-  if (typeof flashState.ready !== "boolean") {
-    flashState.ready = false;
+  if (typeof _flashState.ready !== "boolean") {
+    _flashState.ready = false;
   }
-  if (!ZeroClipboard.isFlashUnusable() && flashState.bridge === null) {
+  if (!ZeroClipboard.isFlashUnusable() && _flashState.bridge === null) {
     var _client = this;
     var maxWait = _globalConfig.flashLoadTimeout;
     if (typeof maxWait === "number" && maxWait >= 0) {
       setTimeout(function() {
         // If it took longer the `_globalConfig.flashLoadTimeout` milliseconds to receive
         // a `ready` event, consider Flash "deactivated".
-        if (typeof flashState.deactivated !== "boolean") {
-          flashState.deactivated = true;
+        if (typeof _flashState.deactivated !== "boolean") {
+          _flashState.deactivated = true;
         }
-        if (flashState.deactivated === true) {
+        if (_flashState.deactivated === true) {
           ZeroClipboard.emit({ "type": "error", "name": "flash-deactivated", "client": _client });
         }
       }, maxWait);
     }
 
     // If creating a new `ZeroClipboard` instance, it is safe to ignore the `overdue` status
-    flashState.overdue = false;
+    _flashState.overdue = false;
 
     // Load the SWF
     _bridge();
@@ -94,7 +94,7 @@ ZeroClipboard.prototype.setRichText = function (richText) {
  * @return object instance
  */
 ZeroClipboard.prototype.setData = function () {
-  ZeroClipboard.setData.apply(ZeroClipboard, Array.prototype.slice.call(arguments, 0));
+  ZeroClipboard.setData.apply(ZeroClipboard, _args(arguments));
   return this;
 };
 
@@ -105,7 +105,7 @@ ZeroClipboard.prototype.setData = function () {
  * @return object instance
  */
 ZeroClipboard.prototype.clearData = function () {
-  ZeroClipboard.clearData.apply(ZeroClipboard, Array.prototype.slice.call(arguments, 0));
+  ZeroClipboard.clearData.apply(ZeroClipboard, _args(arguments));
   return this;
 };
 
@@ -130,11 +130,11 @@ ZeroClipboard.prototype.setSize = function (width, height) {
  * returns nothing
  */
 var _setHandCursor = function (enabled) {
-  if (flashState.ready === true && flashState.bridge && typeof flashState.bridge.setHandCursor === 'function') {
-    flashState.bridge.setHandCursor(enabled);
+  if (_flashState.ready === true && _flashState.bridge && typeof _flashState.bridge.setHandCursor === "function") {
+    _flashState.bridge.setHandCursor(enabled);
   }
   else {
-    flashState.ready = false;
+    _flashState.ready = false;
   }
 };
 

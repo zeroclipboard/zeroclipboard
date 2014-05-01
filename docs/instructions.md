@@ -87,9 +87,6 @@ var _globalConfig = {
   // The z-index used by the Flash object. Max value (32-bit): 2147483647
   zIndex: 999999999,
 
-  // Debug enabled: send `console` messages with deprecation warnings, etc.
-  debug: true,
-
   // Sets the title of the `div` encapsulating the Flash object
   title: null,
 

@@ -25,7 +25,7 @@ var _camelizeCssPropName = (function () {
  * returns the computed style
  */
 var _getStyle = function (el, prop) {
-  var value, camelProp, tagName, possiblePointers, i, len;
+  var value, camelProp, tagName;
 
   if (window.getComputedStyle) {
     value = window.getComputedStyle(el, null).getPropertyValue(prop);
@@ -137,7 +137,7 @@ var _addClass = function (element, value) {
           }
         }
         // jank trim
-        element.className = setClass.replace(/^\s+|\s+$/g, '');
+        element.className = setClass.replace(/^\s+|\s+$/g, "");
       }
     }
 
@@ -175,7 +175,7 @@ var _removeClass = function (element, value) {
           className = className.replace(" " + classNames[c] + " ", " ");
         }
         // jank trim
-        element.className = className.replace(/^\s+|\s+$/g, '');
+        element.className = className.replace(/^\s+|\s+$/g, "");
 
       } else {
         element.className = "";
@@ -362,14 +362,13 @@ var _inArray = function (elem, array, fromIndex) {
  * returns the elements
  */
 var _prepClip = function (elements) {
-
   // if elements is a string
-  if (typeof elements === "string") throw new TypeError("ZeroClipboard doesn't accept query strings.");
+  if (typeof elements === "string") {
+    throw new TypeError("ZeroClipboard doesn't accept query strings.");
+  }
 
-  // if the elements isn't an array
-  if (!elements.length) return [elements];
-
-  return elements;
+  // if the elements isn't an array, wrap it with one
+  return typeof elements.length !== "number" ? [elements] : elements;
 };
 
 
@@ -419,39 +418,6 @@ var _getSafeZIndex = function (val) {
   }
 
   return zIndex || 0;
-};
-
-
-/*
- * private _deprecationWarning
- * Issue a warning against the use of deprecated methods.
- *
- * returns void
- */
-var _deprecationWarning = function(deprecatedApiName, debugEnabled) {
-  if (deprecatedApiName) {
-    var deprecationWarning = "`" + deprecatedApiName + "` is deprecated. See docs for more info:\n" +
-          "    https://github.com/zeroclipboard/zeroclipboard/blob/master/docs/instructions.md#deprecations";
-    _log(deprecationWarning, debugEnabled);
-  }
-};
-
-
-/*
- * private _log
- * If `console` is available, issue a `console.warn`/`console.log` message
- *
- * returns void
- */
-var _log = function(message, debugEnabled) {
-  if (message && debugEnabled !== false && typeof console !== "undefined" && console && (console.warn || console.log)) {
-    if (console.warn) {
-      console.warn(message);
-    }
-    else {
-      console.log(message);
-    }
-  }
 };
 
 
@@ -529,25 +495,24 @@ var _extractDomain = function(originOrUrl) {
 var _determineScriptAccess = (function() {
   var _extractAllDomains = function(origins, resultsArray) {
     var i, len, tmp;
-    if (origins != null && resultsArray[0] !== "*") {
-      if (typeof origins === "string") {
-        origins = [origins];
-      }
-      if (typeof origins === "object" && "length" in origins) {
-        for (i = 0, len = origins.length; i < len; i++) {
-          if (origins.hasOwnProperty(i)) {
-            tmp = _extractDomain(origins[i]);
-            if (tmp) {
-              if (tmp === "*") {
-                resultsArray.length = 0;
-                resultsArray.push("*");
-                break;
-              }
-              if (_inArray(tmp, resultsArray) === -1) {
-                resultsArray.push(tmp);
-              }
-            }
-          }
+    if (origins == null || resultsArray[0] === "*") {
+      return;
+    }
+    if (typeof origins === "string") {
+      origins = [origins];
+    }
+    if (!(typeof origins === "object" && typeof origins.length === "number")) {
+      return;
+    }
+    for (i = 0, len = origins.length; i < len; i++) {
+      if (origins.hasOwnProperty(i) && (tmp = _extractDomain(origins[i]))) {
+        if (tmp === "*") {
+          resultsArray.length = 0;
+          resultsArray.push("*");
+          break;
+        }
+        if (_inArray(tmp, resultsArray) === -1) {
+          resultsArray.push(tmp);
         }
       }
     }
@@ -728,20 +693,32 @@ var _mapClipResultsFromFlash = function(clipResults, formatMap) {
   var newResults = {};
 
   for (var prop in clipResults) {
-    if (!(prop === "success" || prop === "data")) {
-      newResults[prop] = clipResults[prop];
-      continue;
-    }
+    if (clipResults.hasOwnProperty(prop)) {
+      if (prop !== "success" && prop !== "data") {
+        newResults[prop] = clipResults[prop];
+        continue;
+      }
 
-    newResults[prop] = {};
+      newResults[prop] = {};
 
-    // Standardize the allowed clipboard segment names to reduce complexity on the Flash side
-    var tmpHash = clipResults[prop];
-    for (var dataFormat in tmpHash) {
-      if (dataFormat && tmpHash.hasOwnProperty(dataFormat) && formatMap.hasOwnProperty(dataFormat)) {
-        newResults[prop][formatMap[dataFormat]] = tmpHash[dataFormat];
+      // Standardize the allowed clipboard segment names to reduce complexity on the Flash side
+      var tmpHash = clipResults[prop];
+      for (var dataFormat in tmpHash) {
+        if (dataFormat && tmpHash.hasOwnProperty(dataFormat) && formatMap.hasOwnProperty(dataFormat)) {
+          newResults[prop][formatMap[dataFormat]] = tmpHash[dataFormat];
+        }
       }
     }
   }
   return newResults;
 };
+
+
+/**
+ * Convert an `arguments` object into an Array.
+ */
+var _args = (function(arraySlice) {
+  return function(args) {
+    return arraySlice.call(args, 0);
+  };
+})(window.Array.prototype.slice);

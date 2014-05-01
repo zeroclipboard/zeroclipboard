@@ -1,4 +1,4 @@
-/*global flashState */
+/*global _flashState */
 
 //
 // SOURCES FOR MUCH OF THIS CODE:
@@ -6,10 +6,11 @@
 //   - http://stackoverflow.com/questions/12866060/detecting-pepper-ppapi-flash-with-javascript
 //
 var _detectFlashSupport = function() {
-  var hasFlash = false;
-  var isActiveX = false;
-  var flashVersion = "";
-  var isPPAPI = false;
+  var plugin, ax, mimeType,
+      hasFlash = false,
+      isActiveX = false,
+      isPPAPI = false,
+      flashVersion = "";
 
   /**
    * Derived from Apple's suggested sniffer.
@@ -46,8 +47,6 @@ var _detectFlashSupport = function() {
       }
     }
   }
-
-  var plugin, ax, mimeType;
 
   if (navigator.plugins && navigator.plugins.length) {
     plugin = navigator.plugins["Shockwave Flash"];
@@ -92,11 +91,10 @@ var _detectFlashSupport = function() {
     }
   }
 
-
-  flashState.disabled = hasFlash !== true;
-  flashState.outdated = flashVersion && (parseFloat(flashVersion) < 11.0);
-  flashState.version = flashVersion || "0.0.0";
-  flashState.pluginType = isPPAPI ? "pepper" : (isActiveX ? "activex" : (hasFlash ? "netscape" : "unknown"));
+  _flashState.disabled = hasFlash !== true;
+  _flashState.outdated = flashVersion && (parseFloat(flashVersion) < 11.0);
+  _flashState.version = flashVersion || "0.0.0";
+  _flashState.pluginType = isPPAPI ? "pepper" : (isActiveX ? "activex" : (hasFlash ? "netscape" : "unknown"));
 
 };
 
