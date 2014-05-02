@@ -1,8 +1,7 @@
 /*global _camelizeCssPropName, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _inArray, _dispatchCallback, _extend, _extractDomain, _determineScriptAccess, _objectKeys, _deleteOwnProperties, _pick, _omit, _mapClipDataToFlash, _mapClipResultsFromFlash, _args */
 
-"use strict";
-
 (function(module, test) {
+  "use strict";
 
   module("utils.js");
 
@@ -671,11 +670,11 @@
     var fn = function() {};
     var expectedOutput1 = [1, 2, 3];
     var expectedOutput2 = [fn];
-    var expectedOutput3 = [{ foo: 'bar' }];
+    var expectedOutput3 = [{ foo: "bar" }];
     var expectedOutput4 = [[1, 2, 3]];
     var inputArgs1 = _arguments(1, 2, 3);
     var inputArgs2 = _arguments(fn);
-    var inputArgs3 = _arguments({ foo: 'bar' });
+    var inputArgs3 = _arguments({ foo: "bar" });
     var inputArgs4 = _arguments([1, 2, 3]);
 
     // Act

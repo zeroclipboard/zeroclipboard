@@ -22,16 +22,11 @@ module.exports = function(grunt) {
     // Task configuration
     jshint: {
       options: {
-        jshintrc: ".jshintrc"
+        jshintrc: true
       },
       Gruntfile: ["Gruntfile.js"],
       js: ["src/javascript/ZeroClipboard/**/*.js"],
-      test: {
-        options: {
-          jshintrc: "test/.jshintrc"
-        },
-        src: ["test/*.js"]
-      }
+      test: ["test/*.js"]
     },
     flexpmd: {
       flash: {

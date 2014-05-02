@@ -1,8 +1,7 @@
-/*global ZeroClipboard, _currentElement:true, _flashState:true, _extend, _clipData, _importClipDataFromFlash, _exportClipDataForFlash */
-
-"use strict";
+/*global ZeroClipboard, _currentElement:true, _flashState:true, _extend, _clipData */
 
 (function(module, test) {
+  "use strict";
 
   var originalFlashState, originalConfig;
 
@@ -475,7 +474,7 @@
     var id = client.id;
 
     // Act (should auto-fire immediately but the handler will be invoked asynchronously)
-    client.on( 'error', function(event) {
+    client.on( "error", function(event) {
       // Assert
       assert.strictEqual(this, client);
       assert.strictEqual(this.id, id);
@@ -499,10 +498,10 @@
     var id = client.id;
 
     // Act
-    client.on( 'ready', function(event) {
-      assert.ok(false, 'The `ready` event should NOT have fired!');
+    client.on( "ready", function(/* event */) {
+      assert.ok(false, "The `ready` event should NOT have fired!");
     } );
-    client.on( 'error', function(event) {
+    client.on( "error", function(event) {
       // Assert
       assert.strictEqual(this, client);
       assert.strictEqual(this.id, id);
@@ -527,10 +526,10 @@
     ZeroClipboard.config({ flashLoadTimeout: 2000 });
     var client = new ZeroClipboard();
     var id = client.id;
-    client.on( 'ready', function(event) {
-      assert.ok(false, 'The `ready` event should NOT have fired!');
+    client.on( "ready", function(/* event */) {
+      assert.ok(false, "The `ready` event should NOT have fired!");
     } );
-    client.on( 'error', function(event) {
+    client.on( "error", function(event) {
       // Assert
       assert.strictEqual(this, client);
       assert.strictEqual(this.id, id);
@@ -561,12 +560,11 @@
     _flashState.version = "11.0.0";
     _flashState.deactivated = true;
     var client = new ZeroClipboard();
-    var currentEl = document.getElementById("d_clip_button");
     var id = client.id;
-    client.on( 'ready', function(event) {
-      assert.ok(false, 'The `ready` event should NOT have fired!');
+    client.on( "ready", function(/* event */) {
+      assert.ok(false, "The `ready` event should NOT have fired!");
     } );
-    client.on( 'error', function(event) {
+    client.on( "error", function(event) {
       // Assert
       assert.strictEqual(this, client);
       assert.strictEqual(this.id, id);
@@ -595,7 +593,7 @@
     var currentEl = document.getElementById("d_clip_button");
     var id = client.id;
     client.clip(currentEl);
-    client.on( 'ready', function(event) {
+    client.on( "ready", function(event) {
       // Assert
       assert.strictEqual(this, client);
       assert.strictEqual(this.id, id);
@@ -647,12 +645,11 @@
     _flashState.version = "11.0.0";
     _flashState.deactivated = true;
     var client = new ZeroClipboard();
-    var currentEl = document.getElementById("d_clip_button");
     var id = client.id;
-    client.on( 'ready', function(event) {
-      assert.ok(false, 'The `ready` event should NOT have fired!');
+    client.on( "ready", function(/* event */) {
+      assert.ok(false, "The `ready` event should NOT have fired!");
     } );
-    client.on( 'error', function(event) {
+    client.on( "error", function(event) {
       // Assert
       assert.strictEqual(this, client);
       assert.strictEqual(this.id, id);
@@ -800,25 +797,25 @@
     client.clip(currentEl);
     ZeroClipboard.activate(currentEl);
 
-    client.on( 'ready error', function(event) {
+    client.on( "ready error", function(/* event */) {
       // Assert
       assert.strictEqual(this, client);
     } );
-    client.on( 'mousedown mouseover mouseup beforecopy', function(event) {
+    client.on( "mousedown mouseover mouseup beforecopy", function(event) {
       // Assert
       assert.strictEqual(event.target, currentEl);
     } );
-    client.on( 'copy', function(event) {
+    client.on( "copy", function(event) {
       // Assert
       assert.strictEqual(event.target, currentEl);
       assert.ok(_clipData["text/plain"]);
     } );
-    client.on( 'aftercopy', function(event) {
+    client.on( "aftercopy", function(event) {
       // Assert
       assert.strictEqual(event.target, currentEl);
       assert.ok(!_clipData["text/plain"]);
     } );
-    client.on( 'mouseout', function(event) {
+    client.on( "mouseout", function(event) {
       // Assert
       assert.strictEqual(event.target, currentEl);
       QUnit.start();

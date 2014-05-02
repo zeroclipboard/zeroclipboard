@@ -1,8 +1,7 @@
 /*global ZeroClipboard, _globalConfig:true, _clipData, _objectKeys, _deleteOwnProperties */
 
-"use strict";
-
 (function(module, test) {
+  "use strict";
 
   var originalConfig;
 

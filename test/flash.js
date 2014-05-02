@@ -1,8 +1,7 @@
 /*global _flashState, _detectFlashSupport */
 
-"use strict";
-
 (function(module, test) {
+  "use strict";
 
   var mimeType, ax;
 

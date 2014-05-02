@@ -1,8 +1,7 @@
 /*global ZeroClipboard */
 
-"use strict";
-
 (function(module, test) {
+  "use strict";
 
   // Helper functions
   var TestUtils = {
@@ -208,7 +207,8 @@
 
     // Assert, arrange, assert, act, assert
     assert.equal(TestUtils.getHtmlBridge(), null, "The bridge does not exist before creating a client");
-    var client = new ZeroClipboard();
+    /*jshint nonew:false */
+    new ZeroClipboard();
     assert.notEqual(TestUtils.getHtmlBridge(), null, "The bridge does exist after creating a client");
     ZeroClipboard.destroy();
     assert.equal(TestUtils.getHtmlBridge(), null, "The bridge does not exist after calling `destroy`");
