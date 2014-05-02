@@ -259,6 +259,9 @@
     if (options.forceEnhancedClipboard === true) {
       str += (str ? "&" : "") + "forceEnhancedClipboard=true";
     }
+    if (options.flashBridgeName) {
+      str += (str ? "&" : "") + "flashBridgeName=" + encodeURIComponent(options.flashBridgeName);
+    }
     return str;
   };
   var _inArray = function(elem, array, fromIndex) {
@@ -673,13 +676,33 @@
     debug: false,
     title: null,
     autoActivate: true,
-    flashLoadTimeout: 3e4
+    flashLoadTimeout: 3e4,
+    containerId: "global-zeroclipboard-html-bridge",
+    containerClass: "global-zeroclipboard-container",
+    flashBridgeName: "global-zeroclipboard-flash-bridge"
   };
+  var _protectedProperties = [ "swfPath", "containerId", "containerClass", "flashBridgeName" ];
   ZeroClipboard.isFlashUnusable = function() {
     return !!(_flashState.disabled || _flashState.outdated || _flashState.unavailable || _flashState.deactivated);
   };
   ZeroClipboard.config = function(options) {
     if (typeof options === "object" && options !== null) {
+      if (_flashState.bridge) {
+        for (var i = 0, len = _protectedProperties.length; i < len; i++) {
+          if (options[_protectedProperties[i]] && _globalConfig.debug) {
+            console.warn("WARNING: " + _protectedProperties[i] + " cannot be configured after the ZeroClipboard SWF has been embedded");
+          }
+        }
+        options = _omit(options, _protectedProperties);
+      }
+      var toValidate = _pick(options, [ "containerId", "flashBridgeName" ]);
+      for (var key in toValidate) {
+        if (toValidate.hasOwnProperty(key)) {
+          if (!/^[A-Za-z][A-Za-z0-9_:\-\.]*$/.test(toValidate[key])) {
+            throw new Error("The specified `" + key + "` value is not valid as an HTML4 Element ID");
+          }
+        }
+      }
       _extend(_globalConfig, options);
     }
     if (typeof options === "string" && options) {
@@ -817,7 +840,7 @@
   };
   var _bridge = function() {
     var flashBridge, len;
-    var container = document.getElementById("global-zeroclipboard-html-bridge");
+    var container = document.getElementById(_globalConfig.containerId);
     if (!container) {
       var allowScriptAccess = _determineScriptAccess(window.location.host, _globalConfig);
       var allowNetworking = allowScriptAccess === "never" ? "none" : "all";
@@ -829,14 +852,14 @@
       document.body.appendChild(container);
       var tmpDiv = document.createElement("div");
       var oldIE = _flashState.pluginType === "activex";
-      tmpDiv.innerHTML = '<object id="global-zeroclipboard-flash-bridge" name="global-zeroclipboard-flash-bridge" ' + 'width="100%" height="100%" ' + (oldIE ? 'classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"' : 'type="application/x-shockwave-flash" data="' + swfUrl + '"') + ">" + (oldIE ? '<param name="movie" value="' + swfUrl + '"/>' : "") + '<param name="allowScriptAccess" value="' + allowScriptAccess + '"/>' + '<param name="allowNetworking" value="' + allowNetworking + '"/>' + '<param name="menu" value="false"/>' + '<param name="wmode" value="transparent"/>' + '<param name="flashvars" value="' + flashvars + '"/>' + "</object>";
+      tmpDiv.innerHTML = '<object id="' + _globalConfig.flashBridgeName + '" name="' + _globalConfig.flashBridgeName + '" ' + 'width="100%" height="100%" ' + (oldIE ? 'classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"' : 'type="application/x-shockwave-flash" data="' + swfUrl + '"') + ">" + (oldIE ? '<param name="movie" value="' + swfUrl + '"/>' : "") + '<param name="allowScriptAccess" value="' + allowScriptAccess + '"/>' + '<param name="allowNetworking" value="' + allowNetworking + '"/>' + '<param name="menu" value="false"/>' + '<param name="wmode" value="transparent"/>' + '<param name="flashvars" value="' + flashvars + '"/>' + "</object>";
       flashBridge = tmpDiv.firstChild;
       tmpDiv = null;
       flashBridge.ZeroClipboard = ZeroClipboard;
       container.replaceChild(flashBridge, divToBeReplaced);
     }
     if (!flashBridge) {
-      flashBridge = document["global-zeroclipboard-flash-bridge"];
+      flashBridge = document[_globalConfig.flashBridgeName];
       if (flashBridge && (len = flashBridge.length)) {
         flashBridge = flashBridge[len - 1];
       }
@@ -848,8 +871,8 @@
   };
   var _createHtmlBridge = function() {
     var container = document.createElement("div");
-    container.id = "global-zeroclipboard-html-bridge";
-    container.className = "global-zeroclipboard-container";
+    container.id = _globalConfig.containerId;
+    container.className = _globalConfig.containerClass;
     container.style.position = "absolute";
     container.style.left = "0px";
     container.style.top = "-9999px";

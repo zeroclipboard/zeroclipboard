@@ -325,6 +325,10 @@ var _vars = function (options) {
     str += (str ? "&" : "") + "forceEnhancedClipboard=true";
   }
 
+  if (options.flashBridgeName) {
+    str += (str ? "&" : "") + "flashBridgeName=" + encodeURIComponent(options.flashBridgeName);
+  }
+
   return str;
 };
 

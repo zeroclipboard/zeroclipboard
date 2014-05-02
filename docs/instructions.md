@@ -98,7 +98,15 @@ var _globalConfig = {
   // Flash is deactivated (e.g. click-to-play) in the user's browser. If you don't care about
   // how long it takes to load the SWF, you can set this to `null`.
   flashLoadTimeout: 30000,
-
+  
+  // Sets the id of the the `div` encapsulating the Flash object
+  containerId: "global-zeroclipboard-html-bridge",
+ 
+  // Sets the class of the the `div` encapsulating the Flash object
+  containerClass: "global-zeroclipboard-container",
+ 
+  // Sets the id and name of the Flash 'object' element
+  flashBridgeName: "global-zeroclipboard-flash-bridge",
 
   /** @deprecated */
   // The class used to indicate that a clipped element is being hovered over
@@ -867,7 +875,16 @@ Here is a more complete example which exercises many of the configuration option
 </html>
 ```
 
+## Namespacing ZeroClipboard
+ZeroClipboard creates DOM elements with pre-configured attributes. For example, a `<div>` element with an ID of `global-zeroclipboard-html-bridge` to encapuslate the flash object.
 
+If you have a need to change the default values, they can be configured by passing in values for `containerId`, `containerClass`, and/or `flashBridgeName` using the `ZeroClipboard.config` method. Configuration of these values is completely optional.
+
+These values cannot be configured after the ZeroClipboard SWF has been embedded. Configuration of these values after you execute `new ZeroClipboard(...)` is ignored.
+
+Values for `containerId` and `flashBridgeName` are validated against the [HTML4 specification for ID and Name tokens](http://www.w3.org/TR/html4/types.html#type-id).
+
+  
 ## AMD
 
 If using [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) with a library such as [RequireJS](http://requirejs.org/), etc., you shouldn't need to do any special configuration for ZeroClipboard to work correctly as an AMD module.

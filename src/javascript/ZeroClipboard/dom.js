@@ -7,7 +7,7 @@ var _bridge = function () {
   var flashBridge, len;
 
   // try and find the current global bridge
-  var container = document.getElementById("global-zeroclipboard-html-bridge");
+  var container = document.getElementById(_globalConfig.containerId);
 
   if (!container) {
     // Set `allowScriptAccess`/`allowNetworking` based on `trustedDomains` and `window.location.host` vs. `swfPath`
@@ -39,7 +39,7 @@ var _bridge = function () {
     var oldIE = _flashState.pluginType === "activex";
     /*jshint quotmark:single */
     tmpDiv.innerHTML =
-      '<object id="global-zeroclipboard-flash-bridge" name="global-zeroclipboard-flash-bridge" ' +
+      '<object id="' + _globalConfig.flashBridgeName + '" name="' + _globalConfig.flashBridgeName + '" ' +
         'width="100%" height="100%" ' +
         (oldIE ? 'classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"' : 'type="application/x-shockwave-flash" data="' + swfUrl + '"') +
       '>' +
@@ -67,7 +67,7 @@ var _bridge = function () {
   }
 
   if (!flashBridge) {
-    flashBridge = document["global-zeroclipboard-flash-bridge"];
+    flashBridge = document[_globalConfig.flashBridgeName];
     if (flashBridge && (len = flashBridge.length)) {
       flashBridge = flashBridge[len - 1];
     }
@@ -86,8 +86,8 @@ var _bridge = function () {
  */
 var _createHtmlBridge = function() {
   var container = document.createElement("div");
-  container.id = "global-zeroclipboard-html-bridge";
-  container.className = "global-zeroclipboard-container";
+  container.id = _globalConfig.containerId;
+  container.className = _globalConfig.containerClass;
   container.style.position = "absolute";
   container.style.left = "0px";
   container.style.top = "-9999px";

@@ -6,7 +6,7 @@
   // Helper functions
   var TestUtils = {
     getHtmlBridge: function() {
-      return document.getElementById("global-zeroclipboard-html-bridge");
+      return document.getElementById(ZeroClipboard.config("containerId"));
     }
   };
 
@@ -113,12 +113,13 @@
     assert.expect(6);
 
     // Assert, arrange, assert, act, assert
-    assert.strictEqual($(".global-zeroclipboard-container").length, 0);
+    var containerClass = "." + ZeroClipboard.config("containerClass");
+    assert.strictEqual($(containerClass).length, 0);
     var client1 = new ZeroClipboard();
     assert.ok(client1.id);
-    assert.strictEqual($(".global-zeroclipboard-container").length, 1);
+    assert.strictEqual($(containerClass).length, 1);
     var client2 = new ZeroClipboard();
-    assert.strictEqual($(".global-zeroclipboard-container").length, 1);
+    assert.strictEqual($(containerClass).length, 1);
     assert.notEqual(client2.id, client1.id);
     assert.notEqual(client2, client1);
   });

@@ -18,34 +18,16 @@ package {
   public class ZeroClipboard extends Sprite {
 
     /**
-     * Expected Flash object ID.
+     * Expected Flash object ID. Assigned during init(),
+     * where the value is parsed from flashvars.
      */
-    private static const SWF_OBJECT_ID:String = "global-zeroclipboard-flash-bridge";
+    private static var SWF_OBJECT_ID:String = null;
 
     /**
      * Function through which JavaScript events are emitted. Accounts for scenarios
      * in which ZeroClipboard is used via AMD/CommonJS module loaders, too.
      */
-    private static const JS_EMITTER:String =
-      "(function(eventObj) {\n" +
-      "  var objectId = '" + ZeroClipboard.SWF_OBJECT_ID + "',\n" +
-      "      ZC = null,\n" +
-      "      swf = null;\n" +
-      "  if (typeof ZeroClipboard === 'function' && typeof ZeroClipboard.emit === 'function') {\n" +
-      "    \nZC = ZeroClipboard;\n" +
-      "  }\n" +
-      "  else {\n" +
-      "    swf = document[objectId] || document.getElementById(objectId);\n" +
-      "    if (swf && typeof swf.ZeroClipboard === 'function' && typeof swf.ZeroClipboard.emit === 'function') {\n" +
-      "      ZC = swf.ZeroClipboard;\n" +
-      "    }\n" +
-      "  }\n" +
-      "  if (!ZC) {\n" +
-      "    throw new Error('ERROR: ZeroClipboard SWF could not locate ZeroClipboard JS object!\\n" +
-                           "Expected element ID: ' + objectId);\n" +
-      "  }\n" +
-      "  return ZC.emit(eventObj);\n" +
-      "})";
+    private static var JS_EMITTER:String = null;
 
 
     /**
@@ -99,6 +81,21 @@ package {
       var flashvars:Object;  // NOPMD
       flashvars = XssUtils.filterToFlashVars(this.loaderInfo.parameters);
 
+      // Configure the SWF object's flash bridge name
+      if (flashvars.flashBridgeName && typeof flashvars.flashBridgeName === "string") {
+        var flashBridgeName:String = XssUtils.sanitizeString(flashvars.flashBridgeName);
+
+        // Validate against HTML4 Spec
+        if (!/^[A-Za-z][A-Za-z0-9_:\-\.]*$/.test(flashBridgeName)) {
+          // If/when we can support HTML5 only compliant browsers, the regex can look more like: `!/^[^ \t\n\f\r]+$/.test(value)`
+          throw new Error("The specified `flashBridgeName` value is not valid as an HTML4 Element ID");
+        }
+
+        ZeroClipboard.SWF_OBJECT_ID = flashBridgeName;
+      } else {
+        throw new Error("`flashBridgeName` is required but not present");
+      }
+
       // Allow the SWF object to communicate with a page on a different origin than its own (e.g. SWF served from CDN)
       if (flashvars.trustedOrigins && typeof flashvars.trustedOrigins === "string") {
         var origins:Array = XssUtils.sanitizeString(flashvars.trustedOrigins).split(",");
@@ -110,6 +107,27 @@ package {
       if (flashvars.forceEnhancedClipboard === "true" || flashvars.forceEnhancedClipboard === true) {
         forceEnhancedClipboard = true;
       }
+
+      ZeroClipboard.JS_EMITTER =
+        "(function(eventObj) {\n" +
+        "  var objectId = '" + ZeroClipboard.SWF_OBJECT_ID + "',\n" +
+        "      ZC = null,\n" +
+        "      swf = null;\n" +
+        "  if (typeof ZeroClipboard === 'function' && typeof ZeroClipboard.emit === 'function') {\n" +
+        "    \nZC = ZeroClipboard;\n" +
+        "  }\n" +
+        "  else {\n" +
+        "    swf = document[objectId] || document.getElementById(objectId);\n" +
+        "    if (swf && typeof swf.ZeroClipboard === 'function' && typeof swf.ZeroClipboard.emit === 'function') {\n" +
+        "      ZC = swf.ZeroClipboard;\n" +
+        "    }\n" +
+        "  }\n" +
+        "  if (!ZC) {\n" +
+        "    throw new Error('ERROR: ZeroClipboard SWF could not locate ZeroClipboard JS object!\\n" +
+                             "Expected element ID: ' + objectId);\n" +
+        "  }\n" +
+        "  return ZC.emit(eventObj);\n" +
+        "})";
 
       // Create an invisible "button" and transparently fill the entire Stage
       var button:Sprite = this.prepareUI();

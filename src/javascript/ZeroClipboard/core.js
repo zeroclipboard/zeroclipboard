@@ -34,10 +34,21 @@ var _globalConfig = {
   // How many milliseconds to wait for the Flash SWF to load and respond before assuming that
   // Flash is deactivated (e.g. click-to-play) in the user's browser. If you don't care about
   // how long it takes to load the SWF, you can set this to `null`.
-  flashLoadTimeout: 30000
+  flashLoadTimeout: 30000,
+
+  // Sets the id of the the `div` encapsulating the Flash object
+  containerId: "global-zeroclipboard-html-bridge",
+
+  // Sets the class of the the `div` encapsulating the Flash object
+  containerClass: "global-zeroclipboard-container",
+
+  // Sets the id and name of the Flash 'object' element
+  flashBridgeName: "global-zeroclipboard-flash-bridge"
 
 };
 
+// Property keys that require special handling during runtime configuration
+var _protectedProperties = ["swfPath", "containerId", "containerClass", "flashBridgeName"];
 
 /*
  * Check if Flash is unusable for any reason: disabled, outdated, deactivated, etc.
@@ -61,6 +72,32 @@ ZeroClipboard.isFlashUnusable = function() {
  */
 ZeroClipboard.config = function (options) {
   if (typeof options === "object" && options !== null) {
+
+    // When being configured after the SWF has been embedded
+    if (_flashState.bridge) {
+      // Check for configuration of any protected properties and issue warnings
+      for (var i = 0, len = _protectedProperties.length; i < len; i++) {
+        if (options[_protectedProperties[i]] && _globalConfig.debug) {
+           console.warn("WARNING: " + _protectedProperties[i] + " cannot be configured after the ZeroClipboard SWF has been embedded");
+        }
+      }
+
+      // Filter out DOM-related configurations
+      options = _omit(options, _protectedProperties);
+    }
+
+    // Validate values used for DOM ID and Name attributes
+    // This is validating against HTML4 standards http://www.w3.org/TR/html4/types.html#type-id
+    var toValidate = _pick(options, ["containerId", "flashBridgeName"]);
+    for (var key in toValidate) {
+      if (toValidate.hasOwnProperty(key)) {
+        if (!/^[A-Za-z][A-Za-z0-9_:\-\.]*$/.test(toValidate[key])) {
+          // If/when we can support HTML5 only compliant browsers, the regex can look more like: `!/^[^ \t\n\f\r]+$/.test(value)`
+          throw new Error("The specified `" + key + "` value is not valid as an HTML4 Element ID");
+        }
+      }
+    }
+
     _extend(_globalConfig, options);
   }
   if (typeof options === "string" && options) {
