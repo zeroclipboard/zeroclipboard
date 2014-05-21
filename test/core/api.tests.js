@@ -84,6 +84,78 @@
   });
 
 
+  test("Some config values are ignored if SWF is actively embedded", function(assert) {
+    assert.expect(2);
+
+    // Arrange
+    var _swfPath = ZeroClipboard.config("swfPath");
+    var expectedBefore = {
+      hoverClass: "zeroclipboard-is-hover",
+      activeClass: "zeroclipboard-is-active",
+      swfPath: _swfPath,
+      trustedDomains: window.location.host ? [window.location.host] : [],
+      cacheBust: true,
+      forceEnhancedClipboard: false,
+      flashLoadTimeout: 30000,
+      autoActivate: true,
+      containerId: "global-zeroclipboard-html-bridge",
+      containerClass: "global-zeroclipboard-container",
+      swfObjectId: "global-zeroclipboard-flash-bridge",
+
+      // These configuration values CAN be modified while a SWF is actively embedded.
+      forceHandCursor: false,
+      title: null,
+      zIndex: 999999999
+    };
+    var expectedAfter = {
+      hoverClass: "zeroclipboard-is-hover",
+      activeClass: "zeroclipboard-is-active",
+      swfPath: _swfPath,
+      trustedDomains: window.location.host ? [window.location.host] : [],
+      cacheBust: true,
+      forceEnhancedClipboard: false,
+      flashLoadTimeout: 30000,
+      autoActivate: true,
+      containerId: "global-zeroclipboard-html-bridge",
+      containerClass: "global-zeroclipboard-container",
+      swfObjectId: "global-zeroclipboard-flash-bridge",
+
+      // These configuration values CAN be modified while a SWF is actively embedded.
+      forceHandCursor: true,
+      title: "test",
+      zIndex: 1000
+    };
+
+    // Act
+    var actualBefore = ZeroClipboard.config();
+
+    _flashState.bridge = {};
+
+    var actualAfter = ZeroClipboard.config({
+      hoverClass: "test-hover",
+      activeClass: "test-active",
+      swfPath: "/path/to/test.swf",
+      trustedDomains: ["test.domain.com"],
+      cacheBust: false,
+      forceEnhancedClipboard: true,
+      flashLoadTimeout: 15000,
+      autoActivate: false,
+      containerId: "test-id",
+      containerClass: "test-class",
+      swfObjectId: "test-swf",
+
+      // These configuration values CAN be modified while a SWF is actively embedded.
+      forceHandCursor: true,
+      title: "test",
+      zIndex: 1000
+    });
+
+    // Assert
+    assert.deepEqual(actualBefore, expectedBefore, "Original config is as expected");
+    assert.deepEqual(actualAfter, expectedAfter, "Updated config is as expected");
+  });
+
+
   module("core/api.js unit tests - clipboard", {
     teardown: function() {
       _deleteOwnProperties(_clipData);

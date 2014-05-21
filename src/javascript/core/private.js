@@ -3,9 +3,33 @@
  * @private
  */
 var _config = function(options) {
+  /*jshint maxdepth:6 */
   if (typeof options === "object" && options !== null) {
-    _extend(_globalConfig, options);
+    for (var prop in options) {
+      if (_hasOwn.call(options, prop)) {
+        // These configuration values CAN be modified while a SWF is actively embedded.
+        if (prop === "forceHandCursor" || prop === "title" || prop === "zIndex") {
+          _globalConfig[prop] = options[prop];
+        }
+        // All other configuration values CANNOT be modified while a SWF is actively embedded.
+        else if (_flashState.bridge == null) {
+          if (prop === "containerId" || prop === "swfObjectId") {
+            // Validate values against the HTML4 spec for `ID` and `Name` tokens
+            if (_isValidHtml4Id(options[prop])) {
+              _globalConfig[prop] = options[prop];
+            }
+            else {
+              throw new Error("The specified `" + prop + "` value is not valid as an HTML4 Element ID");
+            }
+          }
+          else {
+            _globalConfig[prop] = options[prop];
+          }
+        }
+      }
+    }
   }
+
   if (typeof options === "string" && options) {
     if (_hasOwn.call(_globalConfig, options)) {
       // TODO: MAYBE do a `_deepCopy` of this as well? It is convenient to NOT
@@ -17,6 +41,7 @@ var _config = function(options) {
     // else `return undefined;`
     return;
   }
+
   return _deepCopy(_globalConfig);
 };
 
@@ -381,6 +406,15 @@ var _deactivate = function() {
 //
 
 /**
+ * Check if a value is a valid HTML4 `ID` or `Name` token.
+ * @private
+ */
+var _isValidHtml4Id = function(id) {
+  return typeof id === "string" && id && /^[A-Za-z][A-Za-z0-9_:\-\.]*$/.test(id);
+};
+
+
+/**
  * Create or update an `event` object, based on the `eventType`.
  * @private
  */
@@ -464,7 +498,7 @@ var _getRelatedTarget = function(targetEl) {
 
 
 /**
- * Determine if an event's registered handlers should be execute synchronously or asynchronously. 
+ * Determine if an event's registered handlers should be execute synchronously or asynchronously.
  *
  * @returns {boolean}
  * @private
@@ -624,8 +658,8 @@ var _preprocessEvent = function(event) {
  */
 var _createHtmlBridge = function() {
   var container = _document.createElement("div");
-  container.id = "global-zeroclipboard-html-bridge";
-  container.className = "global-zeroclipboard-container";
+  container.id = _globalConfig.containerId;
+  container.className = _globalConfig.containerClass;
   container.style.position = "absolute";
   container.style.left = "0px";
   container.style.top = "-9999px";
@@ -657,8 +691,8 @@ var _getHtmlBridge = function(flashBridge) {
  */
 var _embedSwf = function() {
   var len,
-      container = _document.getElementById("global-zeroclipboard-html-bridge"),
-      flashBridge = _flashState.bridge;
+      flashBridge = _flashState.bridge,
+      container = _getHtmlBridge(flashBridge);
 
   if (!flashBridge) {
     // Set `allowScriptAccess`/`allowNetworking` based on `trustedDomains` and `window.location.host` vs. `swfPath`
@@ -690,7 +724,7 @@ var _embedSwf = function() {
     var oldIE = _flashState.pluginType === "activex";
     /*jshint quotmark:single */
     tmpDiv.innerHTML =
-      '<object id="global-zeroclipboard-flash-bridge" name="global-zeroclipboard-flash-bridge" ' +
+      '<object id="' + _globalConfig.swfObjectId + '" name="' + _globalConfig.swfObjectId + '" ' +
         'width="100%" height="100%" ' +
         (oldIE ? 'classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"' : 'type="application/x-shockwave-flash" data="' + swfUrl + '"') +
       '>' +
@@ -718,7 +752,7 @@ var _embedSwf = function() {
   }
 
   if (!flashBridge) {
-    flashBridge = _document["global-zeroclipboard-flash-bridge"];
+    flashBridge = _document[_globalConfig.swfObjectId];
     if (flashBridge && (len = flashBridge.length)) {
       flashBridge = flashBridge[len - 1];
     }
@@ -756,7 +790,7 @@ var _unembedSwf = function() {
               }
             }
             if (flashBridge.parentNode) {
-              flashBridge.parentNode.removeChild(flashBridge);  
+              flashBridge.parentNode.removeChild(flashBridge);
             }
             if (htmlBridge.parentNode) {
               htmlBridge.parentNode.removeChild(htmlBridge);
@@ -769,7 +803,7 @@ var _unembedSwf = function() {
       }
       else {
         if (flashBridge.parentNode) {
-          flashBridge.parentNode.removeChild(flashBridge);  
+          flashBridge.parentNode.removeChild(flashBridge);
         }
         if (htmlBridge.parentNode) {
           htmlBridge.parentNode.removeChild(htmlBridge);
@@ -947,6 +981,10 @@ var _vars = function(options) {
 
   if (options.forceEnhancedClipboard === true) {
     str += (str ? "&" : "") + "forceEnhancedClipboard=true";
+  }
+
+  if (typeof options.swfObjectId === "string" && options.swfObjectId) {
+    str += (str ? "&" : "") + "swfObjectId=" + _encodeURIComponent(options.swfObjectId);
   }
 
   return str;

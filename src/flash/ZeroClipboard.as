@@ -18,35 +18,10 @@ package {
   public class ZeroClipboard extends Sprite {
 
     /**
-     * Expected Flash object ID.
-     */
-    private static const SWF_OBJECT_ID:String = "global-zeroclipboard-flash-bridge";
-
-    /**
      * Function through which JavaScript events are emitted. Accounts for scenarios
      * in which ZeroClipboard is used via AMD/CommonJS module loaders, too.
      */
-    private static const JS_EMITTER:String =
-      "(function(eventObj) {\n" +
-      "  var objectId = '" + ZeroClipboard.SWF_OBJECT_ID + "',\n" +
-      "      ZC = null,\n" +
-      "      swf = null;\n" +
-      "  if (typeof ZeroClipboard === 'function' && typeof ZeroClipboard.emit === 'function') {\n" +
-      "    \nZC = ZeroClipboard;\n" +
-      "  }\n" +
-      "  else {\n" +
-      "    swf = document[objectId] || document.getElementById(objectId);\n" +
-      "    if (swf && typeof swf.ZeroClipboard === 'function' && typeof swf.ZeroClipboard.emit === 'function') {\n" +
-      "      ZC = swf.ZeroClipboard;\n" +
-      "    }\n" +
-      "  }\n" +
-      "  if (!ZC) {\n" +
-      "    throw new Error('ERROR: ZeroClipboard SWF could not locate ZeroClipboard JS object!\\n" +
-                           "Expected element ID: ' + objectId);\n" +
-      "  }\n" +
-      "  return ZC.emit(eventObj);\n" +
-      "})";
-
+    private var jsEmitter:String = null;
 
     /**
      * JavaScript proxy object.
@@ -99,6 +74,17 @@ package {
       var flashvars:Object;  // NOPMD
       flashvars = XssUtils.filterToFlashVars(this.loaderInfo.parameters);
 
+      // Configure the SWF object's ID
+      var swfObjectId:String = "global-zeroclipboard-flash-bridge";
+      if (flashvars.swfObjectId && typeof flashvars.swfObjectId === "string") {
+        var swfId = XssUtils.sanitizeString(flashvars.swfObjectId);
+
+        // Validate the ID against the HTML4 spec for `ID` tokens.
+        if (/^[A-Za-z][A-Za-z0-9_:\-\.]*$/.test(swfId)) {
+          swfObjectId = swfId;
+        }
+      }
+
       // Allow the SWF object to communicate with a page on a different origin than its own (e.g. SWF served from CDN)
       if (flashvars.trustedOrigins && typeof flashvars.trustedOrigins === "string") {
         var origins:Array = XssUtils.sanitizeString(flashvars.trustedOrigins).split(",");
@@ -111,6 +97,27 @@ package {
         forceEnhancedClipboard = true;
       }
 
+      this.jsEmitter =
+        "(function(eventObj) {\n" +
+        "  var objectId = '" + swfObjectId + "',\n" +
+        "      ZC = null,\n" +
+        "      swf = null;\n" +
+        "  if (typeof ZeroClipboard === 'function' && typeof ZeroClipboard.emit === 'function') {\n" +
+        "    \nZC = ZeroClipboard;\n" +
+        "  }\n" +
+        "  else {\n" +
+        "    swf = document[objectId] || document.getElementById(objectId);\n" +
+        "    if (swf && typeof swf.ZeroClipboard === 'function' && typeof swf.ZeroClipboard.emit === 'function') {\n" +
+        "      ZC = swf.ZeroClipboard;\n" +
+        "    }\n" +
+        "  }\n" +
+        "  if (!ZC) {\n" +
+        "    throw new Error('ERROR: ZeroClipboard SWF could not locate ZeroClipboard JS object!\\n" +
+                             "Expected element ID: ' + objectId);\n" +
+        "  }\n" +
+        "  return ZC.emit(eventObj);\n" +
+        "})";
+
       // Create an invisible "button" and transparently fill the entire Stage
       var button:Sprite = this.prepareUI();
 
@@ -118,7 +125,7 @@ package {
       this.clipboard = new ClipboardInjector(forceEnhancedClipboard);
 
       // Establish a communication line with JavaScript
-      this.jsProxy = new JsProxy(ZeroClipboard.SWF_OBJECT_ID);
+      this.jsProxy = new JsProxy(swfObjectId);
 
       // Only proceed if this SWF is hosted in the browser as expected
       if (this.jsProxy.isComplete()) {
@@ -232,10 +239,10 @@ package {
 
       var result:Object = undefined;  // NOPMD
       if (this.jsProxy.isComplete()) {
-        result = this.jsProxy.call(ZeroClipboard.JS_EMITTER, [eventObj]);
+        result = this.jsProxy.call(this.jsEmitter, [eventObj]);
       }
       else {
-        this.jsProxy.send(ZeroClipboard.JS_EMITTER, [eventObj]);
+        this.jsProxy.send(this.jsEmitter, [eventObj]);
       }
       return result;
     }

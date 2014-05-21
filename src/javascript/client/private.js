@@ -472,7 +472,7 @@ var _addMouseHandlers = function(element) {
     // If the mouse is moving to the Flash object, bail out
     var htmlBridge;
     if (
-        _flashState.bridge != null && 
+        _flashState.bridge != null &&
         (
           relTarget === _flashState.bridge ||
           ((htmlBridge = _getHtmlBridge(_flashState.bridge)) && relTarget === htmlBridge)
@@ -534,7 +534,7 @@ var _addMouseHandlers = function(element) {
     mouseout:  _elementMouseOut,
     mousedown: _elementMouseDown,
     mouseup:   _elementMouseUp
-  }; 
+  };
 };
 
 

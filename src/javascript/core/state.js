@@ -21,7 +21,8 @@ var _flashState = {
 
 
 /**
- * 
+ * The minimum Flash Player version required to use ZeroClipboard completely.
+ * @readonly
  * @private
  */
 var _minimumFlashVersion = "11.0.0";
@@ -134,49 +135,64 @@ var _swfPath = (function() {
  */
 var _globalConfig = {
 
+  /** @deprecated */
+  // The class used to indicate that a clipped element is being hovered over.
+  hoverClass: "zeroclipboard-is-hover",
+
+  /** @deprecated */
+  // The class used to indicate that a clipped element is active (is being clicked).
+  activeClass: "zeroclipboard-is-active",
+
+
+
   // SWF URL, relative to the page. Default value will be "ZeroClipboard.swf"
   // under the same path as the ZeroClipboard JS file.
   swfPath: _swfPath,
 
   // SWF inbound scripting policy: page domains that the SWF should trust.
   // (single string, or array of strings)
-  trustedDomains: _window.location.host ? [_window.location.host] : [],
+  trustedDomains: window.location.host ? [window.location.host] : [],
 
-  // Include a "nocache" query parameter on requests for the SWF.
+  // Include a "noCache" query parameter on requests for the SWF.
   cacheBust: true,
 
   // Enable use of the fancy "Desktop" clipboard, even on Linux where it is
   // known to suck.
   forceEnhancedClipboard: false,
 
-  // How many milliseconds to wait for the Flash SWF to load and respond before
-  // assuming that Flash is deactivated (e.g. click-to-play) in the user's
-  // browser. If you don't care about how long it takes to load the SWF, you
-  // can set this to `null`.
+  // How many milliseconds to wait for the Flash SWF to load and respond before assuming that
+  // Flash is deactivated (e.g. click-to-play) in the user's browser. If you don't care about
+  // how long it takes to load the SWF, you can set this to `null`.
   flashLoadTimeout: 30000,
 
+  // Setting this to `false` would allow users to handle calling `ZeroClipboard.activate(...);`
+  // themselves instead of relying on our per-element `mouseover` handler.
+  autoActivate: true,
+  
+  // Sets the ID of the `div` encapsulating the Flash object.
+  // Value is validated against the HTML4 spec for `ID` tokens.
+  containerId: "global-zeroclipboard-html-bridge",
+ 
+  // Sets the class of the `div` encapsulating the Flash object.
+  containerClass: "global-zeroclipboard-container",
+ 
+  // Sets the ID and name of the Flash `object` element.
+  // Value is validated against the HTML4 spec for `ID` and `Name` tokens.
+  swfObjectId: "global-zeroclipboard-flash-bridge",
+
+
+
   // Forcibly set the hand cursor ("pointer") for all clipped elements.
+  // IMPORTANT: This configuration value CAN be modified while a SWF is actively embedded.
   forceHandCursor: false,
 
   // Sets the title of the `div` encapsulating the Flash object.
+  // IMPORTANT: This configuration value CAN be modified while a SWF is actively embedded.
   title: null,
 
   // The z-index used by the Flash object.
   // Max value (32-bit): 2147483647.
-  zIndex: 999999999,
-
-
-
-  /**
-   * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for alternatives.
-   */
-  // The CSS class used to indicate that the object is being hovered over. Similar to `:hover`.
-  hoverClass: "zeroclipboard-is-hover",
-
-  /**
-   * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for alternatives.
-   */
-  // The CSS class used to indicate that the object is active. Similar to `:active`.
-  activeClass: "zeroclipboard-is-active"
+  // IMPORTANT: This configuration value CAN be modified while a SWF is actively embedded.
+  zIndex: 999999999
 
 };

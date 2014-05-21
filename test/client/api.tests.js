@@ -42,13 +42,16 @@
   test("New client is not the same client (no singleton) but does share the same bridge", function(assert) {
     assert.expect(6);
 
+    // Arrange
+    var containerClass = "." + ZeroClipboard.config("containerClass");
+
     // Assert, arrange, assert, act, assert
-    assert.strictEqual($(".global-zeroclipboard-container").length, 0);
+    assert.strictEqual($(containerClass).length, 0);
     var client1 = new ZeroClipboard();
     assert.ok(client1.id);
-    assert.strictEqual($(".global-zeroclipboard-container").length, 1);
+    assert.strictEqual($(containerClass).length, 1);
     var client2 = new ZeroClipboard();
-    assert.strictEqual($(".global-zeroclipboard-container").length, 1);
+    assert.strictEqual($(containerClass).length, 1);
     assert.notEqual(client2.id, client1.id);
     assert.notEqual(client2, client1);
   });
@@ -80,20 +83,21 @@
     assert.expect(6);
 
     // Arrange
+    var containerId = "#" + ZeroClipboard.config("containerId");
     ZeroClipboard.isFlashUnusable = function() {
       return false;
     };
 
     // Assert, arrange, assert, act, assert
     assert.ok(!ZeroClipboard.prototype._singleton, "The client singleton does not exist before creating a client");
-    assert.equal(document.getElementById("global-zeroclipboard-html-bridge"), null, "The HTML bridge does not exist before creating a client");
+    assert.equal($(containerId)[0], null, "The HTML bridge does not exist before creating a client");
     /*jshint nonew:false */
     new ZeroClipboard();
     assert.ok(!ZeroClipboard.prototype._singleton, "The client singleton does exist after creating a client");
-    assert.notEqual(document.getElementById("global-zeroclipboard-html-bridge"), null, "The HTML bridge does exist after creating a client");
+    assert.notEqual($(containerId)[0], null, "The HTML bridge does exist after creating a client");
     ZeroClipboard.destroy();
     assert.ok(!ZeroClipboard.prototype._singleton, "The client singleton does not exist after calling `destroy`");
-    assert.equal(document.getElementById("global-zeroclipboard-html-bridge"), null, "The HTML bridge does not exist after calling `destroy`");
+    assert.equal($(containerId)[0], null, "The HTML bridge does not exist after calling `destroy`");
   });
 
 

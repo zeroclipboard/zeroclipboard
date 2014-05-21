@@ -215,7 +215,8 @@
     ready: null
   };
   /**
- * 
+ * The minimum Flash Player version required to use ZeroClipboard completely.
+ * @readonly
  * @private
  */
   var _minimumFlashVersion = "11.0.0";
@@ -302,22 +303,20 @@
  * @private
  */
   var _globalConfig = {
+    hoverClass: "zeroclipboard-is-hover",
+    activeClass: "zeroclipboard-is-active",
     swfPath: _swfPath,
-    trustedDomains: _window.location.host ? [ _window.location.host ] : [],
+    trustedDomains: window.location.host ? [ window.location.host ] : [],
     cacheBust: true,
     forceEnhancedClipboard: false,
     flashLoadTimeout: 3e4,
+    autoActivate: true,
+    containerId: "global-zeroclipboard-html-bridge",
+    containerClass: "global-zeroclipboard-container",
+    swfObjectId: "global-zeroclipboard-flash-bridge",
     forceHandCursor: false,
     title: null,
-    zIndex: 999999999,
-    /**
-   * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for alternatives.
-   */
-    hoverClass: "zeroclipboard-is-hover",
-    /**
-   * @deprecated in [v1.3.0], slated for removal in [v2.0.0]. See docs for alternatives.
-   */
-    activeClass: "zeroclipboard-is-active"
+    zIndex: 999999999
   };
   /**
  * The underlying implementation of `ZeroClipboard.config`.
@@ -325,7 +324,23 @@
  */
   var _config = function(options) {
     if (typeof options === "object" && options !== null) {
-      _extend(_globalConfig, options);
+      for (var prop in options) {
+        if (_hasOwn.call(options, prop)) {
+          if (prop === "forceHandCursor" || prop === "title" || prop === "zIndex") {
+            _globalConfig[prop] = options[prop];
+          } else if (_flashState.bridge == null) {
+            if (prop === "containerId" || prop === "swfObjectId") {
+              if (_isValidHtml4Id(options[prop])) {
+                _globalConfig[prop] = options[prop];
+              } else {
+                throw new Error("The specified `" + prop + "` value is not valid as an HTML4 Element ID");
+              }
+            } else {
+              _globalConfig[prop] = options[prop];
+            }
+          }
+        }
+      }
     }
     if (typeof options === "string" && options) {
       if (_hasOwn.call(_globalConfig, options)) {
@@ -591,6 +606,13 @@
     }
   };
   /**
+ * Check if a value is a valid HTML4 `ID` or `Name` token.
+ * @private
+ */
+  var _isValidHtml4Id = function(id) {
+    return typeof id === "string" && id && /^[A-Za-z][A-Za-z0-9_:\-\.]*$/.test(id);
+  };
+  /**
  * Create or update an `event` object, based on the `eventType`.
  * @private
  */
@@ -657,7 +679,7 @@
     return relatedTargetId ? _document.getElementById(relatedTargetId) : null;
   };
   /**
- * Determine if an event's registered handlers should be execute synchronously or asynchronously. 
+ * Determine if an event's registered handlers should be execute synchronously or asynchronously.
  *
  * @returns {boolean}
  * @private
@@ -776,8 +798,8 @@
  */
   var _createHtmlBridge = function() {
     var container = _document.createElement("div");
-    container.id = "global-zeroclipboard-html-bridge";
-    container.className = "global-zeroclipboard-container";
+    container.id = _globalConfig.containerId;
+    container.className = _globalConfig.containerClass;
     container.style.position = "absolute";
     container.style.left = "0px";
     container.style.top = "-9999px";
@@ -804,7 +826,7 @@
  * @private
  */
   var _embedSwf = function() {
-    var len, container = _document.getElementById("global-zeroclipboard-html-bridge"), flashBridge = _flashState.bridge;
+    var len, flashBridge = _flashState.bridge, container = _getHtmlBridge(flashBridge);
     if (!flashBridge) {
       var allowScriptAccess = _determineScriptAccess(_window.location.host, _globalConfig);
       var allowNetworking = allowScriptAccess === "never" ? "none" : "all";
@@ -816,14 +838,14 @@
       _document.body.appendChild(container);
       var tmpDiv = _document.createElement("div");
       var oldIE = _flashState.pluginType === "activex";
-      tmpDiv.innerHTML = '<object id="global-zeroclipboard-flash-bridge" name="global-zeroclipboard-flash-bridge" ' + 'width="100%" height="100%" ' + (oldIE ? 'classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"' : 'type="application/x-shockwave-flash" data="' + swfUrl + '"') + ">" + (oldIE ? '<param name="movie" value="' + swfUrl + '"/>' : "") + '<param name="allowScriptAccess" value="' + allowScriptAccess + '"/>' + '<param name="allowNetworking" value="' + allowNetworking + '"/>' + '<param name="menu" value="false"/>' + '<param name="wmode" value="transparent"/>' + '<param name="flashvars" value="' + flashvars + '"/>' + "</object>";
+      tmpDiv.innerHTML = '<object id="' + _globalConfig.swfObjectId + '" name="' + _globalConfig.swfObjectId + '" ' + 'width="100%" height="100%" ' + (oldIE ? 'classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"' : 'type="application/x-shockwave-flash" data="' + swfUrl + '"') + ">" + (oldIE ? '<param name="movie" value="' + swfUrl + '"/>' : "") + '<param name="allowScriptAccess" value="' + allowScriptAccess + '"/>' + '<param name="allowNetworking" value="' + allowNetworking + '"/>' + '<param name="menu" value="false"/>' + '<param name="wmode" value="transparent"/>' + '<param name="flashvars" value="' + flashvars + '"/>' + "</object>";
       flashBridge = tmpDiv.firstChild;
       tmpDiv = null;
       flashBridge.ZeroClipboard = ZeroClipboard;
       container.replaceChild(flashBridge, divToBeReplaced);
     }
     if (!flashBridge) {
-      flashBridge = _document["global-zeroclipboard-flash-bridge"];
+      flashBridge = _document[_globalConfig.swfObjectId];
       if (flashBridge && (len = flashBridge.length)) {
         flashBridge = flashBridge[len - 1];
       }
@@ -1006,6 +1028,9 @@
     }
     if (options.forceEnhancedClipboard === true) {
       str += (str ? "&" : "") + "forceEnhancedClipboard=true";
+    }
+    if (typeof options.swfObjectId === "string" && options.swfObjectId) {
+      str += (str ? "&" : "") + "swfObjectId=" + _encodeURIComponent(options.swfObjectId);
     }
     return str;
   };

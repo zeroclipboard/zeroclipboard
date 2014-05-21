@@ -6,7 +6,7 @@
   // Helper functions
   var TestUtils = {
     getHtmlBridge: function() {
-      return document.getElementById("global-zeroclipboard-html-bridge");
+      return document.getElementById(ZeroClipboard.config("containerId"));
     }
   };
 
