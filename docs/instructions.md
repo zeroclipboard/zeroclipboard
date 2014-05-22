@@ -17,17 +17,31 @@ Note that, due to browser and Flash security restrictions, this clipboard inject
 
 ## Installation
 
-If you are installing for Node:
+### [NPM](https://www.npmjs.org/)
 
 ```shell
 npm install zeroclipboard
 ```
 
-If you are installing for the web, you can use Bower:
+### [Bower](http://bower.io/)
 
 ```shell
 bower install zeroclipboard
 ```
+
+### [SPM](http://spmjs.io/)
+
+```shell
+spm install zeroclipboard
+```
+
+### [PHP Composer](https://getcomposer.org/)
+
+For any PHP Composer users, ZeroClipboard is also [available on Packagist](https://packagist.org/packages/zeroclipboard/zeroclipboard).
+
+### [Ruby Gem](https://rubygems.org/)
+
+For any Rails users, the [`zeroclipboard-rails` Ruby Gem](https://rubygems.org/gems/zeroclipboard-rails) is available to automatically add ZeroClipboard into your Rails asset pipeline.
 
 
 ## Setup
