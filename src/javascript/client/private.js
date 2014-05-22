@@ -398,7 +398,8 @@ var _addEventHandler = function(element, method, func) {
 
   if (element.addEventListener) { // all browsers except IE<9
     element.addEventListener(method, func, false);
-  } else if (element.attachEvent) { // IE<9
+  }
+  else if (element.attachEvent) { // IE<9
     element.attachEvent("on" + method, func);
   }
   return element;
@@ -429,7 +430,7 @@ var _removeEventHandler = function(element, method, func) {
 
 
 /**
- * Add `mouseover`, `mousedown`, `mouseup`, and `mouseout` handler functions for a clipped element.
+ * Add a `mouseover` handler function for a clipped element.
  *
  * @returns `undefined`
  * @private
@@ -439,107 +440,29 @@ var _addMouseHandlers = function(element) {
     return;
   }
 
-  var _elementMouseOver, _elementMouseDown, _elementMouseUp, _elementMouseOut;
-
-  // Create a `mousedown` handler function
-  _elementMouseDown = function(/* event */) {
-    // Add the active class
-    _addClass(element, _globalConfig.activeClass);
-  };
-
-  // Create a `mouseup` handler function
-  _elementMouseUp = function(/* event */) {
-    // Remove the active class
-    _removeClass(element, _globalConfig.activeClass);
-  };
-
-  // Create a `mouseout` handler function
-  _elementMouseOut = function(event) {
-    // IE usually doesn't pass the `event`
-    if (!event) {
-      event = _window.event;
-    }
-    if (!event) {
-      return;
-    }
-
-    // Acquire the `relatedTarget`, or bail out
-    var relTarget = event.relatedTarget || event.toElement || null;
-    if (!(relTarget && relTarget.nodeType === 1)) {
-      return;
-    }
-
-    // If the mouse is moving to the Flash object, bail out
-    var htmlBridge;
-    if (
-        _flashState.bridge != null &&
-        (
-          relTarget === _flashState.bridge ||
-          ((htmlBridge = _getHtmlBridge(_flashState.bridge)) && relTarget === htmlBridge)
-        )
-    ) {
-      return;
-    }
-
-    // If the mouse is moving to any other element, deactivate and...
-    ZeroClipboard.deactivate();
-
-    // ...remove all mouse handler functions other than `mouseover`
-    _removeEventHandler(element, "mouseup", _elementMouseUp);
-    _removeEventHandler(element, "mousedown", _elementMouseDown);
-    _removeEventHandler(element, "mouseout", _elementMouseOut);
-
-    // ...and remove the ZCEvent-bound handlers
-    // NOTE: This is temporary until the Flash mouse event capturing is removed!
-    ZeroClipboard.off("mouseup", _elementMouseUp);
-    ZeroClipboard.off("mousedown", _elementMouseDown);
-    ZeroClipboard.off("mouseout", _elementMouseOut);
-  };
-
   // Create a `mouseover` handler function
-  _elementMouseOver = function(event) {
-    // IE usually doesn't pass the `event`
-    if (!event) {
-      event = _window.event;
-    }
-    if (!event) {
+  var _elementMouseOver = function(event) {
+    // oldIE usually doesn't pass the `event`
+    if (!(event || _window.event)) {
       return;
     }
 
     // Set this as the new currently active element
     ZeroClipboard.activate(element);
-
-    // Add all mouse handler functions other than `mouseover`
-    _addEventHandler(element, "mouseout", _elementMouseOut);
-    _addEventHandler(element, "mousedown", _elementMouseDown);
-    _addEventHandler(element, "mouseup", _elementMouseUp);
-
-    // ...and add the ZCEvent-bound handlers
-    // NOTE: This is temporary until the Flash mouse event capturing is removed!
-    ZeroClipboard.on("mouseout", _elementMouseOut);
-    ZeroClipboard.on("mousedown", _elementMouseDown);
-    ZeroClipboard.on("mouseup", _elementMouseUp);
   };
 
   // Add the `mouseover` handler function
   _addEventHandler(element, "mouseover", _elementMouseOver);
 
-  // ...and add the ZCEvent-bound handler
-  // NOTE: This is temporary until the Flash mouse event capturing is removed!
-  ZeroClipboard.on("mouseover", _elementMouseOver);
-
   // Save these function references to a global variable
   _mouseHandlers[element.zcClippingId] = {
-    mouseover: _elementMouseOver,
-    mouseout:  _elementMouseOut,
-    mousedown: _elementMouseDown,
-    mouseup:   _elementMouseUp
+    mouseover: _elementMouseOver
   };
 };
 
 
 /**
- * Remove `mouseover`, `mousedown`, `mouseup`, and `mouseout` handler functions for a clipped element.
+ * Remove a `mouseover` handler function for a clipped element.
  *
  * @returns `undefined`
  * @private
@@ -556,25 +479,9 @@ var _removeMouseHandlers = function(element) {
   }
 
   // Remove the mouse event handlers
-  if (typeof mouseHandlers.mouseup === "function") {
-    _removeEventHandler(element, "mouseup", mouseHandlers.mouseup);
-  }
-  if (typeof mouseHandlers.mousedown === "function") {
-    _removeEventHandler(element, "mousedown", mouseHandlers.mousedown);
-  }
-  if (typeof mouseHandlers.mouseout === "function") {
-    _removeEventHandler(element, "mouseout", mouseHandlers.mouseout);
-  }
   if (typeof mouseHandlers.mouseover === "function") {
     _removeEventHandler(element, "mouseover", mouseHandlers.mouseover);
   }
-
-  // ...and remove the ZCEvent-bound handlers
-  // NOTE: This is temporary until the Flash mouse event capturing is removed!
-  ZeroClipboard.off("mouseup", mouseHandlers.mouseup);
-  ZeroClipboard.off("mousedown", mouseHandlers.mousedown);
-  ZeroClipboard.off("mouseout", mouseHandlers.mouseout);
-  ZeroClipboard.off("mouseover", mouseHandlers.mouseover);
 
   // Delete these function references from a global variable
   delete _mouseHandlers[element.zcClippingId];

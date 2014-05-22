@@ -90,8 +90,6 @@
     // Arrange
     var _swfPath = ZeroClipboard.config("swfPath");
     var expectedBefore = {
-      hoverClass: "zeroclipboard-is-hover",
-      activeClass: "zeroclipboard-is-active",
       swfPath: _swfPath,
       trustedDomains: window.location.host ? [window.location.host] : [],
       cacheBust: true,
@@ -101,15 +99,16 @@
       containerId: "global-zeroclipboard-html-bridge",
       containerClass: "global-zeroclipboard-container",
       swfObjectId: "global-zeroclipboard-flash-bridge",
+      hoverClass: "zeroclipboard-is-hover",
+      activeClass: "zeroclipboard-is-active",
 
       // These configuration values CAN be modified while a SWF is actively embedded.
+      bubbleEvents: true,
       forceHandCursor: false,
       title: null,
       zIndex: 999999999
     };
     var expectedAfter = {
-      hoverClass: "zeroclipboard-is-hover",
-      activeClass: "zeroclipboard-is-active",
       swfPath: _swfPath,
       trustedDomains: window.location.host ? [window.location.host] : [],
       cacheBust: true,
@@ -119,8 +118,11 @@
       containerId: "global-zeroclipboard-html-bridge",
       containerClass: "global-zeroclipboard-container",
       swfObjectId: "global-zeroclipboard-flash-bridge",
+      hoverClass: "zeroclipboard-is-hover",
+      activeClass: "zeroclipboard-is-active",
 
       // These configuration values CAN be modified while a SWF is actively embedded.
+      bubbleEvents: false,
       forceHandCursor: true,
       title: "test",
       zIndex: 1000
@@ -132,8 +134,6 @@
     _flashState.bridge = {};
 
     var actualAfter = ZeroClipboard.config({
-      hoverClass: "test-hover",
-      activeClass: "test-active",
       swfPath: "/path/to/test.swf",
       trustedDomains: ["test.domain.com"],
       cacheBust: false,
@@ -143,8 +143,11 @@
       containerId: "test-id",
       containerClass: "test-class",
       swfObjectId: "test-swf",
+      hoverClass: "test-hover",
+      activeClass: "test-active",
 
       // These configuration values CAN be modified while a SWF is actively embedded.
+      bubbleEvents: false,
       forceHandCursor: true,
       title: "test",
       zIndex: 1000

@@ -135,16 +135,6 @@ var _swfPath = (function() {
  */
 var _globalConfig = {
 
-  /** @deprecated */
-  // The class used to indicate that a clipped element is being hovered over.
-  hoverClass: "zeroclipboard-is-hover",
-
-  /** @deprecated */
-  // The class used to indicate that a clipped element is active (is being clicked).
-  activeClass: "zeroclipboard-is-active",
-
-
-
   // SWF URL, relative to the page. Default value will be "ZeroClipboard.swf"
   // under the same path as the ZeroClipboard JS file.
   swfPath: _swfPath,
@@ -168,6 +158,9 @@ var _globalConfig = {
   // Setting this to `false` would allow users to handle calling `ZeroClipboard.activate(...);`
   // themselves instead of relying on our per-element `mouseover` handler.
   autoActivate: true,
+
+  // Bubble synthetic events in JavaScript after they are received by the Flash object.
+  bubbleEvents: true,
   
   // Sets the ID of the `div` encapsulating the Flash object.
   // Value is validated against the HTML4 spec for `ID` tokens.
@@ -179,6 +172,12 @@ var _globalConfig = {
   // Sets the ID and name of the Flash `object` element.
   // Value is validated against the HTML4 spec for `ID` and `Name` tokens.
   swfObjectId: "global-zeroclipboard-flash-bridge",
+
+  // The class used to indicate that a clipped element is being hovered over.
+  hoverClass: "zeroclipboard-is-hover",
+
+  // The class used to indicate that a clipped element is active (is being clicked).
+  activeClass: "zeroclipboard-is-active",
 
 
 

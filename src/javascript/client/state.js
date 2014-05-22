@@ -38,7 +38,9 @@ var _elementMeta = {};
  * Entry structure:
  *   _mouseHandlers[element.zcClippingId] = {
  *     mouseover: function(event) {},
- *     mouseout:  function(event) {}
+ *     mouseout:  function(event) {},
+ *     mousedown: function(event) {},
+ *     mouseup:   function(event) {}
  *   };
  */
 var _mouseHandlers = {};

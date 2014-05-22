@@ -1058,85 +1058,8 @@
   });
 
 
-  test("Test mouseover and mouseout event", function(assert) {
-    assert.expect(3);
-
-    // Arrange
-    var hoverClassRegex = /(^| )zeroclipboard-is-hover( |$)/;
-    var currentEl = document.getElementById("d_clip_button");
-    var client = new ZeroClipboard();
-    client.clip(currentEl);
-    
-    // Act
-    QUnit.stop();
-    assert.strictEqual(hoverClassRegex.test(currentEl.className), false, "no hover before `mouseover`");
-    ZeroClipboard.activate(currentEl);
-    ZeroClipboard.emit("mouseover");
-
-    setTimeout(function() {
-      // Assert
-      assert.strictEqual(hoverClassRegex.test(currentEl.className), true, "hover after `mouseover`");
-
-      // Act more
-      ZeroClipboard.emit({
-        type: "mouseout",
-        relatedTarget: { nodeType: 1, tagName: "fake", nodeName: "FAKE" }
-      });
-
-      setTimeout(function() {
-        // Assert more
-        assert.strictEqual(hoverClassRegex.test(currentEl.className), false, "no hover after `mouseout`");
-        QUnit.start();
-      }, 25);
-    }, 25);
-  });
-
-
-  test("Test mousedown and mouseup event", function(assert) {
-    assert.expect(3);
-
-    // Arrange
-    var activeClassRegex = /(^| )zeroclipboard-is-active( |$)/;
-    var currentEl = document.getElementById("d_clip_button");
-    var client = new ZeroClipboard();
-    client.clip(currentEl);
-    // Emit `mouseover` to cause `ZeroClipboard.activate` as well as adding the other mouse handlers
-    ZeroClipboard.emit("mouseover");
-    //ZeroClipboard.activate(currentEl);
-
-    // Act
-    QUnit.stop();
-    setTimeout(function() {
-      assert.strictEqual(activeClassRegex.test(currentEl.className), false, "deactivated before `mousedown`");
-      ZeroClipboard.emit("mousedown");
-
-      setTimeout(function() {
-        // Assert
-        assert.strictEqual(activeClassRegex.test(currentEl.className), true, "activated after `mousedown`");
-
-        // Act more
-        ZeroClipboard.emit("mouseup");
-
-        setTimeout(function() {
-          // Assert more
-          assert.strictEqual(activeClassRegex.test(currentEl.className), false, "deactivated after `mouseup`");
-
-          ZeroClipboard.emit({
-            type: "mouseout",
-            relatedTarget: { nodeType: 1, tagName: "fake", nodeName: "FAKE" }
-          });
-
-          setTimeout(function() {
-            QUnit.start();
-          }, 25);
-        }, 25);
-      }, 25);
-    }, 25);
-  });
-
-
   test("Test for appropriate context inside of invoked event handlers", function(assert) {
-    assert.expect(16);
+    assert.expect(12);
 
     // Arrange
     var client = new ZeroClipboard();
@@ -1151,7 +1074,7 @@
       // Assert
       assert.strictEqual(this, client);
     } );
-    client.on( "mousedown mouseover mouseup beforecopy", function(event) {
+    client.on( "beforecopy", function(event) {
       // Assert
       assert.strictEqual(event.target, currentEl);
     } );
@@ -1164,10 +1087,6 @@
       // Assert
       assert.strictEqual(event.target, currentEl);
       assert.ok(!_clipData["text/plain"]);
-    } );
-    client.on( "mouseout", function(event) {
-      // Assert
-      assert.strictEqual(event.target, currentEl);
       QUnit.start();
     } );
 
@@ -1178,13 +1097,9 @@
     ZeroClipboard.emit({"type":"error", "name":"flash-outdated"});
     ZeroClipboard.emit({"type":"error", "name":"flash-deactivated"});
     ZeroClipboard.emit({"type":"error", "name":"flash-overdue"});
-    ZeroClipboard.emit("mouseover");
-    ZeroClipboard.emit("mousedown");
-    ZeroClipboard.emit("mouseup");
     ZeroClipboard.emit("beforecopy");
     ZeroClipboard.emit("copy");
     ZeroClipboard.emit("aftercopy");
-    ZeroClipboard.emit("mouseout");
   });
 
 

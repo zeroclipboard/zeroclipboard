@@ -131,11 +131,7 @@ package {
       if (this.jsProxy.isComplete()) {
 
         // Add the MouseEvent listeners
-        button.addEventListener(MouseEvent.MOUSE_OVER, mouseOver);
-        button.addEventListener(MouseEvent.MOUSE_OUT, mouseOut);
-        button.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
-        button.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
-        button.addEventListener(MouseEvent.CLICK, onClick);
+        this.addMouseHandlers(button);
 
         // Expose the external functions
         this.jsProxy.addCallback(
@@ -247,67 +243,59 @@ package {
       return result;
     }
 
-    // mouseOver
-    //
-    // The mouseOver function signals to the page that the button is being hovered.
-    //
-    // returns nothing
-    private function mouseOver(event:MouseEvent): void {
-      this.emit("mouseover", ZeroClipboard.metaData(event));
-    }
 
-    // mouseOut
-    //
-    // The mouseOut function signals to the page that the button is not being hovered.
-    //
-    // returns nothing
-    private function mouseOut(event:MouseEvent): void {
-      this.emit("mouseout", ZeroClipboard.metaData(event));
-    }
+    /**
+     * Signals to the page that a MouseEvent occurred.
+     *
+     * @return `undefined`
+     */
+    private function onMouseEvent(event:MouseEvent): void {
+      var evtData:Object = {}; // NOPMD
 
-    // mouseDown
-    //
-    // The mouseDown function signals to the page that the button has a mouse button down.
-    //
-    // returns nothing
-    private function mouseDown(event:MouseEvent): void {
-      this.emit("mousedown", ZeroClipboard.metaData(event));
-    }
-
-    // mouseUp
-    //
-    // The mouseUp function signals to the page that the mouse button has been lifted
-    //
-    // returns nothing
-    private function mouseUp(event:MouseEvent): void {
-      this.emit("mouseup", ZeroClipboard.metaData(event));
-    }
-
-    // metaData
-    //
-    // The metaData function will take a mouseEvent, and an extra object to
-    // create a meta object of more info. This will let the page know if
-    // certain modifier keys are down
-    //
-    // returns an Object of extra event data
-    private static function metaData(event:MouseEvent = void, extra:Object = void):Object {
-
-      // create the default options
-      var normalOptions:Object = {};
-
-      // if an event is passed in, return what modifier keys are pressed
+      // If an event is passed in, return what modifier keys are pressed, etc.
       if (event) {
-        normalOptions.altKey = event.altKey;
-        normalOptions.ctrlKey = event.ctrlKey;
-        normalOptions.shiftKey = event.shiftKey;
+        var props:Object;  // NOPMD
+        props = {
+          "altKey": "altKey",
+          "commandKey": "metaKey",
+          "controlKey": "ctrlKey",
+          "shiftKey": "shiftKey",
+          "bubbles": "bubbles",
+          "cancelable": "cancelable",
+          "clickCount": "detail",
+          "movementX": "movementX",
+          "movementY": "movementY",
+          "stageX": "_stageX",
+          "stageY": "_stageY"
+        };
+
+        for (var prop in props) {
+          if (event.hasOwnProperty(prop) && event[prop] != null) {
+            evtData[props[prop]] = event[prop];
+          }
+        }
+        evtData.type = "_" + event.type.toLowerCase();
+        evtData._source = "swf";
       }
 
-      // for everything in the extra object, add it to the normal options
-      for (var i:String in extra) {
-        normalOptions[i] = extra[i];
-      }
+      this.emit(evtData.type, evtData);
+    }
 
-      return normalOptions;
+
+    /**
+     * Add mouse event handlers to the button.
+     *
+     * @return `undefined`
+     */
+    private function addMouseHandlers(button:Sprite): Sprite {
+      button.addEventListener(MouseEvent.MOUSE_MOVE, this.onMouseEvent);
+      button.addEventListener(MouseEvent.MOUSE_OVER, this.onMouseEvent);
+      button.addEventListener(MouseEvent.MOUSE_OUT, this.onMouseEvent);
+      button.addEventListener(MouseEvent.MOUSE_DOWN, this.onMouseEvent);
+      button.addEventListener(MouseEvent.MOUSE_UP, this.onMouseEvent);
+      button.addEventListener(MouseEvent.CLICK, this.onClick);
+      button.addEventListener(MouseEvent.CLICK, this.onMouseEvent);
+      return button;
     }
   }
 }

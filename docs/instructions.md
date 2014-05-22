@@ -86,16 +86,6 @@ These are default values for the global configurations options. You should gener
 ```js
 var _globalConfig = {
 
-  /** @deprecated */
-  // The class used to indicate that a clipped element is being hovered over.
-  hoverClass: "zeroclipboard-is-hover",
-
-  /** @deprecated */
-  // The class used to indicate that a clipped element is active (is being clicked).
-  activeClass: "zeroclipboard-is-active",
-
-
-
   // SWF URL, relative to the page. Default value will be "ZeroClipboard.swf"
   // under the same path as the ZeroClipboard JS file.
   swfPath: _swfPath,
@@ -119,7 +109,10 @@ var _globalConfig = {
   // Setting this to `false` would allow users to handle calling `ZeroClipboard.activate(...);`
   // themselves instead of relying on our per-element `mouseover` handler.
   autoActivate: true,
-  
+
+  // Bubble synthetic events in JavaScript after they are received by the Flash object.
+  bubbleEvents: true,
+
   // Sets the ID of the `div` encapsulating the Flash object.
   // Value is validated against the [HTML4 spec for `ID` tokens][valid_ids].
   containerId: "global-zeroclipboard-html-bridge",
@@ -130,6 +123,12 @@ var _globalConfig = {
   // Sets the ID and name of the Flash `object` element.
   // Value is validated against the [HTML4 spec for `ID` and `Name` tokens][valid_ids].
   swfObjectId: "global-zeroclipboard-flash-bridge",
+
+  // The class used to indicate that a clipped element is being hovered over.
+  hoverClass: "zeroclipboard-is-hover",
+
+  // The class used to indicate that a clipped element is active (is being clicked).
+  activeClass: "zeroclipboard-is-active",
 
 
 
@@ -281,11 +280,9 @@ var client = new ZeroClipboard( $("button#my-button") );
 
 ## CSS Effects
 
-Since the Flash movie is floating on top of your DOM element, it will receive all the mouse events before the browser has a chance to catch them.  However, for convenience these events are passed through to your clipboard client which you can capture (see _Event Handlers_ below).  But in addition to this, the Flash movie can also activate CSS classes on your DOM element to simulate the ":hover" and ":active" pseudo-classes.
+Since the Flash movie is floating on top of your DOM element, it will receive all the mouse events before the browser has a chance to catch them.  However, for convenience, these events are passed through to your clipboard client which you can capture (see _Event Handlers_ below).  But in addition to this, ZeroClipboard can also trigger the CSS pseudo-classes ":hover" and ":active" on your DOM element.  This essentially allows your elements to behave normally, even though the floating Flash movie is the first object receiving all the mouse events during the event bubbling phase.
 
-If this feature is enabled, the CSS classes "hover" and "active" are added / removed to your DOM element as the mouse hovers over and clicks the Flash movie.  This essentially allows your button to behave normally, even though the floating Flash movie is receiving all the mouse events.  Please note that the actual CSS pseudo-classes ":hover" and ":active" are not used -- these cannot be programmatically activated with current browser software.  Instead, sub-classes named "zeroclipboard-is-hover" and "zeroclipboard-is-active" are used by default.
-
-Example CSS:
+Example CSS, targeting a DOM element with an ID of "d_clip_button":
 
 ```css
   #d_clip_button {
@@ -296,11 +293,9 @@ Example CSS:
     margin: 10px;
     padding: 10px;
   }
-  #d_clip_button.zeroclipboard-is-hover { background-color: #eee; }
-  #d_clip_button.zeroclipboard-is-active { background-color: #aaa; }
+  #d_clip_button:hover { background-color: #eee; }
+  #d_clip_button:active { background-color: #aaa; }
 ```
-
-These classes are for a DOM element with an ID: "d_clip_button".  The "zeroclipboard-is-hover" and "zeroclipboard-is-active" sub-classes would automatically be activated as the user hovers over, and clicks down on the Flash movie, respectively.  They behave exactly like CSS pseudo-classes of the same names.
 
 
 ## Event Handlers
@@ -1011,23 +1006,6 @@ decisions of how _your_ site should handle each of these situations.
       ```
 
 
-
-# Deprecations
-
-By default, ZeroClipboard will issue deprecation warnings to the developer `console`. To disable this, set the
-following option:  
-```js
-ZeroClipboard.config({ debug: false });
-```
-
-The current list of deprecations includes:  
- - The `hoverClass` config option &rarr; as of [v1.3.0], removing in [v2.0.0]
-     - As of [v2.0.0] (but no sooner), you will be able to use normal `:hover` CSS pseudo-class selectors instead!
- - The `activeClass` config option &rarr; as of [v1.3.0], removing in [v2.0.0]
-     - As of [v2.0.0] (but no sooner), you will be able to use normal `:active` CSS pseudo-class selectors instead!
- - Adding `mouseover`/`mouseout`/`mousedown`/`mouseup` handlers via ZeroClipboard &rarr; as of [v1.3.0], removing in [v2.0.0]
-     - As of [v2.0.0] (but no sooner), you will be able to use normal event listener attaching functionality for
-       these type of non-semantic, elemental events. For example, with jQuery: `$(zcClient.elements()).on("mousedown", fn)`
 
 
 [valid_ids]: http://www.w3.org/TR/html4/types.html#type-id "HTML4 specification for `ID` and `Name` tokens"

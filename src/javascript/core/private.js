@@ -8,7 +8,7 @@ var _config = function(options) {
     for (var prop in options) {
       if (_hasOwn.call(options, prop)) {
         // These configuration values CAN be modified while a SWF is actively embedded.
-        if (prop === "forceHandCursor" || prop === "title" || prop === "zIndex") {
+        if (/^(?:forceHandCursor|title|zIndex|bubbleEvents)$/.test(prop)) {
           _globalConfig[prop] = options[prop];
         }
         // All other configuration values CANNOT be modified while a SWF is actively embedded.
@@ -208,7 +208,9 @@ var _emit = function(event) {
   }
 
   // Preprocess any special behaviors, reactions, or state changes after receiving this event
-  _preprocessEvent(event);
+  if (_preprocessEvent(event)) {
+    return;
+  }
 
   // If this was a Flash "ready" event that was overdue, bail out and fire an "error" event instead
   if (event.type === "ready" && _flashState.overdue === true) {
@@ -346,18 +348,16 @@ var _activate = function(element) {
 
   // "Ignore" the currently active element
   if (_currentElement) {
-    _removeClass(_currentElement, _globalConfig.hoverClass);
     _removeClass(_currentElement, _globalConfig.activeClass);
+
+    if (_currentElement !== element) {
+      _removeClass(_currentElement, _globalConfig.hoverClass);
+    }
   }
 
   // Mark the element as currently activated
   _currentElement = element;
-
-  // Add the hover class
   _addClass(element, _globalConfig.hoverClass);
-
-  // Move the Flash object
-  _reposition();
 
   // If the element has a title, mimic it
   var newTitle = element.getAttribute("title") || _globalConfig.title;
@@ -372,6 +372,9 @@ var _activate = function(element) {
   var useHandCursor = _globalConfig.forceHandCursor === true || _getStyle(element, "cursor") === "pointer";
   // Update the hand cursor state without updating the `forceHandCursor` option
   _setHandCursor(useHandCursor);
+
+  // Move the Flash object over the newly activated element
+  _reposition();
 };
 
 
@@ -483,7 +486,7 @@ var _createEvent = function(event) {
     event.relatedTarget = _getRelatedTarget(event.target);
   }
 
-  return event;
+  return _addMouseData(event);
 };
 
 
@@ -494,6 +497,64 @@ var _createEvent = function(event) {
 var _getRelatedTarget = function(targetEl) {
   var relatedTargetId = targetEl && targetEl.getAttribute && targetEl.getAttribute("data-clipboard-target");
   return relatedTargetId ? _document.getElementById(relatedTargetId) : null;
+};
+
+
+/**
+ * Add element and position data to `MouseEvent` instances
+ * @private
+ */
+var _addMouseData = function(event) {
+  if (event && /^_(?:click|mouse(?:over|out|down|up|move))$/.test(event.type)) {
+    // Element data
+    var srcElement  = event.target;
+    var fromElement = event.type === "_mouseover" && event.relatedTarget ? event.relatedTarget : undefined;
+    var toElement   = event.type === "_mouseout"  && event.relatedTarget ? event.relatedTarget : undefined;
+
+    // Calculate positional data
+    var pos = _getDOMObjectPosition(srcElement);
+    var screenLeft = _window.screenLeft || _window.screenX || 0;
+    var screenTop  = _window.screenTop  || _window.screenY || 0;
+    var scrollLeft = _document.body.scrollLeft + _document.documentElement.scrollLeft;
+    var scrollTop  = _document.body.scrollTop  + _document.documentElement.scrollTop;
+    var pageX = pos.left + (typeof event._stageX === "number" ? event._stageX : 0);
+    var pageY = pos.top  + (typeof event._stageY === "number" ? event._stageY : 0);
+    var clientX = pageX - scrollLeft;
+    var clientY = pageY - scrollTop;
+    var screenX = screenLeft + clientX;
+    var screenY = screenTop  + clientY;
+    var moveX = typeof event.movementX === "number" ? event.movementX : 0;
+    var moveY = typeof event.movementY === "number" ? event.movementY : 0;
+
+    // Remove these transient properties, if present
+    delete event._stageX;
+    delete event._stageY;
+
+    // Update the appropriate properties of `event` with position data.
+    // Good notes:
+    //   http://www.jacklmoore.com/notes/mouse-position/
+    _extend(event, {
+      srcElement: srcElement,
+      fromElement: fromElement,
+      toElement: toElement,
+      screenX: screenX,  // screenLeft + clientX
+      screenY: screenY,  // screenTop  + clientY
+      pageX: pageX,      // scrollLeft + clientX
+      pageY: pageY,      // scrollTop  + clientY
+      clientX: clientX,  // pageX - scrollLeft
+      clientY: clientY,  // pageY - scrollTop
+      x: clientX,        // clientX
+      y: clientY,        // clientY
+      movementX: moveX,  // movementX
+      movementY: moveY,  // movementY
+      offsetX: 0,        // Unworthy of calculation
+      offsetY: 0,        // Unworthy of calculation
+      layerX: 0,         // Unworthy of calculation
+      layerY: 0          // Unworthy of calculation
+    });
+  }
+
+  return event;
 };
 
 
@@ -591,6 +652,10 @@ var _dispatchCallbacks = function(event) {
  */
 var _preprocessEvent = function(event) {
   var element = event.target || _currentElement || null;
+
+  var sourceIsSwf = event._source === "swf";
+  delete event._source;
+
   switch (event.type) {
     case "error":
       if (_inArray(event.name, ["flash-disabled", "flash-outdated", "flash-deactivated", "flash-overdue"])) {
@@ -648,7 +713,111 @@ var _preprocessEvent = function(event) {
         element.focus();
       }
       break;
+
+    case "_mouseover":
+      // Set this as the new currently active element
+      ZeroClipboard.activate(element);
+      
+      if (_globalConfig.bubbleEvents === true && sourceIsSwf) {
+        _fireMouseEvent(_extend({}, event, { type: "mouseover" }));
+        _fireMouseEvent(_extend({}, event, { type: "mouseenter", bubbles: false }));
+      }
+      break;
+
+    case "_mouseout":
+      // If the mouse is moving to any other element, deactivate and...
+      ZeroClipboard.deactivate();
+
+      if (_globalConfig.bubbleEvents === true && sourceIsSwf) {
+        _fireMouseEvent(_extend({}, event, { type: "mouseout" }));
+        _fireMouseEvent(_extend({}, event, { type: "mouseleave", bubbles: false }));
+      }
+      break;
+
+    case "_mousedown":
+      _addClass(element, _globalConfig.activeClass);
+
+      if (_globalConfig.bubbleEvents === true && sourceIsSwf) {
+        _fireMouseEvent(_extend({}, event, { type: event.type.slice(1) }));
+      }
+      break;
+
+    case "_mouseup":
+      _removeClass(element, _globalConfig.activeClass);
+
+      if (_globalConfig.bubbleEvents === true && sourceIsSwf) {
+        _fireMouseEvent(_extend({}, event, { type: event.type.slice(1) }));
+      }
+      break;
+
+    case "_click":
+    case "_mousemove":
+      if (_globalConfig.bubbleEvents === true && sourceIsSwf) {
+        _fireMouseEvent(_extend({}, event, { type: event.type.slice(1) }));
+      }
+      break;
   } // end `switch`
+
+  // Return a flag to indicate that this event should stop being processed
+  if (/^_(?:click|mouse(?:over|out|down|up|move))$/.test(event.type)) {
+    return true;
+  }
+};
+
+
+/**
+ * Dispatch a synthetic MouseEvent.
+ *
+ * @returns `undefined`
+ * @private
+ */
+var _fireMouseEvent = function(event) {
+  if (!(event && typeof event.type === "string" && event)) {
+    return;
+  }
+
+  var e,
+      target = event.target || event.srcElement || null,
+      doc = (target && target.ownerDocument) || _document,
+      defaults = {
+        view: doc.defaultView || _window,
+        canBubble: true,
+        cancelable: true,
+        detail: event.type === "click" ? 1 : 0,
+        button:
+          typeof event.which === "number" ?
+          (event.which - 1) :
+          (
+            typeof event.button === "number" ?
+            event.button :
+            (doc.createEvent ? 0 : 1)
+          )
+      },
+      // Update the Event data to its final state
+      args = _extend(defaults, event);
+
+  if (!target) {
+    return;
+  }
+
+  // Create and fire the MouseEvent
+  if (doc.createEvent && target.dispatchEvent) {
+    args = [
+      args.type, args.canBubble, args.cancelable, args.view, args.detail,
+      args.screenX, args.screenY, args.clientX, args.clientY,
+      args.ctrlKey, args.altKey, args.shiftKey, args.metaKey,
+      args.button, args.relatedTarget
+    ];
+    e = doc.createEvent("MouseEvents");
+    if (e.initMouseEvent) {
+      e.initMouseEvent.apply(e, args);
+      target.dispatchEvent(e);
+    }
+  }
+  else if (doc.createEventObject && target.fireEvent) {
+    e = doc.createEventObject(args);
+    target.fireEvent("on" + args.type, e);
+  }
 };
 
 
@@ -920,7 +1089,8 @@ var _cacheBust = function(path, options) {
   var cacheBust = options == null || (options && options.cacheBust === true);
   if (cacheBust) {
     return (path.indexOf("?") === -1 ? "?" : "&") + "noCache=" + _now();
-  } else {
+  }
+  else {
     return "";
   }
 };
@@ -1101,8 +1271,6 @@ var _safeActiveElement = function() {
 
 
 /**
- * @deprecated
- *
  * Add a class to an element, if it doesn't already have it.
  *
  * @returns The element, with its new class added.
@@ -1128,7 +1296,8 @@ var _addClass = function(element, value) {
     if (element.nodeType === 1) {
       if (!element.className) {
         element.className = value;
-      } else {
+      }
+      else {
         var className = " " + element.className + " ", setClass = element.className;
         for (var c = 0, cl = classNames.length; c < cl; c++) {
           if (className.indexOf(" " + classNames[c] + " ") < 0) {
@@ -1147,8 +1316,6 @@ var _addClass = function(element, value) {
 
 
 /**
- * @deprecated
- *
  * Remove a class from an element, if it has it.
  *
  * @returns The element, with its class removed.
@@ -1276,9 +1443,9 @@ var _getZoomFactor = function() {
 var _getDOMObjectPosition = function(obj) {
   // get absolute coordinates for dom element
   var info = {
-    left:   0,
-    top:    0,
-    width:  0,
+    left: 0,
+    top: 0,
+    width: 0,
     height: 0
   };
 
@@ -1325,12 +1492,13 @@ var _reposition = function() {
   // If there is no `_currentElement`, skip it
   if (_currentElement && (htmlBridge = _getHtmlBridge(_flashState.bridge))) {
     var pos = _getDOMObjectPosition(_currentElement);
-
-    htmlBridge.style.width  = pos.width + "px";
-    htmlBridge.style.height = pos.height + "px";
-    htmlBridge.style.top    = pos.top + "px";
-    htmlBridge.style.left   = pos.left + "px";
-    htmlBridge.style.zIndex = "" + _getSafeZIndex(_globalConfig.zIndex);
+    _extend(htmlBridge.style, {
+      width: pos.width + "px",
+      height: pos.height + "px",
+      top: pos.top + "px",
+      left: pos.left + "px",
+      zIndex: "" + _getSafeZIndex(_globalConfig.zIndex)
+    });
   }
 };
 
@@ -1435,11 +1603,13 @@ var _detectFlashSupport = function(ActiveXObject) {
       hasFlash = true;
       flashVersion = "2.0.0.11";
     }
-  } else if (_navigator.mimeTypes && _navigator.mimeTypes.length) {
+  }
+  else if (_navigator.mimeTypes && _navigator.mimeTypes.length) {
     mimeType = _navigator.mimeTypes["application/x-shockwave-flash"];
     plugin = mimeType && mimeType.enabledPlugin;
     inspectPlugin(plugin);
-  } else if (typeof ActiveXObject !== "undefined") {
+  }
+  else if (typeof ActiveXObject !== "undefined") {
     //
     // Using IE < 11
     //
@@ -1450,19 +1620,22 @@ var _detectFlashSupport = function(ActiveXObject) {
       ax = new ActiveXObject("ShockwaveFlash.ShockwaveFlash.7");
       hasFlash = true;
       flashVersion = parseFlashVersion(ax.GetVariable("$version"));
-    } catch (e1) {
+    }
+    catch (e1) {
       // Try 6 next, some versions are known to crash with GetVariable calls
       try {
         ax = new ActiveXObject("ShockwaveFlash.ShockwaveFlash.6");
         hasFlash = true;
         flashVersion = "6.0.21"; // First public version of Flash 6
-      } catch (e2) {
+      }
+      catch (e2) {
         try {
           // Try the default ActiveX
           ax = new ActiveXObject("ShockwaveFlash.ShockwaveFlash");
           hasFlash = true;
           flashVersion = parseFlashVersion(ax.GetVariable("$version"));
-        } catch (e3) {
+        }
+        catch (e3) {
           // No flash
           isActiveX = false;
         }
