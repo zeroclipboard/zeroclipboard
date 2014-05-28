@@ -42,23 +42,23 @@
     "send": "0"
   },
   "devDependencies": {
-    "grunt": "^0.4.4",
-    "grunt-contrib-clean": "^0.5.0",
-    "grunt-contrib-jshint": "^0.10.0",
-    "grunt-contrib-connect": "^0.7.1",
-    "grunt-contrib-qunit": "^0.4.0",
-    "grunt-contrib-concat": "^0.4.0",
-    "grunt-contrib-uglify": "^0.4.0",
-    "grunt-chmod": "^1.0.3",
     "flex-sdk": "~4.6.0-0",
+    "flexpmd": "^1.3.0-1",
+    "grunt": "^0.4.4",
+    "grunt-chmod": "^1.0.3",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-concat": "^0.4.0",
+    "grunt-contrib-connect": "^0.7.1",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-qunit": "^0.4.0",
+    "grunt-contrib-uglify": "^0.4.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-flexpmd": "^0.1.2",
     "grunt-mxmlc": "^0.5.1",
     "grunt-template": "^0.2.3",
-    "grunt-contrib-watch": "^0.6.1",
-    "flexpmd": "^1.3.0-1",
-    "grunt-flexpmd": "^0.1.2",
-    "qunitjs": "^1.14.0",
-    "qunit-composite": "^1.0.1",
     "jquery": "^1.11.1",
+    "qunit-composite": "^1.0.1",
+    "qunitjs": "^1.14.0",
     "spm": "^3.0.0"
   },
   "main": "./dist/ZeroClipboard.js",
@@ -69,7 +69,10 @@
   },
   "spm": {
     "main": "ZeroClipboard.js",
-    "output": ["ZeroClipboard.swf"]
+    "output": [
+      "ZeroClipboard.swf",
+      "ZeroClipboard.Core.js"
+    ]
   },
   "scripts": {
     "test": "grunt travis --verbose",

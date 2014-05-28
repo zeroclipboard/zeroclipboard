@@ -52,11 +52,11 @@
     var indexOfTest = window.location.pathname.toLowerCase().indexOf("/test/");
     var rootDir = window.location.pathname.slice(1, indexOfTest + 1);
     var rootPath = rootOrigin + rootDir;
-    //var stateJsUrl = rootPath + "src/javascript/core/state.js";
+    //var stateJsUrl = rootPath + "src/js/core/state.js";
     // This is, for the record, a totally incorrect path due to being the development
     // file structure but it IS the correct URL based on calculated assumption of using
     // the built distributable versions of the library
-    var swfPathBasedOnStateJsPath = rootPath + "src/javascript/core/ZeroClipboard.swf";
+    var swfPathBasedOnStateJsPath = rootPath + "src/js/core/ZeroClipboard.swf";
 
     // Test that the client has the expected default URL [even if it's not correct]
     assert.strictEqual(ZeroClipboard.config("swfPath"), swfPathBasedOnStateJsPath);

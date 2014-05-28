@@ -25,7 +25,7 @@ module.exports = function(grunt) {
         jshintrc: true
       },
       Gruntfile: ["Gruntfile.js"],
-      js: ["src/javascript/**/*.js", "!src/javascript/start.js", "!src/javascript/end.js"],
+      js: ["src/js/**/*.js", "!src/js/start.js", "!src/js/end.js"],
       test: ["test/**/*.js"],
       dist: ["dist/*.js", "!dist/*.min.js"]
     },
@@ -55,29 +55,29 @@ module.exports = function(grunt) {
       core: {
         src: [
           "src/meta/source-banner.tmpl",
-          "src/javascript/start.js",
-          "src/javascript/shared/state.js",
-          "src/javascript/shared/private.js",
-          "src/javascript/core/state.js",
-          "src/javascript/core/private.js",
-          "src/javascript/core/api.js",
-          "src/javascript/end.js"
+          "src/js/start.js",
+          "src/js/shared/state.js",
+          "src/js/shared/private.js",
+          "src/js/core/state.js",
+          "src/js/core/private.js",
+          "src/js/core/api.js",
+          "src/js/end.js"
         ],
         dest: "dist/ZeroClipboard.Core.js"
       },
       client: {
         src: [
           "src/meta/source-banner.tmpl",
-          "src/javascript/start.js",
-          "src/javascript/shared/state.js",
-          "src/javascript/shared/private.js",
-          "src/javascript/core/state.js",
-          "src/javascript/core/private.js",
-          "src/javascript/core/api.js",
-          "src/javascript/client/state.js",
-          "src/javascript/client/private.js",
-          "src/javascript/client/api.js",
-          "src/javascript/end.js"
+          "src/js/start.js",
+          "src/js/shared/state.js",
+          "src/js/shared/private.js",
+          "src/js/core/state.js",
+          "src/js/core/private.js",
+          "src/js/core/api.js",
+          "src/js/client/state.js",
+          "src/js/client/private.js",
+          "src/js/client/api.js",
+          "src/js/end.js"
         ],
         dest: "dist/ZeroClipboard.js"
       },
@@ -276,9 +276,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-contrib-watch");
 
 
-  //
   // Task aliases and chains
-  //
   grunt.registerTask("jshint-prebuild", ["jshint:Gruntfile", "jshint:js", "jshint:test"]);
   grunt.registerTask("prep-flash",      ["clean:flash", "concat:flash"]);
   grunt.registerTask("validate",        ["jshint-prebuild", "prep-flash", "flexpmd"]);
