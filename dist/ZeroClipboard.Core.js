@@ -485,7 +485,7 @@
       });
     }
     eventCopy = _extend({}, event);
-    _dispatchCallbacks(eventCopy);
+    _dispatchCallbacks.call(this, eventCopy);
     if (event.type === "copy") {
       tmp = _mapClipDataToFlash(_clipData);
       returnVal = tmp.data;
@@ -653,11 +653,15 @@
       });
     }
     if (event.type === "error") {
-      if (/^flash-(outdated|unavailable|deactivated|overdue)$/.test(event.name)) {
+      if (/^flash-(disabled|outdated|unavailable|deactivated|overdue)$/.test(event.name)) {
         _extend(event, {
           target: null,
-          version: _flashState.version,
           minimumVersion: _minimumFlashVersion
+        });
+      }
+      if (/^flash-(outdated|unavailable|deactivated|overdue)$/.test(event.name)) {
+        _extend(event, {
+          version: _flashState.version
         });
       }
     }
@@ -673,7 +677,8 @@
     if (event.target && !event.relatedTarget) {
       event.relatedTarget = _getRelatedTarget(event.target);
     }
-    return _addMouseData(event);
+    event = _addMouseData(event);
+    return event;
   };
   /**
  * Get a relatedTarget from the target's `data-clipboard-target` attribute

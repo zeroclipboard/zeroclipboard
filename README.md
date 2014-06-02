@@ -43,7 +43,8 @@ client.on( "ready", function( readyEvent ) {
 } );
 ```
 
-See the [instructions](docs/instructions.md) for more advanced options in using the library on your site.
+See [docs/instructions.md](docs/instructions.md) for more advanced options in using the library on your site.
+See [docs/api/ZeroClipboard.md](docs/api/ZeroClipboard.md) for the complete API documentation.
 
 Here is a working [test page](http://zeroclipboard.org/#demo) where you can try out ZeroClipboard in your browser.
 

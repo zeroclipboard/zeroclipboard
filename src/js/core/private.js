@@ -219,7 +219,7 @@ var _emit = function(event) {
 
   // Trigger any and all registered event handlers
   eventCopy = _extend({}, event);
-  _dispatchCallbacks(eventCopy);
+  _dispatchCallbacks.call(this, eventCopy);
 
   // For the `copy` event, be sure to return the `_clipData` to Flash to be injected into the clipboard
   if (event.type === "copy") {
@@ -422,6 +422,8 @@ var _isValidHtml4Id = function(id) {
  * @private
  */
 var _createEvent = function(event) {
+  /*jshint maxstatements:28 */
+
   var eventType;
   if (typeof event === "string" && event) {
     eventType = event;
@@ -461,11 +463,15 @@ var _createEvent = function(event) {
   }
 
   if (event.type === "error") {
-    if (/^flash-(outdated|unavailable|deactivated|overdue)$/.test(event.name)) {
+    if (/^flash-(disabled|outdated|unavailable|deactivated|overdue)$/.test(event.name)) {
       _extend(event, {
         target: null,
-        version: _flashState.version,
         minimumVersion: _minimumFlashVersion
+      });
+    }
+    if (/^flash-(outdated|unavailable|deactivated|overdue)$/.test(event.name)) {
+      _extend(event, {
+        version: _flashState.version
       });
     }
   }
@@ -486,7 +492,9 @@ var _createEvent = function(event) {
     event.relatedTarget = _getRelatedTarget(event.target);
   }
 
-  return _addMouseData(event);
+  event = _addMouseData(event);
+
+  return event;
 };
 
 
