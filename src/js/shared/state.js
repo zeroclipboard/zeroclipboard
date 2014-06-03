@@ -12,10 +12,26 @@ var _window = window,
     _parseFloat = _window.Number.parseFloat || _window.parseFloat,
     _isNaN = _window.Number.isNaN || _window.isNaN,
     _encodeURIComponent = _window.encodeURIComponent,
+    _Math = _window.Math,
+    _Date = _window.Date,
+    _ActiveXObject = _window.ActiveXObject,
     _slice = _window.Array.prototype.slice,
     _keys = _window.Object.keys,
     _hasOwn = _window.Object.prototype.hasOwnProperty,
-    _defineProperty = _window.Object.defineProperty,
-    _Math = _window.Math,
-    _Date = _window.Date,
-    _ActiveXObject = _window.ActiveXObject;
+    _defineProperty = (function() {
+      if (
+        typeof _window.Object.defineProperty === "function" &&
+        (function() {
+          try {
+            var x = {};
+            _window.Object.defineProperty(x, "y", { value: "z" });
+            return x.y === "z";
+          }
+          catch (e) {
+            return false;
+          }
+        })()
+      ) {
+        return _window.Object.defineProperty;
+      }
+    })();
