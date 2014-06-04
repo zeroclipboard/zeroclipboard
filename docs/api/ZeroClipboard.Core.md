@@ -209,7 +209,7 @@ _[`Object`]_ Retrieves a copy of the map of registered listener functions/object
 #### `"ready"`
 
 The `ready` event is fired when the Flash SWF completes loading and is ready for action.  Please
-note that you need to set most configuration options [with [`ZeroClipboard.config(...)`](#zeroclipboard-config)]
+note that you need to set most configuration options [with [`ZeroClipboard.config(...)`](#zeroclipboardconfig)]
 before `ZeroClipboard.create()` is invoked.
 
 ```js
