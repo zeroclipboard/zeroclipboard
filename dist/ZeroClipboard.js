@@ -871,7 +871,8 @@
         }));
         _fireMouseEvent(_extend({}, event, {
           type: "mouseenter",
-          bubbles: false
+          bubbles: false,
+          cancelable: false
         }));
       }
       break;
@@ -884,7 +885,8 @@
         }));
         _fireMouseEvent(_extend({}, event, {
           type: "mouseleave",
-          bubbles: false
+          bubbles: false,
+          cancelable: false
         }));
       }
       break;

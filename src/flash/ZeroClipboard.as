@@ -260,8 +260,6 @@ package {
           "commandKey": "metaKey",
           "controlKey": "ctrlKey",
           "shiftKey": "shiftKey",
-          "bubbles": "bubbles",
-          "cancelable": "cancelable",
           "clickCount": "detail",
           "movementX": "movementX",
           "movementY": "movementY",

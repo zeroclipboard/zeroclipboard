@@ -538,7 +538,7 @@ var _addMouseData = function(event) {
     delete event._stageX;
     delete event._stageY;
 
-    // Update the appropriate properties of `event` with position data.
+    // Update the appropriate properties of `event`, mostly with position data.
     // Good notes:
     //   http://www.jacklmoore.com/notes/mouse-position/
     _extend(event, {
@@ -728,7 +728,7 @@ var _preprocessEvent = function(event) {
       
       if (_globalConfig.bubbleEvents === true && sourceIsSwf) {
         _fireMouseEvent(_extend({}, event, { type: "mouseover" }));
-        _fireMouseEvent(_extend({}, event, { type: "mouseenter", bubbles: false }));
+        _fireMouseEvent(_extend({}, event, { type: "mouseenter", bubbles: false, cancelable: false }));
       }
       break;
 
@@ -738,7 +738,7 @@ var _preprocessEvent = function(event) {
 
       if (_globalConfig.bubbleEvents === true && sourceIsSwf) {
         _fireMouseEvent(_extend({}, event, { type: "mouseout" }));
-        _fireMouseEvent(_extend({}, event, { type: "mouseleave", bubbles: false }));
+        _fireMouseEvent(_extend({}, event, { type: "mouseleave", bubbles: false, cancelable: false }));
       }
       break;
 
