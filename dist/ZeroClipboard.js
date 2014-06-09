@@ -760,8 +760,7 @@
         offsetX: 0,
         offsetY: 0,
         layerX: 0,
-        layerY: 0,
-        _source: "js"
+        layerY: 0
       });
     }
     return event;
@@ -969,6 +968,7 @@
       e = doc.createEvent("MouseEvents");
       if (e.initMouseEvent) {
         e.initMouseEvent.apply(e, args);
+        e._source = "js";
         target.dispatchEvent(e);
       }
     }

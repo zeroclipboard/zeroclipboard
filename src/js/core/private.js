@@ -558,8 +558,7 @@ var _addMouseData = function(event) {
       offsetX: 0,        // Unworthy of calculation
       offsetY: 0,        // Unworthy of calculation
       layerX: 0,         // Unworthy of calculation
-      layerY: 0,         // Unworthy of calculation
-      _source: "js"
+      layerY: 0          // Unworthy of calculation
     });
   }
 
@@ -854,6 +853,7 @@ var _fireMouseEvent = function(event) {
     e = doc.createEvent("MouseEvents");
     if (e.initMouseEvent) {
       e.initMouseEvent.apply(e, args);
+      e._source = "js";
       target.dispatchEvent(e);
     }
   }
