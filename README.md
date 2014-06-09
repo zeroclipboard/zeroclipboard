@@ -61,12 +61,9 @@ that the clipboard copy operation be initiated by a user click event inside the
 Flash movie. This is achieved by automatically floating the invisible movie on top
 of a [DOM](http://en.wikipedia.org/wiki/Document_Object_Model) element of your
 choice. Standard mouse events are even propagated out to your DOM element, so you
-can still have rollover and mousedown effects.
+can still have rollover and mousedown effects with just a _little_ extra effort.
 
-Definitely works in IE8+ and all of the evergreen browsers.
-Should also work in IE7 if you provide a polyfill for the global `JSON` object, e.g.
-[JSON 2](https://github.com/douglascrockford/JSON-js/blob/master/json2.js) or
-[JSON 3](http://bestiejs.github.io/json3/).
+ZeroClipboard `v2.x` is expected to work in IE9+ and all of the evergreen browsers.
 
 
 ## Contributing

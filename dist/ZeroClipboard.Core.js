@@ -760,7 +760,8 @@
         offsetX: 0,
         offsetY: 0,
         layerX: 0,
-        layerY: 0
+        layerY: 0,
+        _source: "js"
       });
     }
     return event;
@@ -953,7 +954,7 @@
     if (!(event && typeof event.type === "string" && event)) {
       return;
     }
-    var e, target = event.target || event.srcElement || null, doc = target && target.ownerDocument || _document, defaults = {
+    var e, target = event.target || null, doc = target && target.ownerDocument || _document, defaults = {
       view: doc.defaultView || _window,
       canBubble: true,
       cancelable: true,
@@ -970,9 +971,6 @@
         e.initMouseEvent.apply(e, args);
         target.dispatchEvent(e);
       }
-    } else if (doc.createEventObject && target.fireEvent) {
-      e = doc.createEventObject(args);
-      target.fireEvent("on" + args.type, e);
     }
   };
   /**
@@ -1371,26 +1369,6 @@
     return element;
   };
   /**
- * Convert standard CSS property names into the equivalent CSS property names
- * for use by oldIE and/or `el.style.{prop}`.
- *
- * NOTE: oldIE has other special cases that are not accounted for here,
- * e.g. "float" -> "styleFloat"
- *
- * @example _camelizeCssPropName("z-index") -> "zIndex"
- *
- * @returns The CSS property name for oldIE and/or `el.style.{prop}`
- * @private
- */
-  var _camelizeCssPropName = function() {
-    var matcherRegex = /\-([a-z])/g, replacerFn = function(match, group) {
-      return group.toUpperCase();
-    };
-    return function(prop) {
-      return prop.replace(matcherRegex, replacerFn);
-    };
-  }();
-  /**
  * Attempt to interpret the element's CSS styling. If `prop` is `"cursor"`,
  * then we assume that it should be a hand ("pointer") cursor if the element
  * is an anchor element ("a" tag).
@@ -1399,21 +1377,10 @@
  * @private
  */
   var _getStyle = function(el, prop) {
-    var value, camelProp, tagName;
-    if (_window.getComputedStyle) {
-      value = _window.getComputedStyle(el, null).getPropertyValue(prop);
-    } else {
-      camelProp = _camelizeCssPropName(prop);
-      if (el.currentStyle) {
-        value = el.currentStyle[camelProp];
-      } else {
-        value = el.style[camelProp];
-      }
-    }
+    var value = _window.getComputedStyle(el, null).getPropertyValue(prop);
     if (prop === "cursor") {
       if (!value || value === "auto") {
-        tagName = el.tagName.toLowerCase();
-        if (tagName === "a") {
+        if (el.nodeName === "A") {
           return "pointer";
         }
       }

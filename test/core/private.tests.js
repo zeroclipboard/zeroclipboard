@@ -1,4 +1,4 @@
-/*global _flashState:true, _extend, _camelizeCssPropName, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _extractDomain, _determineScriptAccess, _mapClipDataToFlash, _mapClipResultsFromFlash, _createEvent, _getRelatedTarget, _shouldPerformAsync, _dispatchCallback, _detectFlashSupport */
+/*global _flashState:true, _extend, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _extractDomain, _determineScriptAccess, _mapClipDataToFlash, _mapClipResultsFromFlash, _createEvent, _getRelatedTarget, _shouldPerformAsync, _dispatchCallback, _detectFlashSupport */
 
 (function(module, test) {
   "use strict";
@@ -7,20 +7,6 @@
 
 
   module("core/private.js unit tests - utils");
-
-
-  test("`_camelizeCssPropName` converts CSS property names", function(assert) {
-    assert.expect(3);
-
-    // Arrange -> N/A
-
-    // Act -> N/A
-
-    // Assert
-    assert.strictEqual(_camelizeCssPropName("z-index"), "zIndex");
-    assert.strictEqual(_camelizeCssPropName("border-left-width"), "borderLeftWidth");
-    assert.strictEqual(_camelizeCssPropName("cursor"), "cursor");
-  });
 
 
   test("`_getStyle` returns computed styles", function(assert) {
