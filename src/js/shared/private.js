@@ -228,3 +228,27 @@ var _now = (function(Date) {
     return time;
   };
 })(_Date);
+
+
+/**
+ * Determine if an element is contained within another element.
+ *
+ * @returns Boolean
+ * @private
+ */
+var _containedBy = function(el, ancestorEl) {
+  if (
+    el && el.nodeType === 1 &&
+    ancestorEl && (ancestorEl.nodeType === 1 || ancestorEl.nodeType === 9)
+  ) {
+    do {
+      if (el === ancestorEl) {
+        return true;
+      }
+      el = el.parentNode;
+    }
+    while (el);
+  }
+
+  return false;
+};

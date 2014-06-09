@@ -214,6 +214,23 @@
     };
   }(_Date);
   /**
+ * Determine if an element is contained within another element.
+ *
+ * @returns Boolean
+ * @private
+ */
+  var _containedBy = function(el, ancestorEl) {
+    if (el && el.nodeType === 1 && ancestorEl && (ancestorEl.nodeType === 1 || ancestorEl.nodeType === 9)) {
+      do {
+        if (el === ancestorEl) {
+          return true;
+        }
+        el = el.parentNode;
+      } while (el);
+    }
+    return false;
+  };
+  /**
  * Keep track of the state of the Flash object.
  * @private
  */
@@ -866,13 +883,15 @@
      case "_mouseover":
       ZeroClipboard.activate(element);
       if (_globalConfig.bubbleEvents === true && sourceIsSwf) {
+        if (element && element !== event.relatedTarget && !_containedBy(event.relatedTarget, element)) {
+          _fireMouseEvent(_extend({}, event, {
+            type: "mouseenter",
+            bubbles: false,
+            cancelable: false
+          }));
+        }
         _fireMouseEvent(_extend({}, event, {
           type: "mouseover"
-        }));
-        _fireMouseEvent(_extend({}, event, {
-          type: "mouseenter",
-          bubbles: false,
-          cancelable: false
         }));
       }
       break;
@@ -880,13 +899,15 @@
      case "_mouseout":
       ZeroClipboard.deactivate();
       if (_globalConfig.bubbleEvents === true && sourceIsSwf) {
+        if (element && element !== event.relatedTarget && !_containedBy(event.relatedTarget, element)) {
+          _fireMouseEvent(_extend({}, event, {
+            type: "mouseleave",
+            bubbles: false,
+            cancelable: false
+          }));
+        }
         _fireMouseEvent(_extend({}, event, {
           type: "mouseout"
-        }));
-        _fireMouseEvent(_extend({}, event, {
-          type: "mouseleave",
-          bubbles: false,
-          cancelable: false
         }));
       }
       break;

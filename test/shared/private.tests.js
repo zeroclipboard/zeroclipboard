@@ -1,4 +1,4 @@
-/*global _args, _inArray, _extend, _deepCopy, _pick, _omit, _objectKeys, _deleteOwnProperties, _makeReadOnly, _now */
+/*global _args, _inArray, _extend, _deepCopy, _pick, _omit, _objectKeys, _deleteOwnProperties, _makeReadOnly, _now, _containedBy */
 
 (function(module, test) {
   "use strict";
@@ -434,6 +434,75 @@
     var actual = _now();
     assert.strictEqual(typeof actual === "number" && !isNaN(actual), true, "Should return a non-NaN number");
     assert.strictEqual(actual <= (expected + 250), true, "Should return the current time (or very close)");
+  });
+
+
+  test("`_containedBy` works", function(assert) {
+    /*jshint camelcase:false */
+
+    assert.expect(29);
+
+    // Arrange
+    var fixture = document.getElementById("qunit-fixture");
+    fixture.innerHTML =
+      "<div id='container'>" +
+        "<div id='contained1'>" +
+          "<div id='contained1_1'></div>" +
+          "<div id='contained1_2'>" +
+            "<div id='contained1_2_1'></div>" +
+          "</div>" +
+        "</div>" +
+        "<div id='contained2'></div>" +
+      "</div>" +
+      "<div id='not_container'>" +
+        "<div id='not_contained'></div>" +
+      "</div>";
+
+    var container = document.getElementById("container");
+    var contained1 = document.getElementById("contained1");
+    var contained1_1 = document.getElementById("contained1_1");
+    var contained1_2 = document.getElementById("contained1_2");
+    var contained1_2_1 = document.getElementById("contained1_2_1");
+    var contained2 = document.getElementById("contained2");
+    var not_container = document.getElementById("not_container");
+    var not_contained = document.getElementById("not_contained");
+
+    // Act & Assert
+    assert.strictEqual(_containedBy(contained1_2_1, contained1_2_1), true);
+    assert.strictEqual(_containedBy(contained1_2_1, contained1_2), true);
+    assert.strictEqual(_containedBy(contained1_2_1, contained1), true);
+    assert.strictEqual(_containedBy(contained1_2_1, container), true);
+    assert.strictEqual(_containedBy(contained1_2_1, fixture), true);
+    assert.strictEqual(_containedBy(contained1_2_1, not_container), false);
+
+    assert.strictEqual(_containedBy(contained1_1, contained1_1), true);
+    assert.strictEqual(_containedBy(contained1_1, contained1), true);
+    assert.strictEqual(_containedBy(contained1_1, container), true);
+    assert.strictEqual(_containedBy(contained1_1, fixture), true);
+    assert.strictEqual(_containedBy(contained1_1, not_container), false);
+
+    assert.strictEqual(_containedBy(contained1, contained1), true);
+    assert.strictEqual(_containedBy(contained1, container), true);
+    assert.strictEqual(_containedBy(contained1, fixture), true);
+    assert.strictEqual(_containedBy(contained1, not_container), false);
+
+    assert.strictEqual(_containedBy(contained2, contained2), true);
+    assert.strictEqual(_containedBy(contained2, container), true);
+    assert.strictEqual(_containedBy(contained2, fixture), true);
+    assert.strictEqual(_containedBy(contained2, not_container), false);
+
+    assert.strictEqual(_containedBy(container, container), true);
+    assert.strictEqual(_containedBy(container, fixture), true);
+    assert.strictEqual(_containedBy(container, not_container), false);
+
+    assert.strictEqual(_containedBy(not_contained, not_contained), true);
+    assert.strictEqual(_containedBy(not_contained, not_container), true);
+    assert.strictEqual(_containedBy(not_contained, fixture), true);
+    assert.strictEqual(_containedBy(not_contained, container), false);
+
+    assert.strictEqual(_containedBy(not_container, not_container), true);
+    assert.strictEqual(_containedBy(not_container, fixture), true);
+    assert.strictEqual(_containedBy(not_container, container), false);
   });
 
 })(QUnit.module, QUnit.test);

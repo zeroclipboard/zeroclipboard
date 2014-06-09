@@ -727,8 +727,15 @@ var _preprocessEvent = function(event) {
       ZeroClipboard.activate(element);
       
       if (_globalConfig.bubbleEvents === true && sourceIsSwf) {
+        if (
+          element &&
+          element !== event.relatedTarget &&
+          !_containedBy(event.relatedTarget, element)
+        ) {
+          _fireMouseEvent(_extend({}, event, { type: "mouseenter", bubbles: false, cancelable: false }));
+        }
+
         _fireMouseEvent(_extend({}, event, { type: "mouseover" }));
-        _fireMouseEvent(_extend({}, event, { type: "mouseenter", bubbles: false, cancelable: false }));
       }
       break;
 
@@ -737,8 +744,15 @@ var _preprocessEvent = function(event) {
       ZeroClipboard.deactivate();
 
       if (_globalConfig.bubbleEvents === true && sourceIsSwf) {
+        if (
+          element &&
+          element !== event.relatedTarget &&
+          !_containedBy(event.relatedTarget, element)
+        ) {
+          _fireMouseEvent(_extend({}, event, { type: "mouseleave", bubbles: false, cancelable: false }));
+        }
+
         _fireMouseEvent(_extend({}, event, { type: "mouseout" }));
-        _fireMouseEvent(_extend({}, event, { type: "mouseleave", bubbles: false, cancelable: false }));
       }
       break;
 
