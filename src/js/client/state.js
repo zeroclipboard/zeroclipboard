@@ -53,7 +53,7 @@ var _mouseHandlers = {};
 _extend(_globalConfig, {
 
   // Setting this to `false` would allow users to handle calling
-  // `ZeroClipboard.activate(...);` themselves instead of relying on our
+  // `ZeroClipboard.focus(...);` themselves instead of relying on our
   // per-element `mouseover` handler.
   autoActivate: true
 

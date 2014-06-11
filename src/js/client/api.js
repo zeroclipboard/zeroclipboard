@@ -149,3 +149,14 @@ ZeroClipboard.prototype.clearData = function(/* format */) {
   ZeroClipboard.clearData.apply(this, _args(arguments));
   return this;
 };
+
+
+/**
+ * Gets a copy of the pending data to inject into the clipboard.
+ * If no `format` is provided, a copy of ALL pending data formats will be returned.
+ *
+ * @returns `String` or `Object`
+ */
+ZeroClipboard.prototype.getData = function(/* format */) {
+  return ZeroClipboard.getData.apply(this, _args(arguments));
+};

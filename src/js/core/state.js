@@ -155,7 +155,7 @@ var _globalConfig = {
   // how long it takes to load the SWF, you can set this to `null`.
   flashLoadTimeout: 30000,
 
-  // Setting this to `false` would allow users to handle calling `ZeroClipboard.activate(...);`
+  // Setting this to `false` would allow users to handle calling `ZeroClipboard.focus(...);`
   // themselves instead of relying on our per-element `mouseover` handler.
   autoActivate: true,
 

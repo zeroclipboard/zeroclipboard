@@ -420,7 +420,7 @@ var _addMouseHandlers = function(element) {
     _suppressMouseEvents(event);
 
     // Set this as the new currently active element
-    ZeroClipboard.activate(element);
+    ZeroClipboard.focus(element);
   };
 
   // Add the `mouseover` handler function

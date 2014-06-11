@@ -557,7 +557,7 @@
  */
   var _destroy = function() {
     ZeroClipboard.clearData();
-    ZeroClipboard.deactivate();
+    ZeroClipboard.blur();
     ZeroClipboard.emit("destroy");
     _unembedSwf();
     ZeroClipboard.off();
@@ -596,10 +596,21 @@
     }
   };
   /**
- * The underlying implementation of `ZeroClipboard.activate`.
+ * The underlying implementation of `ZeroClipboard.getData`.
  * @private
  */
-  var _activate = function(element) {
+  var _getData = function(format) {
+    if (typeof format === "undefined") {
+      return _deepCopy(_clipData);
+    } else if (typeof format === "string" && _hasOwn.call(_clipData, format)) {
+      return _clipData[format];
+    }
+  };
+  /**
+ * The underlying implementation of `ZeroClipboard.focus`/`ZeroClipboard.activate`.
+ * @private
+ */
+  var _focus = function(element) {
     if (!(element && element.nodeType === 1)) {
       return;
     }
@@ -623,10 +634,10 @@
     _reposition();
   };
   /**
- * The underlying implementation of `ZeroClipboard.deactivate`.
+ * The underlying implementation of `ZeroClipboard.blur`/`ZeroClipboard.deactivate`.
  * @private
  */
-  var _deactivate = function() {
+  var _blur = function() {
     var htmlBridge = _getHtmlBridge(_flashState.bridge);
     if (htmlBridge) {
       htmlBridge.removeAttribute("title");
@@ -640,6 +651,13 @@
       _removeClass(_currentElement, _globalConfig.activeClass);
       _currentElement = null;
     }
+  };
+  /**
+ * The underlying implementation of `ZeroClipboard.activeElement`.
+ * @private
+ */
+  var _activeElement = function() {
+    return _currentElement || null;
   };
   /**
  * Check if a value is a valid HTML4 `ID` or `Name` token.
@@ -881,7 +899,7 @@
       break;
 
      case "_mouseover":
-      ZeroClipboard.activate(element);
+      ZeroClipboard.focus(element);
       if (_globalConfig.bubbleEvents === true && sourceIsSwf) {
         if (element && element !== event.relatedTarget && !_containedBy(event.relatedTarget, element)) {
           _fireMouseEvent(_extend({}, event, {
@@ -897,7 +915,7 @@
       break;
 
      case "_mouseout":
-      ZeroClipboard.deactivate();
+      ZeroClipboard.blur();
       if (_globalConfig.bubbleEvents === true && sourceIsSwf) {
         if (element && element !== event.relatedTarget && !_containedBy(event.relatedTarget, element)) {
           _fireMouseEvent(_extend({}, event, {
@@ -1696,6 +1714,16 @@
     return _clearData.apply(this, _args(arguments));
   };
   /**
+ * Get a copy of the pending data for clipboard injection.
+ * If no `format` is provided, a copy of ALL pending data formats will be returned.
+ *
+ * @returns `String` or `Object`
+ * @static
+ */
+  ZeroClipboard.getData = function() {
+    return _getData.apply(this, _args(arguments));
+  };
+  /**
  * Sets the current HTML object that the Flash object should overlay. This will put the global
  * Flash object on top of the current element; depending on the setup, this may also set the
  * pending clipboard text data as well as the Flash object's wrapping element's title attribute
@@ -1704,8 +1732,8 @@
  * @returns `undefined`
  * @static
  */
-  ZeroClipboard.activate = function() {
-    return _activate.apply(this, _args(arguments));
+  ZeroClipboard.focus = ZeroClipboard.activate = function() {
+    return _focus.apply(this, _args(arguments));
   };
   /**
  * Un-overlays the Flash object. This will put the global Flash object off-screen; depending on
@@ -1715,8 +1743,17 @@
  * @returns `undefined`
  * @static
  */
-  ZeroClipboard.deactivate = function() {
-    return _deactivate.apply(this, _args(arguments));
+  ZeroClipboard.blur = ZeroClipboard.deactivate = function() {
+    return _blur.apply(this, _args(arguments));
+  };
+  /**
+ * Returns the currently focused/"activated" HTML element that the Flash object is wrapping.
+ *
+ * @returns `HTMLElement` or `null`
+ * @static
+ */
+  ZeroClipboard.activeElement = function() {
+    return _activeElement.apply(this, _args(arguments));
   };
   /**
  * Keep track of the ZeroClipboard client instance counter.
@@ -2072,7 +2109,7 @@
         return;
       }
       _suppressMouseEvents(event);
-      ZeroClipboard.activate(element);
+      ZeroClipboard.focus(element);
     };
     element.addEventListener("mouseover", _elementMouseOver, false);
     element.addEventListener("mouseout", _suppressMouseEvents, false);
@@ -2234,6 +2271,15 @@
   ZeroClipboard.prototype.clearData = function() {
     ZeroClipboard.clearData.apply(this, _args(arguments));
     return this;
+  };
+  /**
+ * Gets a copy of the pending data to inject into the clipboard.
+ * If no `format` is provided, a copy of ALL pending data formats will be returned.
+ *
+ * @returns `String` or `Object`
+ */
+  ZeroClipboard.prototype.getData = function() {
+    return ZeroClipboard.getData.apply(this, _args(arguments));
   };
   if (typeof define === "function" && define.amd) {
     define(function() {

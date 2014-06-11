@@ -9,7 +9,7 @@ This documents details the ZeroClipboard API, including various types of propert
 
 #### `ZeroClipboard.version`
 
-_[`String`]_ The version of the ZeroClipboard library being used, e.g. `"v2.0.0"`.
+_[`String`]_ The version of the ZeroClipboard library being used, e.g. `"2.0.0"`.
 
 
 ### Static Methods
@@ -80,18 +80,46 @@ ZeroClipboard.clearData();
 _[`undefined`]_ Clear the pending data of ALL formats for clipboard injection.
 
 
+#### `ZeroClipboard.getData(...)`
+
+```js
+var text = ZeroClipboard.getData("text/plain");
+```
+
+_[`String`]_ Get the pending data of type `format` for clipboard injection.
+
+```js
+var dataObj = ZeroClipboard.getData();
+```
+
+_[`Object`]_ Get a copy of the pending data of ALL formats for clipboard injection.
+
+
+#### `ZeroClipboard.focus(...)`
 #### `ZeroClipboard.activate(...)`
 
 ```js
-ZeroClipboard.activate(document.getElementById("d_clip_button"));
+ZeroClipboard.focus(document.getElementById("d_clip_button"));
 ```
 
-_[`undefined`]_ "Activate" the provided element by moving the Flash SWF object in front of it.
+_[`undefined`]_ Focus/"activate" the provided element by moving the Flash SWF object in front of it. **NOTE:** The preferred method to use is `focus` but the alias `activate` is available for backward compatibility's sake.
 
 
+#### `ZeroClipboard.blur()`
 #### `ZeroClipboard.deactivate()`
 
-_[`undefined`]_ "Deactivate" the currently "activated" element, moving the Flash SWF object off the screen.
+_[`undefined`]_ Blur/"deactivate" the currently focused/"activated" element, moving the Flash SWF object off the screen. **NOTE:** The preferred method to use is `blur` but the alias `deactivate` is available for backward compatibility's sake.
+
+
+#### `ZeroClipboard.activeElement()`
+
+```js
+var el = document.getElementById("d_clip_button");
+ZeroClipboard.focus(el);
+var activeEl = ZeroClipboard.activeElement();  // activeEl === el
+```
+
+_[`HTMLElement` or `null`]_ Return the currently "activated" element that the Flash SWF object is in front of it.
 
 
 #### `ZeroClipboard.state()`
@@ -577,6 +605,21 @@ client.clearData();
 _[`this`]_ Clear the pending data of ALL formats for clipboard injection.
 
 
+#### `client.getData(...)`
+
+```js
+var text = client.getData("text/plain");
+```
+
+_[`String`]_ Get the pending data of type `format` for clipboard injection.
+
+```js
+var dataObj = client.getData();
+```
+
+_[`Object`]_ Get a copy of the pending data of ALL formats for clipboard injection.
+
+
 #### `client.clip(...)`
 
 ```js
@@ -586,7 +629,7 @@ client.clip(jQuery(".clip_button"));
 ```
 
 _[`this`]_ Register clipboard actions for new element(s) to the client. This includes
-automatically invoking `ZeroClipboard.activate` on the current element when it is hovered over,
+automatically invoking `ZeroClipboard.focus` on the current element when it is hovered over,
 unless the `autoActivate` configuration property is set to `false`.
 
 
@@ -751,7 +794,7 @@ var _globalConfig = {
   // how long it takes to load the SWF, you can set this to `null`.
   flashLoadTimeout: 30000,
 
-  // Setting this to `false` would allow users to handle calling `ZeroClipboard.activate(...);`
+  // Setting this to `false` would allow users to handle calling `ZeroClipboard.focus(...);`
   // themselves instead of relying on our per-element `mouseover` handler.
   autoActivate: true,
 

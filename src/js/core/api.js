@@ -158,6 +158,18 @@ ZeroClipboard.clearData = function(/* format */) {
 
 
 /**
+ * Get a copy of the pending data for clipboard injection.
+ * If no `format` is provided, a copy of ALL pending data formats will be returned.
+ *
+ * @returns `String` or `Object`
+ * @static
+ */
+ZeroClipboard.getData = function(/* format */) {
+  return _getData.apply(this, _args(arguments));
+};
+
+
+/**
  * Sets the current HTML object that the Flash object should overlay. This will put the global
  * Flash object on top of the current element; depending on the setup, this may also set the
  * pending clipboard text data as well as the Flash object's wrapping element's title attribute
@@ -166,8 +178,8 @@ ZeroClipboard.clearData = function(/* format */) {
  * @returns `undefined`
  * @static
  */
-ZeroClipboard.activate = function(/* element */) {
-  return _activate.apply(this, _args(arguments));
+ZeroClipboard.focus = ZeroClipboard.activate = function(/* element */) {
+  return _focus.apply(this, _args(arguments));
 };
 
 
@@ -179,6 +191,17 @@ ZeroClipboard.activate = function(/* element */) {
  * @returns `undefined`
  * @static
  */
-ZeroClipboard.deactivate = function() {
-  return _deactivate.apply(this, _args(arguments));
+ZeroClipboard.blur = ZeroClipboard.deactivate = function() {
+  return _blur.apply(this, _args(arguments));
+};
+
+
+/**
+ * Returns the currently focused/"activated" HTML element that the Flash object is wrapping.
+ *
+ * @returns `HTMLElement` or `null`
+ * @static
+ */
+ZeroClipboard.activeElement = function() {
+  return _activeElement.apply(this, _args(arguments));
 };

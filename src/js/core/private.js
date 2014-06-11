@@ -273,7 +273,7 @@ var _destroy = function() {
   ZeroClipboard.clearData();
 
   // Deactivate during self-destruct, even if `_globalConfig.autoActivate` !== `true`
-  ZeroClipboard.deactivate();
+  ZeroClipboard.blur();
 
   // Emit a special [synchronously handled] event so that Clients may listen
   // for it and destroy themselves
@@ -338,10 +338,26 @@ var _clearData = function(format) {
 
 
 /**
- * The underlying implementation of `ZeroClipboard.activate`.
+ * The underlying implementation of `ZeroClipboard.getData`.
  * @private
  */
-var _activate = function(element) {
+var _getData = function(format) {
+  // If no format is passed, get a copy of ALL of the pending data
+  if (typeof format === "undefined") {
+    return _deepCopy(_clipData);
+  }
+  // Otherwise, get only the pending data of the specified format
+  else if (typeof format === "string" && _hasOwn.call(_clipData, format)) {
+    return _clipData[format];
+  }
+};
+
+
+/**
+ * The underlying implementation of `ZeroClipboard.focus`/`ZeroClipboard.activate`.
+ * @private
+ */
+var _focus = function(element) {
   if (!(element && element.nodeType === 1)) {
     return;
   }
@@ -379,10 +395,10 @@ var _activate = function(element) {
 
 
 /**
- * The underlying implementation of `ZeroClipboard.deactivate`.
+ * The underlying implementation of `ZeroClipboard.blur`/`ZeroClipboard.deactivate`.
  * @private
  */
-var _deactivate = function() {
+var _blur = function() {
   // Hide the Flash object off-screen
   var htmlBridge = _getHtmlBridge(_flashState.bridge);
   if (htmlBridge) {
@@ -401,6 +417,14 @@ var _deactivate = function() {
   }
 };
 
+
+/**
+ * The underlying implementation of `ZeroClipboard.activeElement`.
+ * @private
+ */
+var _activeElement = function() {
+  return _currentElement || null;
+};
 
 
 
@@ -724,7 +748,7 @@ var _preprocessEvent = function(event) {
 
     case "_mouseover":
       // Set this as the new currently active element
-      ZeroClipboard.activate(element);
+      ZeroClipboard.focus(element);
       
       if (_globalConfig.bubbleEvents === true && sourceIsSwf) {
         if (
@@ -751,7 +775,7 @@ var _preprocessEvent = function(event) {
 
     case "_mouseout":
       // If the mouse is moving to any other element, deactivate and...
-      ZeroClipboard.deactivate();
+      ZeroClipboard.blur();
 
       if (_globalConfig.bubbleEvents === true && sourceIsSwf) {
         if (
