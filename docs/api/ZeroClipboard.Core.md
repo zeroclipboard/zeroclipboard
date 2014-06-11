@@ -1,6 +1,6 @@
 # ZeroClipboard.Core API
 
-This documents details the **ZeroClipboard.Core** API, including various types of properties, methods, and events. **ZeroClipboard.Core** is primarily intended for use in wrapping ZeroClipboard in 3rd party plugins, e.g. [jquery.zeroclipboard](https://github.com/JamesMGreene/jquery.zeroclipboard).
+This documents details the **ZeroClipboard.Core** API, including various types of properties, methods, and events. **ZeroClipboard.Core** is primarily intended for use in wrapping ZeroClipboard in 3rd party plugins, e.g. [jquery.zeroclipboard](https://github.com/zeroclipboard/jquery.zeroclipboard).
 
 
 ## Static
@@ -631,7 +631,7 @@ If you find yourself in this situation (as in [Issue #170](https://github.com/ze
 ## Extending `ZeroClipboard`
 
 For developers who want to wrap ZeroClipboard into a 3rd party plugin
-(e.g. [JamesMGreene/jquery.zeroclipboard](https://github.com/JamesMGreene/jquery.zeroclipboard)), here
+(e.g. [jquery.zeroclipboard](https://github.com/zeroclipboard/jquery.zeroclipboard)), here
 are the important extension points:
 
 

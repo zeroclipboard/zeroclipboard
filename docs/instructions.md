@@ -83,7 +83,7 @@ For the full API documentation, see [api/ZeroClipboard.md](api/ZeroClipboard.md)
 [Configuration Options](api/ZeroClipboard.md#configuration-options) are also documented there.
 
 For developers who want to wrap ZeroClipboard into a 3rd party plugin
-(e.g. [JamesMGreene/jquery.zeroclipboard](https://github.com/JamesMGreene/jquery.zeroclipboard)),
+(e.g. [jquery.zeroclipboard](https://github.com/zeroclipboard/jquery.zeroclipboard)),
 see the [api/ZeroClipboard.Core.md](api/ZeroClipboard.Core.md) documentation instead.
 
 
