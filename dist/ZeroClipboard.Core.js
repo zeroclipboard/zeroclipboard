@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Jon Rohan, James M. Greene
  * Licensed MIT
  * http://zeroclipboard.org/
- * v2.1.0
+ * v2.1.1
  */
 (function(window, undefined) {
   "use strict";
@@ -1608,7 +1608,7 @@
  * @readonly
  * @property {string}
  */
-  ZeroClipboard.version = "2.1.0";
+  ZeroClipboard.version = "2.1.1";
   _makeReadOnly(ZeroClipboard, "version");
   /**
  * Update or get a copy of the ZeroClipboard global configuration.
