@@ -12,7 +12,11 @@ This is achieved by automatically floating the invisible movie on top of a [DOM]
 
 ## Limitations
 
-Note that, due to browser and Flash security restrictions, this clipboard injection can _**ONLY**_ occur when the user clicks on the invisible Flash movie. A simulated `click` event from JavaScript will not suffice as this would enable [clipboard poisoning](http://www.computerworld.com/s/article/9117268/Adobe_patches_Flash_clickjacking_and_clipboard_poisoning_bugs).
+### User Interaction Required
+
+Due to browser and Flash security restrictions, this clipboard injection can _**ONLY**_ occur when
+the user clicks on the invisible Flash movie. A simulated `click` event from JavaScript will not
+suffice as this would enable [clipboard poisoning](http://www.computerworld.com/s/article/9117268/Adobe_patches_Flash_clickjacking_and_clipboard_poisoning_bugs).
 
 
 ## Simple Example

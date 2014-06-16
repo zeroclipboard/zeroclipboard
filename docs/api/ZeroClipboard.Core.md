@@ -589,30 +589,34 @@ var _globalConfig = {
 };
 ```
 
-You can override the defaults by making a call like `ZeroClipboard.config({ swfPath: "new/path" });` before you create any clients.
+You can override the defaults by making calls like `ZeroClipboard.config({ swfPath: "new/path" });`
+before you create any clients.
 
 
 ### SWF Inbound Scripting Access: The `trustedDomains` option
 
-This allows other SWF files and HTML pages from the allowed domains to access/call publicly exposed ActionScript code,
-e.g. functions shared via `ExternalInterface.addCallback`. In other words, it controls the SWF inbound scripting access.
+This allows other SWF files and HTML pages from the allowed domains to access/call publicly
+exposed ActionScript code, e.g. functions shared via `ExternalInterface.addCallback`. In other
+words, it controls the SWF inbound scripting access.
 
-If your ZeroClipboard SWF is served from a different origin/domain than your page, you need to tell the SWF that it's
-OK to trust your page. The default value of `[window.location.host]` is almost _**always**_ what you will want unless
-you specifically want the SWF to communicate with pages from other domains (e.g. in `iframe`s or child windows).
+If your ZeroClipboard SWF is served from a different origin/domain than your page, you need to tell
+the SWF that it's OK to trust your page. The default value of `[window.location.host]` is almost
+_**always**_ what you will want unless you specifically want the SWF to communicate with pages from
+other domains (e.g. in `iframe`s or child windows).
 
 For more information about trusted domains, consult the [_official Flash documentation for `flash.system.Security.allowDomain(...)`_](http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/Security.html#allowDomain\(\)).
 
 
 ### SWF Outbound Scripting Access
 
-The `allowScriptAccess` parameter (for Flash embedding markup) allows the SWF file to access/call JavaScript/HTML functionality of
-HTML pages on allowed domains, e.g. invoking functions via `ExternalInterface.call`. In other words, it controls the SWF outbound
-scripting access.
+The `allowScriptAccess` parameter (for Flash embedding markup) allows the SWF file to access/call
+JavaScript/HTML functionality of HTML pages on allowed domains, e.g. invoking functions via
+`ExternalInterface.call`. In other words, it controls the SWF outbound scripting access.
 
-As of version `v2.0.0-alpha.2`, the `allowScriptAccess` configuration option no longer exists. The appropriate value will be determined
-immediately before the Flash object is embedded on the page. The value is based on a relationship between the current
-domain (`window.location.host`) and the value of the `trustedDomains` configuration option.
+As of version `v2.0.0-alpha.2`, the `allowScriptAccess` configuration option no longer exists. The
+appropriate value will be determined immediately before the Flash object is embedded on the page.
+The value is based on a relationship between the current domain (`window.location.host`) and the
+value of the `trustedDomains` configuration option.
 
 For more information about `allowScriptAccess`, consult the [_official Flash documentation_](http://helpx.adobe.com/flash/kb/control-access-scripts-host-web.html).
 
@@ -621,11 +625,24 @@ For more information about `allowScriptAccess`, consult the [_official Flash doc
 
 ZeroClipboard was intentionally configured to _not_ allow the SWF to be served from a secure domain (HTTPS) but scripted by an insecure domain (HTTP).
 
-If you find yourself in this situation (as in [Issue #170](https://github.com/zeroclipboard/ZeroClipboard/issues/170)), please consider the following options:  
+If you find yourself in this situation (as in [Issue #170](https://github.com/zeroclipboard/zeroclipboard/issues/170)), please consider the following options:  
  1. Serve the SWF over HTTP instead of HTTPS. If the page's protocol can vary (e.g. authorized/unauthorized, staging/production, etc.), you should include add the SWF with a relative protocol (`//s3.amazonaws.com/blah/ZeroClipboard.swf`) instead of an absolute protocol (`https://s3.amazonaws.com/blah/ZeroClipboard.swf`).
  2. Serve the page over HTTPS instead of HTTP. If the page's protocol can vary, see the note on the previous option (1).
  3. Update ZeroClipboard's ActionScript codebase to call the [`allowInsecureDomain`](http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/Security.html#allowInsecureDomain\(\)) method, then recompile the SWF with your custom changes.
 
+
+### `file://` Protocol Limitations
+
+If you want to host a page locally on the `file://` protocol, you must specifically configure
+ZeroClipboard to trust ALL domains for SWF interaction via a wildcard. This configuration must be
+set _before_ creating ZeroClipboard client instances as a typical consumer, or before calling
+`ZeroClipboard.create()` in a 3rd party wrapper:
+
+```js
+ZeroClipboard.config({ trustedDomains: ["*"] });
+```
+
+This wildcard configuration should _**NOT**_ be used in environments hosted over HTTP/HTTPS.
 
 
 ## Extending `ZeroClipboard`

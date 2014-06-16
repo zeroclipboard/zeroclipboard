@@ -12,7 +12,11 @@ This is achieved by automatically floating the invisible movie on top of a [DOM]
 
 ## Limitations
 
-Note that, due to browser and Flash security restrictions, this clipboard injection can _**ONLY**_ occur when the user clicks on the invisible Flash movie. A simulated `click` event from JavaScript will not suffice as this would enable [clipboard poisoning](http://www.computerworld.com/s/article/9117268/Adobe_patches_Flash_clickjacking_and_clipboard_poisoning_bugs).
+### User Interaction Required
+
+Due to browser and Flash security restrictions, this clipboard injection can _**ONLY**_ occur when
+the user clicks on the invisible Flash movie. A simulated `click` event from JavaScript will not
+suffice as this would enable [clipboard poisoning](http://www.computerworld.com/s/article/9117268/Adobe_patches_Flash_clickjacking_and_clipboard_poisoning_bugs).
 
 
 ## Installation
@@ -44,6 +48,14 @@ For any PHP Composer users, ZeroClipboard is also [available on Packagist](https
 For any Rails users, the [`zeroclipboard-rails` Ruby Gem](https://rubygems.org/gems/zeroclipboard-rails) is available to automatically add ZeroClipboard into your Rails asset pipeline.
 
 
+## CDN Availability
+
+If you'd like to use ZeroClipboard hosted via a CDN (content delivery network), you can try:
+
+ - **cdnjs**: http://cdnjs.com/libraries/zeroclipboard
+ - **jsDelivr**: http://www.jsdelivr.com/#!zeroclipboard
+
+
 ## Setup
 
 To use the library, simply include the following JavaScript file in your page:
@@ -52,19 +64,20 @@ To use the library, simply include the following JavaScript file in your page:
 <script type="text/javascript" src="ZeroClipboard.js"></script>
 ```
 
-You also need to have the "`ZeroClipboard.swf`" file available to the browser.  If this file is located in the same
-directory as your web page, then it will work out of the box.  However, if the SWF file is hosted elsewhere, you need
-to set the URL like this (place this code _after_ the script tag):
+You also need to have the "`ZeroClipboard.swf`" file available to the browser.  If this file is
+located in the same directory as your web page, then it will work out of the box.  However, if the
+SWF file is hosted elsewhere, you need to set the URL like this (place this code _after_ the script
+tag):
 
 ```js
-ZeroClipboard.config( { swfPath: 'http://YOURSERVER/path/ZeroClipboard.swf' } );
+ZeroClipboard.config( { swfPath: "http://YOURSERVER/path/ZeroClipboard.swf" } );
 ```
 
 
 ## Clients
 
-Now you are ready to create one or more _clients_.  A client is a single instance of the clipboard library on the page,
-linked to one or more DOM elements. Here is how to create a client instance:
+Now you are ready to create one or more _clients_.  A client is a single instance of the clipboard
+library on the page, linked to one or more DOM elements. Here is how to create a client instance:
 
 ```js
 var client = new ZeroClipboard();
