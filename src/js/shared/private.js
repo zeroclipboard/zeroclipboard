@@ -29,13 +29,8 @@ var _extend = function() {
           src = target[prop];
           copy = arg[prop];
 
-          // Prevent never-ending loops
-          if (target === copy) {
-            continue;
-          }
-
-          // Don't bring in `undefined` values
-          if (copy !== undefined) {
+          // Prevent never-ending loops and copying `undefined` valeus
+          if (target !== copy && copy !== undefined) {
             target[prop] = copy;
           }
         }

@@ -36,10 +36,7 @@
           if (_hasOwn.call(arg, prop)) {
             src = target[prop];
             copy = arg[prop];
-            if (target === copy) {
-              continue;
-            }
-            if (copy !== undefined) {
+            if (target !== copy && copy !== undefined) {
               target[prop] = copy;
             }
           }
