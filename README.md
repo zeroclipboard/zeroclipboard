@@ -1,9 +1,8 @@
-# WARNING
-**This `master` branch contains the `v2.x` codebase for ZeroClipboard! If you
-want to see the `v1.x` codebase, please see the [`1.x-master`](https://github.com/zeroclipboard/zeroclipboard/tree/1.x-master) branch instead.**
+### WARNING
+**This `master` branch contains the `v2.x` codebase for ZeroClipboard! For the `v1.x` codebase, see the [`1.x-master`](https://github.com/zeroclipboard/zeroclipboard/tree/1.x-master) branch instead.**
 
 
-# ZeroClipboard
+# ZeroClipboard  [![Build Status](https://secure.travis-ci.org/zeroclipboard/zeroclipboard.png?branch=master)](https://travis-ci.org/zeroclipboard/zeroclipboard) [![dependencies Status](https://david-dm.org/zeroclipboard/zeroclipboard.png?theme=shields.io)](https://david-dm.org/zeroclipboard/zeroclipboard) [![devDependencies Status](https://david-dm.org/zeroclipboard/zeroclipboard/dev-status.png?theme=shields.io)](https://david-dm.org/zeroclipboard/zeroclipboard#info=devDependencies)
 
 The ZeroClipboard library provides an easy way to copy text to the clipboard using an invisible [Adobe Flash](http://en.wikipedia.org/wiki/Adobe_Flash) movie and a [JavaScript](http://en.wikipedia.org/wiki/JavaScript) interface. The "Zero" signifies that the library is invisible and the user interface is left entirely up to you. 
 
@@ -85,8 +84,3 @@ see [releases](https://github.com/zeroclipboard/zeroclipboard/releases)
 ## Roadmap
 
 see [roadmap.md](docs/roadmap.md)
-
-
-## Last Build
-
-[![Build Status](https://secure.travis-ci.org/zeroclipboard/zeroclipboard.png?branch=master)](https://travis-ci.org/zeroclipboard/zeroclipboard)

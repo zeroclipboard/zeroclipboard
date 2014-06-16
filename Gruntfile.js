@@ -25,6 +25,7 @@ module.exports = function(grunt) {
         jshintrc: true
       },
       Gruntfile: ["Gruntfile.js"],
+      component: ["index.js"],
       js: ["src/js/**/*.js", "!src/js/start.js", "!src/js/end.js"],
       test: ["test/**/*.js"],
       dist: ["dist/*.js", "!dist/*.min.js"]
@@ -277,7 +278,7 @@ module.exports = function(grunt) {
 
 
   // Task aliases and chains
-  grunt.registerTask("jshint-prebuild", ["jshint:Gruntfile", "jshint:js", "jshint:test"]);
+  grunt.registerTask("jshint-prebuild", ["jshint:Gruntfile", "jshint:component", "jshint:js", "jshint:test"]);
   grunt.registerTask("prep-flash",      ["clean:flash", "concat:flash"]);
   grunt.registerTask("validate",        ["jshint-prebuild", "prep-flash", "flexpmd"]);
   grunt.registerTask("build",           ["clean", "concat", "jshint:dist", "uglify", "mxmlc", "template", "chmod"]);

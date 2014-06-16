@@ -1,31 +1,29 @@
+/*jshint node:true */
 
-/**
- * Module exports.
- */
 
+// Module exports
 exports = module.exports = setup;
 
-/**
- * Module dependencies.
- */
+// Module dependencies
+var http = require("http");
+var send = require("send");
 
-var http = require('http');
-var send = require('send');
+
 var root = __dirname;
-var swf = '/ZeroClipboard.swf';
+var swf = "/ZeroClipboard.swf";
 
-function setup () {
+function setup() {
   return http.createServer(onReq);
 }
 
-function onReq (req, res) {
+function onReq(req, res) {
   send(req, swf)
     .root(root)
-    .on('error', onError)
+    .on("error", onError)
     .pipe(res);
 }
 
-function onError (err) {
+function onError(err) {
   res.statusCode = err.status || 500;
   res.end(err.message);
 }
