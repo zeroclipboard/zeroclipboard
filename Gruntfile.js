@@ -261,12 +261,13 @@ module.exports = function(grunt) {
               "src/js/**/*.js",
               "!src/js/start.js",
               "!src/js/end.js",
-              "dist/ZeroClipboard.js"
+              "dist/*.js",
+              "!dist/*.min.js"
             ],
             instrumentedFiles: "tmp",
             htmlReport: "coverage/html",
             lcovReport: "coverage/lcov",
-            statementsThresholdPct: 66.6,
+            statementsThresholdPct: 60.0,
             disposeCollector: true
           },
           urls:
