@@ -28,8 +28,12 @@ var ZeroClipboard = function() {
  * @readonly
  * @property {string}
  */
-ZeroClipboard.version = "<%= version %>";
-_makeReadOnly(ZeroClipboard, "version");
+_defineProperty(ZeroClipboard, "version", {
+  value: "<%= version %>",
+  writable: false,
+  configurable: true,
+  enumerable: true
+});
 
 
 /**

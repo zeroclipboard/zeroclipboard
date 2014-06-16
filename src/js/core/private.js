@@ -140,7 +140,7 @@ var _off = function(eventType, listener) {
   var i, len, foundIndex, events, perEventHandlers;
   if (arguments.length === 0) {
     // Remove ALL of the _handlers for ALL event types
-    events = _objectKeys(_handlers);
+    events = _keys(_handlers);
   }
   else if (typeof eventType === "string" && eventType) {
     events = eventType.split(/\s+/);
@@ -159,10 +159,10 @@ var _off = function(eventType, listener) {
       perEventHandlers = _handlers[eventType];
       if (perEventHandlers && perEventHandlers.length) {
         if (listener) {
-          foundIndex = _inArray(listener, perEventHandlers);
+          foundIndex = perEventHandlers.indexOf(listener);
           while (foundIndex !== -1) {
             perEventHandlers.splice(foundIndex, 1);
-            foundIndex = _inArray(listener, perEventHandlers, foundIndex);
+            foundIndex = perEventHandlers.indexOf(listener, foundIndex);
           }
         }
         else {
@@ -688,9 +688,17 @@ var _preprocessEvent = function(event) {
   var sourceIsSwf = event._source === "swf";
   delete event._source;
 
+  var flashErrorNames = [
+    "flash-disabled",
+    "flash-outdated",
+    "flash-unavailable",
+    "flash-deactivated",
+    "flash-overdue"
+  ];
+
   switch (event.type) {
     case "error":
-      if (_inArray(event.name, ["flash-disabled", "flash-outdated", "flash-deactivated", "flash-overdue"])) {
+      if (flashErrorNames.indexOf(event.name) !== -1) {
         _extend(_flashState, {
           disabled:    event.name === "flash-disabled",
           outdated:    event.name === "flash-outdated",
@@ -1190,7 +1198,8 @@ var _vars = function(options) {
 
         // If we encounter a wildcard, ignore everything else as they are irrelevant
         if (domain === "*") {
-          trustedOriginsExpanded = [domain];
+          trustedOriginsExpanded.length = 0;
+          trustedOriginsExpanded.push(domain);
           break;
         }
 
@@ -1264,16 +1273,14 @@ var _extractDomain = function(originOrUrl) {
  * @private
  */
 var _determineScriptAccess = (function() {
-  var _extractAllDomains = function(origins, resultsArray) {
-    var i, len, tmp;
-    if (origins == null || resultsArray[0] === "*") {
-      return;
-    }
+  var _extractAllDomains = function(origins) {
+    var i, len, tmp,
+        resultsArray = [];
     if (typeof origins === "string") {
       origins = [origins];
     }
-    if (!(typeof origins === "object" && typeof origins.length === "number")) {
-      return;
+    if (!(typeof origins === "object" && origins && typeof origins.length === "number")) {
+      return resultsArray;
     }
     for (i = 0, len = origins.length; i < len; i++) {
       if (_hasOwn.call(origins, i) && (tmp = _extractDomain(origins[i]))) {
@@ -1282,11 +1289,12 @@ var _determineScriptAccess = (function() {
           resultsArray.push("*");
           break;
         }
-        if (_inArray(tmp, resultsArray) === -1) {
+        if (resultsArray.indexOf(tmp) === -1) {
           resultsArray.push(tmp);
         }
       }
     }
+    return resultsArray;
   };
 
   return function(currentDomain, configOptions) {
@@ -1296,16 +1304,14 @@ var _determineScriptAccess = (function() {
       swfDomain = currentDomain;
     }
     // Get all trusted domains
-    var trustedDomains = [];
-    _extractAllDomains(configOptions.trustedOrigins, trustedDomains);
-    _extractAllDomains(configOptions.trustedDomains, trustedDomains);
+    var trustedDomains = _extractAllDomains(configOptions.trustedDomains);
 
     var len = trustedDomains.length;
     if (len > 0) {
       if (len === 1 && trustedDomains[0] === "*") {
         return "always";
       }
-      if (_inArray(currentDomain, trustedDomains) !== -1) {
+      if (trustedDomains.indexOf(currentDomain) !== -1) {
         if (len === 1 && currentDomain === swfDomain) {
           return "sameDomain";
         }
@@ -1452,7 +1458,7 @@ var _getZoomFactor = function() {
     physicalWidth = rect.right - rect.left;
     logicalWidth = _document.body.offsetWidth;
 
-    zoomFactor = _Math.round((physicalWidth / logicalWidth) * 100) / 100;
+    zoomFactor = _round((physicalWidth / logicalWidth) * 100) / 100;
   }
   return zoomFactor;
 };
@@ -1487,8 +1493,8 @@ var _getDOMObjectPosition = function(obj) {
     }
     else {
       zoomFactor = _getZoomFactor();
-      pageXOffset = _Math.round(_document.documentElement.scrollLeft / zoomFactor);
-      pageYOffset = _Math.round(_document.documentElement.scrollTop / zoomFactor);
+      pageXOffset = _round(_document.documentElement.scrollLeft / zoomFactor);
+      pageYOffset = _round(_document.documentElement.scrollTop / zoomFactor);
     }
 
     // `clientLeft`/`clientTop` are to fix IE's 2px offset in standards mode

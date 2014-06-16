@@ -1,4 +1,4 @@
-/*global ZeroClipboard, _globalConfig:true, _flashState, _clipData, _clipDataFormatMap, _deleteOwnProperties, _objectKeys */
+/*global ZeroClipboard, _globalConfig:true, _flashState, _clipData, _clipDataFormatMap, _deleteOwnProperties */
 
 (function(module, test) {
   "use strict";
@@ -23,14 +23,14 @@
     var result = ZeroClipboard.state();
 
     // Assert
-    assert.deepEqual(_objectKeys(result), ["browser", "flash", "zeroclipboard"], "Has all expected keys");
+    assert.deepEqual(Object.keys(result), ["browser", "flash", "zeroclipboard"], "Has all expected keys");
     assert.strictEqual(typeof result.browser, "object", ".browser is an object");
     assert.notStrictEqual(result.browser, null, ".browser is a non-null object");
     assert.strictEqual(typeof result.flash, "object", ".flash is an object");
     assert.notStrictEqual(result.flash, null, ".flash is a non-null object");
     assert.strictEqual(typeof result.zeroclipboard, "object", ".zeroclipboard is an object");
     assert.notStrictEqual(result.zeroclipboard, null, ".zeroclipboard is a non-null object");
-    assert.deepEqual(_objectKeys(result.zeroclipboard), ["version", "config"], ".zeroclipboard has all expected keys");
+    assert.deepEqual(Object.keys(result.zeroclipboard), ["version", "config"], ".zeroclipboard has all expected keys");
   });
 
 

@@ -12,21 +12,7 @@
  * Store references to critically important global functions that may be
  * overridden on certain web pages.
  */
-  var _window = window, _document = _window.document, _navigator = _window.navigator, _setTimeout = _window.setTimeout, _parseInt = _window.Number.parseInt || _window.parseInt, _parseFloat = _window.Number.parseFloat || _window.parseFloat, _isNaN = _window.Number.isNaN || _window.isNaN, _encodeURIComponent = _window.encodeURIComponent, _Math = _window.Math, _Date = _window.Date, _ActiveXObject = _window.ActiveXObject, _slice = _window.Array.prototype.slice, _keys = _window.Object.keys, _hasOwn = _window.Object.prototype.hasOwnProperty, _defineProperty = function() {
-    if (typeof _window.Object.defineProperty === "function" && function() {
-      try {
-        var x = {};
-        _window.Object.defineProperty(x, "y", {
-          value: "z"
-        });
-        return x.y === "z";
-      } catch (e) {
-        return false;
-      }
-    }()) {
-      return _window.Object.defineProperty;
-    }
-  }();
+  var _window = window, _document = _window.document, _navigator = _window.navigator, _setTimeout = _window.setTimeout, _encodeURIComponent = _window.encodeURIComponent, _ActiveXObject = _window.ActiveXObject, _parseInt = _window.Number.parseInt || _window.parseInt, _parseFloat = _window.Number.parseFloat || _window.parseFloat, _isNaN = _window.Number.isNaN || _window.isNaN, _round = _window.Math.round, _now = _window.Date.now, _keys = _window.Object.keys, _defineProperty = _window.Object.defineProperty, _hasOwn = _window.Object.prototype.hasOwnProperty, _slice = _window.Array.prototype.slice;
   /**
  * Convert an `arguments` object into an Array.
  *
@@ -35,29 +21,6 @@
  */
   var _args = function(argumentsObj) {
     return _slice.call(argumentsObj, 0);
-  };
-  /**
- * Get the index of an item in an Array.
- *
- * @returns The index of an item in the Array, or `-1` if not found.
- * @private
- */
-  var _inArray = function(item, array, fromIndex) {
-    if (typeof array.indexOf === "function") {
-      return array.indexOf(item, fromIndex);
-    }
-    var i, len = array.length;
-    if (typeof fromIndex === "undefined") {
-      fromIndex = 0;
-    } else if (fromIndex < 0) {
-      fromIndex = len + fromIndex;
-    }
-    for (i = fromIndex; i < len; i++) {
-      if (_hasOwn.call(array, i) && array[i] === item) {
-        return i;
-      }
-    }
-    return -1;
   };
   /**
  * Shallow-copy the owned, enumerable properties of one object over to another, similar to jQuery's `$.extend`.
@@ -139,32 +102,11 @@
   var _omit = function(obj, keys) {
     var newObj = {};
     for (var prop in obj) {
-      if (_inArray(prop, keys) === -1) {
+      if (keys.indexOf(prop) === -1) {
         newObj[prop] = obj[prop];
       }
     }
     return newObj;
-  };
-  /**
- * Get all of an object's owned, enumerable property names. Does NOT include prototype properties.
- *
- * @returns An Array of property names.
- * @private
- */
-  var _objectKeys = function(obj) {
-    if (obj == null) {
-      return [];
-    }
-    if (_keys) {
-      return _keys(obj);
-    }
-    var keys = [];
-    for (var prop in obj) {
-      if (_hasOwn.call(obj, prop)) {
-        keys.push(prop);
-      }
-    }
-    return keys;
   };
   /**
  * Remove all owned, enumerable properties from an object.
@@ -183,44 +125,13 @@
     return obj;
   };
   /**
- * Mark an existing property as read-only.
- * @private
- */
-  var _makeReadOnly = function(obj, prop) {
-    if (prop in obj && typeof _defineProperty === "function") {
-      _defineProperty(obj, prop, {
-        value: obj[prop],
-        writable: false,
-        configurable: true,
-        enumerable: true
-      });
-    }
-  };
-  /**
- * Get the current time in milliseconds since the epoch.
- *
- * @returns Number
- * @private
- */
-  var _now = function(Date) {
-    return function() {
-      var time;
-      if (Date.now) {
-        time = Date.now();
-      } else {
-        time = new Date().getTime();
-      }
-      return time;
-    };
-  }(_Date);
-  /**
  * Determine if an element is contained within another element.
  *
  * @returns Boolean
  * @private
  */
   var _containedBy = function(el, ancestorEl) {
-    if (el && el.nodeType === 1 && ancestorEl && (ancestorEl.nodeType === 1 || ancestorEl.nodeType === 9)) {
+    if (el && el.nodeType === 1 && el.ownerDocument && ancestorEl && (ancestorEl.nodeType === 1 && ancestorEl.ownerDocument && ancestorEl.ownerDocument === el.ownerDocument || ancestorEl.nodeType === 9 && !ancestorEl.ownerDocument && ancestorEl === el.ownerDocument)) {
       do {
         if (el === ancestorEl) {
           return true;
@@ -454,7 +365,7 @@
   var _off = function(eventType, listener) {
     var i, len, foundIndex, events, perEventHandlers;
     if (arguments.length === 0) {
-      events = _objectKeys(_handlers);
+      events = _keys(_handlers);
     } else if (typeof eventType === "string" && eventType) {
       events = eventType.split(/\s+/);
     } else if (typeof eventType === "object" && eventType && typeof listener === "undefined") {
@@ -470,10 +381,10 @@
         perEventHandlers = _handlers[eventType];
         if (perEventHandlers && perEventHandlers.length) {
           if (listener) {
-            foundIndex = _inArray(listener, perEventHandlers);
+            foundIndex = perEventHandlers.indexOf(listener);
             while (foundIndex !== -1) {
               perEventHandlers.splice(foundIndex, 1);
-              foundIndex = _inArray(listener, perEventHandlers, foundIndex);
+              foundIndex = perEventHandlers.indexOf(listener, foundIndex);
             }
           } else {
             perEventHandlers.length = 0;
@@ -851,9 +762,10 @@
     var element = event.target || _currentElement || null;
     var sourceIsSwf = event._source === "swf";
     delete event._source;
+    var flashErrorNames = [ "flash-disabled", "flash-outdated", "flash-unavailable", "flash-deactivated", "flash-overdue" ];
     switch (event.type) {
      case "error":
-      if (_inArray(event.name, [ "flash-disabled", "flash-outdated", "flash-deactivated", "flash-overdue" ])) {
+      if (flashErrorNames.indexOf(event.name) !== -1) {
         _extend(_flashState, {
           disabled: event.name === "flash-disabled",
           outdated: event.name === "flash-outdated",
@@ -1215,7 +1127,8 @@
             continue;
           }
           if (domain === "*") {
-            trustedOriginsExpanded = [ domain ];
+            trustedOriginsExpanded.length = 0;
+            trustedOriginsExpanded.push(domain);
             break;
           }
           trustedOriginsExpanded.push.apply(trustedOriginsExpanded, [ domain, "//" + domain, _window.location.protocol + "//" + domain ]);
@@ -1264,16 +1177,13 @@
  * @private
  */
   var _determineScriptAccess = function() {
-    var _extractAllDomains = function(origins, resultsArray) {
-      var i, len, tmp;
-      if (origins == null || resultsArray[0] === "*") {
-        return;
-      }
+    var _extractAllDomains = function(origins) {
+      var i, len, tmp, resultsArray = [];
       if (typeof origins === "string") {
         origins = [ origins ];
       }
-      if (!(typeof origins === "object" && typeof origins.length === "number")) {
-        return;
+      if (!(typeof origins === "object" && origins && typeof origins.length === "number")) {
+        return resultsArray;
       }
       for (i = 0, len = origins.length; i < len; i++) {
         if (_hasOwn.call(origins, i) && (tmp = _extractDomain(origins[i]))) {
@@ -1282,26 +1192,25 @@
             resultsArray.push("*");
             break;
           }
-          if (_inArray(tmp, resultsArray) === -1) {
+          if (resultsArray.indexOf(tmp) === -1) {
             resultsArray.push(tmp);
           }
         }
       }
+      return resultsArray;
     };
     return function(currentDomain, configOptions) {
       var swfDomain = _extractDomain(configOptions.swfPath);
       if (swfDomain === null) {
         swfDomain = currentDomain;
       }
-      var trustedDomains = [];
-      _extractAllDomains(configOptions.trustedOrigins, trustedDomains);
-      _extractAllDomains(configOptions.trustedDomains, trustedDomains);
+      var trustedDomains = _extractAllDomains(configOptions.trustedDomains);
       var len = trustedDomains.length;
       if (len > 0) {
         if (len === 1 && trustedDomains[0] === "*") {
           return "always";
         }
-        if (_inArray(currentDomain, trustedDomains) !== -1) {
+        if (trustedDomains.indexOf(currentDomain) !== -1) {
           if (len === 1 && currentDomain === swfDomain) {
             return "sameDomain";
           }
@@ -1418,7 +1327,7 @@
       rect = _document.body.getBoundingClientRect();
       physicalWidth = rect.right - rect.left;
       logicalWidth = _document.body.offsetWidth;
-      zoomFactor = _Math.round(physicalWidth / logicalWidth * 100) / 100;
+      zoomFactor = _round(physicalWidth / logicalWidth * 100) / 100;
     }
     return zoomFactor;
   };
@@ -1443,8 +1352,8 @@
         pageYOffset = _window.pageYOffset;
       } else {
         zoomFactor = _getZoomFactor();
-        pageXOffset = _Math.round(_document.documentElement.scrollLeft / zoomFactor);
-        pageYOffset = _Math.round(_document.documentElement.scrollTop / zoomFactor);
+        pageXOffset = _round(_document.documentElement.scrollLeft / zoomFactor);
+        pageYOffset = _round(_document.documentElement.scrollTop / zoomFactor);
       }
       var leftBorderWidth = _document.documentElement.clientLeft || 0;
       var topBorderWidth = _document.documentElement.clientTop || 0;
@@ -1608,8 +1517,12 @@
  * @readonly
  * @property {string}
  */
-  ZeroClipboard.version = "2.1.1";
-  _makeReadOnly(ZeroClipboard, "version");
+  _defineProperty(ZeroClipboard, "version", {
+    value: "2.1.1",
+    writable: false,
+    configurable: true,
+    enumerable: true
+  });
   /**
  * Update or get a copy of the ZeroClipboard global configuration.
  * Returns a copy of the current/updated configuration.
@@ -1876,7 +1789,7 @@
   var _clientOff = function(eventType, listener) {
     var i, len, foundIndex, events, perEventHandlers, handlers = _clientMeta[this.id] && _clientMeta[this.id].handlers;
     if (arguments.length === 0) {
-      events = _objectKeys(handlers);
+      events = _keys(handlers);
     } else if (typeof eventType === "string" && eventType) {
       events = eventType.split(/\s+/);
     } else if (typeof eventType === "object" && eventType && typeof listener === "undefined") {
@@ -1892,10 +1805,10 @@
         perEventHandlers = handlers[eventType];
         if (perEventHandlers && perEventHandlers.length) {
           if (listener) {
-            foundIndex = _inArray(listener, perEventHandlers);
+            foundIndex = perEventHandlers.indexOf(listener);
             while (foundIndex !== -1) {
               perEventHandlers.splice(foundIndex, 1);
-              foundIndex = _inArray(listener, perEventHandlers, foundIndex);
+              foundIndex = perEventHandlers.indexOf(listener, foundIndex);
             }
           } else {
             perEventHandlers.length = 0;
@@ -1950,11 +1863,11 @@
           if (_globalConfig.autoActivate === true) {
             _addMouseHandlers(elements[i]);
           }
-        } else if (_inArray(this.id, _elementMeta[elements[i].zcClippingId]) === -1) {
+        } else if (_elementMeta[elements[i].zcClippingId].indexOf(this.id) === -1) {
           _elementMeta[elements[i].zcClippingId].push(this.id);
         }
         var clippedElements = _clientMeta[this.id] && _clientMeta[this.id].elements;
-        if (_inArray(elements[i], clippedElements) === -1) {
+        if (clippedElements.indexOf(elements[i]) === -1) {
           clippedElements.push(elements[i]);
         }
       }
@@ -1980,13 +1893,13 @@
     for (var i = elements.length; i--; ) {
       if (_hasOwn.call(elements, i) && elements[i] && elements[i].nodeType === 1) {
         arrayIndex = 0;
-        while ((arrayIndex = _inArray(elements[i], clippedElements, arrayIndex)) !== -1) {
+        while ((arrayIndex = clippedElements.indexOf(elements[i], arrayIndex)) !== -1) {
           clippedElements.splice(arrayIndex, 1);
         }
         var clientIds = _elementMeta[elements[i].zcClippingId];
         if (clientIds) {
           arrayIndex = 0;
-          while ((arrayIndex = _inArray(this.id, clientIds, arrayIndex)) !== -1) {
+          while ((arrayIndex = clientIds.indexOf(this.id, arrayIndex)) !== -1) {
             clientIds.splice(arrayIndex, 1);
           }
           if (clientIds.length === 0) {
@@ -2030,8 +1943,8 @@
     }
     var clippedEls = _clientMeta[this.id] && _clientMeta[this.id].elements;
     var hasClippedEls = !!clippedEls && clippedEls.length > 0;
-    var goodTarget = !event.target || hasClippedEls && _inArray(event.target, clippedEls) !== -1;
-    var goodRelTarget = event.relatedTarget && hasClippedEls && _inArray(event.relatedTarget, clippedEls) !== -1;
+    var goodTarget = !event.target || hasClippedEls && clippedEls.indexOf(event.target) !== -1;
+    var goodRelTarget = event.relatedTarget && hasClippedEls && clippedEls.indexOf(event.relatedTarget) !== -1;
     var goodClient = event.client && event.client === this;
     if (!(goodTarget || goodRelTarget || goodClient)) {
       return false;

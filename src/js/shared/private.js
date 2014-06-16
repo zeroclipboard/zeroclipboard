@@ -10,35 +10,6 @@ var _args = function(argumentsObj) {
 
 
 /**
- * Get the index of an item in an Array.
- *
- * @returns The index of an item in the Array, or `-1` if not found.
- * @private
- */
-var _inArray = function(item, array, fromIndex) {
-  if (typeof array.indexOf === "function") {
-    return array.indexOf(item, fromIndex);
-  }
-
-  var i,
-      len = array.length;
-  if (typeof fromIndex === "undefined") {
-    fromIndex = 0;
-  }
-  else if (fromIndex < 0) {
-    fromIndex = len + fromIndex;
-  }
-  for (i = fromIndex; i < len; i++) {
-    if (_hasOwn.call(array, i) && array[i] === item) {
-      return i;
-    }
-  }
-
-  return -1;
-};
-
-
-/**
  * Shallow-copy the owned, enumerable properties of one object over to another, similar to jQuery's `$.extend`.
  *
  * @returns The target object, augmented
@@ -143,35 +114,11 @@ var _pick = function(obj, keys) {
 var _omit = function(obj, keys) {
   var newObj = {};
   for (var prop in obj) {
-    if (_inArray(prop, keys) === -1) {
+    if (keys.indexOf(prop) === -1) {
       newObj[prop] = obj[prop];
     }
   }
   return newObj;
-};
-
-
-/**
- * Get all of an object's owned, enumerable property names. Does NOT include prototype properties.
- *
- * @returns An Array of property names.
- * @private
- */
-var _objectKeys = function(obj) {
-  // Avoid the impending `TypeError`
-  if (obj == null) {
-    return [];
-  }
-  if (_keys) {
-    return _keys(obj);
-  }
-  var keys = [];
-  for (var prop in obj) {
-    if (_hasOwn.call(obj,prop)) {
-      keys.push(prop);
-    }
-  }
-  return keys;
 };
 
 
@@ -194,43 +141,6 @@ var _deleteOwnProperties = function(obj) {
 
 
 /**
- * Mark an existing property as read-only.
- * @private
- */
-var _makeReadOnly = function(obj, prop) {
-  // Convert it into a read-only property, if possible
-  if (prop in obj && typeof _defineProperty === "function") {
-    _defineProperty(obj, prop, {
-      value: obj[prop],
-      writable: false,
-      configurable: true,
-      enumerable: true
-    });
-  }
-};
-
-
-/**
- * Get the current time in milliseconds since the epoch.
- *
- * @returns Number
- * @private
- */
-var _now = (function(Date) {
-  return function() {
-    var time;
-    if (Date.now) {
-      time = Date.now();
-    }
-    else {
-      time = (new Date()).getTime();
-    }
-    return time;
-  };
-})(_Date);
-
-
-/**
  * Determine if an element is contained within another element.
  *
  * @returns Boolean
@@ -238,8 +148,11 @@ var _now = (function(Date) {
  */
 var _containedBy = function(el, ancestorEl) {
   if (
-    el && el.nodeType === 1 &&
-    ancestorEl && (ancestorEl.nodeType === 1 || ancestorEl.nodeType === 9)
+    el && el.nodeType === 1 && el.ownerDocument &&
+    ancestorEl && (
+      (ancestorEl.nodeType === 1 && ancestorEl.ownerDocument && ancestorEl.ownerDocument === el.ownerDocument) ||
+      (ancestorEl.nodeType === 9 && !ancestorEl.ownerDocument && ancestorEl === el.ownerDocument)
+    )
   ) {
     do {
       if (el === ancestorEl) {

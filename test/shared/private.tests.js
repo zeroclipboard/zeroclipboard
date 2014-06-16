@@ -1,4 +1,4 @@
-/*global _args, _inArray, _extend, _deepCopy, _pick, _omit, _objectKeys, _deleteOwnProperties, _makeReadOnly, _now, _containedBy */
+/*global _args, _extend, _deepCopy, _pick, _omit, _deleteOwnProperties, _containedBy */
 
 (function(module, test) {
   "use strict";
@@ -33,20 +33,6 @@
     assert.deepEqual(actualOutput2, expectedOutput2);
     assert.deepEqual(actualOutput3, expectedOutput3);
     assert.deepEqual(actualOutput4, expectedOutput4);
-  });
-
-
-  test("`_inArray` finds elements in array", function(assert) {
-    assert.expect(4);
-
-    // Arrange
-    var fruits = ["apple", "banana", "orange", "cherry", "strawberry"];
-
-    // Act & Assert
-    assert.strictEqual(_inArray("kiwi", fruits), -1);
-    assert.strictEqual(_inArray("BANANA", fruits), -1);
-    assert.strictEqual(_inArray("banana", fruits), 1);
-    assert.strictEqual(_inArray("strawberry", fruits), 4);
   });
 
 
@@ -278,49 +264,21 @@
   });
 
 
-  test("`_objectKeys` will get all owned enumerable properties", function(assert) {
-    assert.expect(7);
-
-    var a = {
-      "a": "apple",
-      "c": "cantalope",
-      "d": "dragon fruit"
-    },
-    b = {},
-    c = ["banana", "cherry"],
-    d = (function() {
-      var arr = ["apple"];
-      arr[3] = "dragon fruit";
-      return arr;
-    })(),
-    e = (function() {
-      function SomePrototype() {
-        this.protoProp = "foo";
-      }
-      function SomeClass() {
-        this.ownedProp = "bar";
-      }
-      SomeClass.prototype = new SomePrototype();
-      SomeClass.prototype.constructor = SomeClass;
-
-      return new SomeClass();
-    })(),
-    f = null,
-    g; // = undefined;
-
-    assert.deepEqual(_objectKeys(a), ["a", "c", "d"], "Plain object returns all property names");
-    assert.deepEqual(_objectKeys(b), [], "Empty object returns no property names");
-    assert.deepEqual(_objectKeys(c), ["0", "1"], "Array returns index names");
-    assert.deepEqual(_objectKeys(d), ["0", "3"], "Sparse array returns only owned index names");
-    assert.deepEqual(_objectKeys(e), ["ownedProp"], "Object with prototype returns only owned property names (no prototype property names)");
-    assert.deepEqual(_objectKeys(f), [], "`null` returns no property names");
-    assert.deepEqual(_objectKeys(g), [], "`undefined` returns no property names");
-  });
-
-
   test("`_deleteOwnProperties` will delete all owned enumerable properties", function(assert) {
     assert.expect(24);
 
+    var getNonObjectKeys = function(obj) {
+      var prop,
+          keys = [];
+      if (obj) {
+        for (prop in obj) {
+          if (obj.hasOwnProperty(prop)) {
+            keys.push(prop);
+          }
+        }
+      }
+      return keys;
+    };
     var getProtoKeys = function(obj) {
       var prop,
           keys = [];
@@ -356,84 +314,41 @@
     e = null,
     f; // = undefined;
 
-    assert.deepEqual(_objectKeys(a), ["a", "c", "d"]);
+    assert.deepEqual(Object.keys(a), ["a", "c", "d"]);
     assert.deepEqual(getProtoKeys(a), []);
     _deleteOwnProperties(a);
-    assert.deepEqual(_objectKeys(a), []);
+    assert.deepEqual(Object.keys(a), []);
     assert.deepEqual(getProtoKeys(a), []);
 
-    assert.deepEqual(_objectKeys(b), []);
+    assert.deepEqual(Object.keys(b), []);
     assert.deepEqual(getProtoKeys(b), []);
     _deleteOwnProperties(b);
-    assert.deepEqual(_objectKeys(b), []);
+    assert.deepEqual(Object.keys(b), []);
     assert.deepEqual(getProtoKeys(b), []);
 
-    assert.deepEqual(_objectKeys(c), ["0", "1"]);
+    assert.deepEqual(getNonObjectKeys(c), ["0", "1"]);
     assert.deepEqual(getProtoKeys(c), []);
     _deleteOwnProperties(c);
-    assert.deepEqual(_objectKeys(c), []);
+    assert.deepEqual(getNonObjectKeys(c), []);
     assert.deepEqual(getProtoKeys(c), []);
 
-    assert.deepEqual(_objectKeys(d), ["ownedProp"]);
+    assert.deepEqual(Object.keys(d), ["ownedProp"]);
     assert.deepEqual(getProtoKeys(d), ["protoProp", "constructor"]);
     _deleteOwnProperties(d);
-    assert.deepEqual(_objectKeys(d), []);
+    assert.deepEqual(Object.keys(d), []);
     assert.deepEqual(getProtoKeys(d), ["protoProp", "constructor"]);
 
-    assert.deepEqual(_objectKeys(e), []);
+    assert.deepEqual(getNonObjectKeys(e), []);
     assert.deepEqual(getProtoKeys(e), []);
     _deleteOwnProperties(e);
-    assert.deepEqual(_objectKeys(e), []);
+    assert.deepEqual(getNonObjectKeys(e), []);
     assert.deepEqual(getProtoKeys(e), []);
 
-    assert.deepEqual(_objectKeys(f), []);
+    assert.deepEqual(getNonObjectKeys(f), []);
     assert.deepEqual(getProtoKeys(f), []);
     _deleteOwnProperties(f);
-    assert.deepEqual(_objectKeys(f), []);
+    assert.deepEqual(getNonObjectKeys(f), []);
     assert.deepEqual(getProtoKeys(f), []);
-  });
-
-
-  test("`_makeReadOnly` works", function(assert) {
-    assert.expect(3);
-
-    // Arrange
-    var obj = {
-      a: "wat"
-    };
-
-    // Assert
-    assert.strictEqual(obj.a, "wat", "Property's value is as expected");
-
-    // Act & Assert
-    obj.a = "foo";
-    assert.strictEqual(obj.a, "foo", "Property's value should be changed");
-
-    // Act & Assert
-    _makeReadOnly(obj, "a");
-    if (typeof Object.defineProperty === "function") {
-      try {
-        obj.a = "bar";
-      }
-      catch (e) {
-        // Some browsers will throw Errors/TypeErrors, some will not
-      }
-      assert.strictEqual(obj.a, "foo", "Made readonly. Property's value should be unchanged");
-    }
-    else {
-      obj.a = "bar";
-      assert.strictEqual(obj.a, "bar", "Could not be made readonly due to browser limitations");
-    }
-  });
-
-
-  test("`_now` works", function(assert) {
-    assert.expect(2);
-
-    var expected = Date.now ? Date.now() : (new Date()).getTime();
-    var actual = _now();
-    assert.strictEqual(typeof actual === "number" && !isNaN(actual), true, "Should return a non-NaN number");
-    assert.strictEqual(actual <= (expected + 250), true, "Should return the current time (or very close)");
   });
 
 

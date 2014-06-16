@@ -104,7 +104,7 @@ var _clientOff = function(eventType, listener) {
       handlers = _clientMeta[this.id] && _clientMeta[this.id].handlers;
   if (arguments.length === 0) {
     // Remove ALL of the handlers for ALL event types
-    events = _objectKeys(handlers);
+    events = _keys(handlers);
   }
   else if (typeof eventType === "string" && eventType) {
     events = eventType.split(/\s+/);
@@ -123,10 +123,10 @@ var _clientOff = function(eventType, listener) {
       perEventHandlers = handlers[eventType];
       if (perEventHandlers && perEventHandlers.length) {
         if (listener) {
-          foundIndex = _inArray(listener, perEventHandlers);
+          foundIndex = perEventHandlers.indexOf(listener);
           while (foundIndex !== -1) {
             perEventHandlers.splice(foundIndex, 1);
-            foundIndex = _inArray(listener, perEventHandlers, foundIndex);
+            foundIndex = perEventHandlers.indexOf(listener, foundIndex);
           }
         }
         else {
@@ -195,13 +195,13 @@ var _clientClip = function(elements) {
           _addMouseHandlers(elements[i]);
         }
       }
-      else if (_inArray(this.id, _elementMeta[elements[i].zcClippingId]) === -1) {
+      else if (_elementMeta[elements[i].zcClippingId].indexOf(this.id) === -1) {
         _elementMeta[elements[i].zcClippingId].push(this.id);
       }
 
       // If the element hasn't been clipped to THIS client yet, add it
       var clippedElements = _clientMeta[this.id] && _clientMeta[this.id].elements;
-      if (_inArray(elements[i], clippedElements) === -1) {
+      if (clippedElements.indexOf(elements[i]) === -1) {
         clippedElements.push(elements[i]);
       }
     }
@@ -236,7 +236,7 @@ var _clientUnclip = function(elements) {
     if (_hasOwn.call(elements, i) && elements[i] && elements[i].nodeType === 1) {
       // If the element was clipped to THIS client yet, remove it
       arrayIndex = 0;
-      while ((arrayIndex = _inArray(elements[i], clippedElements, arrayIndex)) !== -1) {
+      while ((arrayIndex = clippedElements.indexOf(elements[i], arrayIndex)) !== -1) {
         clippedElements.splice(arrayIndex, 1);
       }
 
@@ -244,7 +244,7 @@ var _clientUnclip = function(elements) {
       var clientIds = _elementMeta[elements[i].zcClippingId];
       if (clientIds) {
         arrayIndex = 0;
-        while ((arrayIndex = _inArray(this.id, clientIds, arrayIndex)) !== -1) {
+        while ((arrayIndex = clientIds.indexOf(this.id, arrayIndex)) !== -1) {
           clientIds.splice(arrayIndex, 1);
         }
         if (clientIds.length === 0) {
@@ -311,8 +311,8 @@ var _clientShouldEmit = function(event) {
   // unless the event's `client` was specifically set to this client.
   var clippedEls = _clientMeta[this.id] && _clientMeta[this.id].elements;
   var hasClippedEls = !!clippedEls && clippedEls.length > 0;
-  var goodTarget = !event.target || (hasClippedEls && _inArray(event.target, clippedEls) !== -1);
-  var goodRelTarget = event.relatedTarget && hasClippedEls && _inArray(event.relatedTarget, clippedEls) !== -1;
+  var goodTarget = !event.target || (hasClippedEls && clippedEls.indexOf(event.target) !== -1);
+  var goodRelTarget = event.relatedTarget && hasClippedEls && clippedEls.indexOf(event.relatedTarget) !== -1;
   var goodClient = event.client && event.client === this;
   // At least one of these must be true....
   if (!(goodTarget || goodRelTarget || goodClient)) {
