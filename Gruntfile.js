@@ -3,9 +3,14 @@
 
 var os = require("os");
 var path = require("path");
+var loadGruntTasks = require("load-grunt-tasks");
 
 module.exports = function(grunt) {
   "use strict";
+
+  // Load necessary tasks
+  loadGruntTasks(grunt);
+
 
   // Metadata
   var pkg = grunt.file.readJSON("package.json");
@@ -24,7 +29,7 @@ module.exports = function(grunt) {
       options: {
         jshintrc: true
       },
-      Gruntfile: ["Gruntfile.js"],
+      gruntfile: ["Gruntfile.js"],
       component: ["index.js"],
       js: ["src/js/**/*.js", "!src/js/start.js", "!src/js/end.js"],
       test: ["test/**/*.js"],
@@ -44,7 +49,8 @@ module.exports = function(grunt) {
         },
         src: [flashTmpDir]
       },
-      meta: ["bower.json", "composer.json", "LICENSE"]
+      meta: ["bower.json", "composer.json", "LICENSE"],
+      coveralls: ["tmp/", "coverage/"]
     },
     concat: {
       options: {
@@ -153,6 +159,9 @@ module.exports = function(grunt) {
               /^(!|\*!)\r?\n/.test(comment.value);
           },
           sourceMap: true,
+          sourceMapName: function(dest) {
+            return dest.replace(".min.js", ".min.map");
+          },
           // Bundles the contents of "`src`" into the "`dest`.map" source map file. This way,
           // consumers only need to host the "*.min.js" and "*.min.map" files rather than
           // needing to host all three files: "*.js", "*.min.js", and "*.min.map".
@@ -241,13 +250,54 @@ module.exports = function(grunt) {
               return "http://localhost:" + localPort + "/" + testPage + "?noglobals=true";
             })
         }
+      },
+      coveralls: {
+        options: {
+          "--web-security": false,
+          timeout: 10000,
+          coverage: {
+            baseUrl: ".",
+            src: [
+              "src/js/**/*.js",
+              "!src/js/start.js",
+              "!src/js/end.js",
+              "dist/ZeroClipboard.js"
+            ],
+            instrumentedFiles: "tmp",
+            htmlReport: "coverage/html",
+            lcovReport: "coverage/lcov",
+            statementsThresholdPct: 66.6,
+            disposeCollector: true
+          },
+          urls:
+            grunt.file.expand([
+              "test/shared/private.tests.js.html",
+              "test/core/private.tests.js.html",
+              "test/core/api.tests.js.html",
+              "test/client/private.tests.js.html",
+              "test/client/api.tests.js.html",
+              "test/built/ZeroClipboard.Core.tests.js.html",
+              "test/built/ZeroClipboard.tests.js.html"
+              //"test/**/*.tests.js.html"
+            ]).map(function(testPage) {
+              return "http://localhost:" + localPort + "/" + testPage + "?noglobals=true";
+            })
+        }
+      }
+    },
+    coveralls: {
+      options: {
+        force: true
+      },
+      all: {
+        src: "<%= qunit.coveralls.options.coverage.lcovReport %>/lcov.info"
       }
     },
     watch: {
       options: {
         spawn: false
       },
-      Gruntfile: {
+      gruntfile: {
         files: "<%= jshint.Gruntfile %>",
         tasks: ["jshint:Gruntfile"]
       },
@@ -263,31 +313,19 @@ module.exports = function(grunt) {
   };
   grunt.initConfig(config);
 
-  // These plugins provide necessary tasks
-  grunt.loadNpmTasks("grunt-contrib-jshint");
-  grunt.loadNpmTasks("grunt-flexpmd");
-  grunt.loadNpmTasks("grunt-contrib-clean");
-  grunt.loadNpmTasks("grunt-contrib-concat");
-  grunt.loadNpmTasks("grunt-contrib-uglify");
-  grunt.loadNpmTasks("grunt-mxmlc");
-  grunt.loadNpmTasks("grunt-template");
-  grunt.loadNpmTasks("grunt-chmod");
-  grunt.loadNpmTasks("grunt-contrib-connect");
-  grunt.loadNpmTasks("grunt-contrib-qunit");
-  grunt.loadNpmTasks("grunt-contrib-watch");
-
 
   // Task aliases and chains
-  grunt.registerTask("jshint-prebuild", ["jshint:Gruntfile", "jshint:component", "jshint:js", "jshint:test"]);
+  grunt.registerTask("jshint-prebuild", ["jshint:gruntfile", "jshint:component", "jshint:js", "jshint:test"]);
   grunt.registerTask("prep-flash",      ["clean:flash", "concat:flash"]);
   grunt.registerTask("validate",        ["jshint-prebuild", "prep-flash", "flexpmd"]);
   grunt.registerTask("build",           ["clean", "concat", "jshint:dist", "uglify", "mxmlc", "template", "chmod"]);
-  grunt.registerTask("build-travis",    ["clean:dist", "concat", "jshint:dist", "mxmlc", "chmod:dist"]);
-  grunt.registerTask("test",            ["connect", "qunit"]);
+  grunt.registerTask("build-travis",    ["clean", "concat", "jshint:dist", "mxmlc", "chmod:dist"]);
+  grunt.registerTask("test",            ["connect", "qunit:file", "qunit:http"]);
 
   // Default task
   grunt.registerTask("default", ["validate", "build", "test"]);
+
   // Travis CI task
-  grunt.registerTask("travis",  ["validate", "build-travis", "test"]);
+  grunt.registerTask("travis",  ["validate", "build-travis", "test", "qunit:coveralls", "coveralls"]);
 
 };
