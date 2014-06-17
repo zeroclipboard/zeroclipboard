@@ -1675,5 +1675,5 @@
     window.ZeroClipboard = ZeroClipboard;
   }
 })(function() {
-  return this;
+  return this || window;
 }());

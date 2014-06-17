@@ -17,5 +17,5 @@ else {
 
 })((function() {
   /*jshint strict: false */
-  return this;
+  return this || window;
 })());
