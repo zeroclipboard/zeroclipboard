@@ -8,5 +8,10 @@
   "authors": <%= JSON.stringify(contributors) %>,
   "homepage": "<%= homepage %>",
   "repository": <%= JSON.stringify(repository) %>,
-  "location": "<%= repository.url.replace(/^https:\/\//, "git://") %>"
+  "location": "<%= repository.url.replace(/^https:\/\//, "git://") %>",
+  "ignore": [
+    "*",
+    "!/bower.json",
+    "!/dist/**"
+  ]
 }

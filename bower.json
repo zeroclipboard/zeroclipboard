@@ -8,5 +8,10 @@
   "authors": [{"name":"Jon Rohan","url":"http://jonrohan.me/"},{"name":"James M. Greene","email":"james.m.greene@gmail.com","url":"http://jamesgreene.net/"}],
   "homepage": "http://zeroclipboard.org/",
   "repository": {"type":"git","url":"https://github.com/zeroclipboard/zeroclipboard.git"},
-  "location": "git://github.com/zeroclipboard/zeroclipboard.git"
+  "location": "git://github.com/zeroclipboard/zeroclipboard.git",
+  "ignore": [
+    "*",
+    "!/bower.json",
+    "!/dist/**"
+  ]
 }
