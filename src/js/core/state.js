@@ -73,63 +73,6 @@ var _eventMessages = {
 
 
 /**
- * The presumed location of the "ZeroClipboard.swf" file, based on the location
- * of the executing JavaScript file (e.g. "ZeroClipboard.js", etc.).
- * @private
- */
-var _swfPath = (function() {
-  var i, jsDir, tmpJsPath, jsPath,
-      swfPath = "ZeroClipboard.swf";
-  // Try to leverage the `currentScript` feature
-  if (!(_document.currentScript && (jsPath = _document.currentScript.src))) {
-    // If it it not available, then seek the script out instead...
-    var scripts = _document.getElementsByTagName("script");
-    // If `script` elements have the `readyState` property in this browser
-    if ("readyState" in scripts[0]) {
-      for (i = scripts.length; i--; ) {
-        if (scripts[i].readyState === "interactive" && (jsPath = scripts[i].src)) {
-          // Do nothing, assignment occurred during condition
-          break;
-        }
-      }
-    }
-    // If the document is still parsing, then the last script in the document is the one that is currently loading
-    else if (_document.readyState === "loading") {
-      jsPath = scripts[scripts.length - 1].src;
-    }
-    // If every `script` has a `src` attribute AND they all come from the same directory
-    else {
-      for (i = scripts.length; i--; ) {
-        tmpJsPath = scripts[i].src;
-        if (!tmpJsPath) {
-          jsDir = null;
-          break;
-        }
-        tmpJsPath = tmpJsPath.split("#")[0].split("?")[0];
-        tmpJsPath = tmpJsPath.slice(0, tmpJsPath.lastIndexOf("/") + 1);
-        if (jsDir == null) {
-          jsDir = tmpJsPath;
-        }
-        else if (jsDir !== tmpJsPath) {
-          jsDir = null;
-          break;
-        }
-      }
-      if (jsDir !== null) {
-        jsPath = jsDir;
-      }
-    }
-    // Otherwise we cannot reliably know what script is executing....
-  }
-  if (jsPath) {
-    jsPath = jsPath.split("#")[0].split("?")[0];
-    swfPath = jsPath.slice(0, jsPath.lastIndexOf("/") + 1) + swfPath;
-  }
-  return swfPath;
-})();
-
-
-/**
  * ZeroClipboard configuration defaults for the Core module.
  * @private
  */
@@ -137,7 +80,7 @@ var _globalConfig = {
 
   // SWF URL, relative to the page. Default value will be "ZeroClipboard.swf"
   // under the same path as the ZeroClipboard JS file.
-  swfPath: _swfPath,
+  swfPath: _getDefaultSwfPath(),
 
   // SWF inbound scripting policy: page domains that the SWF should trust.
   // (single string, or array of strings)

@@ -12,7 +12,7 @@
  * Store references to critically important global functions that may be
  * overridden on certain web pages.
  */
-  var _window = window, _document = _window.document, _navigator = _window.navigator, _setTimeout = _window.setTimeout, _encodeURIComponent = _window.encodeURIComponent, _ActiveXObject = _window.ActiveXObject, _parseInt = _window.Number.parseInt || _window.parseInt, _parseFloat = _window.Number.parseFloat || _window.parseFloat, _isNaN = _window.Number.isNaN || _window.isNaN, _round = _window.Math.round, _now = _window.Date.now, _keys = _window.Object.keys, _defineProperty = _window.Object.defineProperty, _hasOwn = _window.Object.prototype.hasOwnProperty, _slice = _window.Array.prototype.slice;
+  var _window = window, _document = _window.document, _navigator = _window.navigator, _setTimeout = _window.setTimeout, _encodeURIComponent = _window.encodeURIComponent, _ActiveXObject = _window.ActiveXObject, _Error = _window.Error, _parseInt = _window.Number.parseInt || _window.parseInt, _parseFloat = _window.Number.parseFloat || _window.parseFloat, _isNaN = _window.Number.isNaN || _window.isNaN, _round = _window.Math.round, _now = _window.Date.now, _keys = _window.Object.keys, _defineProperty = _window.Object.defineProperty, _hasOwn = _window.Object.prototype.hasOwnProperty, _slice = _window.Array.prototype.slice;
   /**
  * Convert an `arguments` object into an Array.
  *
@@ -139,6 +139,125 @@
     return false;
   };
   /**
+ * Get the URL path's parent directory.
+ *
+ * @returns String or `undefined`
+ * @private
+ */
+  var _getDirPathOfUrl = function(url) {
+    var dir;
+    if (typeof url === "string" && url) {
+      dir = url.split("#")[0].split("?")[0];
+      dir = url.slice(0, url.lastIndexOf("/") + 1);
+    }
+    return dir;
+  };
+  /**
+ * Get the current script's URL by throwing an `Error` and analyzing it.
+ *
+ * @returns String or `undefined`
+ * @private
+ */
+  var _getCurrentScriptUrlFromErrorStack = function(stack) {
+    var url, matches;
+    if (typeof stack === "string" && stack) {
+      matches = stack.match(/^(?:|[^:@]*@|.+\)@(?=http[s]?|file)|.+?\s+(?: at |@)(?:[^:\(]+ )*[\(]?)((?:http[s]?|file):\/\/[\/]?.+?\/[^:\)]*?)(?::\d+)(?::\d+)?/);
+      if (matches && matches[1]) {
+        url = matches[1];
+      } else {
+        matches = stack.match(/\)@((?:http[s]?|file):\/\/[\/]?.+?\/[^:\)]*?)(?::\d+)(?::\d+)?/);
+        if (matches && matches[1]) {
+          url = matches[1];
+        }
+      }
+    }
+    return url;
+  };
+  /**
+ * Get the current script's URL by throwing an `Error` and analyzing it.
+ *
+ * @returns String or `undefined`
+ * @private
+ */
+  var _getCurrentScriptUrlFromError = function() {
+    var url, err;
+    try {
+      throw new _Error();
+    } catch (e) {
+      err = e;
+    }
+    if (err) {
+      url = err.sourceURL || err.fileName || _getCurrentScriptUrlFromErrorStack(err.stack);
+    }
+    return url;
+  };
+  /**
+ * Get the current script's URL.
+ *
+ * @returns String or `undefined`
+ * @private
+ */
+  var _getCurrentScriptUrl = function() {
+    var jsPath, scripts, i;
+    if (_document.currentScript && (jsPath = _document.currentScript.src)) {
+      return jsPath;
+    }
+    scripts = _document.getElementsByTagName("script");
+    if (scripts.length === 1) {
+      return scripts[0].src || undefined;
+    }
+    if ("readyState" in scripts[0]) {
+      for (i = scripts.length; i--; ) {
+        if (scripts[i].readyState === "interactive" && (jsPath = scripts[i].src)) {
+          return jsPath;
+        }
+      }
+    }
+    if (_document.readyState === "loading" && (jsPath = scripts[scripts.length - 1].src)) {
+      return jsPath;
+    }
+    if (jsPath = _getCurrentScriptUrlFromError()) {
+      return jsPath;
+    }
+    return undefined;
+  };
+  /**
+ * Get the unanimous parent directory of ALL script tags.
+ * If any script tags are either (a) inline or (b) from differing parent
+ * directories, this method must return `undefined`.
+ *
+ * @returns String or `undefined`
+ * @private
+ */
+  var _getUnanimousScriptParentDir = function() {
+    var i, jsDir, jsPath, scripts = _document.getElementsByTagName("script");
+    for (i = scripts.length; i--; ) {
+      if (!(jsPath = scripts[i].src)) {
+        jsDir = null;
+        break;
+      }
+      jsPath = _getDirPathOfUrl(jsPath);
+      if (jsDir == null) {
+        jsDir = jsPath;
+      } else if (jsDir !== jsPath) {
+        jsDir = null;
+        break;
+      }
+    }
+    return jsDir || undefined;
+  };
+  /**
+ * Get the presumed location of the "ZeroClipboard.swf" file, based on the location
+ * of the executing JavaScript file (e.g. "ZeroClipboard.js", etc.).
+ *
+ * @returns String
+ * @private
+ */
+  var _getDefaultSwfPath = function() {
+    var jsDir = _getDirPathOfUrl(_getCurrentScriptUrl()) || _getUnanimousScriptParentDir() || "";
+    return jsDir + "ZeroClipboard.swf";
+  };
+  /**
  * Keep track of the state of the Flash object.
  * @private
  */
@@ -194,55 +313,11 @@
     }
   };
   /**
- * The presumed location of the "ZeroClipboard.swf" file, based on the location
- * of the executing JavaScript file (e.g. "ZeroClipboard.js", etc.).
- * @private
- */
-  var _swfPath = function() {
-    var i, jsDir, tmpJsPath, jsPath, swfPath = "ZeroClipboard.swf";
-    if (!(_document.currentScript && (jsPath = _document.currentScript.src))) {
-      var scripts = _document.getElementsByTagName("script");
-      if ("readyState" in scripts[0]) {
-        for (i = scripts.length; i--; ) {
-          if (scripts[i].readyState === "interactive" && (jsPath = scripts[i].src)) {
-            break;
-          }
-        }
-      } else if (_document.readyState === "loading") {
-        jsPath = scripts[scripts.length - 1].src;
-      } else {
-        for (i = scripts.length; i--; ) {
-          tmpJsPath = scripts[i].src;
-          if (!tmpJsPath) {
-            jsDir = null;
-            break;
-          }
-          tmpJsPath = tmpJsPath.split("#")[0].split("?")[0];
-          tmpJsPath = tmpJsPath.slice(0, tmpJsPath.lastIndexOf("/") + 1);
-          if (jsDir == null) {
-            jsDir = tmpJsPath;
-          } else if (jsDir !== tmpJsPath) {
-            jsDir = null;
-            break;
-          }
-        }
-        if (jsDir !== null) {
-          jsPath = jsDir;
-        }
-      }
-    }
-    if (jsPath) {
-      jsPath = jsPath.split("#")[0].split("?")[0];
-      swfPath = jsPath.slice(0, jsPath.lastIndexOf("/") + 1) + swfPath;
-    }
-    return swfPath;
-  }();
-  /**
  * ZeroClipboard configuration defaults for the Core module.
  * @private
  */
   var _globalConfig = {
-    swfPath: _swfPath,
+    swfPath: _getDefaultSwfPath(),
     trustedDomains: window.location.host ? [ window.location.host ] : [],
     cacheBust: true,
     forceEnhancedClipboard: false,
