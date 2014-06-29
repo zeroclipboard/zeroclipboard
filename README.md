@@ -18,6 +18,10 @@ Due to browser and Flash security restrictions, this clipboard injection can _**
 the user clicks on the invisible Flash movie. A simulated `click` event from JavaScript will not
 suffice as this would enable [clipboard poisoning](http://www.computerworld.com/s/article/9117268/Adobe_patches_Flash_clickjacking_and_clipboard_poisoning_bugs).
 
+### Other Limitations
+
+For a complete list of limitations, see [docs/instructions.md#limitations](docs/instructions.md#limitations).
+
 
 ## Simple Example
 

@@ -17,6 +17,19 @@ Due to browser and Flash security restrictions, this clipboard injection can _**
 the user clicks on the invisible Flash movie. A simulated `click` event from JavaScript will not
 suffice as this would enable [clipboard poisoning](http://www.computerworld.com/s/article/9117268/Adobe_patches_Flash_clickjacking_and_clipboard_poisoning_bugs).
 
+### Synchronicity Required During `copy`
+
+If a handler of `copy` event intends to modify the pending data for clipboard
+injection, it _MUST_ operate synchronously in order to maintain the temporarily elevated
+permissions granted by the user's `click` event. The most common "gotcha" for this restriction is
+if someone wants to make an asynchronous XMLHttpRequest in response to the `copy` event to get the
+data to inject &mdash; this will not work. You must make it a _synchronous_ XMLHttpRequest instead, or do the
+work in advance before the `copy` event is fired.
+
+### OS-Specific Limitations
+
+See [OS Considerations](#os-considerations) below.
+
 
 ## Installation
 
@@ -390,6 +403,20 @@ decisions of how _your_ site should handle each of these situations.
           var text = document.getElementById('yourTextArea').value;
           var windowsText = text.replace(/\n/g, '\r\n');
           event.clipboardData.setData('text/plain', windowsText);
+      });
+      ```
+
+ - **Linux:**
+     - The Linux Clipboard system (a.k.a. "Selection Atoms" within the [X Consortium's Standard Inter-Client Communication Conventions Manual](http://www.x.org/docs/ICCCM/icccm.pdf)) is a complex but capable setup. However,
+     for normal end users, it stinks. Flash Player's Clipboard API can either:
+         1. Insert plain text into the "System Clipboard" and have it available everywhere; or
+         2. Insert plain, HTML, and RTF text into the "Desktop Clipboard" but it will only be available in applications whose UI are managed by the Desktop Manager System (e.g. GNOME, etc.). This, for example, means that a user on a typical Linux configuration would not be able to paste something copied with ZeroClipboard into a terminal shell but they may still be able to paste it into OpenOffice, the browser, etc.
+
+      As such, the default behavior for ZeroClipboard while running on Linux is to only inject plain text into the "System Clipboard" to cover the most bases.  If you want to ignore that caution and use the "Desktop Clipboard" anyway, just set the `forceEnhancedClipboard` configuration option to `true`, i.e.:
+
+      ```js
+      ZeroClipboard.config({
+        forceEnhancedClipboard: true
       });
       ```
 
