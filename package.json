@@ -70,10 +70,10 @@
     }
   },
   "spm": {
-    "main": "ZeroClipboard.js",
+    "main": "dist/ZeroClipboard.js",
     "output": [
-      "ZeroClipboard.swf",
-      "ZeroClipboard.Core.js"
+      "dist/ZeroClipboard.swf",
+      "dist/ZeroClipboard.Core.js"
     ]
   },
   "scripts": {
