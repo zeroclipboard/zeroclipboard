@@ -19,4 +19,23 @@ var _window = window,
     _keys = _window.Object.keys,
     _defineProperty = _window.Object.defineProperty,
     _hasOwn = _window.Object.prototype.hasOwnProperty,
-    _slice = _window.Array.prototype.slice;
+    _slice = _window.Array.prototype.slice,
+    _unwrap = (function() {
+      var unwrapper = function(el) {
+        return el;
+      };
+      // For Polymer
+      if (typeof _window.wrap === "function" && typeof _window.unwrap === "function") {
+        try {
+          var div = _document.createElement("div");
+          var unwrappedDiv = _window.unwrap(div);
+          if (div.nodeType === 1 && unwrappedDiv && unwrappedDiv.nodeType === 1) {
+            unwrapper = _window.unwrap;
+          }
+        }
+        catch (e) {
+          // Some unreliable `window.unwrap` function is exposed
+        }
+      }
+      return unwrapper;
+    })();

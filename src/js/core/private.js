@@ -983,7 +983,7 @@ var _embedSwf = function() {
     // on the ZeroClipboard-owned "object" element. This will help us
     // easily avoid issues with AMD/CommonJS loaders that don't have
     // a global `ZeroClipboard` reliably available.
-    flashBridge.ZeroClipboard = ZeroClipboard;
+    _unwrap(flashBridge).ZeroClipboard = ZeroClipboard;
 
     // NOTE: Using `replaceChild` is very important!
     // - https://github.com/swfobject/swfobject/blob/562fe358216edbb36445aa62f817c1a56252950c/swfobject/src/swfobject.js
