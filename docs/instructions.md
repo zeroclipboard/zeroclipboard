@@ -33,25 +33,25 @@ See [OS Considerations](#os-considerations) below.
 
 ## Installation
 
-### [NPM](https://www.npmjs.org/)
+### [NPM](https://www.npmjs.org/) [![NPM version](https://badge.fury.io/js/zeroclipboard.png)](https://www.npmjs.org/package/zeroclipboard)
 
 ```shell
 npm install zeroclipboard
 ```
 
-### [Bower](http://bower.io/)
+### [Bower](http://bower.io/) [![Bower version](https://badge.fury.io/bo/zeroclipboard.png)](http://bower.io/search/?q=zeroclipboard)
 
 ```shell
 bower install zeroclipboard
 ```
 
-### [SPM](http://spmjs.io/)
+### [SPM](http://spmjs.io/) [![SPM version](http://spmjs.io/badge/zeroclipboard)](http://spmjs.io/package/zeroclipboard)
 
 ```shell
 spm install zeroclipboard
 ```
 
-### [PHP Composer](https://getcomposer.org/)
+### [PHP Composer](https://getcomposer.org/) [![PHP version](https://badge.fury.io/ph/zeroclipboard%2Fzeroclipboard.svg)](https://packagist.org/packages/zeroclipboard/zeroclipboard)
 
 For any PHP Composer users, ZeroClipboard is also [available on Packagist](https://packagist.org/packages/zeroclipboard/zeroclipboard).
 
