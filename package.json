@@ -57,8 +57,8 @@
     "grunt-mxmlc": "^0.5.1",
     "grunt-qunit-istanbul": "^0.4.5",
     "grunt-template": "^0.2.3",
-    "jquery": "^1.11.1",
-    "load-grunt-tasks": "^0.5.0",
+    "jquery": "^2.1.1",
+    "load-grunt-tasks": "^0.6.0",
     "qunit-composite": "^1.0.1",
     "qunitjs": "^1.14.0",
     "spm": "^3.0.1"
