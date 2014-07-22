@@ -346,7 +346,7 @@ if (/MSIE|Trident/.test(window.navigator.userAgent)) {
 ```js
 if (/MSIE|Trident/.test(window.navigator.userAgent)) {
   (function($) {
-    var zcClass = ZeroClipboard.config('containerClass');
+    var zcClass = '.' + ZeroClipboard.config('containerClass');
     var proto = $.fn.modal.Constructor.prototype;
     proto.enforceFocus = function() {
       $(document)
@@ -375,7 +375,7 @@ if (/MSIE|Trident/.test(window.navigator.userAgent)) {
 ```js
 if (/MSIE|Trident/.test(window.navigator.userAgent)) {
   (function($) {
-    var zcClass = ZeroClipboard.config('containerClass');
+    var zcClass = '.' + ZeroClipboard.config('containerClass');
     $.widget( 'ui.dialog', $.ui.dialog, {
       _allowInteraction: function( event ) {
         return this._super(event) || $( event.target ).closest( zcClass ).length;
