@@ -330,6 +330,19 @@ If using [CommonJS](http://wiki.commonjs.org/wiki/Modules/1.1) with a library su
    changes in future versions of Bootstrap.
  - **Workaround:** _Targeted against [Bootstrap v3.x](https://github.com/twbs/bootstrap/blob/96a9e1bae06cb21f8cf72ec528b8e31b6ab27272/js/modal.js#L115-123)._
 
+#### Workaround A
+
+```js
+if (/MSIE|Trident/.test(window.navigator.userAgent)) {
+  (function($) {
+    var zcContainerId = ZeroClipboard.config('containerId');
+    $('#' + zcContainerId).on('focusin', false);
+  })(window.jQuery);
+}
+```
+
+#### Workaround B
+
 ```js
 if (/MSIE|Trident/.test(window.navigator.userAgent)) {
   (function($) {
