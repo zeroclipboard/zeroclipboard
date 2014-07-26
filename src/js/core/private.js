@@ -446,7 +446,7 @@ var _isValidHtml4Id = function(id) {
  * @private
  */
 var _createEvent = function(event) {
-  /*jshint maxstatements:28 */
+  /*jshint maxstatements:30 */
 
   var eventType;
   if (typeof event === "string" && event) {
@@ -463,6 +463,10 @@ var _createEvent = function(event) {
   }
 
   // Sanitize the event type and set the `target` and `relatedTarget` properties if not already set
+  if (!event.target && /^(copy|aftercopy|_click)$/.test(eventType.toLowerCase())) {
+    event.target = _copyTarget;
+  }
+
   _extend(event, {
     type: eventType.toLowerCase(),
     target: event.target || _currentElement || null,
@@ -722,6 +726,10 @@ var _preprocessEvent = function(event) {
       });
       break;
 
+    case "beforecopy":
+      _copyTarget = element;
+      break;
+
     case "copy":
       var textContent,
           htmlContent,
@@ -825,6 +833,13 @@ var _preprocessEvent = function(event) {
       break;
 
     case "_click":
+      _copyTarget = null;
+
+      if (_globalConfig.bubbleEvents === true && sourceIsSwf) {
+        _fireMouseEvent(_extend({}, event, { type: event.type.slice(1) }));
+      }
+      break;
+
     case "_mousemove":
       if (_globalConfig.bubbleEvents === true && sourceIsSwf) {
         _fireMouseEvent(_extend({}, event, { type: event.type.slice(1) }));

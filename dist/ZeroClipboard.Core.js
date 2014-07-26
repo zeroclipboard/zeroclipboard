@@ -303,6 +303,11 @@
  */
   var _currentElement;
   /**
+ * Keep track of the element that was activated when a `copy` process started.
+ * @private
+ */
+  var _copyTarget;
+  /**
  * Keep track of data for the pending clipboard transaction.
  * @private
  */
@@ -678,6 +683,9 @@
     if (!eventType) {
       return;
     }
+    if (!event.target && /^(copy|aftercopy|_click)$/.test(eventType.toLowerCase())) {
+      event.target = _copyTarget;
+    }
     _extend(event, {
       type: eventType.toLowerCase(),
       target: event.target || _currentElement || null,
@@ -875,6 +883,10 @@
       });
       break;
 
+     case "beforecopy":
+      _copyTarget = element;
+      break;
+
      case "copy":
       var textContent, htmlContent, targetEl = event.relatedTarget;
       if (!(_clipData["text/html"] || _clipData["text/plain"]) && targetEl && (htmlContent = targetEl.value || targetEl.outerHTML || targetEl.innerHTML) && (textContent = targetEl.value || targetEl.textContent || targetEl.innerText)) {
@@ -947,6 +959,14 @@
       break;
 
      case "_click":
+      _copyTarget = null;
+      if (_globalConfig.bubbleEvents === true && sourceIsSwf) {
+        _fireMouseEvent(_extend({}, event, {
+          type: event.type.slice(1)
+        }));
+      }
+      break;
+
      case "_mousemove":
       if (_globalConfig.bubbleEvents === true && sourceIsSwf) {
         _fireMouseEvent(_extend({}, event, {

@@ -1,4 +1,4 @@
-/*global _flashState:true, _extend, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _extractDomain, _determineScriptAccess, _mapClipDataToFlash, _mapClipResultsFromFlash, _createEvent, _getRelatedTarget, _shouldPerformAsync, _dispatchCallback, _detectFlashSupport */
+/*global _flashState:true, _currentElement:true, _copyTarget:true, _extend, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _extractDomain, _determineScriptAccess, _mapClipDataToFlash, _mapClipResultsFromFlash, _createEvent, _preprocessEvent, _getRelatedTarget, _shouldPerformAsync, _dispatchCallback, _detectFlashSupport */
 
 (function(module, test) {
   "use strict";
@@ -312,6 +312,76 @@
     assert.strictEqual(actual.type, "ready", "Object has a `type` property of 'ready'");
 
     // etc.
+  });
+
+
+  // Tests fix for: https://github.com/zeroclipboard/zeroclipboard/issues/467
+  test("`_copyTarget` element is handled appropriately", function(assert) {
+    assert.expect(18);
+
+    // Arrange
+    var el1 = $("#d_clip_button")[0];
+    var el2 = $("#goodTargetId")[0];
+    _currentElement = el1;
+    _copyTarget = null;
+
+    // Act
+    var evt = _createEvent("beforecopy");
+    _preprocessEvent(evt);
+
+    // Assert
+    assert.strictEqual(_currentElement, el1, "`_currentElement` is 'el1'");
+    assert.strictEqual(_copyTarget, el1, "`_copyTarget` is 'el1'");
+    assert.strictEqual(evt.target, el1, "`beforecopy` target is 'el1'");
+
+    // Act some more
+    _currentElement = el2;
+    evt = _createEvent("copy");
+    _preprocessEvent(evt);
+
+    // Assert some more
+    assert.strictEqual(_currentElement, el2, "`_currentElement` is 'el2'");
+    assert.strictEqual(_copyTarget, el1, "`_copyTarget` is 'el1'");
+    assert.strictEqual(evt.target, el1, "`copy` target is 'el1'");
+
+    // Act some more: interruption due to mouse movement (only happens in Firefox,
+    // though similar issues occur in Chrome for Windows if the user clicks on
+    // another clipped element)
+    evt = _createEvent("_mouseover");
+    _preprocessEvent(evt);
+
+    // Assert some more
+    assert.strictEqual(_currentElement, el2, "`_currentElement` is 'el2'");
+    assert.strictEqual(_copyTarget, el1, "`_copyTarget` is 'el1'");
+    assert.strictEqual(evt.target, el2, "`_mouseover` target is 'el2'");
+
+    // Act some more
+    evt = _createEvent("aftercopy");
+    _preprocessEvent(evt);
+
+    // Assert some more
+    assert.strictEqual(_currentElement, el2, "`_currentElement` is 'el2'");
+    assert.strictEqual(_copyTarget, el1, "`_copyTarget` is 'el1'");
+    assert.strictEqual(evt.target, el1, "`aftercopy` target is 'el1'");
+
+    // Act some more
+    evt = _createEvent("_click");
+
+    // Assert some more
+    assert.strictEqual(_currentElement, el2, "`_currentElement` is 'el2'");
+    assert.strictEqual(_copyTarget, el1, "`_copyTarget` is 'el1'");
+    assert.strictEqual(evt.target, el1, "`_click` target is 'el1'");
+
+    // Act some more
+    _preprocessEvent(evt);
+
+    // Assert some more
+    assert.strictEqual(_currentElement, el2, "`_currentElement` is 'el2'");
+    assert.strictEqual(_copyTarget, null, "`_copyTarget` is `null`");
+    assert.strictEqual(evt.target, el1, "`_click` target is 'el1'");
+
+    // Reset
+    _currentElement = _copyTarget = el1 = el2 = null;
   });
 
 

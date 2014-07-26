@@ -31,6 +31,15 @@
         __flash__addCallback = null,
         __flash__removeCallback = null,
         __flash__request = null;
+
+    // Provide a shell of the `ZeroClipboard` object to pass through a few tests
+    var ZeroClipboard = {
+      setData: function() {},
+      clearData: function() {},
+      focus: function(el) {
+        _currentElement = el;
+      }
+    };
   </script>
   <script src="../../src/js/shared/state.js"></script>
   <script src="../../src/js/shared/private.js"></script>

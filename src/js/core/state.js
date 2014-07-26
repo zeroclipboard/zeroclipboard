@@ -43,6 +43,13 @@ var _currentElement;
 
 
 /**
+ * Keep track of the element that was activated when a `copy` process started.
+ * @private
+ */
+var _copyTarget;
+
+
+/**
  * Keep track of data for the pending clipboard transaction.
  * @private
  */
