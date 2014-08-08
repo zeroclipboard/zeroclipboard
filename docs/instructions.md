@@ -85,6 +85,22 @@ tag):
 ZeroClipboard.config( { swfPath: "http://YOURSERVER/path/ZeroClipboard.swf" } );
 ```
 
+#### Using the minified library
+If you intend use the minified version of ZeroClipboard, you may also wish to include the sourcemap to be able to debug as unminified Javascript in your browser dev tools.
+For example:
+```html
+<script type="text/javascript" src="ZeroClipboard.min.js"></script>
+<script type="text/javascript" src="ZeroClipboard.min.map"></script>
+```
+The sourcemap is not required for normal operation and typically will not be requested by the browser unless the dev tools are open. If you **_do not_** include the sourcemap you may see warnings in your Javascript console.
+Safari
+```javascript
+[Error] Failed to load resource: the server responded with a status of 404 (Not Found) (ZeroClipboard.min.map, line 0)
+```
+Firefox
+```
+http://YOURSERVER/path/ZeroClipboard.min.js is being assigned a //# sourceMappingURL, but already has one
+```
 
 ## Clients
 
