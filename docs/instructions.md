@@ -85,26 +85,33 @@ tag):
 ZeroClipboard.config( { swfPath: "http://YOURSERVER/path/ZeroClipboard.swf" } );
 ```
 
-#### Using the minified library
-If you intend to use the minified version of ZeroClipboard, you may also wish to include the sourcemap to be able to debug as unminified Javascript in your browser dev tools.
-The following example demonstrates including the sourcemap:
-```html
-<script type="text/javascript" src="ZeroClipboard.min.js"></script>
-<script type="text/javascript" src="ZeroClipboard.min.map"></script>
-```
-The sourcemap is not required for normal operation and typically will not be requested by the browser unless the dev tools are open. If you **_do not_** include the sourcemap you may see warnings in your Javascript console.
+### Using the Minified Library
+If you intend to use the minified version of ZeroClipboard, you will likely also want to do one of the following two things:
+ 1. Include the SourceMap file in the same hosted directory in order to be able to debug as unminified JavaScript in your browser dev tools.
+ 2. Open the "ZeroClipboard.min.js" file and remove the last line. It is a comment that begins with `//# sourceMappingURL=`. Removing this line will prevent the browsers' dev tools from requesting the file.
 
-_JavaScript console in Safari_
-```javascript
+#### SourceMap Error Messages
+The SourceMap is not _required_ for normal operation and typically will not be requested by the browser unless the dev tools are open. If you _**do NOT**_ include the SourceMap in your hosted directory [or remove the `sourceMappingURL` comment], then you may see a variety of confusing warnings in your dev tools' JavaScript console:
+
+##### Safari
+```
 [Error] Failed to load resource: the server responded with a status of 404 (Not Found) (ZeroClipboard.min.map, line 0)
 ```
 
-_JavaScript console in Firefox_
-```javascript
+##### Firefox
+```
 http://YOURSERVER/path/ZeroClipboard.min.js is being assigned a //# sourceMappingURL, but already has one
 ```
 
-You may not see any message in Chrome
+##### Chrome
+You may not see any error message in Chrome's console. However, you will likely see 404 responses in the Network tab, e.g.
+```
+ZeroClipboard.min.map   404 (Not Found)
+```
+
+##### IE
+You will likely see an error message in the Debugger tab.
+
 
 ## Clients
 
