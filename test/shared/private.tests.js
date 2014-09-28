@@ -296,7 +296,7 @@
           keys = [];
       if (obj) {
         for (prop in obj) {
-          if (!obj.hasOwnProperty(prop)) {
+          if (obj.hasOwnProperty(prop) === false) {
             keys.push(prop);
           }
         }
