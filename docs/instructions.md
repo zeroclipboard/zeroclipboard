@@ -87,7 +87,7 @@ ZeroClipboard.config( { swfPath: "http://YOURSERVER/path/ZeroClipboard.swf" } );
 
 ### Using the Minified Library
 If you intend to use the minified version of ZeroClipboard, you will likely also want to do one of the following two things:
- 1. Include the SourceMap file in the same hosted directory in order to be able to debug as unminified JavaScript in your browser dev tools.
+ 1. Include the SourceMap file ("ZeroClipboard.min.map") in the same hosted directory in order to be able to debug as unminified JavaScript in your browser dev tools.
  2. Open the "ZeroClipboard.min.js" file and remove the last line. It is a comment that begins with `//# sourceMappingURL=`. Removing this line will prevent the browsers' dev tools from requesting the file.
 
 #### SourceMap Error Messages
