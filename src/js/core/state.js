@@ -62,6 +62,12 @@ var _clipData = {};
  */
 var _clipDataFormatMap = null;
 
+/**
+ * Keep track of the flash availability check timeout
+ * @private
+ */
+var _flashCheckTimeout = 0;
+
 
 /**
  * The `message` store for events

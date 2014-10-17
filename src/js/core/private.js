@@ -243,7 +243,7 @@ var _create = function() {
   if (!ZeroClipboard.isFlashUnusable() && _flashState.bridge === null) {
     var maxWait = _globalConfig.flashLoadTimeout;
     if (typeof maxWait === "number" && maxWait >= 0) {
-      _setTimeout(function() {
+      _flashCheckTimeout = _setTimeout(function() {
         // If it took longer than `_globalConfig.flashLoadTimeout` milliseconds to receive
         // a `ready` event, so consider Flash "deactivated".
         if (typeof _flashState.deactivated !== "boolean") {
@@ -1065,6 +1065,10 @@ var _unembedSwf = function() {
         }
       }
     }
+
+    // Remove the availability checking timeout, as it triggers deactivated after destroy.
+    _clearTimeout(_flashCheckTimeout);
+    _flashCheckTimeout = 0;
 
     _flashState.ready = null;
     _flashState.bridge = null;
