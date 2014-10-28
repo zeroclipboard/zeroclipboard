@@ -127,7 +127,7 @@ _[`HTMLElement` or `null`]_ Return the currently "activated" element that the Fl
 _[`Object`]_ Diagnostic method that describes the state of the browser, Flash Player, and ZeroClipboard.
 
 
-#### `ZeroClipboard.isFlashUnavailable()`
+#### `ZeroClipboard.isFlashUnusable()`
 
 _[`Boolean`]_ Indicates if Flash Player is **definitely** unusable (disabled, outdated, unavailable, or deactivated). _**IMPORTANT:**_ This method should be considered private.
 
