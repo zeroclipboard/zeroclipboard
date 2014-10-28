@@ -70,10 +70,17 @@ var _clipData = {};
 var _clipDataFormatMap = null;
 
 /**
- * Keep track of the flash availability check timeout
+ * Keep track of the Flash availability check timeout.
  * @private
  */
 var _flashCheckTimeout = 0;
+
+
+/**
+ * Keep track of SWF network errors interval polling.
+ * @private
+ */
+var _swfFallbackCheckInterval = 0;
 
 
 /**
@@ -87,11 +94,12 @@ var _eventMessages = {
     "flash-outdated": "Flash is too outdated to support ZeroClipboard",
     "flash-unavailable": "Flash is unable to communicate bidirectionally with JavaScript",
     "flash-degraded": "Flash is unable to preserve data fidelity when communicating with JavaScript",
-    "flash-deactivated": "Flash is too outdated for your browser and/or is configured as click-to-activate",
+    "flash-deactivated": "Flash is too outdated for your browser and/or is configured as click-to-activate.\nThis may also mean that the ZeroClipboard SWF object could not be loaded, so please check your `swfPath` configuration and/or network connectivity.",
     "flash-overdue": "Flash communication was established but NOT within the acceptable time limit",
     "version-mismatch": "ZeroClipboard JS version number does not match ZeroClipboard SWF version number",
     "clipboard-error": "At least one error was thrown while ZeroClipboard was attempting to inject your data into the clipboard",
-    "config-mismatch": "ZeroClipboard configuration does not match Flash's reality"
+    "config-mismatch": "ZeroClipboard configuration does not match Flash's reality",
+    "swf-not-found": "The ZeroClipboard SWF object could not be loaded, so please check your `swfPath` configuration and/or network connectivity"
   }
 };
 

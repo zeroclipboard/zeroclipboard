@@ -12,7 +12,7 @@
  * Store references to critically important global functions that may be
  * overridden on certain web pages.
  */
-  var _window = window, _document = _window.document, _navigator = _window.navigator, _setTimeout = _window.setTimeout, _clearTimeout = _window.clearTimeout, _encodeURIComponent = _window.encodeURIComponent, _ActiveXObject = _window.ActiveXObject, _Error = _window.Error, _parseInt = _window.Number.parseInt || _window.parseInt, _parseFloat = _window.Number.parseFloat || _window.parseFloat, _isNaN = _window.Number.isNaN || _window.isNaN, _now = _window.Date.now, _keys = _window.Object.keys, _defineProperty = _window.Object.defineProperty, _hasOwn = _window.Object.prototype.hasOwnProperty, _slice = _window.Array.prototype.slice, _unwrap = function() {
+  var _window = window, _document = _window.document, _navigator = _window.navigator, _setTimeout = _window.setTimeout, _clearTimeout = _window.clearTimeout, _setInterval = _window.setInterval, _clearInterval = _window.clearInterval, _getComputedStyle = _window.getComputedStyle, _encodeURIComponent = _window.encodeURIComponent, _ActiveXObject = _window.ActiveXObject, _Error = _window.Error, _parseInt = _window.Number.parseInt || _window.parseInt, _parseFloat = _window.Number.parseFloat || _window.parseFloat, _isNaN = _window.Number.isNaN || _window.isNaN, _now = _window.Date.now, _keys = _window.Object.keys, _defineProperty = _window.Object.defineProperty, _hasOwn = _window.Object.prototype.hasOwnProperty, _slice = _window.Array.prototype.slice, _unwrap = function() {
     var unwrapper = function(el) {
       return el;
     };
@@ -323,10 +323,15 @@
  */
   var _clipDataFormatMap = null;
   /**
- * Keep track of the flash availability check timeout
+ * Keep track of the Flash availability check timeout.
  * @private
  */
   var _flashCheckTimeout = 0;
+  /**
+ * Keep track of SWF network errors interval polling.
+ * @private
+ */
+  var _swfFallbackCheckInterval = 0;
   /**
  * The `message` store for events
  * @private
@@ -338,11 +343,12 @@
       "flash-outdated": "Flash is too outdated to support ZeroClipboard",
       "flash-unavailable": "Flash is unable to communicate bidirectionally with JavaScript",
       "flash-degraded": "Flash is unable to preserve data fidelity when communicating with JavaScript",
-      "flash-deactivated": "Flash is too outdated for your browser and/or is configured as click-to-activate",
+      "flash-deactivated": "Flash is too outdated for your browser and/or is configured as click-to-activate.\nThis may also mean that the ZeroClipboard SWF object could not be loaded, so please check your `swfPath` configuration and/or network connectivity.",
       "flash-overdue": "Flash communication was established but NOT within the acceptable time limit",
       "version-mismatch": "ZeroClipboard JS version number does not match ZeroClipboard SWF version number",
       "clipboard-error": "At least one error was thrown while ZeroClipboard was attempting to inject your data into the clipboard",
-      "config-mismatch": "ZeroClipboard configuration does not match Flash's reality"
+      "config-mismatch": "ZeroClipboard configuration does not match Flash's reality",
+      "swf-not-found": "The ZeroClipboard SWF object could not be loaded, so please check your `swfPath` configuration and/or network connectivity"
     }
   };
   /**
@@ -903,8 +909,7 @@
           ready: false
         });
       }
-      _clearTimeout(_flashCheckTimeout);
-      _flashCheckTimeout = 0;
+      _clearTimeoutsAndPolling();
       break;
 
      case "ready":
@@ -919,8 +924,7 @@
         overdue: wasDeactivated,
         ready: !wasDeactivated
       });
-      _clearTimeout(_flashCheckTimeout);
-      _flashCheckTimeout = 0;
+      _clearTimeoutsAndPolling();
       break;
 
      case "beforecopy":
@@ -1068,6 +1072,40 @@
     }
   };
   /**
+ * Continuously poll the DOM until either:
+ *  (a) the fallback content becomes visible, or
+ *  (b) we receive an event from SWF (handled elsewhere)
+ *
+ * IMPORTANT:
+ * This is NOT a necessary check but it can result in significantly faster
+ * detection of bad `swfPath` configuration and/or network/server issues [in
+ * supported browsers] than waiting for the entire `flashLoadTimeout` duration
+ * to elapse before detecting that the SWF cannot be loaded. The detection
+ * duration can be anywhere from 10-30 times faster [in supported browsers] by
+ * using this approach.
+ *
+ * @returns `undefined`
+ * @private
+ */
+  var _watchForSwfFallbackContent = function() {
+    var maxWait = _globalConfig.flashLoadTimeout;
+    if (typeof maxWait === "number" && maxWait >= 0) {
+      var pollWait = Math.min(1e3, maxWait / 10);
+      var fallbackContentId = _globalConfig.swfObjectId + "_fallbackContent";
+      _swfFallbackCheckInterval = _setInterval(function() {
+        var el = _document.getElementById(fallbackContentId);
+        if (_isElementVisible(el)) {
+          _clearTimeoutsAndPolling();
+          _flashState.deactivated = null;
+          ZeroClipboard.emit({
+            type: "error",
+            name: "swf-not-found"
+          });
+        }
+      }, pollWait);
+    }
+  };
+  /**
  * Create the HTML bridge element to embed the Flash object into.
  * @private
  */
@@ -1114,12 +1152,13 @@
       container.appendChild(divToBeReplaced);
       _document.body.appendChild(container);
       var tmpDiv = _document.createElement("div");
-      var oldIE = _flashState.pluginType === "activex";
-      tmpDiv.innerHTML = '<object id="' + _globalConfig.swfObjectId + '" name="' + _globalConfig.swfObjectId + '" ' + 'width="100%" height="100%" ' + (oldIE ? 'classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"' : 'type="application/x-shockwave-flash" data="' + swfUrl + '"') + ">" + (oldIE ? '<param name="movie" value="' + swfUrl + '"/>' : "") + '<param name="allowScriptAccess" value="' + allowScriptAccess + '"/>' + '<param name="allowNetworking" value="' + allowNetworking + '"/>' + '<param name="menu" value="false"/>' + '<param name="wmode" value="transparent"/>' + '<param name="flashvars" value="' + flashvars + '"/>' + "</object>";
+      var usingActiveX = _flashState.pluginType === "activex";
+      tmpDiv.innerHTML = '<object id="' + _globalConfig.swfObjectId + '" name="' + _globalConfig.swfObjectId + '" ' + 'width="100%" height="100%" ' + (usingActiveX ? 'classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"' : 'type="application/x-shockwave-flash" data="' + swfUrl + '"') + ">" + (usingActiveX ? '<param name="movie" value="' + swfUrl + '"/>' : "") + '<param name="allowScriptAccess" value="' + allowScriptAccess + '"/>' + '<param name="allowNetworking" value="' + allowNetworking + '"/>' + '<param name="menu" value="false"/>' + '<param name="wmode" value="transparent"/>' + '<param name="flashvars" value="' + flashvars + '"/>' + '<div id="' + _globalConfig.swfObjectId + '_fallbackContent">&nbsp;</div>' + "</object>";
       flashBridge = tmpDiv.firstChild;
       tmpDiv = null;
       _unwrap(flashBridge).ZeroClipboard = ZeroClipboard;
       container.replaceChild(flashBridge, divToBeReplaced);
+      _watchForSwfFallbackContent();
     }
     if (!flashBridge) {
       flashBridge = _document[_globalConfig.swfObjectId];
@@ -1170,8 +1209,7 @@
           }
         }
       }
-      _clearTimeout(_flashCheckTimeout);
-      _flashCheckTimeout = 0;
+      _clearTimeoutsAndPolling();
       _flashState.ready = null;
       _flashState.bridge = null;
       _flashState.deactivated = null;
@@ -1481,7 +1519,7 @@
  * @private
  */
   var _getStyle = function(el, prop) {
-    var value = _window.getComputedStyle(el, null).getPropertyValue(prop);
+    var value = _getComputedStyle(el, null).getPropertyValue(prop);
     if (prop === "cursor") {
       if (!value || value === "auto") {
         if (el.nodeName === "A") {
@@ -1524,6 +1562,38 @@
       pos.height = "height" in elRect ? elRect.height : elRect.bottom - elRect.top;
     }
     return pos;
+  };
+  /**
+ * Determine is an element is visible somewhere within the document (page).
+ *
+ * @returns Boolean
+ * @private
+ */
+  var _isElementVisible = function(el) {
+    if (!el) {
+      return false;
+    }
+    var styles = _getComputedStyle(el, null);
+    var hasCssHeight = _parseFloat(styles.height) > 0;
+    var hasCssWidth = _parseFloat(styles.width) > 0;
+    var hasCssTop = _parseFloat(styles.top) >= 0;
+    var hasCssLeft = _parseFloat(styles.left) >= 0;
+    var cssKnows = hasCssHeight && hasCssWidth && hasCssTop && hasCssLeft;
+    var rect = cssKnows ? null : _getElementPosition(el);
+    var isVisible = styles.display !== "none" && styles.visibility !== "collapse" && (cssKnows || !!rect && (hasCssHeight || rect.height > 0) && (hasCssWidth || rect.width > 0) && (hasCssTop || rect.top >= 0) && (hasCssLeft || rect.left >= 0));
+    return isVisible;
+  };
+  /**
+ * Clear all existing timeouts and interval polling delegates.
+ *
+ * @returns `undefined`
+ * @private
+ */
+  var _clearTimeoutsAndPolling = function() {
+    _clearTimeout(_flashCheckTimeout);
+    _flashCheckTimeout = 0;
+    _clearInterval(_swfFallbackCheckInterval);
+    _swfFallbackCheckInterval = 0;
   };
   /**
  * Reposition the Flash object to cover the currently activated element.

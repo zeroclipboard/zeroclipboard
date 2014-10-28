@@ -744,9 +744,8 @@ var _preprocessEvent = function(event) {
         });
       }
 
-      // Remove the availability checking timeout for cleanliness
-      _clearTimeout(_flashCheckTimeout);
-      _flashCheckTimeout = 0;
+      // Remove for cleanliness
+      _clearTimeoutsAndPolling();
 
       break;
 
@@ -764,9 +763,8 @@ var _preprocessEvent = function(event) {
         ready:       !wasDeactivated
       });
 
-      // Remove the availability checking timeout for cleanliness
-      _clearTimeout(_flashCheckTimeout);
-      _flashCheckTimeout = 0;
+      // Remove for cleanliness
+      _clearTimeoutsAndPolling();
 
       break;
 
@@ -975,6 +973,45 @@ var _fireMouseEvent = function(event) {
 
 
 /**
+ * Continuously poll the DOM until either:
+ *  (a) the fallback content becomes visible, or
+ *  (b) we receive an event from SWF (handled elsewhere)
+ *
+ * IMPORTANT:
+ * This is NOT a necessary check but it can result in significantly faster
+ * detection of bad `swfPath` configuration and/or network/server issues [in
+ * supported browsers] than waiting for the entire `flashLoadTimeout` duration
+ * to elapse before detecting that the SWF cannot be loaded. The detection
+ * duration can be anywhere from 10-30 times faster [in supported browsers] by
+ * using this approach.
+ *
+ * @returns `undefined`
+ * @private
+ */
+var _watchForSwfFallbackContent = function() {
+  var maxWait = _globalConfig.flashLoadTimeout;
+  if (typeof maxWait === "number" && maxWait >= 0) {
+    var pollWait = Math.min(1000, (maxWait / 10));
+    var fallbackContentId = _globalConfig.swfObjectId + "_fallbackContent";
+    _swfFallbackCheckInterval = _setInterval(function() {
+      // If the fallback content is showing, the SWF failed to load
+      // NOTE: Only works in Firefox and IE10 (specifically; not IE9, not IE11... o_O)
+      var el = _document.getElementById(fallbackContentId);
+      if (_isElementVisible(el)) {
+        // Remove the polling checks immediately
+        _clearTimeoutsAndPolling();
+
+        // Do NOT count a missing SWF as a Flash deactivation
+        _flashState.deactivated = null;
+
+        ZeroClipboard.emit({ "type": "error", "name": "swf-not-found" });
+      }
+    }, pollWait);
+  }
+};
+
+
+/**
  * Create the HTML bridge element to embed the Flash object into.
  * @private
  */
@@ -1012,6 +1049,8 @@ var _getHtmlBridge = function(flashBridge) {
  * @private
  */
 var _embedSwf = function() {
+  /*jshint maxstatements:26 */
+
   var len,
       flashBridge = _flashState.bridge,
       container = _getHtmlBridge(flashBridge);
@@ -1043,19 +1082,20 @@ var _embedSwf = function() {
     // Hybrid of Flash Satay markup is from Ambience:
     //  - Flash Satay version:  http://alistapart.com/article/flashsatay
     //  - Ambience version:     http://www.ambience.sk/flash-valid.htm
-    var oldIE = _flashState.pluginType === "activex";
+    var usingActiveX = _flashState.pluginType === "activex";
     /*jshint quotmark:single */
     tmpDiv.innerHTML =
       '<object id="' + _globalConfig.swfObjectId + '" name="' + _globalConfig.swfObjectId + '" ' +
         'width="100%" height="100%" ' +
-        (oldIE ? 'classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"' : 'type="application/x-shockwave-flash" data="' + swfUrl + '"') +
+        (usingActiveX ? 'classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"' : 'type="application/x-shockwave-flash" data="' + swfUrl + '"') +
       '>' +
-        (oldIE ? '<param name="movie" value="' + swfUrl + '"/>' : '') +
+        (usingActiveX ? '<param name="movie" value="' + swfUrl + '"/>' : '') +
         '<param name="allowScriptAccess" value="' + allowScriptAccess + '"/>' +
         '<param name="allowNetworking" value="' + allowNetworking + '"/>' +
         '<param name="menu" value="false"/>' +
         '<param name="wmode" value="transparent"/>' +
         '<param name="flashvars" value="' + flashvars + '"/>' +
+        '<div id="' + _globalConfig.swfObjectId + '_fallbackContent">&nbsp;</div>' +
       '</object>';
     /*jshint quotmark:double */
     flashBridge = tmpDiv.firstChild;
@@ -1071,6 +1111,9 @@ var _embedSwf = function() {
     // - https://github.com/swfobject/swfobject/blob/562fe358216edbb36445aa62f817c1a56252950c/swfobject/src/swfobject.js
     // - http://pipwerks.com/2011/05/30/using-the-object-element-to-dynamically-embed-flash-swfs-in-internet-explorer/
     container.replaceChild(flashBridge, divToBeReplaced);
+
+    // Watch the DOM for the fallback content to become visible, indicating a SWF load failure
+    _watchForSwfFallbackContent();
   }
 
   if (!flashBridge) {
@@ -1133,9 +1176,9 @@ var _unembedSwf = function() {
       }
     }
 
-    // Remove the availability checking timeout, as it triggers "deactivated" after destroy.
-    _clearTimeout(_flashCheckTimeout);
-    _flashCheckTimeout = 0;
+    // Remove the availability and SWF network error checking timeout/interval, as they could
+    // inappropriately trigger events like "flash-deactivated" and "swf-not-found" after destroy.
+    _clearTimeoutsAndPolling();
 
     _flashState.ready = null;
     _flashState.bridge = null;
@@ -1530,7 +1573,7 @@ var _removeClass = function(element, value) {
  * @private
  */
 var _getStyle = function(el, prop) {
-  var value = _window.getComputedStyle(el, null).getPropertyValue(prop);
+  var value = _getComputedStyle(el, null).getPropertyValue(prop);
   if (prop === "cursor") {
     if (!value || value === "auto") {
       if (el.nodeName === "A") {
@@ -1589,6 +1632,60 @@ var _getElementPosition = function(el) {
   }
 
   return pos;
+};
+
+
+/**
+ * Determine is an element is visible somewhere within the document (page).
+ *
+ * @returns Boolean
+ * @private
+ */
+var _isElementVisible = function(el) {
+  if (!el) {
+    return false;
+  }
+
+  var styles = _getComputedStyle(el, null);
+  var hasCssHeight = _parseFloat(styles.height) > 0;
+  var hasCssWidth = _parseFloat(styles.width) > 0;
+  var hasCssTop = _parseFloat(styles.top) >= 0;
+  var hasCssLeft = _parseFloat(styles.left) >= 0;
+  var cssKnows = hasCssHeight && hasCssWidth && hasCssTop && hasCssLeft;
+  var rect = cssKnows ? null : _getElementPosition(el);
+
+  var isVisible = (
+    styles.display !== "none" &&
+    styles.visibility !== "collapse" &&
+    (
+      cssKnows ||
+      (
+        !!rect &&
+        (hasCssHeight || rect.height > 0) &&
+        (hasCssWidth || rect.width > 0) &&
+        (hasCssTop || rect.top >= 0) &&
+        (hasCssLeft || rect.left >= 0)
+      )
+    )
+  );
+  return isVisible;
+};
+
+
+/**
+ * Clear all existing timeouts and interval polling delegates.
+ *
+ * @returns `undefined`
+ * @private
+ */
+var _clearTimeoutsAndPolling = function() {
+  // Remove the availability checking timeout
+  _clearTimeout(_flashCheckTimeout);
+  _flashCheckTimeout = 0;
+
+  // Remove the SWF network error polling
+  _clearInterval(_swfFallbackCheckInterval);
+  _swfFallbackCheckInterval = 0;
 };
 
 

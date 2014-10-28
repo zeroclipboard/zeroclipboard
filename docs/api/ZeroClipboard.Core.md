@@ -502,6 +502,8 @@ for the browser [but _not_ too old for ZeroClipboard] or if Flash objects are co
 click-to-play and the user does not authorize it within `_globalConfig.flashLoadTimeout`
 milliseconds or does not authorize it at all.
 
+This event may also be fired in some browsers if the ZeroClipboard SWF object cannot be loaded at all. See [`error\[name = "swf-not-found"\]`](#error-name--swf-not-found) for more information.
+
 ```js
 ZeroClipboard.on("error", function(e) {
 /*
@@ -658,6 +660,35 @@ ZeroClipboard.on("error", function(e) {
     property: "swfObjectId",
     configuredValue: "my-zeroclipboard-object",
     actualValue: "global-zeroclipboard-flash-bridge"
+  };
+*/
+});
+
+
+##### `error[name = "swf-not-found"]`
+
+_Added in `v2.2.0`._
+
+This type of `error` event fires when the ZeroClipboard SWF object cannot be loaded, which typically means one of the following:
+ 1. Your `swfPath` configuration is incorrect
+ 2. The server/domain hosting your SWF is down
+ 3. Your network connectivity has been lost
+
+Unfortunately, this event can only be supported in a limited sub-set of browsers at this time:
+ - Firefox
+ - IE10 (_specifically_; not IE9, not IE11)
+
+```js
+ZeroClipboard.on("error", function(e) {
+/*
+  e = {
+    type: "error",
+    name: "swf-not-found",
+    messsage: "The ZeroClipboard SWF object could not be loaded, so please check your `swfPath` configuration and/or network connectivity",
+    target: null,
+    relatedTarget: null,
+    currentTarget: flashSwfObjectRef,
+    timeStamp: Date.now()
   };
 */
 });
