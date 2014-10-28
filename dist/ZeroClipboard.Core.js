@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Jon Rohan, James M. Greene
  * Licensed MIT
  * http://zeroclipboard.org/
- * v2.1.6
+ * v2.2.0-beta.1
  */
 (function(window, undefined) {
   "use strict";
@@ -1624,7 +1624,7 @@
  * @property {string}
  */
   _defineProperty(ZeroClipboard, "version", {
-    value: "2.1.6",
+    value: "2.2.0-beta.1",
     writable: false,
     configurable: true,
     enumerable: true

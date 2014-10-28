@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Jon Rohan, James M. Greene
  * Licensed MIT
  * http://zeroclipboard.org/
- * v2.1.6
+ * v2.2.0-beta.1
  */
 (function(window, undefined) {
   "use strict";
@@ -1624,7 +1624,7 @@
  * @property {string}
  */
   _defineProperty(ZeroClipboard, "version", {
-    value: "2.1.6",
+    value: "2.2.0-beta.1",
     writable: false,
     configurable: true,
     enumerable: true
@@ -1847,7 +1847,10 @@
  * @private
  */
   var _clientOn = function(eventType, listener) {
-    var i, len, events, added = {}, handlers = _clientMeta[this.id] && _clientMeta[this.id].handlers;
+    var i, len, events, added = {}, meta = _clientMeta[this.id], handlers = meta && meta.handlers;
+    if (!meta) {
+      throw new Error("Attempted to add new listener(s) to a destroyed ZeroClipboard client instance");
+    }
     if (typeof eventType === "string" && eventType) {
       events = eventType.toLowerCase().split(/\s+/);
     } else if (typeof eventType === "object" && eventType && typeof listener === "undefined") {
@@ -1893,7 +1896,10 @@
  * @private
  */
   var _clientOff = function(eventType, listener) {
-    var i, len, foundIndex, events, perEventHandlers, handlers = _clientMeta[this.id] && _clientMeta[this.id].handlers;
+    var i, len, foundIndex, events, perEventHandlers, meta = _clientMeta[this.id], handlers = meta && meta.handlers;
+    if (!handlers) {
+      return this;
+    }
     if (arguments.length === 0) {
       events = _keys(handlers);
     } else if (typeof eventType === "string" && eventType) {
@@ -1960,6 +1966,9 @@
  * @private
  */
   var _clientClip = function(elements) {
+    if (!_clientMeta[this.id]) {
+      throw new Error("Attempted to clip element(s) to a destroyed ZeroClipboard client instance");
+    }
     elements = _prepClip(elements);
     for (var i = 0; i < elements.length; i++) {
       if (_hasOwn.call(elements, i) && elements[i] && elements[i].nodeType === 1) {
@@ -2032,6 +2041,9 @@
  * @private
  */
   var _clientDestroy = function() {
+    if (!_clientMeta[this.id]) {
+      return;
+    }
     this.unclip();
     this.off();
     delete _clientMeta[this.id];
@@ -2047,12 +2059,13 @@
     if (event.client && event.client !== this) {
       return false;
     }
-    var clippedEls = _clientMeta[this.id] && _clientMeta[this.id].elements;
+    var meta = _clientMeta[this.id];
+    var clippedEls = meta && meta.elements;
     var hasClippedEls = !!clippedEls && clippedEls.length > 0;
     var goodTarget = !event.target || hasClippedEls && clippedEls.indexOf(event.target) !== -1;
     var goodRelTarget = event.relatedTarget && hasClippedEls && clippedEls.indexOf(event.relatedTarget) !== -1;
     var goodClient = event.client && event.client === this;
-    if (!(goodTarget || goodRelTarget || goodClient)) {
+    if (!meta || !(goodTarget || goodRelTarget || goodClient)) {
       return false;
     }
     return true;
@@ -2060,16 +2073,17 @@
   /**
  * Handle the actual dispatching of events to a client instance.
  *
- * @returns `this`
+ * @returns `undefined`
  * @private
  */
   var _clientDispatchCallbacks = function(event) {
-    if (!(typeof event === "object" && event && event.type)) {
+    var meta = _clientMeta[this.id];
+    if (!(typeof event === "object" && event && event.type && meta)) {
       return;
     }
     var async = _shouldPerformAsync(event);
-    var wildcardTypeHandlers = _clientMeta[this.id] && _clientMeta[this.id].handlers["*"] || [];
-    var specificTypeHandlers = _clientMeta[this.id] && _clientMeta[this.id].handlers[event.type] || [];
+    var wildcardTypeHandlers = meta && meta.handlers["*"] || [];
+    var specificTypeHandlers = meta && meta.handlers[event.type] || [];
     var handlers = wildcardTypeHandlers.concat(specificTypeHandlers);
     if (handlers && handlers.length) {
       var i, len, func, context, eventCopy, originalContext = this;
@@ -2089,7 +2103,6 @@
         }
       }
     }
-    return this;
   };
   /**
  * Prepares the elements for clipping/unclipping.
@@ -2251,6 +2264,9 @@
  * @returns `this`
  */
   ZeroClipboard.prototype.setText = function(text) {
+    if (!_clientMeta[this.id]) {
+      throw new Error("Attempted to set pending clipboard data from a destroyed ZeroClipboard client instance");
+    }
     ZeroClipboard.setData("text/plain", text);
     return this;
   };
@@ -2260,6 +2276,9 @@
  * @returns `this`
  */
   ZeroClipboard.prototype.setHtml = function(html) {
+    if (!_clientMeta[this.id]) {
+      throw new Error("Attempted to set pending clipboard data from a destroyed ZeroClipboard client instance");
+    }
     ZeroClipboard.setData("text/html", html);
     return this;
   };
@@ -2269,6 +2288,9 @@
  * @returns `this`
  */
   ZeroClipboard.prototype.setRichText = function(richText) {
+    if (!_clientMeta[this.id]) {
+      throw new Error("Attempted to set pending clipboard data from a destroyed ZeroClipboard client instance");
+    }
     ZeroClipboard.setData("application/rtf", richText);
     return this;
   };
@@ -2278,6 +2300,9 @@
  * @returns `this`
  */
   ZeroClipboard.prototype.setData = function() {
+    if (!_clientMeta[this.id]) {
+      throw new Error("Attempted to set pending clipboard data from a destroyed ZeroClipboard client instance");
+    }
     ZeroClipboard.setData.apply(this, _args(arguments));
     return this;
   };
@@ -2288,6 +2313,9 @@
  * @returns `this`
  */
   ZeroClipboard.prototype.clearData = function() {
+    if (!_clientMeta[this.id]) {
+      throw new Error("Attempted to clear pending clipboard data from a destroyed ZeroClipboard client instance");
+    }
     ZeroClipboard.clearData.apply(this, _args(arguments));
     return this;
   };
@@ -2298,6 +2326,9 @@
  * @returns `String` or `Object`
  */
   ZeroClipboard.prototype.getData = function() {
+    if (!_clientMeta[this.id]) {
+      throw new Error("Attempted to get pending clipboard data from a destroyed ZeroClipboard client instance");
+    }
     return ZeroClipboard.getData.apply(this, _args(arguments));
   };
   if (typeof define === "function" && define.amd) {

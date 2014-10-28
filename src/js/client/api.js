@@ -101,6 +101,9 @@ ZeroClipboard.prototype.destroy = function() {
  * @returns `this`
  */
 ZeroClipboard.prototype.setText = function(text) {
+  if (!_clientMeta[this.id]) {
+    throw new Error("Attempted to set pending clipboard data from a destroyed ZeroClipboard client instance");
+  }
   ZeroClipboard.setData("text/plain", text);
   return this;
 };
@@ -112,6 +115,9 @@ ZeroClipboard.prototype.setText = function(text) {
  * @returns `this`
  */
 ZeroClipboard.prototype.setHtml = function(html) {
+  if (!_clientMeta[this.id]) {
+    throw new Error("Attempted to set pending clipboard data from a destroyed ZeroClipboard client instance");
+  }
   ZeroClipboard.setData("text/html", html);
   return this;
 };
@@ -123,6 +129,9 @@ ZeroClipboard.prototype.setHtml = function(html) {
  * @returns `this`
  */
 ZeroClipboard.prototype.setRichText = function(richText) {
+  if (!_clientMeta[this.id]) {
+    throw new Error("Attempted to set pending clipboard data from a destroyed ZeroClipboard client instance");
+  }
   ZeroClipboard.setData("application/rtf", richText);
   return this;
 };
@@ -134,6 +143,9 @@ ZeroClipboard.prototype.setRichText = function(richText) {
  * @returns `this`
  */
 ZeroClipboard.prototype.setData = function(/* format, data */) {
+  if (!_clientMeta[this.id]) {
+    throw new Error("Attempted to set pending clipboard data from a destroyed ZeroClipboard client instance");
+  }
   ZeroClipboard.setData.apply(this, _args(arguments));
   return this;
 };
@@ -146,6 +158,9 @@ ZeroClipboard.prototype.setData = function(/* format, data */) {
  * @returns `this`
  */
 ZeroClipboard.prototype.clearData = function(/* format */) {
+  if (!_clientMeta[this.id]) {
+    throw new Error("Attempted to clear pending clipboard data from a destroyed ZeroClipboard client instance");
+  }
   ZeroClipboard.clearData.apply(this, _args(arguments));
   return this;
 };
@@ -158,5 +173,8 @@ ZeroClipboard.prototype.clearData = function(/* format */) {
  * @returns `String` or `Object`
  */
 ZeroClipboard.prototype.getData = function(/* format */) {
+  if (!_clientMeta[this.id]) {
+    throw new Error("Attempted to get pending clipboard data from a destroyed ZeroClipboard client instance");
+  }
   return ZeroClipboard.getData.apply(this, _args(arguments));
 };

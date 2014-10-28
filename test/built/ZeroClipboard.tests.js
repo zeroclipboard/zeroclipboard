@@ -225,4 +225,64 @@
   });
 
 
+  module("ZeroClipboard.js (built) unit tests - destroyed client", {
+    setup: function() {
+      // Store
+      originalConfig = ZeroClipboard.config();
+      originalFlashDetect = ZeroClipboard.isFlashUnusable;
+      // Modify
+      ZeroClipboard.isFlashUnusable = function() {
+        return false;
+      };
+      ZeroClipboard.config({ swfPath: originalConfig.swfPath.replace(/\/(?:src|test)\/.*$/i, "/dist/ZeroClipboard.swf") });
+    },
+    teardown: function() {
+      // Restore
+      ZeroClipboard.destroy();
+      ZeroClipboard.config(originalConfig);
+      ZeroClipboard.isFlashUnusable = originalFlashDetect;
+    }
+  });
+
+
+  test("client methods act as expected after `destroy`", function(assert) {
+    assert.expect(10);
+
+    // Arrange
+    ZeroClipboard.isFlashUnusable = function() {
+      return false;
+    };
+    var client = new ZeroClipboard();
+    var currentEl = document.getElementById("d_clip_button");
+    var tmp;
+
+    // Act
+    client.destroy();
+
+    //
+    // Act & Assert
+    //
+
+    // These should NOT throw Errors
+    tmp = client.handlers();
+    assert.strictEqual(tmp, null, "Destroyed client instance should return `null` for handlers");
+    tmp = client.elements();
+    assert.strictEqual(JSON.stringify(tmp), "[]", "Destroyed client instance should return an empty array for elements");
+    client.off();
+    client.unclip();
+    client.emit({ type: "error", name: "fake-error" });
+    client.destroy();
+
+    // These SHOULD throw Errors
+    assert.throws(function() { client.on("ready", function() {}); }, new RegExp("Attempted to add new listener\\(s\\) to a destroyed ZeroClipboard client instance"));
+    assert.throws(function() { client.clip(currentEl); }, new RegExp("Attempted to clip element\\(s\\) to a destroyed ZeroClipboard client instance"));
+    assert.throws(function() { client.setText("foo"); }, new RegExp("Attempted to set pending clipboard data from a destroyed ZeroClipboard client instance"));
+    assert.throws(function() { client.setHtml("<em>foo</em>"); }, new RegExp("Attempted to set pending clipboard data from a destroyed ZeroClipboard client instance"));
+    assert.throws(function() { client.setRichText("{\\rtf1\\ansi\n{\\i foo}}"); }, new RegExp("Attempted to set pending clipboard data from a destroyed ZeroClipboard client instance"));
+    assert.throws(function() { client.setData({ "text/plain": "foo" }); }, new RegExp("Attempted to set pending clipboard data from a destroyed ZeroClipboard client instance"));
+    assert.throws(function() { client.clearData(); }, new RegExp("Attempted to clear pending clipboard data from a destroyed ZeroClipboard client instance"));
+    assert.throws(function() { tmp = client.getData(); }, new RegExp("Attempted to get pending clipboard data from a destroyed ZeroClipboard client instance"));
+  });
+
+
 })(QUnit.module, QUnit.test);

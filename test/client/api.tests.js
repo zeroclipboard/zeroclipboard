@@ -79,7 +79,7 @@
   });
 
 
-  test("`destroy` clears up the client", function(assert) {
+  test("`ZeroClipboard.destroy` clears up the clients", function(assert) {
     assert.expect(6);
 
     // Arrange
