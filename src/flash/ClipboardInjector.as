@@ -87,7 +87,7 @@ package {
         System.setClipboard(clipData.text);
         results.text = true;
       }
-      catch (e:Error) {
+      catch (err:Error) {
         // Yes, this is already set but FlexPMD complains about empty `catch` blocks
         results.text = false;
       }
@@ -114,7 +114,7 @@ package {
         try {
           results.text = Clipboard.generalClipboard.setData(ClipboardFormats.TEXT_FORMAT, clipData.text);
         }
-        catch (e:Error) {
+        catch (err:Error) {
           results.text = false;
         }
       }
@@ -124,7 +124,7 @@ package {
         try {
           results.html = Clipboard.generalClipboard.setData(ClipboardFormats.HTML_FORMAT, clipData.html);
         }
-        catch (e:Error) {
+        catch (err:Error) {
           results.html = false;
         }
       }
@@ -138,7 +138,7 @@ package {
             results.rtf = Clipboard.generalClipboard.setData(ClipboardFormats.RICH_TEXT_FORMAT, bytes);
           }
         }
-        catch (e:Error) {
+        catch (err:Error) {
           results.rtf = false;
         }
       }

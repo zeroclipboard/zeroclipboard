@@ -14,6 +14,7 @@ var _flashState = {
   disabled: null,
   outdated: null,
   unavailable: null,
+  degraded: null,
   deactivated: null,
   overdue: null,
   ready: null
@@ -79,6 +80,7 @@ var _eventMessages = {
     "flash-disabled": "Flash is disabled or not installed",
     "flash-outdated": "Flash is too outdated to support ZeroClipboard",
     "flash-unavailable": "Flash is unable to communicate bidirectionally with JavaScript",
+    "flash-degraded": "Flash is unable to preserve data fidelity when communicating with JavaScript",
     "flash-deactivated": "Flash is too outdated for your browser and/or is configured as click-to-activate",
     "flash-overdue": "Flash communication was established but NOT within the acceptable time limit"
   }

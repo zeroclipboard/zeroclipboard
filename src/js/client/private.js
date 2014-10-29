@@ -83,7 +83,7 @@ var _clientOn = function(eventType, listener) {
       });
     }
     if (added.error) {
-      var errorTypes = ["disabled", "outdated", "unavailable", "deactivated", "overdue"];
+      var errorTypes = ["disabled", "outdated", "unavailable", "degraded", "deactivated", "overdue"];
       for (i = 0, len = errorTypes.length; i < len; i++) {
         if (_flashState[errorTypes[i]]) {
           this.emit({

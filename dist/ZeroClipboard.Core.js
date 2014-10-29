@@ -12,7 +12,7 @@
  * Store references to critically important global functions that may be
  * overridden on certain web pages.
  */
-  var _window = window, _document = _window.document, _navigator = _window.navigator, _setTimeout = _window.setTimeout, _encodeURIComponent = _window.encodeURIComponent, _ActiveXObject = _window.ActiveXObject, _Error = _window.Error, _parseInt = _window.Number.parseInt || _window.parseInt, _parseFloat = _window.Number.parseFloat || _window.parseFloat, _isNaN = _window.Number.isNaN || _window.isNaN, _round = _window.Math.round, _now = _window.Date.now, _keys = _window.Object.keys, _defineProperty = _window.Object.defineProperty, _hasOwn = _window.Object.prototype.hasOwnProperty, _slice = _window.Array.prototype.slice, _unwrap = function() {
+  var _window = window, _document = _window.document, _navigator = _window.navigator, _setTimeout = _window.setTimeout, _clearTimeout = _window.clearTimeout, _encodeURIComponent = _window.encodeURIComponent, _ActiveXObject = _window.ActiveXObject, _Error = _window.Error, _parseInt = _window.Number.parseInt || _window.parseInt, _parseFloat = _window.Number.parseFloat || _window.parseFloat, _isNaN = _window.Number.isNaN || _window.isNaN, _round = _window.Math.round, _now = _window.Date.now, _keys = _window.Object.keys, _defineProperty = _window.Object.defineProperty, _hasOwn = _window.Object.prototype.hasOwnProperty, _slice = _window.Array.prototype.slice, _unwrap = function() {
     var unwrapper = function(el) {
       return el;
     };
@@ -282,6 +282,7 @@
     disabled: null,
     outdated: null,
     unavailable: null,
+    degraded: null,
     deactivated: null,
     overdue: null,
     ready: null
@@ -318,6 +319,11 @@
  */
   var _clipDataFormatMap = null;
   /**
+ * Keep track of the flash availability check timeout
+ * @private
+ */
+  var _flashCheckTimeout = 0;
+  /**
  * The `message` store for events
  * @private
  */
@@ -327,6 +333,7 @@
       "flash-disabled": "Flash is disabled or not installed",
       "flash-outdated": "Flash is too outdated to support ZeroClipboard",
       "flash-unavailable": "Flash is unable to communicate bidirectionally with JavaScript",
+      "flash-degraded": "Flash is unable to preserve data fidelity when communicating with JavaScript",
       "flash-deactivated": "Flash is too outdated for your browser and/or is configured as click-to-activate",
       "flash-overdue": "Flash communication was established but NOT within the acceptable time limit"
     }
@@ -403,7 +410,7 @@
  * @private
  */
   var _isFlashUnusable = function() {
-    return !!(_flashState.disabled || _flashState.outdated || _flashState.unavailable || _flashState.deactivated);
+    return !!(_flashState.disabled || _flashState.outdated || _flashState.unavailable || _flashState.degraded || _flashState.deactivated);
   };
   /**
  * The underlying implementation of `ZeroClipboard.on`.
@@ -435,7 +442,7 @@
         });
       }
       if (added.error) {
-        var errorTypes = [ "disabled", "outdated", "unavailable", "deactivated", "overdue" ];
+        var errorTypes = [ "disabled", "outdated", "unavailable", "degraded", "deactivated", "overdue" ];
         for (i = 0, len = errorTypes.length; i < len; i++) {
           if (_flashState[errorTypes[i]] === true) {
             ZeroClipboard.emit({
@@ -537,7 +544,7 @@
     if (!ZeroClipboard.isFlashUnusable() && _flashState.bridge === null) {
       var maxWait = _globalConfig.flashLoadTimeout;
       if (typeof maxWait === "number" && maxWait >= 0) {
-        _setTimeout(function() {
+        _flashCheckTimeout = _setTimeout(function() {
           if (typeof _flashState.deactivated !== "boolean") {
             _flashState.deactivated = true;
           }
@@ -707,13 +714,13 @@
       });
     }
     if (event.type === "error") {
-      if (/^flash-(disabled|outdated|unavailable|deactivated|overdue)$/.test(event.name)) {
+      if (/^flash-(disabled|outdated|unavailable|degraded|deactivated|overdue)$/.test(event.name)) {
         _extend(event, {
           target: null,
           minimumVersion: _minimumFlashVersion
         });
       }
-      if (/^flash-(outdated|unavailable|deactivated|overdue)$/.test(event.name)) {
+      if (/^flash-(outdated|unavailable|degraded|deactivated|overdue)$/.test(event.name)) {
         _extend(event, {
           version: _flashState.version
         });
@@ -856,7 +863,7 @@
     var element = event.target || _currentElement || null;
     var sourceIsSwf = event._source === "swf";
     delete event._source;
-    var flashErrorNames = [ "flash-disabled", "flash-outdated", "flash-unavailable", "flash-deactivated", "flash-overdue" ];
+    var flashErrorNames = [ "flash-disabled", "flash-outdated", "flash-unavailable", "flash-degraded", "flash-deactivated", "flash-overdue" ];
     switch (event.type) {
      case "error":
       if (flashErrorNames.indexOf(event.name) !== -1) {
@@ -864,6 +871,7 @@
           disabled: event.name === "flash-disabled",
           outdated: event.name === "flash-outdated",
           unavailable: event.name === "flash-unavailable",
+          degraded: event.name === "flash-degraded",
           deactivated: event.name === "flash-deactivated",
           overdue: event.name === "flash-overdue",
           ready: false
@@ -877,6 +885,7 @@
         disabled: false,
         outdated: false,
         unavailable: false,
+        degraded: false,
         deactivated: false,
         overdue: wasDeactivated,
         ready: !wasDeactivated
@@ -1110,6 +1119,8 @@
           }
         }
       }
+      _clearTimeout(_flashCheckTimeout);
+      _flashCheckTimeout = 0;
       _flashState.ready = null;
       _flashState.bridge = null;
       _flashState.deactivated = null;

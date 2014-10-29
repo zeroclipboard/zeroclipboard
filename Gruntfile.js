@@ -181,7 +181,7 @@ module.exports = function(grunt) {
     },
     mxmlc: {
       options: {
-        rawConfig: "-target-player=11.0.0 -static-link-runtime-shared-libraries=true"
+        rawConfig: "-target-player=11.0.0 -static-link-runtime-shared-libraries=true -actionscript-file-encoding=UTF-8"
       },
       swf: {
         files: {
@@ -328,5 +328,8 @@ module.exports = function(grunt) {
 
   // Travis CI task
   grunt.registerTask("travis",  ["validate", "build-travis", "test", "qunit:coveralls", "coveralls"]);
+
+  // Local Flash dev
+  grunt.registerTask("asdev",   ["validate", "build"]);
 
 };

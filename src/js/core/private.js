@@ -71,6 +71,7 @@ var _isFlashUnusable = function() {
     _flashState.disabled ||
     _flashState.outdated ||
     _flashState.unavailable ||
+    _flashState.degraded ||
     _flashState.deactivated
   );
 };
@@ -115,7 +116,7 @@ var _on = function(eventType, listener) {
       });
     }
     if (added.error) {
-      var errorTypes = ["disabled", "outdated", "unavailable", "deactivated", "overdue"];
+      var errorTypes = ["disabled", "outdated", "unavailable", "degraded", "deactivated", "overdue"];
       for (i = 0, len = errorTypes.length; i < len; i++) {
         if (_flashState[errorTypes[i]] === true) {
           ZeroClipboard.emit({
@@ -491,13 +492,13 @@ var _createEvent = function(event) {
   }
 
   if (event.type === "error") {
-    if (/^flash-(disabled|outdated|unavailable|deactivated|overdue)$/.test(event.name)) {
+    if (/^flash-(disabled|outdated|unavailable|degraded|deactivated|overdue)$/.test(event.name)) {
       _extend(event, {
         target: null,
         minimumVersion: _minimumFlashVersion
       });
     }
-    if (/^flash-(outdated|unavailable|deactivated|overdue)$/.test(event.name)) {
+    if (/^flash-(outdated|unavailable|degraded|deactivated|overdue)$/.test(event.name)) {
       _extend(event, {
         version: _flashState.version
       });
@@ -696,6 +697,7 @@ var _preprocessEvent = function(event) {
     "flash-disabled",
     "flash-outdated",
     "flash-unavailable",
+    "flash-degraded",
     "flash-deactivated",
     "flash-overdue"
   ];
@@ -707,6 +709,7 @@ var _preprocessEvent = function(event) {
           disabled:    event.name === "flash-disabled",
           outdated:    event.name === "flash-outdated",
           unavailable: event.name === "flash-unavailable",
+          degraded:    event.name === "flash-degraded",
           deactivated: event.name === "flash-deactivated",
           overdue:     event.name === "flash-overdue",
           ready:       false
@@ -720,6 +723,7 @@ var _preprocessEvent = function(event) {
         disabled:    false,
         outdated:    false,
         unavailable: false,
+        degraded:    false,
         deactivated: false,
         overdue:     wasDeactivated,
         ready:       !wasDeactivated
@@ -1072,8 +1076,9 @@ var _unembedSwf = function() {
 
     _flashState.ready = null;
     _flashState.bridge = null;
-    // Reset the `deactivated` status in case the user wants to "try again", e.g. after receiving
-    // an `overdueFlash` event
+
+    // Reset the `deactivated` status in case the user wants to "try again", i.e.
+    // after receiving an `error[name="flash-overdue"]` event
     _flashState.deactivated = null;
   }
 };

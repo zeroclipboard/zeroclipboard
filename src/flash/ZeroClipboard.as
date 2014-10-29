@@ -77,7 +77,7 @@ package {
       // Configure the SWF object's ID
       var swfObjectId:String = "global-zeroclipboard-flash-bridge";
       if (flashvars.swfObjectId && typeof flashvars.swfObjectId === "string") {
-        var swfId = XssUtils.sanitizeString(flashvars.swfObjectId);
+        var swfId:String = XssUtils.sanitizeString(flashvars.swfObjectId);
 
         // Validate the ID against the HTML4 spec for `ID` tokens.
         if (/^[A-Za-z][A-Za-z0-9_:\-\.]*$/.test(swfId)) {
@@ -100,8 +100,7 @@ package {
       this.jsEmitter =
         "(function(eventObj) {\n" +
         "  var objectId = '" + swfObjectId + "',\n" +
-        "      ZC = null,\n" +
-        "      swf = null;\n" +
+        "      ZC, swf, result;\n\n" +
         "  if (typeof ZeroClipboard === 'function' && typeof ZeroClipboard.emit === 'function') {\n" +
         "    \nZC = ZeroClipboard;\n" +
         "  }\n" +
@@ -109,13 +108,18 @@ package {
         "    swf = document[objectId] || document.getElementById(objectId);\n" +
         "    if (swf && typeof swf.ZeroClipboard === 'function' && typeof swf.ZeroClipboard.emit === 'function') {\n" +
         "      ZC = swf.ZeroClipboard;\n" +
-        "    }\n" +
+        "    }\n\n" +
+        "    // Drop the reference\n" +
+        "    swf = null;\n" +
         "  }\n" +
         "  if (!ZC) {\n" +
         "    throw new Error('ERROR: ZeroClipboard SWF could not locate ZeroClipboard JS object!\\n" +
                              "Expected element ID: ' + objectId);\n" +
-        "  }\n" +
-        "  return ZC.emit(eventObj);\n" +
+        "  }\n\n" +
+        "  result = ZC.emit(eventObj);\n\n" +
+        "  // Drop the reference\n" +
+        "  ZC = null;\n\n" +
+        "  return result;\n" +
         "})";
 
       // Create an invisible "button" and transparently fill the entire Stage
@@ -129,20 +133,27 @@ package {
 
       // Only proceed if this SWF is hosted in the browser as expected
       if (this.jsProxy.isComplete()) {
+        if (this.jsProxy.isHighFidelity()) {
+          // Add the MouseEvent listeners
+          this.addMouseHandlers(button);
 
-        // Add the MouseEvent listeners
-        this.addMouseHandlers(button);
+          // Expose the external functions
+          this.jsProxy.addCallback(
+            "setHandCursor",
+            function(enabled:Boolean): void {
+              button.useHandCursor = enabled === true;
+            }
+          );
 
-        // Expose the external functions
-        this.jsProxy.addCallback(
-          "setHandCursor",
-          function(enabled:Boolean) {
-            button.useHandCursor = enabled === true;
-          }
-        );
-
-        // Signal to the browser that we are ready
-        this.emit("ready");
+          // Signal to the browser that we are ready
+          this.emit("ready");
+        }
+        else {
+          // Signal to the browser that data fidelity cannot be guaranteed
+          this.emit("error", {
+            name: "flash-degraded"
+          });
+        }
       }
       else {
         // Signal to the browser that something is wrong
@@ -235,10 +246,10 @@ package {
 
       var result:Object = undefined;  // NOPMD
       if (this.jsProxy.isComplete()) {
-        result = this.jsProxy.call(this.jsEmitter, [eventObj]);
+        result = this.jsProxy.call(this.jsEmitter, eventObj);
       }
       else {
-        this.jsProxy.send(this.jsEmitter, [eventObj]);
+        this.jsProxy.send(this.jsEmitter, eventObj);
       }
       return result;
     }
@@ -267,7 +278,7 @@ package {
           "stageY": "_stageY"
         };
 
-        for (var prop in props) {
+        for (var prop:String in props) {
           if (event.hasOwnProperty(prop) && event[prop] != null) {
             evtData[props[prop]] = event[prop];
           }

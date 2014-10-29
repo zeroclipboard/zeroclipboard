@@ -452,6 +452,29 @@ ZeroClipboard.on("error", function(e) {
 ```
 
 
+##### `error[name = "flash-degraded"]`
+
+This type of `error` event fires when the browser's installation of Flash Player cannot communicate bidirectionally with JavaScript without losing data fidelity.
+
+```js
+ZeroClipboard.on("error", function(e) {
+/*
+  e = {
+    type: "error",
+    name: "flash-degraded",
+    messsage: "Flash is unable to preserve data fidelity when communicating with JavaScript",
+    target: null,
+    relatedTarget: null,
+    currentTarget: flashSwfObjectRef,
+    timeStamp: Date.now(),
+    minimumVersion: "11.0.0",
+    version: "11.2.202"
+  };
+*/
+});
+```
+
+
 ##### `error[name = "flash-deactivated"]`
 
 This type of `error` event fires when the browser's installation of Flash Player is either too old
