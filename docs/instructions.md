@@ -440,7 +440,7 @@ ZeroClipboard `v2.x` is expected to work in IE9+ and all of the evergreen browse
 ### Opera
  - [Issue #459](https://github.com/zeroclipboard/zeroclipboard/issues/459)
      - **Problem:** Both the implicit observation of clipped elements' `cursor` CSS property and the `forceHandCursor: true` [Configuration Option](api/ZeroClipboard.md#configuration-options) cannot be honored in Opera's NPAPI Flash Player plugin.
-     - **Workaround:** End users must install both Opera 24+ **AND** the separate PPAPI Flash Player plugin that is currently only available in [Adobe Flash Player 16 Beta](http://labs.adobe.com/downloads/flashplayer.html) (look for the OS-specific download entitled "Download Flash Player for Opera and Chromium based applications – PPAPI").
+     - **Workaround:** End users must install both Opera 24+ **AND** the separate PPAPI Flash Player plugin that is currently only available in [Adobe Flash Player 16 Beta](http://labs.adobe.com/downloads/flashplayer.html) (look for the OS-specific download entitled "Download Flash Player for Opera and Chromium based applications – PPAPI"). Beginning with Opera 27 (currently in the alpha/dev channel cycle), Opera will automatically warn users that only have the NPAPI Flash Player plugin installed and guide them into installing the PPAPI Flash Player plugin from Adobe.
 
 
 
