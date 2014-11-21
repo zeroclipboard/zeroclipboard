@@ -38,9 +38,7 @@
   "bugs": {
     "url": "https://github.com/zeroclipboard/zeroclipboard/issues"
   },
-  "dependencies": {
-    "send": "0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "flex-sdk": "~4.6.0-0",
     "flexpmd": "^1.3.0-1",
