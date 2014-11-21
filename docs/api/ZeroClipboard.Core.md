@@ -2,6 +2,8 @@
 
 This documents details the **ZeroClipboard.Core** API, including various types of properties, methods, and events. **ZeroClipboard.Core** is primarily intended for use in wrapping ZeroClipboard in 3rd party plugins, e.g. [jquery.zeroclipboard](https://github.com/zeroclipboard/jquery.zeroclipboard).
 
+Any entry that does not include an annotation similar to "Added in `v2.x.y`" should be assumed to have been available since `v2.0.0`.
+
 
 ## Static
 
@@ -82,6 +84,8 @@ _[`undefined`]_ Clear the pending data of ALL formats for clipboard injection.
 
 #### `ZeroClipboard.getData(...)`
 
+_Added in `v2.1.0`._
+
 ```js
 var text = ZeroClipboard.getData("text/plain");
 ```
@@ -98,6 +102,8 @@ _[`Object`]_ Get a copy of the pending data of ALL formats for clipboard injecti
 #### `ZeroClipboard.focus(...)`
 #### `ZeroClipboard.activate(...)`
 
+_The preferred alias `ZeroClipboard.focus(...)` was added in `v2.1.0`._
+
 ```js
 ZeroClipboard.focus(document.getElementById("d_clip_button"));
 ```
@@ -108,10 +114,14 @@ _[`undefined`]_ Focus/"activate" the provided element by moving the Flash SWF ob
 #### `ZeroClipboard.blur()`
 #### `ZeroClipboard.deactivate()`
 
+_The preferred alias `ZeroClipboard.blur()` was added in `v2.1.0`._
+
 _[`undefined`]_ Blur/"deactivate" the currently focused/"activated" element, moving the Flash SWF object off the screen. **NOTE:** The preferred method to use is `blur` but the alias `deactivate` is available for backward compatibility's sake.
 
 
 #### `ZeroClipboard.activeElement()`
+
+_Added in `v2.1.0`._
 
 ```js
 var el = document.getElementById("d_clip_button");
@@ -543,6 +553,8 @@ ZeroClipboard.on("error", function(e) {
 
 
 ##### `error[name = "version-mismatch"]`
+
+_Added in `v2.2.0-beta.2`._
 
 This type of `error` event fires when the JavaScript side's `ZeroClipboard.version` property value
 does not exactly match the `ZeroClipboard.VERSION` property value that was compiled into the SWF.
