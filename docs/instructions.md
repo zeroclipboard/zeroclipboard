@@ -23,8 +23,12 @@ If a handler of `copy` event intends to modify the pending data for clipboard
 injection, it _MUST_ operate synchronously in order to maintain the temporarily elevated
 permissions granted by the user's `click` event. The most common "gotcha" for this restriction is
 if someone wants to make an asynchronous XMLHttpRequest in response to the `copy` event to get the
-data to inject &mdash; this will not work. You must make it a _synchronous_ XMLHttpRequest instead, or do the
-work in advance before the `copy` event is fired.
+data to inject &mdash; this will not work. You must make it a _synchronous_ XMLHttpRequest instead,
+or do the work in advance before the `copy` event is fired.
+
+### Browser-Specific Limitations
+
+See [Support](#support) and [Browser-Specific Known Issues](#browser-specific-known-issues) below.
 
 ### OS-Specific Limitations
 
@@ -426,39 +430,51 @@ ZeroClipboard `v2.x` is expected to work in IE9+ and all of the evergreen browse
 
 
 
+## Browser-Specific Known Issues
+
+### Opera
+ - [Issue #459](https://github.com/zeroclipboard/zeroclipboard/issues/459)
+     - **Problem:** Both the implicit observation of clipped elements' `cursor` CSS property and the `forceHandCursor: true` [Configuration Option](api/ZeroClipboard.md#configuration-options) cannot be honored in Opera's NPAPI Flash Player plugin.
+     - **Workaround:** End users must install both Opera 24+ **AND** the separate PPAPI Flash Player plugin that is currently only available in [Adobe Flash Player 16 Beta](http://labs.adobe.com/downloads/flashplayer.html) (look for the OS-specific download entitled "Download Flash Player for Opera and Chromium based applications – PPAPI").
+
+
+
 ## OS Considerations
 
 Because ZeroClipboard will be interacting with your users' system clipboards, there are some special considerations
 specific to the users' operating systems that you should be aware of. With this information, you can make informed
 decisions of how _your_ site should handle each of these situations.
 
- - **Windows:**
-     - If you want to ensure that your Windows users will be able to paste their copied text into Windows
-       Notepad and have it honor line breaks, you'll need to ensure that the text uses the sequence `\r\n` instead of
-       just `\n` for line breaks.  If the text to copy is based on user input (e.g. a `textarea`), then you can achieve
-       this transformation by utilizing the `copy` event handler, e.g.  
+### Windows
+ - If you want to ensure that your Windows users will be able to paste their copied text into Windows
+   Notepad and have it honor line breaks, you'll need to ensure that the text uses the sequence `\r\n`
+   instead of just `\n` for line breaks.  If the text to copy is based on user input (e.g. a `textarea`),
+   then you can achieve this transformation by utilizing the `copy` event handler, e.g.  
 
-      ```js
-      client.on('copy', function(event) {
-          var text = document.getElementById('yourTextArea').value;
-          var windowsText = text.replace(/\n/g, '\r\n');
-          event.clipboardData.setData('text/plain', windowsText);
-      });
-      ```
+    ```js
+    client.on('copy', function(event) {
+        var text = document.getElementById('yourTextArea').value;
+        var windowsText = text.replace(/\n/g, '\r\n');
+        event.clipboardData.setData('text/plain', windowsText);
+    });
+    ```
 
- - **Linux:**
-     - The Linux Clipboard system (a.k.a. "Selection Atoms" within the [X Consortium's Standard Inter-Client Communication Conventions Manual](http://www.x.org/docs/ICCCM/icccm.pdf)) is a complex but capable setup. However,
-     for normal end users, it stinks. Flash Player's Clipboard API can either:
-         1. Insert plain text into the "System Clipboard" and have it available everywhere; or
-         2. Insert plain, HTML, and RTF text into the "Desktop Clipboard" but it will only be available in applications whose UI are managed by the Desktop Manager System (e.g. GNOME, etc.). This, for example, means that a user on a typical Linux configuration would not be able to paste something copied with ZeroClipboard into a terminal shell but they may still be able to paste it into OpenOffice, the browser, etc.
+### Linux
+ - The Linux Clipboard system (a.k.a. "Selection Atoms" within the [X Consortium's Standard Inter-Client Communication Conventions Manual](http://www.x.org/docs/ICCCM/icccm.pdf)) is a complex but capable setup. However, for normal end users, it stinks. Flash Player's Clipboard API can either:
+     1. Insert plain text into the "System Clipboard" and have it available everywhere; or
+     2. Insert plain, HTML, and RTF text into the "Desktop Clipboard" but it will only be available in applications whose UI are managed by the Desktop Manager System (e.g. GNOME, etc.). This, for example, means that a user on a typical Linux configuration would not be able to paste something copied with ZeroClipboard into a terminal shell but they may still be able to paste it into OpenOffice, the browser, etc.
 
-      As such, the default behavior for ZeroClipboard while running on Linux is to only inject plain text into the "System Clipboard" to cover the most bases.  If you want to ignore that caution and use the "Desktop Clipboard" anyway, just set the `forceEnhancedClipboard` configuration option to `true`, i.e.:
+   As such, the default behavior for ZeroClipboard while running on Linux is to only inject plain text into the "System Clipboard" to cover the most bases.  If you want to ignore that caution and use the "Desktop Clipboard" anyway, just set the `forceEnhancedClipboard` [configuration option](api/ZeroClipboard.md#configuration-options) to `true`, i.e.:
 
       ```js
       ZeroClipboard.config({
         forceEnhancedClipboard: true
       });
       ```
+
+   Also, a final related behavioral caveat: if the pending clipboard data **ONLY** contains data of the
+   format `"text/plain"`, ZeroClipboard will intelligently choose to use the "System Clipboard" regardless
+   of the `forceEnhancedClipboard` configuration property value.
 
 
 
