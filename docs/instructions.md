@@ -34,6 +34,11 @@ See [Support](#support) and [Browser-Specific Known Issues](#browser-specific-kn
 
 See [OS Considerations](#os-considerations) below.
 
+### Protocol Limitations
+
+See [Cross-Protocol Limitations](#cross-protocol-limitations) and [`file://` Protocol Limitations](#file-protocol-limitations) below.
+
+
 
 ## Installation
 
@@ -475,6 +480,90 @@ decisions of how _your_ site should handle each of these situations.
    Also, a final related behavioral caveat: if the pending clipboard data **ONLY** contains data of the
    format `"text/plain"`, ZeroClipboard will intelligently choose to use the "System Clipboard" regardless
    of the `forceEnhancedClipboard` configuration property value.
+
+
+
+## Protocol Limitations
+
+### Cross-Protocol Limitations
+
+ZeroClipboard was intentionally configured to _not_ allow the SWF to be served from a secure domain (HTTPS) but scripted by an insecure domain (HTTP).
+
+If you find yourself in this situation (as in [Issue #170](https://github.com/zeroclipboard/zeroclipboard/issues/170)), please consider the following options:  
+ 1. Serve the SWF over HTTP instead of HTTPS. If the page's protocol can vary (e.g. authorized/unauthorized, staging/production, etc.), you should include add the SWF with a relative protocol (`//s3.amazonaws.com/blah/ZeroClipboard.swf`) instead of an absolute protocol (`https://s3.amazonaws.com/blah/ZeroClipboard.swf`).
+ 2. Serve the page over HTTPS instead of HTTP. If the page's protocol can vary, see the note on the previous option (1).
+ 3. Fork ZeroClipboard and update "src/flash/ZeroClipboard.as" to call the [`allowInsecureDomain`](http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/Security.html#allowInsecureDomain\(\)) method as needed, then recompile the SWF with your custom changes.
+
+
+### `file://` Protocol Limitations
+
+If you want to either use ZeroClipboard on a page hosted via the `file://` protocol or serve ZeroClipboard's assets via the `file://` protocol, you are almost guaranteed to run into some roadblocks due to Flash Player security restrictions. Whether you will be able to work around these roadblocks depends heavily on the specifics of the browser and Flash Player plugin being used.
+
+The various potential and/or partial workarounds are detailed below. We recommend trying them in the
+order they are listed, with the exception of any that are not applicable to your browser/Flash setup.
+
+#### Stop Hosting It Over The `file://` Protocol
+
+Do you really need to be hosting this via the `file://` protocol?  If not, please don't: it may turn into a neverending (or outright _losing_) security configuration battle for you.
+
+We recommend that you instead just get a simple HTTP server installed and use it.  Many HTTP server applications exist today that don't even require configuration or proper "installation", they are just executable files that can dynamically host the current working directory (or accept command line configuration options). Simple, easy, done.
+
+But, if you really do _need_ to be hosting this via the `file://` protocol, please read on... and we wish you much-needed luck.
+
+
+#### Tell ZeroClipboard To Trust Anyone & Everyone
+
+Rarely, for some browser/Flash setups, you can bypass this security restriction as easily as specifically
+configuring ZeroClipboard to trust ALL domains for SWF interaction via a wildcard. This
+configuration must be set _before_ creating ZeroClipboard client instances as a typical consumer,
+or before calling `ZeroClipboard.create()` in a 3rd party wrapper:
+
+```js
+ZeroClipboard.config({ trustedDomains: ["*"] });
+```
+
+This wildcard configuration should _**NOT**_ be used in environments hosted over HTTP/HTTPS.
+
+
+#### Tell Flash Player Local Settings Manager To Trust Your SWF URL
+
+If you are using any browser with the traditional NPAPI Flash Player plugin enabled **AND** _preferred_
+(i.e. PPAPI Flash Player plugins are not supported, are not installed, or are disabled for the browser
+instance in question) or using the PPAPI Flash Player plugin `v16.0.0` (or higher), you can edit your
+system-level Flash Player security settings to whitelist your SWF URL using the [Flash Player
+Local Settings Manager](http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager.html):
+ 1. Open the Flash Player Local Settings Manager via your system's [OS-specific access procedure](http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager.html#124401).
+ 2. Go to the ["Advanced" tab](http://help.adobe.com/en_US/FlashPlayer/LSM/WS6aa5ec234ff3f285139dc56112e3786b68c-7ff0.html).
+ 3. Locate the ["Developer Tools" subsection](http://help.adobe.com/en_US/FlashPlayer/LSM/WS6aa5ec234ff3f285139dc56112e3786b68c-7ff0.html#WS6aa5ec234ff3f285139dc56112e3786b68c-7feb) (may require you to scroll down).
+ 4. Click the ["Trusted Location Settings..." button](http://help.adobe.com/en_US/FlashPlayer/LSM/WS6aa5ec234ff3f285139dc56112e3786b68c-7ff0.html#WS6aa5ec234ff3f285139dc56112e3786b68c-7fea).
+ 5. Click "Add location" (may be represented as a `+` button).
+ 6. Add the absolute path of your local "ZeroClipboard.swf" file to the trusted files whitelist.
+
+This should work for all NPAPI Flash Player plugins. However, this _may_ **not** work for all PPAPI Flash Player plugins.
+
+
+#### Tell Flash Player Online Settings Manager To Trust Your SWF URL
+
+If you are using any browser with the traditional NPAPI Flash Player plugin enabled **AND** _preferred_
+(i.e. PPAPI Flash Player plugins are not supported, are not installed, or are disabled for the browser
+instance in question), you can edit your device-level NPAPI Flash Player security settings to whitelist
+your SWF URL using the [Flash Player Online Settings Manager](http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04a.html):
+ 1. Using the same browser, go to the [Adobe Flash Player Online Settings Manager page](http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04a.html).
+ 2. In the small embedded Flash app (which looks more like a screen capture rather than an interactive UI), click "Add location".  This may be inside of an "Edit locations..." dropdown menu.
+ 3. Add the absolute path of your local "ZeroClipboard.swf" file to the trusted files whitelist.
+
+Some versions of Flash also include an "allow all" option in the Global Settings Manager.
+
+This should work for all NPAPI Flash Player plugins. However, this **WILL NOT** work for _any_ PPAPI Flash Player plugins.
+
+
+#### Tell PPAPI Flash Player Plugins To Take A Hike
+
+If you are using a PPAPI Flash Player plugin and all of the aforementioned workarounds **combined** still didn't allow you to bypass this security restriction, you have officially run out of proper workarounds as you have almost certainly run into the [even more restrictive security model in Chromium's "Pepper" (PPAPI) Flash layer](https://code.google.com/p/chromium/issues/detail?id=137734). This elevated security will affect PPAPI Flash Player plugin usage in Chromium, Chrome Canary, Chrome, and possibly all Blink-based versions of Opera.
+
+At this point, your only remaining option is to disable your PPAPI Flash Player plugin and fallback to an NPAPI Flash Player plugin instead.
+
+If you are unwilling to disable your PPAPI Flash Player plugin, your goal has now officially been defeated by Flash Player's security restrictions.  You should now reconsider our earlier recommendation to [stop hosting it over the `file://` protocol](#stop-hosting-it-over-the-file-protocol)... we _tried_ to warn you!
 
 
 

@@ -934,25 +934,13 @@ value of the `trustedDomains` configuration option.
 For more information about `allowScriptAccess`, consult the [_official Flash documentation_](http://helpx.adobe.com/flash/kb/control-access-scripts-host-web.html).
 
 
+## Protocol Limitations
+
 ### Cross-Protocol Limitations
 
-ZeroClipboard was intentionally configured to _not_ allow the SWF to be served from a secure domain (HTTPS) but scripted by an insecure domain (HTTP).
-
-If you find yourself in this situation (as in [Issue #170](https://github.com/zeroclipboard/zeroclipboard/issues/170)), please consider the following options:  
- 1. Serve the SWF over HTTP instead of HTTPS. If the page's protocol can vary (e.g. authorized/unauthorized, staging/production, etc.), you should include add the SWF with a relative protocol (`//s3.amazonaws.com/blah/ZeroClipboard.swf`) instead of an absolute protocol (`https://s3.amazonaws.com/blah/ZeroClipboard.swf`).
- 2. Serve the page over HTTPS instead of HTTP. If the page's protocol can vary, see the note on the previous option (1).
- 3. Update ZeroClipboard's ActionScript codebase to call the [`allowInsecureDomain`](http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/Security.html#allowInsecureDomain\(\)) method, then recompile the SWF with your custom changes.
+ZeroClipboard was intentionally configured to _not_ allow the SWF to be served from a secure domain (HTTPS) but scripted by an insecure domain (HTTP). If you find yourself in this situation (as in [Issue #170](https://github.com/zeroclipboard/zeroclipboard/issues/170)), see [../instructions.md#cross-protocol-limitations](../instructions.md#cross-protocol-limitations) for an in-depth explanation of this limitation and how to proceed.
 
 
 ### `file://` Protocol Limitations
 
-If you want to host a page locally on the `file://` protocol, you must specifically configure
-ZeroClipboard to trust ALL domains for SWF interaction via a wildcard. This configuration must be
-set _before_ creating ZeroClipboard client instances as a typical consumer, or before calling
-`ZeroClipboard.create()` in a 3rd party wrapper:
-
-```js
-ZeroClipboard.config({ trustedDomains: ["*"] });
-```
-
-This wildcard configuration should _**NOT**_ be used in environments hosted over HTTP/HTTPS.
+If you want to either use ZeroClipboard on a page hosted via the `file://` protocol or serve ZeroClipboard's assets via the `file://` protocol, you are almost guaranteed to run into some roadblocks due to Flash Player security restrictions. See [../instructions.md#file-protocol-limitations](../instructions.md#file-protocol-limitations) for an in-depth explanation of this limitation and the potential workarounds.
