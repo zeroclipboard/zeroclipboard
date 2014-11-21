@@ -12,7 +12,7 @@
  * Store references to critically important global functions that may be
  * overridden on certain web pages.
  */
-  var _window = window, _document = _window.document, _navigator = _window.navigator, _setTimeout = _window.setTimeout, _clearTimeout = _window.clearTimeout, _encodeURIComponent = _window.encodeURIComponent, _ActiveXObject = _window.ActiveXObject, _Error = _window.Error, _parseInt = _window.Number.parseInt || _window.parseInt, _parseFloat = _window.Number.parseFloat || _window.parseFloat, _isNaN = _window.Number.isNaN || _window.isNaN, _round = _window.Math.round, _now = _window.Date.now, _keys = _window.Object.keys, _defineProperty = _window.Object.defineProperty, _hasOwn = _window.Object.prototype.hasOwnProperty, _slice = _window.Array.prototype.slice, _unwrap = function() {
+  var _window = window, _document = _window.document, _navigator = _window.navigator, _setTimeout = _window.setTimeout, _clearTimeout = _window.clearTimeout, _encodeURIComponent = _window.encodeURIComponent, _ActiveXObject = _window.ActiveXObject, _Error = _window.Error, _parseInt = _window.Number.parseInt || _window.parseInt, _parseFloat = _window.Number.parseFloat || _window.parseFloat, _isNaN = _window.Number.isNaN || _window.isNaN, _now = _window.Date.now, _keys = _window.Object.keys, _defineProperty = _window.Object.defineProperty, _hasOwn = _window.Object.prototype.hasOwnProperty, _slice = _window.Array.prototype.slice, _unwrap = function() {
     var unwrapper = function(el) {
       return el;
     };
@@ -771,7 +771,7 @@
       var srcElement = event.target;
       var fromElement = event.type === "_mouseover" && event.relatedTarget ? event.relatedTarget : undefined;
       var toElement = event.type === "_mouseout" && event.relatedTarget ? event.relatedTarget : undefined;
-      var pos = _getDOMObjectPosition(srcElement);
+      var pos = _getElementPosition(srcElement);
       var screenLeft = _window.screenLeft || _window.screenX || 0;
       var screenTop = _window.screenTop || _window.screenY || 0;
       var scrollLeft = _document.body.scrollLeft + _document.documentElement.scrollLeft;
@@ -1467,54 +1467,38 @@
     return value;
   };
   /**
- * Get the zoom factor of the browser. Always returns `1.0`, except at
- * non-default zoom levels in IE<8 and some older versions of WebKit.
- *
- * @returns Floating unit percentage of the zoom factor (e.g. 150% = `1.5`).
- * @private
- */
-  var _getZoomFactor = function() {
-    var rect, physicalWidth, logicalWidth, zoomFactor = 1;
-    if (typeof _document.body.getBoundingClientRect === "function") {
-      rect = _document.body.getBoundingClientRect();
-      physicalWidth = rect.right - rect.left;
-      logicalWidth = _document.body.offsetWidth;
-      zoomFactor = _round(physicalWidth / logicalWidth * 100) / 100;
-    }
-    return zoomFactor;
-  };
-  /**
- * Get the DOM positioning info of an element.
+ * Get the absolutely positioned coordinates of a DOM element.
  *
  * @returns Object containing the element's position, width, and height.
  * @private
  */
-  var _getDOMObjectPosition = function(obj) {
-    var info = {
+  var _getElementPosition = function(el) {
+    var pos = {
       left: 0,
       top: 0,
       width: 0,
       height: 0
     };
-    if (obj.getBoundingClientRect) {
-      var rect = obj.getBoundingClientRect();
-      var pageXOffset, pageYOffset, zoomFactor;
-      if ("pageXOffset" in _window && "pageYOffset" in _window) {
-        pageXOffset = _window.pageXOffset;
-        pageYOffset = _window.pageYOffset;
-      } else {
-        zoomFactor = _getZoomFactor();
-        pageXOffset = _round(_document.documentElement.scrollLeft / zoomFactor);
-        pageYOffset = _round(_document.documentElement.scrollTop / zoomFactor);
-      }
+    if (el.getBoundingClientRect) {
+      var elRect = el.getBoundingClientRect();
+      var pageXOffset = _window.pageXOffset;
+      var pageYOffset = _window.pageYOffset;
       var leftBorderWidth = _document.documentElement.clientLeft || 0;
       var topBorderWidth = _document.documentElement.clientTop || 0;
-      info.left = rect.left + pageXOffset - leftBorderWidth;
-      info.top = rect.top + pageYOffset - topBorderWidth;
-      info.width = "width" in rect ? rect.width : rect.right - rect.left;
-      info.height = "height" in rect ? rect.height : rect.bottom - rect.top;
+      var leftBodyOffset = 0;
+      var topBodyOffset = 0;
+      if (_getStyle(_document.body, "position") === "relative") {
+        var bodyRect = _document.body.getBoundingClientRect();
+        var htmlRect = _document.documentElement.getBoundingClientRect();
+        leftBodyOffset = bodyRect.left - htmlRect.left || 0;
+        topBodyOffset = bodyRect.top - htmlRect.top || 0;
+      }
+      pos.left = elRect.left + pageXOffset - leftBorderWidth - leftBodyOffset;
+      pos.top = elRect.top + pageYOffset - topBorderWidth - topBodyOffset;
+      pos.width = "width" in elRect ? elRect.width : elRect.right - elRect.left;
+      pos.height = "height" in elRect ? elRect.height : elRect.bottom - elRect.top;
     }
-    return info;
+    return pos;
   };
   /**
  * Reposition the Flash object to cover the currently activated element.
@@ -1525,7 +1509,7 @@
   var _reposition = function() {
     var htmlBridge;
     if (_currentElement && (htmlBridge = _getHtmlBridge(_flashState.bridge))) {
-      var pos = _getDOMObjectPosition(_currentElement);
+      var pos = _getElementPosition(_currentElement);
       _extend(htmlBridge.style, {
         width: pos.width + "px",
         height: pos.height + "px",

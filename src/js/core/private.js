@@ -557,7 +557,7 @@ var _addMouseData = function(event) {
     var toElement   = event.type === "_mouseout"  && event.relatedTarget ? event.relatedTarget : undefined;
 
     // Calculate positional data
-    var pos = _getDOMObjectPosition(srcElement);
+    var pos = _getElementPosition(srcElement);
     var screenLeft = _window.screenLeft || _window.screenX || 0;
     var screenTop  = _window.screenTop  || _window.screenY || 0;
     var scrollLeft = _document.body.scrollLeft + _document.documentElement.scrollLeft;
@@ -1510,36 +1510,13 @@ var _getStyle = function(el, prop) {
 
 
 /**
- * Get the zoom factor of the browser. Always returns `1.0`, except at
- * non-default zoom levels in IE<8 and some older versions of WebKit.
- *
- * @returns Floating unit percentage of the zoom factor (e.g. 150% = `1.5`).
- * @private
- */
-var _getZoomFactor = function() {
-  var rect, physicalWidth, logicalWidth,
-      zoomFactor = 1;
-  if (typeof _document.body.getBoundingClientRect === "function") {
-    // rect is only in physical pixels in IE<8
-    rect = _document.body.getBoundingClientRect();
-    physicalWidth = rect.right - rect.left;
-    logicalWidth = _document.body.offsetWidth;
-
-    zoomFactor = _round((physicalWidth / logicalWidth) * 100) / 100;
-  }
-  return zoomFactor;
-};
-
-
-/**
- * Get the DOM positioning info of an element.
+ * Get the absolutely positioned coordinates of a DOM element.
  *
  * @returns Object containing the element's position, width, and height.
  * @private
  */
-var _getDOMObjectPosition = function(obj) {
-  // get absolute coordinates for dom element
-  var info = {
+var _getElementPosition = function(el) {
+  var pos = {
     left: 0,
     top: 0,
     width: 0,
@@ -1548,33 +1525,36 @@ var _getDOMObjectPosition = function(obj) {
 
   // Use getBoundingClientRect where available (almost everywhere).
   // See: http://www.quirksmode.org/dom/w3c_cssom.html
-  if (obj.getBoundingClientRect) {
-    // compute left / top offset (works for `position:fixed`, too!)
-    var rect = obj.getBoundingClientRect();
-    var pageXOffset, pageYOffset, zoomFactor;
+  if (el.getBoundingClientRect) {
+    // Compute left / top offset (works for `position:fixed`, too!)
+    var elRect = el.getBoundingClientRect();
 
-    // IE<9 doesn't support `pageXOffset`/`pageXOffset`
-    if ("pageXOffset" in _window && "pageYOffset" in _window) {
-      pageXOffset = _window.pageXOffset;
-      pageYOffset = _window.pageYOffset;
-    }
-    else {
-      zoomFactor = _getZoomFactor();
-      pageXOffset = _round(_document.documentElement.scrollLeft / zoomFactor);
-      pageYOffset = _round(_document.documentElement.scrollTop / zoomFactor);
-    }
+    // Get the document's scroll offsets
+    var pageXOffset = _window.pageXOffset;
+    var pageYOffset = _window.pageYOffset;
 
     // `clientLeft`/`clientTop` are to fix IE's 2px offset in standards mode
     var leftBorderWidth = _document.documentElement.clientLeft || 0;
     var topBorderWidth = _document.documentElement.clientTop || 0;
 
-    info.left = rect.left + pageXOffset - leftBorderWidth;
-    info.top = rect.top + pageYOffset - topBorderWidth;
-    info.width = "width" in rect ? rect.width : rect.right - rect.left;
-    info.height = "height" in rect ? rect.height : rect.bottom - rect.top;
+    // Compensate for the `body` offset relative to the `html` root
+    // This is critical for when the `body` element's CSS includes `position:relative`
+    var leftBodyOffset = 0;
+    var topBodyOffset = 0;
+    if (_getStyle(_document.body, "position") === "relative") {
+      var bodyRect = _document.body.getBoundingClientRect();
+      var htmlRect = _document.documentElement.getBoundingClientRect();
+      leftBodyOffset = (bodyRect.left - htmlRect.left) || 0;
+      topBodyOffset = (bodyRect.top - htmlRect.top) || 0;
+    }
+
+    pos.left = elRect.left + pageXOffset - leftBorderWidth - leftBodyOffset;
+    pos.top = elRect.top + pageYOffset - topBorderWidth - topBodyOffset;
+    pos.width = "width" in elRect ? elRect.width : elRect.right - elRect.left;
+    pos.height = "height" in elRect ? elRect.height : elRect.bottom - elRect.top;
   }
 
-  return info;
+  return pos;
 };
 
 
@@ -1588,7 +1568,7 @@ var _reposition = function() {
   var htmlBridge;
   // If there is no `_currentElement`, skip it
   if (_currentElement && (htmlBridge = _getHtmlBridge(_flashState.bridge))) {
-    var pos = _getDOMObjectPosition(_currentElement);
+    var pos = _getElementPosition(_currentElement);
     _extend(htmlBridge.style, {
       width: pos.width + "px",
       height: pos.height + "px",
