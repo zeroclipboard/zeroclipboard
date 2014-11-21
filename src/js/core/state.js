@@ -30,6 +30,12 @@ var _minimumFlashVersion = "11.0.0";
 
 
 /**
+ * The ZeroClipboard library version number, as reported by Flash, at the time the SWF was compiled.
+ */
+var _zcSwfVersion;
+
+
+/**
  * Keep track of all event listener registrations.
  * @private
  */
@@ -82,7 +88,8 @@ var _eventMessages = {
     "flash-unavailable": "Flash is unable to communicate bidirectionally with JavaScript",
     "flash-degraded": "Flash is unable to preserve data fidelity when communicating with JavaScript",
     "flash-deactivated": "Flash is too outdated for your browser and/or is configured as click-to-activate",
-    "flash-overdue": "Flash communication was established but NOT within the acceptable time limit"
+    "flash-overdue": "Flash communication was established but NOT within the acceptable time limit",
+    "version-mismatch": "ZeroClipboard JS version number does not match ZeroClipboard SWF version number"
   }
 };
 

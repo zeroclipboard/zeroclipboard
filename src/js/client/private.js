@@ -41,6 +41,8 @@ var _clientConstructor = function(elements) {
  * @private
  */
 var _clientOn = function(eventType, listener) {
+  /*jshint maxstatements:26 */
+
   // add user event handler for event
   var i, len, events,
       added = {},
@@ -83,16 +85,24 @@ var _clientOn = function(eventType, listener) {
       });
     }
     if (added.error) {
-      var errorTypes = ["disabled", "outdated", "unavailable", "degraded", "deactivated", "overdue"];
-      for (i = 0, len = errorTypes.length; i < len; i++) {
-        if (_flashState[errorTypes[i]]) {
+      var flashErrorTypes = ["disabled", "outdated", "unavailable", "degraded", "deactivated", "overdue"];
+      for (i = 0, len = flashErrorTypes.length; i < len; i++) {
+        if (_flashState[flashErrorTypes[i]]) {
           this.emit({
             type: "error",
-            name: "flash-" + errorTypes[i],
+            name: "flash-" + flashErrorTypes[i],
             client: this
           });
           break;
         }
+      }
+      if (_zcSwfVersion !== undefined && ZeroClipboard.version !== _zcSwfVersion) {
+        this.emit({
+          type: "error",
+          name: "version-mismatch",
+          jsVersion: ZeroClipboard.version,
+          swfVersion: _zcSwfVersion
+        });
       }
     }
   }

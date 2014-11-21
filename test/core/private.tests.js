@@ -1,4 +1,4 @@
-/*global _flashState:true, _currentElement:true, _copyTarget:true, _extend, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _extractDomain, _determineScriptAccess, _mapClipDataToFlash, _mapClipResultsFromFlash, _createEvent, _preprocessEvent, _getRelatedTarget, _shouldPerformAsync, _dispatchCallback, _detectFlashSupport */
+/*global _flashState:true, _currentElement:true, _copyTarget:true, _extend, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _extractDomain, _determineScriptAccess, _mapClipDataToFlash, _mapClipResultsFromFlash, _createEvent, _preprocessEvent, _getRelatedTarget, _shouldPerformAsync, _dispatchCallback, _detectFlashSupport, _encodeURIComponent */
 
 (function(module, test) {
   "use strict";
@@ -110,9 +110,13 @@
     assert.expect(6);
 
     // Arrange
+    var someDomain = "zeroclipboard.org";
     var clipOptionsEmpty = {};
-    var clipOptionsTrustedDomains = {
+    var clipOptionsTrustedDomainsWildcard = {
       trustedDomains: ["*"]
+    };
+    var clipOptionsTrustedDomains = {
+      trustedDomains: [someDomain]
     };
     var clipOptionsEnhancedClipboardFalse = {
       forceEnhancedClipboard: false
@@ -120,22 +124,20 @@
     var clipOptionsEnhancedClipboardTrue = {
       forceEnhancedClipboard: true
     };
-    var clipOptionsTrustedDomainsPlusEnhancedClipboardFalse = {
+    var clipOptionsAll = {
       trustedDomains: ["*"],
-      forceEnhancedClipboard: false
-    };
-    var clipOptionsTrustedDomainsPlusEnhancedClipboardTrue = {
-      trustedDomains: ["*"],
-      forceEnhancedClipboard: true
+      forceEnhancedClipboard: true,
+      swfObjectId: "mySwfObjectId",
+      jsVersion: "2.0.0"
     };
 
     // Act & Assert
     assert.strictEqual(_vars(clipOptionsEmpty), "");
-    assert.strictEqual(_vars(clipOptionsTrustedDomains), "trustedOrigins=*");
+    assert.strictEqual(_vars(clipOptionsTrustedDomainsWildcard), "trustedOrigins=*");
+    assert.strictEqual(_vars(clipOptionsTrustedDomains), "trustedOrigins=" + _encodeURIComponent(someDomain + ",//" + someDomain + "," + window.location.protocol + "//" + someDomain));
     assert.strictEqual(_vars(clipOptionsEnhancedClipboardFalse), "");
     assert.strictEqual(_vars(clipOptionsEnhancedClipboardTrue), "forceEnhancedClipboard=true");
-    assert.strictEqual(_vars(clipOptionsTrustedDomainsPlusEnhancedClipboardFalse), "trustedOrigins=*");
-    assert.strictEqual(_vars(clipOptionsTrustedDomainsPlusEnhancedClipboardTrue), "trustedOrigins=*&forceEnhancedClipboard=true");
+    assert.strictEqual(_vars(clipOptionsAll), "trustedOrigins=*&forceEnhancedClipboard=true&swfObjectId=mySwfObjectId&jsVersion=2.0.0");
   });
 
 

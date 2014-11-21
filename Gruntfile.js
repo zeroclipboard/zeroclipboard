@@ -41,8 +41,9 @@ module.exports = function(grunt) {
       }
     },
     clean: {
-      dist: ["ZeroClipboard.*", "dist/ZeroClipboard.*"],
-      flash: {
+      jsDist: ["ZeroClipboard.*", "dist/ZeroClipboard.*", "!ZeroClipboard.swf", "!dist/ZeroClipboard.swf"],
+      flashDist: ["ZeroClipboard.swf", "dist/ZeroClipboard.swf"],
+      flashTemp: {
         options: {
           // Force is required when trying to clean outside of the project dir
           force: true
@@ -317,19 +318,21 @@ module.exports = function(grunt) {
 
   // Task aliases and chains
   grunt.registerTask("jshint-prebuild", ["jshint:gruntfile", "jshint:component", "jshint:js", "jshint:test"]);
-  grunt.registerTask("prep-flash",      ["clean:flash", "concat:flash"]);
+  grunt.registerTask("prep-flash",      ["clean:flashTemp", "concat:flash"]);
   grunt.registerTask("validate",        ["jshint-prebuild", "prep-flash", "flexpmd"]);
   grunt.registerTask("build",           ["clean", "concat", "jshint:dist", "uglify", "mxmlc", "template", "chmod"]);
   grunt.registerTask("build-travis",    ["clean", "concat", "jshint:dist", "mxmlc", "chmod:dist"]);
   grunt.registerTask("test",            ["connect", "qunit:file", "qunit:http"]);
 
-  // Default task
+  // Default task //grunt concat
   grunt.registerTask("default", ["validate", "build", "test"]);
 
   // Travis CI task
   grunt.registerTask("travis",  ["validate", "build-travis", "test", "qunit:coveralls", "coveralls"]);
 
-  // Local Flash dev
-  grunt.registerTask("asdev",   ["validate", "build"]);
+  // Local development tasks
+  grunt.registerTask("jsdev-build", ["jshint-prebuild", "clean:jsDist", "concat:core", "concat:client", "jshint:dist", "uglify:js"]);
+  grunt.registerTask("jsdev",       ["jsdev-build", "test"]);
+  grunt.registerTask("swfdev",      ["prep-flash", "flexpmd", "clean:flashDist", "mxmlc", "chmod:dist"]);
 
 };

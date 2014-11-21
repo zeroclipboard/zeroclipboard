@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Jon Rohan, James M. Greene
  * Licensed MIT
  * http://zeroclipboard.org/
- * v2.2.0-beta.1
+ * v2.2.0-beta.2
  */
 (function(window, undefined) {
   "use strict";
@@ -294,6 +294,10 @@
  */
   var _minimumFlashVersion = "11.0.0";
   /**
+ * The ZeroClipboard library version number, as reported by Flash, at the time the SWF was compiled.
+ */
+  var _zcSwfVersion;
+  /**
  * Keep track of all event listener registrations.
  * @private
  */
@@ -335,7 +339,8 @@
       "flash-unavailable": "Flash is unable to communicate bidirectionally with JavaScript",
       "flash-degraded": "Flash is unable to preserve data fidelity when communicating with JavaScript",
       "flash-deactivated": "Flash is too outdated for your browser and/or is configured as click-to-activate",
-      "flash-overdue": "Flash communication was established but NOT within the acceptable time limit"
+      "flash-overdue": "Flash communication was established but NOT within the acceptable time limit",
+      "version-mismatch": "ZeroClipboard JS version number does not match ZeroClipboard SWF version number"
     }
   };
   /**
@@ -442,15 +447,23 @@
         });
       }
       if (added.error) {
-        var errorTypes = [ "disabled", "outdated", "unavailable", "degraded", "deactivated", "overdue" ];
-        for (i = 0, len = errorTypes.length; i < len; i++) {
-          if (_flashState[errorTypes[i]] === true) {
+        var flashErrorTypes = [ "disabled", "outdated", "unavailable", "degraded", "deactivated", "overdue" ];
+        for (i = 0, len = flashErrorTypes.length; i < len; i++) {
+          if (_flashState[flashErrorTypes[i]] === true) {
             ZeroClipboard.emit({
               type: "error",
-              name: "flash-" + errorTypes[i]
+              name: "flash-" + flashErrorTypes[i]
             });
             break;
           }
+        }
+        if (_zcSwfVersion !== undefined && ZeroClipboard.version !== _zcSwfVersion) {
+          this.emit({
+            type: "error",
+            name: "version-mismatch",
+            jsVersion: ZeroClipboard.version,
+            swfVersion: _zcSwfVersion
+          });
         }
       }
     }
@@ -876,10 +889,24 @@
           overdue: event.name === "flash-overdue",
           ready: false
         });
+      } else if (event.name === "version-mismatch") {
+        _zcSwfVersion = event.swfVersion;
+        _extend(_flashState, {
+          disabled: false,
+          outdated: false,
+          unavailable: false,
+          degraded: false,
+          deactivated: false,
+          overdue: false,
+          ready: false
+        });
       }
+      _clearTimeout(_flashCheckTimeout);
+      _flashCheckTimeout = 0;
       break;
 
      case "ready":
+      _zcSwfVersion = event.swfVersion;
       var wasDeactivated = _flashState.deactivated === true;
       _extend(_flashState, {
         disabled: false,
@@ -890,6 +917,8 @@
         overdue: wasDeactivated,
         ready: !wasDeactivated
       });
+      _clearTimeout(_flashCheckTimeout);
+      _flashCheckTimeout = 0;
       break;
 
      case "beforecopy":
@@ -1056,7 +1085,9 @@
     if (!flashBridge) {
       var allowScriptAccess = _determineScriptAccess(_window.location.host, _globalConfig);
       var allowNetworking = allowScriptAccess === "never" ? "none" : "all";
-      var flashvars = _vars(_globalConfig);
+      var flashvars = _vars(_extend({
+        jsVersion: ZeroClipboard.version
+      }, _globalConfig));
       var swfUrl = _globalConfig.swfPath + _cacheBust(_globalConfig.swfPath, _globalConfig);
       container = _createHtmlBridge();
       var divToBeReplaced = _document.createElement("div");
@@ -1124,6 +1155,7 @@
       _flashState.ready = null;
       _flashState.bridge = null;
       _flashState.deactivated = null;
+      _zcSwfVersion = undefined;
     }
   };
   /**
@@ -1260,6 +1292,9 @@
     }
     if (typeof options.swfObjectId === "string" && options.swfObjectId) {
       str += (str ? "&" : "") + "swfObjectId=" + _encodeURIComponent(options.swfObjectId);
+    }
+    if (typeof options.jsVersion === "string" && options.jsVersion) {
+      str += (str ? "&" : "") + "jsVersion=" + _encodeURIComponent(options.jsVersion);
     }
     return str;
   };
@@ -1635,7 +1670,7 @@
  * @property {string}
  */
   _defineProperty(ZeroClipboard, "version", {
-    value: "2.2.0-beta.1",
+    value: "2.2.0-beta.2",
     writable: false,
     configurable: true,
     enumerable: true

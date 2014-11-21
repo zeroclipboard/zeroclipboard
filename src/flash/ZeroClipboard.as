@@ -18,6 +18,12 @@ package {
   public class ZeroClipboard extends Sprite {
 
     /**
+     * ZeroClipboard library version number at the time this SWF was compiled.
+     */
+    public static const VERSION:String = "<%= version %>";
+
+
+    /**
      * Function through which JavaScript events are emitted. Accounts for scenarios
      * in which ZeroClipboard is used via AMD/CommonJS module loaders, too.
      */
@@ -70,36 +76,15 @@ package {
       // Remove the event listener, if any
       this.removeEventListener(Event.ADDED_TO_STAGE, this.init);
 
-      // Get the flashvars
-      var flashvars:Object;  // NOPMD
-      flashvars = XssUtils.filterToFlashVars(this.loaderInfo.parameters);
-
-      // Configure the SWF object's ID
-      var swfObjectId:String = "global-zeroclipboard-flash-bridge";
-      if (flashvars.swfObjectId && typeof flashvars.swfObjectId === "string") {
-        var swfId:String = XssUtils.sanitizeString(flashvars.swfObjectId);
-
-        // Validate the ID against the HTML4 spec for `ID` tokens.
-        if (/^[A-Za-z][A-Za-z0-9_:\-\.]*$/.test(swfId)) {
-          swfObjectId = swfId;
-        }
-      }
+      var expectedFlashVars:Object;  // NOPMD
+      expectedFlashVars = this.getExpectedFlashVars();
 
       // Allow the SWF object to communicate with a page on a different origin than its own (e.g. SWF served from CDN)
-      if (flashvars.trustedOrigins && typeof flashvars.trustedOrigins === "string") {
-        var origins:Array = XssUtils.sanitizeString(flashvars.trustedOrigins).split(",");
-        Security.allowDomain.apply(Security, origins);
-      }
-
-      // Enable use of the fancy "Desktop" clipboard, even on Linux where it is known to suck
-      var forceEnhancedClipboard:Boolean = false;
-      if (flashvars.forceEnhancedClipboard === "true" || flashvars.forceEnhancedClipboard === true) {
-        forceEnhancedClipboard = true;
-      }
+      Security.allowDomain.apply(Security, expectedFlashVars.trustedOrigins);
 
       this.jsEmitter =
         "(function(eventObj) {\n" +
-        "  var objectId = '" + swfObjectId + "',\n" +
+        "  var objectId = '" + expectedFlashVars.swfObjectId + "',\n" +
         "      ZC, swf, result;\n\n" +
         "  if (typeof ZeroClipboard === 'function' && typeof ZeroClipboard.emit === 'function') {\n" +
         "    \nZC = ZeroClipboard;\n" +
@@ -126,41 +111,94 @@ package {
       var button:Sprite = this.prepareUI();
 
       // Configure the clipboard injector
-      this.clipboard = new ClipboardInjector(forceEnhancedClipboard);
+      this.clipboard = new ClipboardInjector(expectedFlashVars.forceEnhancedClipboard);
 
       // Establish a communication line with JavaScript
-      this.jsProxy = new JsProxy(swfObjectId);
+      this.jsProxy = new JsProxy(expectedFlashVars.swfObjectId);
 
       // Only proceed if this SWF is hosted in the browser as expected
-      if (this.jsProxy.isComplete()) {
-        if (this.jsProxy.isHighFidelity()) {
-          // Add the MouseEvent listeners
-          this.addMouseHandlers(button);
-
-          // Expose the external functions
-          this.jsProxy.addCallback(
-            "setHandCursor",
-            function(enabled:Boolean): void {
-              button.useHandCursor = enabled === true;
-            }
-          );
-
-          // Signal to the browser that we are ready
-          this.emit("ready");
-        }
-        else {
-          // Signal to the browser that data fidelity cannot be guaranteed
-          this.emit("error", {
-            name: "flash-degraded"
-          });
-        }
-      }
-      else {
+      if (!this.jsProxy.isComplete()) {
         // Signal to the browser that something is wrong
         this.emit("error", {
           name: "flash-unavailable"
         });
       }
+      else if (!this.jsProxy.isHighFidelity()) {
+        // Signal to the browser that data fidelity cannot be guaranteed
+        this.emit("error", {
+          name: "flash-degraded"
+        });
+      }
+      else if (!expectedFlashVars.jsVersion || !ZeroClipboard.VERSION || expectedFlashVars.jsVersion !== ZeroClipboard.VERSION) {
+        this.emit("error", {
+          name: "version-mismatch",
+          jsVersion: expectedFlashVars.jsVersion || null,
+          swfVersion: ZeroClipboard.VERSION || null
+        });
+      }
+      else {
+        // Add the MouseEvent listeners
+        this.addMouseHandlers(button);
+
+        // Expose the external functions
+        this.jsProxy.addCallback(
+          "setHandCursor",
+          function(enabled:Boolean): void {
+            button.useHandCursor = enabled === true;
+          }
+        );
+
+        // Signal to the browser that we are ready
+        this.emit("ready", {
+          swfVersion: ZeroClipboard.VERSION || null
+        });
+      }
+    }
+
+
+    /**
+     *
+     */
+    private function getExpectedFlashVars(
+    ): Object { // NOPMD
+      var expectedFlashVars:Object;  // NOPMD
+      expectedFlashVars = {
+        swfObjectId: "global-zeroclipboard-flash-bridge",
+        trustedOrigins: [],
+        forceEnhancedClipboard: false,
+        jsVersion: null
+      };
+
+      // Get the flashvars
+      var flashvars:Object;  // NOPMD
+      flashvars = XssUtils.filterToFlashVars(this.loaderInfo.parameters);
+
+      // Configure the SWF object's ID
+      if (flashvars.swfObjectId && typeof flashvars.swfObjectId === "string") {
+        var swfId:String = XssUtils.sanitizeString(flashvars.swfObjectId);
+
+        // Validate the ID against the HTML4 spec for `ID` tokens.
+        if (/^[A-Za-z][A-Za-z0-9_:\-\.]*$/.test(swfId)) {
+          expectedFlashVars.swfObjectId = swfId;
+        }
+      }
+
+      // Allow the SWF object to communicate with a page on a different origin than its own (e.g. SWF served from CDN)
+      if (flashvars.trustedOrigins && typeof flashvars.trustedOrigins === "string") {
+        expectedFlashVars.trustedOrigins = XssUtils.sanitizeString(flashvars.trustedOrigins).split(",");
+      }
+
+      // Enable use of the fancy "Desktop" clipboard, even on Linux where it is known to suck
+      if (flashvars.forceEnhancedClipboard === "true" || flashvars.forceEnhancedClipboard === true) {
+        expectedFlashVars.forceEnhancedClipboard = true;
+      }
+
+      // Get the version number of the ZeroClipboard JS side of the library
+      if (typeof flashvars.jsVersion === "string") {
+        expectedFlashVars.jsVersion = XssUtils.sanitizeString(flashvars.jsVersion);
+      }
+
+      return expectedFlashVars;
     }
 
 

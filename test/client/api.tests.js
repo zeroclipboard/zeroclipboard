@@ -1,4 +1,4 @@
-/*global ZeroClipboard, _currentElement:true, _flashState:true, _extend, _clipData, _clipDataFormatMap */
+/*global ZeroClipboard, _currentElement:true, _flashState:true, _zcSwfVersion:true, _extend, _clipData, _clipDataFormatMap */
 
 (function(module, test) {
   "use strict";
@@ -978,6 +978,91 @@
     // Act
     QUnit.stop();
     ZeroClipboard.emit({ type: "error", name: "flash-degraded" });
+  });
+
+
+  test("Test versionMismatch Event", function(assert) {
+    assert.expect(11);
+
+    // Arrange
+    _flashState.disabled = false;
+    _flashState.outdated = false;
+    _flashState.deactivated = false;
+    _flashState.unavailable = false;
+    _flashState.degraded = false;
+    _flashState.version = "11.9.0";
+    var client = new ZeroClipboard();
+    var currentEl = document.getElementById("d_clip_button");
+    var id = client.id;
+    client.clip(currentEl);
+    client.on( "ready", function(/* event */) {
+      assert.ok(false, "The `ready` event should NOT have fired!");
+    } );
+    client.on( "error", function(event) {
+      // Assert
+      assert.strictEqual(this, client);
+      assert.strictEqual(this.id, id);
+      assert.strictEqual(_flashState.degraded, false);
+      assert.strictEqual(_flashState.unavailable, false);
+      assert.strictEqual(_flashState.deactivated, false);
+      assert.strictEqual(_flashState.ready, false);
+      assert.strictEqual(event.type, "error");
+      assert.strictEqual(event.name, "version-mismatch");
+      assert.strictEqual(event.target, null);
+      assert.strictEqual(event.jsVersion, "2.0.1");
+      assert.strictEqual(event.swfVersion, "2.0.0");
+      QUnit.start();
+    } );
+
+    // Act
+    QUnit.stop();
+    ZeroClipboard.emit({
+      type: "error",
+      name: "version-mismatch",
+      jsVersion: "2.0.1",
+      swfVersion: "2.0.0"
+    });
+  });
+
+
+  test("Test versionMismatch Event after first resolution", function(assert) {
+    assert.expect(11);
+
+    // Arrange
+    _flashState.disabled = false;
+    _flashState.outdated = false;
+    _flashState.deactivated = false;
+    _flashState.unavailable = false;
+    _flashState.degraded = false;
+    _flashState.ready = false;
+    _flashState.version = "11.9.0";
+    _zcSwfVersion = "2.1.0";
+    var client = new ZeroClipboard();
+    var currentEl = document.getElementById("d_clip_button");
+    var id = client.id;
+    client.clip(currentEl);
+    client.on( "ready", function(/* event */) {
+      assert.ok(false, "The `ready` event should NOT have fired!");
+    } );
+    client.on( "error", function(event) {
+      // Assert
+      assert.strictEqual(this, client);
+      assert.strictEqual(this.id, id);
+      assert.strictEqual(_flashState.degraded, false);
+      assert.strictEqual(_flashState.unavailable, false);
+      assert.strictEqual(_flashState.deactivated, false);
+      assert.strictEqual(_flashState.ready, false);
+      assert.strictEqual(event.type, "error");
+      assert.strictEqual(event.name, "version-mismatch");
+      assert.strictEqual(event.target, null);
+      assert.strictEqual(event.jsVersion, "<%= version %>");
+      assert.strictEqual(event.swfVersion, "2.1.0");
+      QUnit.start();
+    } );
+
+    // Act
+    QUnit.stop();
+    // The "versionMismatch" event will automatically fire in 0 seconds (when the event loop gets to it)
   });
 
 

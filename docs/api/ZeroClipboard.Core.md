@@ -542,6 +542,35 @@ ZeroClipboard.on("error", function(e) {
 ```
 
 
+##### `error[name = "version-mismatch"]`
+
+This type of `error` event fires when the JavaScript side's `ZeroClipboard.version` property value
+does not exactly match the `ZeroClipboard.VERSION` property value that was compiled into the SWF.
+While this is stricter than usually necessary, it helps avoid weird problems if you accidentally
+forget to copy all of the assets when updating your ZeroClipboard installation, or if you run into
+any weird caching issues afterward.  In those situations, this `error` event should save you a lot of
+time and confusion when you run into the occasional bidirectional API change that will fail to work
+unless both the JS and SWF assets are appropriate updated.
+
+```js
+ZeroClipboard.on("error", function(e) {
+/*
+  e = {
+    type: "error",
+    name: "version-mismatch",
+    messsage: "ZeroClipboard JS version number does not match ZeroClipboard SWF version number",
+    target: null,
+    relatedTarget: null,
+    currentTarget: flashSwfObjectRef,
+    timeStamp: Date.now(),
+    jsVersion: "2.2.1",
+    swfVersion: "2.2.0"
+  };
+*/
+});
+```
+
+
 
 ## Configuration Options
 

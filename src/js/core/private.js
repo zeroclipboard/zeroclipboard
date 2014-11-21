@@ -116,15 +116,23 @@ var _on = function(eventType, listener) {
       });
     }
     if (added.error) {
-      var errorTypes = ["disabled", "outdated", "unavailable", "degraded", "deactivated", "overdue"];
-      for (i = 0, len = errorTypes.length; i < len; i++) {
-        if (_flashState[errorTypes[i]] === true) {
+      var flashErrorTypes = ["disabled", "outdated", "unavailable", "degraded", "deactivated", "overdue"];
+      for (i = 0, len = flashErrorTypes.length; i < len; i++) {
+        if (_flashState[flashErrorTypes[i]] === true) {
           ZeroClipboard.emit({
             type: "error",
-            name: "flash-" + errorTypes[i]
+            name: "flash-" + flashErrorTypes[i]
           });
           break;
         }
+      }
+      if (_zcSwfVersion !== undefined && ZeroClipboard.version !== _zcSwfVersion) {
+        this.emit({
+          type: "error",
+          name: "version-mismatch",
+          jsVersion: ZeroClipboard.version,
+          swfVersion: _zcSwfVersion
+        });
       }
     }
   }
@@ -688,6 +696,8 @@ var _dispatchCallbacks = function(event) {
  * @private
  */
 var _preprocessEvent = function(event) {
+  /*jshint maxstatements:27 */
+
   var element = event.target || _currentElement || null;
 
   var sourceIsSwf = event._source === "swf";
@@ -715,9 +725,29 @@ var _preprocessEvent = function(event) {
           ready:       false
         });
       }
+      else if (event.name === "version-mismatch") {
+        _zcSwfVersion = event.swfVersion;
+
+        _extend(_flashState, {
+          disabled:    false,
+          outdated:    false,
+          unavailable: false,
+          degraded:    false,
+          deactivated: false,
+          overdue:     false,
+          ready:       false
+        });
+      }
+
+      // Remove the availability checking timeout for cleanliness
+      _clearTimeout(_flashCheckTimeout);
+      _flashCheckTimeout = 0;
+
       break;
 
     case "ready":
+      _zcSwfVersion = event.swfVersion;
+
       var wasDeactivated = _flashState.deactivated === true;
       _extend(_flashState, {
         disabled:    false,
@@ -728,6 +758,11 @@ var _preprocessEvent = function(event) {
         overdue:     wasDeactivated,
         ready:       !wasDeactivated
       });
+
+      // Remove the availability checking timeout for cleanliness
+      _clearTimeout(_flashCheckTimeout);
+      _flashCheckTimeout = 0;
+
       break;
 
     case "beforecopy":
@@ -959,7 +994,7 @@ var _embedSwf = function() {
     var allowNetworking = allowScriptAccess === "never" ? "none" : "all";
 
     // Prepare the FlashVars and cache-busting query param
-    var flashvars = _vars(_globalConfig);
+    var flashvars = _vars(_extend({ jsVersion: ZeroClipboard.version }, _globalConfig));
     var swfUrl = _globalConfig.swfPath + _cacheBust(_globalConfig.swfPath, _globalConfig);
 
     // Create the outer container
@@ -1070,7 +1105,7 @@ var _unembedSwf = function() {
       }
     }
 
-    // Remove the availability checking timeout, as it triggers deactivated after destroy.
+    // Remove the availability checking timeout, as it triggers "deactivated" after destroy.
     _clearTimeout(_flashCheckTimeout);
     _flashCheckTimeout = 0;
 
@@ -1080,6 +1115,10 @@ var _unembedSwf = function() {
     // Reset the `deactivated` status in case the user wants to "try again", i.e.
     // after receiving an `error[name="flash-overdue"]` event
     _flashState.deactivated = null;
+
+    // Don't keep track of the SWF's ZC library version number
+    // The use of `undefined` here instead of `null` is important
+    _zcSwfVersion = undefined;
   }
 };
 
@@ -1251,6 +1290,10 @@ var _vars = function(options) {
 
   if (typeof options.swfObjectId === "string" && options.swfObjectId) {
     str += (str ? "&" : "") + "swfObjectId=" + _encodeURIComponent(options.swfObjectId);
+  }
+
+  if (typeof options.jsVersion === "string" && options.jsVersion) {
+    str += (str ? "&" : "") + "jsVersion=" + _encodeURIComponent(options.jsVersion);
   }
 
   return str;
