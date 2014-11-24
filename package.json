@@ -62,11 +62,6 @@
     "spm": "^3.2.3"
   },
   "main": "./dist/ZeroClipboard.js",
-  "component": {
-    "scripts": {
-      "zeroclipboard": "./dist/ZeroClipboard.js"
-    }
-  },
   "spm": {
     "main": "dist/ZeroClipboard.js",
     "output": [

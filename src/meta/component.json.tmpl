@@ -1,0 +1,12 @@
+{
+  "name": "<%= name %>",
+  "repository": "<%= repository.url.replace(/^https:\/\/github.com\//, "").replace(/\.git$/, "") %>",
+  "description": "<%= description %>",
+  "version": "<%= version %>",
+  "keywords": <%= JSON.stringify(keywords) %>,
+  "main": ["<%= main %>"],
+  "scripts": ["<%= main %>"],
+  "files": ["<%= main.replace(/\.js$/, ".swf") %>"],
+  "license": "<%= licenses[0].type %>",
+  "authors": <%= JSON.stringify(contributors) %>
+}

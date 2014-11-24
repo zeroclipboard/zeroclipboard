@@ -60,6 +60,12 @@ bower install zeroclipboard
 spm install zeroclipboard
 ```
 
+### [Component](https://github.com/componentjs/component) [![Component version](https://badge.fury.io/gh/zeroclipboard%2Fzeroclipboard.png)](http://component.github.io/?q=zeroclipboard)
+
+```shell
+component install zeroclipboard/zeroclipboard
+```
+
 ### [PHP Composer](https://getcomposer.org/) [![PHP version](https://badge.fury.io/ph/zeroclipboard%2Fzeroclipboard.svg)](https://packagist.org/packages/zeroclipboard/zeroclipboard)
 
 For any PHP Composer users, ZeroClipboard is also [available on Packagist](https://packagist.org/packages/zeroclipboard/zeroclipboard).

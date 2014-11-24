@@ -30,7 +30,6 @@ module.exports = function(grunt) {
         jshintrc: true
       },
       gruntfile: ["Gruntfile.js"],
-      component: ["index.js"],
       js: ["src/js/**/*.js", "!src/js/start.js", "!src/js/end.js"],
       test: ["test/**/*.js"],
       dist: ["dist/*.js", "!dist/*.min.js"]
@@ -50,7 +49,7 @@ module.exports = function(grunt) {
         },
         src: [flashTmpDir]
       },
-      meta: ["bower.json", "composer.json", "LICENSE"],
+      meta: ["bower.json", "component.json", "composer.json", "LICENSE"],
       coveralls: ["tmp/", "coverage/"]
     },
     concat: {
@@ -199,6 +198,11 @@ module.exports = function(grunt) {
           "bower.json": ["src/meta/bower.json.tmpl"]
         }
       },
+      component: {
+        files: {
+          "component.json": ["src/meta/component.json.tmpl"]
+        }
+      },
       composer: {
         files: {
           "composer.json": ["src/meta/composer.json.tmpl"]
@@ -215,7 +219,7 @@ module.exports = function(grunt) {
         mode: "444"
       },
       dist: ["dist/ZeroClipboard.*"],
-      meta: ["bower.json", "composer.json", "LICENSE"]
+      meta: ["bower.json", "component.json", "composer.json", "LICENSE"]
     },
     connect: {
       server: {
@@ -317,7 +321,7 @@ module.exports = function(grunt) {
 
 
   // Task aliases and chains
-  grunt.registerTask("jshint-prebuild", ["jshint:gruntfile", "jshint:component", "jshint:js", "jshint:test"]);
+  grunt.registerTask("jshint-prebuild", ["jshint:gruntfile", "jshint:js", "jshint:test"]);
   grunt.registerTask("prep-flash",      ["clean:flashTemp", "concat:flash"]);
   grunt.registerTask("validate",        ["jshint-prebuild", "prep-flash", "flexpmd"]);
   grunt.registerTask("build",           ["clean", "concat", "jshint:dist", "uglify", "mxmlc", "template", "chmod"]);

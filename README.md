@@ -5,7 +5,7 @@
 # ZeroClipboard
 [![GitHub Latest Release](https://badge.fury.io/gh/zeroclipboard%2Fzeroclipboard.png)](https://github.com/zeroclipboard/zeroclipboard) [![Build Status](https://secure.travis-ci.org/zeroclipboard/zeroclipboard.png?branch=master)](https://travis-ci.org/zeroclipboard/zeroclipboard) [![Coverage Status](https://coveralls.io/repos/zeroclipboard/zeroclipboard/badge.png?branch=master)](https://coveralls.io/r/zeroclipboard/zeroclipboard?branch=master) [![Dependency Status](https://david-dm.org/zeroclipboard/zeroclipboard.png?theme=shields.io)](https://david-dm.org/zeroclipboard/zeroclipboard) [![Dev Dependency Status](https://david-dm.org/zeroclipboard/zeroclipboard/dev-status.png?theme=shields.io)](https://david-dm.org/zeroclipboard/zeroclipboard#info=devDependencies)
 
-The ZeroClipboard library provides an easy way to copy text to the clipboard using an invisible [Adobe Flash](http://en.wikipedia.org/wiki/Adobe_Flash) movie and a [JavaScript](http://en.wikipedia.org/wiki/JavaScript) interface. The "Zero" signifies that the library is invisible and the user interface is left entirely up to you. 
+The ZeroClipboard library provides an easy way to copy text to the clipboard using an invisible [Adobe Flash](http://en.wikipedia.org/wiki/Adobe_Flash) movie and a [JavaScript](http://en.wikipedia.org/wiki/JavaScript) interface. The "Zero" signifies that the library is invisible and the user interface is left entirely up to you.
 
 This is achieved by automatically floating the invisible movie on top of a [DOM](http://en.wikipedia.org/wiki/Document_Object_Model) element of your choice. Standard mouse events are even propagated out to your DOM element, so you can still have rollover and mousedown effects.
 
