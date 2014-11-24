@@ -72,7 +72,8 @@ choice. Standard mouse events are even propagated out to your DOM element, so yo
 can still have rollover and mousedown effects with just a _little_ extra effort.
 
 ZeroClipboard `v2.x` is expected to work in IE9+ and all of the evergreen browsers.
-
+Although support for IE7 & IE8 was officially dropped in `v2.0.0`, it was actually
+still _technically_ supported through `v2.0.2`.
 
 ## Contributing
 
