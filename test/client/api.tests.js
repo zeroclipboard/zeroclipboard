@@ -1,4 +1,4 @@
-/*global ZeroClipboard, _currentElement:true, _flashState:true, _zcSwfVersion:true, _extend, _clipData, _clipDataFormatMap */
+/*global ZeroClipboard, _currentElement:true, _flashState:true, _zcSwfVersion:true, _extend, _deepCopy, _clipData, _clipDataFormatMap:true, _copyTarget:true */
 
 (function(module, test) {
   "use strict";
@@ -1173,6 +1173,177 @@
       // Emit a "ready" event (as if from the SWF) to trigger an "overdueFlash" event
       ZeroClipboard.emit("ready");
     }, 1000);
+  });
+
+
+  test("Test 'error[name=clipboard-error]' Event triggered by 'aftercopy' event with errors", function(assert) {
+    assert.expect(8);
+
+    // Arrange
+    _flashState.disabled = false;
+    _flashState.outdated = false;
+    _flashState.deactivated = false;
+    _flashState.unavailable = false;
+    _flashState.degraded = false;
+    _flashState.version = "11.9.0";
+    _flashState.ready = true;
+    _flashState.bridge = {};
+
+    var currentEl = document.getElementById("d_clip_button");
+    var client = new ZeroClipboard(currentEl);
+    var id = client.id;
+
+    _clipDataFormatMap = {
+      "text": "text/plain",
+      "html": "text/html"
+    };
+    var afterCopyEvent = {
+      type: "aftercopy",
+      data: {
+        text: "blah",
+        html: "<b>blah</b>"
+      },
+      success: {
+        text: true,
+        html: false
+      },
+      errors: [{
+        name: "SecurityError",
+        message: "Clipboard security error OMG",
+        errorID: 7320,
+        stack: null,
+        format: "html",
+        clipboard: "desktop"
+      }]
+    };
+    var expectedAfterCopyEvent = _deepCopy(afterCopyEvent);
+    _extend(expectedAfterCopyEvent, {
+      target: currentEl,
+      relatedTarget: null,
+      currentTarget: {},
+      client: client
+    });
+    expectedAfterCopyEvent.data["text/plain"] = expectedAfterCopyEvent.data.text;
+    expectedAfterCopyEvent.data["text/html"] = expectedAfterCopyEvent.data.html;
+    delete expectedAfterCopyEvent.data.text;
+    delete expectedAfterCopyEvent.data.html;
+    expectedAfterCopyEvent.success["text/plain"] = expectedAfterCopyEvent.success.text;
+    expectedAfterCopyEvent.success["text/html"] = expectedAfterCopyEvent.success.html;
+    delete expectedAfterCopyEvent.success.text;
+    delete expectedAfterCopyEvent.success.html;
+    expectedAfterCopyEvent.errors[0].format = "text/html";
+
+    var expectedClipboardErrorEvent = _deepCopy(expectedAfterCopyEvent);
+    delete expectedClipboardErrorEvent.success;
+    _extend(expectedClipboardErrorEvent, {
+      type: "error",
+      name: "clipboard-error",
+      message: "At least one error was thrown while ZeroClipboard was attempting to inject your data into the clipboard",
+      // This needs to be copied over again because `_deepCopy` loses the prototype reference
+      client: client
+    });
+    delete expectedClipboardErrorEvent.success;
+
+    client.on( "aftercopy", function(event) {
+      // Assert
+      assert.strictEqual(_clipDataFormatMap, null);
+      assert.strictEqual(this, client);
+      assert.strictEqual(this.id, id);
+      delete event.timeStamp;
+      assert.deepEqual(event, expectedAfterCopyEvent);
+    } );
+    client.on( "error", function(event) {
+      // Assert
+      assert.strictEqual(_clipDataFormatMap, null);
+      assert.strictEqual(this, client);
+      assert.strictEqual(this.id, id);
+      delete event.timeStamp;
+      assert.deepEqual(event, expectedClipboardErrorEvent);
+
+      QUnit.start();
+    } );
+
+    // Act
+    QUnit.stop();
+
+    ZeroClipboard.focus(currentEl);
+    _copyTarget = currentEl;
+    ZeroClipboard.emit(afterCopyEvent);
+  });
+
+
+  test("Test 'error[name=clipboard-error]' Event is NOT triggered by 'aftercopy' event without errors", function(assert) {
+    assert.expect(4);
+
+    // Arrange
+    _flashState.disabled = false;
+    _flashState.outdated = false;
+    _flashState.deactivated = false;
+    _flashState.unavailable = false;
+    _flashState.degraded = false;
+    _flashState.version = "11.9.0";
+    _flashState.ready = true;
+    _flashState.bridge = {};
+
+    var currentEl = document.getElementById("d_clip_button");
+    var client = new ZeroClipboard(currentEl);
+    var id = client.id;
+
+    _clipDataFormatMap = {
+      "text": "text/plain",
+      "html": "text/html"
+    };
+    var afterCopyEvent = {
+      type: "aftercopy",
+      data: {
+        text: "blah",
+        html: "<b>blah</b>"
+      },
+      success: {
+        text: true,
+        html: false
+      },
+      errors: []
+    };
+    var expectedAfterCopyEvent = _deepCopy(afterCopyEvent);
+    _extend(expectedAfterCopyEvent, {
+      target: currentEl,
+      relatedTarget: null,
+      currentTarget: {},
+      client: client
+    });
+    expectedAfterCopyEvent.data["text/plain"] = expectedAfterCopyEvent.data.text;
+    expectedAfterCopyEvent.data["text/html"] = expectedAfterCopyEvent.data.html;
+    delete expectedAfterCopyEvent.data.text;
+    delete expectedAfterCopyEvent.data.html;
+    expectedAfterCopyEvent.success["text/plain"] = expectedAfterCopyEvent.success.text;
+    expectedAfterCopyEvent.success["text/html"] = expectedAfterCopyEvent.success.html;
+    delete expectedAfterCopyEvent.success.text;
+    delete expectedAfterCopyEvent.success.html;
+
+    client.on( "aftercopy", function(event) {
+      // Assert
+      assert.strictEqual(_clipDataFormatMap, null);
+      assert.strictEqual(this, client);
+      assert.strictEqual(this.id, id);
+      delete event.timeStamp;
+      assert.deepEqual(event, expectedAfterCopyEvent);
+
+      setTimeout(function() {
+        QUnit.start();
+      }, 50);
+    } );
+    client.on( "error", function(/* event */) {
+      // Assert
+      assert.ok(false, "Should not receive any error events");
+    } );
+
+    // Act
+    QUnit.stop();
+
+    ZeroClipboard.focus(currentEl);
+    _copyTarget = currentEl;
+    ZeroClipboard.emit(afterCopyEvent);
   });
 
 

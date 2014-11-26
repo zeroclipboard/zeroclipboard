@@ -345,7 +345,17 @@ ZeroClipboard.on("aftercopy", function(e) {
       "text/plain": "Blah",
       "text/html": "<b>Blah</b>",
       "application/rtf": "{\\rtf1\\ansi\n{\\b Blah}}"
-    }
+    },
+    errors: [
+      {
+        name: "SecurityError",
+        message: "Clipboard security error OMG",
+        errorID: 7320,
+        stack: null,
+        format: "application/rtf",
+        clipboard: "desktop"
+      }
+    ]
   };
 */
 });
@@ -577,6 +587,46 @@ ZeroClipboard.on("error", function(e) {
     timeStamp: Date.now(),
     jsVersion: "2.2.1",
     swfVersion: "2.2.0"
+  };
+*/
+});
+```
+
+
+##### `error[name = "clipboard-error"]`
+
+_Added in `v2.2.0-beta.3`._
+
+This type of `error` event fires when any error occurs while the Flash layer is attempting to inject the pending clipboard data into the clipboard. This event is fired only if the injection of at least 1 data format into the clipboard threw an error but does **not** necessarily mean that the injection failed for _every_ data format.
+
+If it is fired at all, it is fired _after_ the `aftercopy` event and before the bubbled `click` event.
+
+```js
+ZeroClipboard.on("error", function(e) {
+/*
+  e = {
+    type: "error",
+    name: "clipboard-error",
+    messsage: "At least one error was thrown while ZeroClipboard was attempting to inject your data into the clipboard",
+    target: currentlyActivatedElementOrNull,
+    relatedTarget: dataClipboardElementTargetOfCurrentlyActivatedElementOrNull,
+    currentTarget: flashSwfObjectRef,
+    timeStamp: Date.now(),
+    data: {
+      "text/plain": "Blah",
+      "text/html": "<b>Blah</b>",
+      "application/rtf": "{\\rtf1\\ansi\n{\\b Blah}}"
+    },
+    errors: [
+      {
+        name: "SecurityError",
+        message: "Clipboard security error OMG",
+        errorID: 7320,
+        stack: null,
+        format: "application/rtf",
+        clipboard: "desktop"
+      }
+    ]
   };
 */
 });

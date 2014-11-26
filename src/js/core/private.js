@@ -127,7 +127,7 @@ var _on = function(eventType, listener) {
         }
       }
       if (_zcSwfVersion !== undefined && ZeroClipboard.version !== _zcSwfVersion) {
-        this.emit({
+        ZeroClipboard.emit({
           type: "error",
           name: "version-mismatch",
           jsVersion: ZeroClipboard.version,
@@ -471,13 +471,20 @@ var _createEvent = function(event) {
     return;
   }
 
+  eventType = eventType.toLowerCase();
+
   // Sanitize the event type and set the `target` and `relatedTarget` properties if not already set
-  if (!event.target && /^(copy|aftercopy|_click)$/.test(eventType.toLowerCase())) {
+  if (!event.target &&
+    (
+      /^(copy|aftercopy|_click)$/.test(eventType) ||
+      (eventType === "error" && event.name === "clipboard-error")
+    )
+  ) {
     event.target = _copyTarget;
   }
 
   _extend(event, {
-    type: eventType.toLowerCase(),
+    type: eventType,
     target: event.target || _currentElement || null,
     relatedTarget: event.relatedTarget || null,
     currentTarget: (_flashState && _flashState.bridge) || null,
@@ -529,9 +536,7 @@ var _createEvent = function(event) {
     event.relatedTarget = _getRelatedTarget(event.target);
   }
 
-  event = _addMouseData(event);
-
-  return event;
+  return _addMouseData(event);
 };
 
 
@@ -792,6 +797,8 @@ var _preprocessEvent = function(event) {
       break;
 
     case "aftercopy":
+      _queueEmitClipboardErrors(event);
+
       // If the copy has [or should have] occurred, clear out all of the data
       ZeroClipboard.clearData();
 
@@ -889,6 +896,27 @@ var _preprocessEvent = function(event) {
   // Return a flag to indicate that this event should stop being processed
   if (/^_(?:click|mouse(?:over|out|down|up|move))$/.test(event.type)) {
     return true;
+  }
+};
+
+
+/**
+ * Check an "aftercopy" event for clipboard errors and emit a corresponding "error" event.
+ * @private
+ */
+var _queueEmitClipboardErrors = function(aftercopyEvent) {
+  if (aftercopyEvent.errors && aftercopyEvent.errors.length > 0) {
+    var errorEvent = _deepCopy(aftercopyEvent);
+    _extend(errorEvent, {
+      type: "error",
+      name: "clipboard-error"
+    });
+    delete errorEvent.success;
+
+    // Delay emitting this until AFTER the "aftercopy" event has finished emitting
+    _setTimeout(function() {
+      ZeroClipboard.emit(errorEvent);
+    }, 0);
   }
 };
 
@@ -1191,18 +1219,24 @@ var _mapClipResultsFromFlash = function(clipResults, formatMap) {
 
   for (var prop in clipResults) {
     if (_hasOwn.call(clipResults, prop)) {
-      if (prop !== "success" && prop !== "data") {
-        newResults[prop] = clipResults[prop];
-        continue;
+      if (prop === "errors") {
+        newResults[prop] = clipResults[prop] ? clipResults[prop].slice() : [];
+        for (var i = 0, len = newResults[prop].length; i < len; i++) {
+          newResults[prop][i].format = formatMap[newResults[prop][i].format];
+        }
       }
+      else if (prop !== "success" && prop !== "data") {
+        newResults[prop] = clipResults[prop];
+      }
+      else {
+        newResults[prop] = {};
 
-      newResults[prop] = {};
-
-      // Standardize the allowed clipboard segment names to reduce complexity on the Flash side
-      var tmpHash = clipResults[prop];
-      for (var dataFormat in tmpHash) {
-        if (dataFormat && _hasOwn.call(tmpHash, dataFormat) && _hasOwn.call(formatMap, dataFormat)) {
-          newResults[prop][formatMap[dataFormat]] = tmpHash[dataFormat];
+        // Standardize the allowed clipboard segment names to reduce complexity on the Flash side
+        var tmpHash = clipResults[prop];
+        for (var dataFormat in tmpHash) {
+          if (dataFormat && _hasOwn.call(tmpHash, dataFormat) && _hasOwn.call(formatMap, dataFormat)) {
+            newResults[prop][formatMap[dataFormat]] = tmpHash[dataFormat];
+          }
         }
       }
     }

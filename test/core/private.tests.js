@@ -277,7 +277,17 @@
       data: {
         "text": "Zero",
         "html": "<b>Zero</b>"
-      }
+      },
+      errors: [
+        {
+          name: "SecurityError",
+          message: "Clipboard security error OMG",
+          errorID: 7320,
+          stack: null,
+          format: "text",
+          clipboard: "desktop"
+        }
+      ]
     };
     var formatMap = {
       "text": "text/plain",
@@ -292,7 +302,17 @@
       data: {
         "text/plain": "Zero",
         "text/html": "<b>Zero</b>"
-      }
+      },
+      errors: [
+        {
+          name: "SecurityError",
+          message: "Clipboard security error OMG",
+          errorID: 7320,
+          stack: null,
+          format: "text/plain",
+          clipboard: "desktop"
+        }
+      ]
     };
 
     // Act & Assert
@@ -301,7 +321,7 @@
 
     // Act & Assert
     var revisedClipResults = _mapClipResultsFromFlash(clipResults, formatMap);
-    assert.deepEqual(revisedClipResults, expectedOutput, "Should reverse the key mapping process");
+    assert.deepEqual(revisedClipResults, expectedOutput, "Should reverse the mapping process");
   });
 
 

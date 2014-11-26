@@ -50,8 +50,8 @@ var _extend = function() {
 var _deepCopy = function(source) {
   var copy, i, len, prop;
 
-  // If not a non-null object, just return the original
-  if (typeof source !== "object" || source == null) {
+  // If not a non-null, non-element object, just return the original
+  if (typeof source !== "object" || source == null || typeof source.nodeType === "number") {
     copy = source;
   }
   // If an Array, iterate and recurse

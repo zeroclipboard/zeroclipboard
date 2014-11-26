@@ -67,7 +67,7 @@
  */
   var _deepCopy = function(source) {
     var copy, i, len, prop;
-    if (typeof source !== "object" || source == null) {
+    if (typeof source !== "object" || source == null || typeof source.nodeType === "number") {
       copy = source;
     } else if (typeof source.length === "number") {
       copy = [];
@@ -340,7 +340,8 @@
       "flash-degraded": "Flash is unable to preserve data fidelity when communicating with JavaScript",
       "flash-deactivated": "Flash is too outdated for your browser and/or is configured as click-to-activate",
       "flash-overdue": "Flash communication was established but NOT within the acceptable time limit",
-      "version-mismatch": "ZeroClipboard JS version number does not match ZeroClipboard SWF version number"
+      "version-mismatch": "ZeroClipboard JS version number does not match ZeroClipboard SWF version number",
+      "clipboard-error": "At least one error was thrown while ZeroClipboard was attempting to inject your data into the clipboard"
     }
   };
   /**
@@ -458,7 +459,7 @@
           }
         }
         if (_zcSwfVersion !== undefined && ZeroClipboard.version !== _zcSwfVersion) {
-          this.emit({
+          ZeroClipboard.emit({
             type: "error",
             name: "version-mismatch",
             jsVersion: ZeroClipboard.version,
@@ -703,11 +704,12 @@
     if (!eventType) {
       return;
     }
-    if (!event.target && /^(copy|aftercopy|_click)$/.test(eventType.toLowerCase())) {
+    eventType = eventType.toLowerCase();
+    if (!event.target && (/^(copy|aftercopy|_click)$/.test(eventType) || eventType === "error" && event.name === "clipboard-error")) {
       event.target = _copyTarget;
     }
     _extend(event, {
-      type: eventType.toLowerCase(),
+      type: eventType,
       target: event.target || _currentElement || null,
       relatedTarget: event.relatedTarget || null,
       currentTarget: _flashState && _flashState.bridge || null,
@@ -751,8 +753,7 @@
     if (event.target && !event.relatedTarget) {
       event.relatedTarget = _getRelatedTarget(event.target);
     }
-    event = _addMouseData(event);
-    return event;
+    return _addMouseData(event);
   };
   /**
  * Get a relatedTarget from the target's `data-clipboard-target` attribute
@@ -940,6 +941,7 @@
       break;
 
      case "aftercopy":
+      _queueEmitClipboardErrors(event);
       ZeroClipboard.clearData();
       if (element && element !== _safeActiveElement() && element.focus) {
         element.focus();
@@ -1015,6 +1017,23 @@
     }
     if (/^_(?:click|mouse(?:over|out|down|up|move))$/.test(event.type)) {
       return true;
+    }
+  };
+  /**
+ * Check an "aftercopy" event for clipboard errors and emit a corresponding "error" event.
+ * @private
+ */
+  var _queueEmitClipboardErrors = function(aftercopyEvent) {
+    if (aftercopyEvent.errors && aftercopyEvent.errors.length > 0) {
+      var errorEvent = _deepCopy(aftercopyEvent);
+      _extend(errorEvent, {
+        type: "error",
+        name: "clipboard-error"
+      });
+      delete errorEvent.success;
+      _setTimeout(function() {
+        ZeroClipboard.emit(errorEvent);
+      }, 0);
     }
   };
   /**
@@ -1221,15 +1240,20 @@
     var newResults = {};
     for (var prop in clipResults) {
       if (_hasOwn.call(clipResults, prop)) {
-        if (prop !== "success" && prop !== "data") {
+        if (prop === "errors") {
+          newResults[prop] = clipResults[prop] ? clipResults[prop].slice() : [];
+          for (var i = 0, len = newResults[prop].length; i < len; i++) {
+            newResults[prop][i].format = formatMap[newResults[prop][i].format];
+          }
+        } else if (prop !== "success" && prop !== "data") {
           newResults[prop] = clipResults[prop];
-          continue;
-        }
-        newResults[prop] = {};
-        var tmpHash = clipResults[prop];
-        for (var dataFormat in tmpHash) {
-          if (dataFormat && _hasOwn.call(tmpHash, dataFormat) && _hasOwn.call(formatMap, dataFormat)) {
-            newResults[prop][formatMap[dataFormat]] = tmpHash[dataFormat];
+        } else {
+          newResults[prop] = {};
+          var tmpHash = clipResults[prop];
+          for (var dataFormat in tmpHash) {
+            if (dataFormat && _hasOwn.call(tmpHash, dataFormat) && _hasOwn.call(formatMap, dataFormat)) {
+              newResults[prop][formatMap[dataFormat]] = tmpHash[dataFormat];
+            }
           }
         }
       }

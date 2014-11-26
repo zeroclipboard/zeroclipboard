@@ -89,7 +89,8 @@ var _eventMessages = {
     "flash-degraded": "Flash is unable to preserve data fidelity when communicating with JavaScript",
     "flash-deactivated": "Flash is too outdated for your browser and/or is configured as click-to-activate",
     "flash-overdue": "Flash communication was established but NOT within the acceptable time limit",
-    "version-mismatch": "ZeroClipboard JS version number does not match ZeroClipboard SWF version number"
+    "version-mismatch": "ZeroClipboard JS version number does not match ZeroClipboard SWF version number",
+    "clipboard-error": "At least one error was thrown while ZeroClipboard was attempting to inject your data into the clipboard"
   }
 };
 

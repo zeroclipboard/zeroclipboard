@@ -246,7 +246,7 @@ package {
      */
     private function onClick(event:MouseEvent): void {
       var clipData:Object;  // NOPMD
-      var clipInjectSuccess:Object = {};  // NOPMD
+      var clipInjectResults:Object = {};  // NOPMD
 
       // Allow for any "UI preparation" work before the "copy" event begins
       this.emit("beforecopy");
@@ -255,14 +255,15 @@ package {
       clipData = this.emit("copy");
 
       // Inject all pending data into the user's clipboard
-      clipInjectSuccess = this.clipboard.inject(clipData);
+      clipInjectResults = this.clipboard.inject(clipData);
 
       // Compose and serialize a results object, send it back to the page
       this.emit(
         "aftercopy",
         {
-          success: clipInjectSuccess,
-          data: clipData
+          success: clipInjectResults.success,
+          data: clipData,
+          errors: clipInjectResults.errors
         }
       );
     }

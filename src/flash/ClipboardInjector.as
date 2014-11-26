@@ -47,23 +47,31 @@ package {
       clipData:Object  // NOPMD
     ): Object {  // NOPMD
       var results:Object = {};  // NOPMD
+      results.success = {};
+      results.errors = [];
 
       // Set all data formats' results to `false` (failed) initially
       for (var dataFormat:String in clipData) {
         if (dataFormat && clipData.hasOwnProperty(dataFormat)) {
-          results[dataFormat] = false;
+          results.success[dataFormat] = false;
         }
       }
 
       // If there is any viable data to copy...
       if (ClipboardInjector.hasData(clipData)) {
+        var plainTextOnly:Boolean = ClipboardInjector.hasOnlyPlainText(clipData);
+
         // ...and we only need to handle plain text...
-        if (!this.useEnhancedClipboard || ClipboardInjector.hasOnlyPlainText(clipData)) {
-          this.injectPlainTextOnly(clipData, results);
+        if (!this.useEnhancedClipboard || plainTextOnly) {
+          // Use the system clipboard
+          ClipboardInjector.injectPlainTextOnly(clipData, results);
         }
-        // ...else if there is viable data to copy and we can copy enhanced formats
-        else if (this.useEnhancedClipboard) {
-          this.injectEnhancedData(clipData, results);
+
+        // ...otherwise, if there is viable data to copy and we can copy enhanced formats, OR
+        // if using the system clipboard for plain text failed unexpectedly...
+        if (this.useEnhancedClipboard || (plainTextOnly && !results.success.text)) {
+          // Use the desktop clipboard
+          ClipboardInjector.injectEnhancedData(clipData, results);
         }
       }
 
@@ -77,7 +85,7 @@ package {
      *
      * @return `undefined`
      */
-    private function injectPlainTextOnly(
+    private static function injectPlainTextOnly(
       clipData:Object,  // NOPMD
       results:Object  // NOPMD
     ): void {
@@ -85,11 +93,11 @@ package {
       // Flash 10 API, so we need to use this until we can figure out an alternative
       try {
         System.setClipboard(clipData.text);
-        results.text = true;
+        results.success.text = true;
       }
       catch (err:Error) {
-        // Yes, this is already set but FlexPMD complains about empty `catch` blocks
-        results.text = false;
+        results.success.text = false;
+        results.errors.push(ClipboardInjector.serializeError(err, "text", "system"));
       }
     }
 
@@ -99,7 +107,7 @@ package {
      *
      * @return `undefined`
      */
-    private function injectEnhancedData(
+    private static function injectEnhancedData(
       clipData:Object,  // NOPMD
       results:Object  // NOPMD
     ): void {
@@ -112,20 +120,22 @@ package {
       // Plain text
       if (typeof clipData.text === "string" && clipData.text) {
         try {
-          results.text = Clipboard.generalClipboard.setData(ClipboardFormats.TEXT_FORMAT, clipData.text);
+          results.success.text = Clipboard.generalClipboard.setData(ClipboardFormats.TEXT_FORMAT, clipData.text);
         }
         catch (err:Error) {
-          results.text = false;
+          results.success.text = false;
+          results.errors.push(ClipboardInjector.serializeError(err, "text", "desktop"));
         }
       }
 
       // HTML
       if (typeof clipData.html === "string" && clipData.html) {
         try {
-          results.html = Clipboard.generalClipboard.setData(ClipboardFormats.HTML_FORMAT, clipData.html);
+          results.success.html = Clipboard.generalClipboard.setData(ClipboardFormats.HTML_FORMAT, clipData.html);
         }
         catch (err:Error) {
-          results.html = false;
+          results.success.html = false;
+          results.errors.push(ClipboardInjector.serializeError(err, "html", "desktop"));
         }
       }
 
@@ -135,11 +145,12 @@ package {
           var bytes:ByteArray = new ByteArray();
           bytes.writeUTFBytes(clipData.rtf);
           if (bytes && bytes.length > 0) {
-            results.rtf = Clipboard.generalClipboard.setData(ClipboardFormats.RICH_TEXT_FORMAT, bytes);
+            results.success.rtf = Clipboard.generalClipboard.setData(ClipboardFormats.RICH_TEXT_FORMAT, bytes);
           }
         }
         catch (err:Error) {
-          results.rtf = false;
+          results.success.rtf = false;
+          results.errors.push(ClipboardInjector.serializeError(err, "rtf", "desktop"));
         }
       }
     }
@@ -180,6 +191,29 @@ package {
         );
       }
       return !hasOtherTypes && hasPlainText;
+    }
+
+
+    /**
+     * Convert an ActionScript Error object into a serializable plain object
+     *
+     * @return Object
+     */
+    private static function serializeError(
+      err:Error,
+      format:String,
+      clipboardType:String
+    ): Object { // NOPMD
+      return {
+        name: err.name,
+        message: err.message,
+        errorID: err.errorID,
+        // NOTE: In Flash Player <= 11.4, `err.getStackTrace()` will always return `null` unless
+        // you are using the debug version of Flash Player.
+        stack: err.getStackTrace() || null,
+        format: format,
+        clipboard: clipboardType
+      };
     }
   }
 }
