@@ -633,6 +633,37 @@ ZeroClipboard.on("error", function(e) {
 ```
 
 
+##### `error[name = "config-mismatch"]`
+
+_Added in `v2.2.0-beta.3`._
+
+This type of `error` event fires when the certain properties within the
+`ZeroClipboard.config` configured values do not match real values within
+Flash. For example, if the specified `swfObjectId` config property does
+not match the SWF's implicitly known element ID for the SWF object. This
+should be extremely rare unless the `swfPath` URL integrity is being
+compromised by attempted cross-site scripting (XSS) attacks.
+
+```js
+ZeroClipboard.on("error", function(e) {
+/*
+  e = {
+    type: "error",
+    name: "config-mismatch",
+    messsage: "ZeroClipboard configuration does not match Flash's reality",
+    target: null,
+    relatedTarget: null,
+    currentTarget: flashSwfObjectRef,
+    timeStamp: Date.now(),
+    property: "swfObjectId",
+    configuredValue: "my-zeroclipboard-object",
+    actualValue: "global-zeroclipboard-flash-bridge"
+  };
+*/
+});
+```
+
+
 
 ## Configuration Options
 

@@ -1,13 +1,16 @@
 package {
 
+  import flash.net.URLVariables;
+
+
   /**
    * Utility methods for XSS attack prevention.
    */
   internal class XssUtils {
 
     /**
-     * Sanitize any object (string, array, object instance) to mitigate XSS
-     * vulnerabilities AND bugs in Flash -> JS communication.
+     * Sanitize any common JSON-serializable object (string, array, object)
+     * to mitigate XSS vulnerabilities.
      *
      * @return an XSS safe object
      * @static
@@ -15,7 +18,7 @@ package {
     public static function sanitize(
       data:*  // NOPMD
     ): * {  // NOPMD
-      if (typeof data === "string" && data.length > 0) {
+      if (typeof data === "string") {
         data = XssUtils.sanitizeString(data);
       }
       else if (typeof data === "object" && data.length > 0) {
@@ -35,8 +38,7 @@ package {
 
 
     /**
-     * Sanitize a string to mitigate XSS vulnerabilities AND
-     * bugs in Flash -> JS communication.
+     * Sanitize a string to mitigate XSS vulnerabilities.
      *
      * @return an XSS safe String
      * @static
@@ -47,21 +49,55 @@ package {
 
 
     /**
-     * Sanitize the Loader parameters by filtering out all URL query parameters,
-     * leaving ONLY parameters that were specified via FlashVars in the HTML
-     * embedding markup.
+     * Validate the ID against the HTML4 spec for `ID` tokens.
      *
-     * @return a filtered parameters object, a.k.a. FlashVars
+     * @return Boolean
      * @static
      */
-    public static function filterToFlashVars(
-      parameters:Object  // NOPMD
+    public static function isValidHtmlId(id:String): Boolean {
+      return typeof id === "string" && !!id && /^[A-Za-z][A-Za-z0-9_:\-\.]*$/.test(id);
+    }
+
+
+    /**
+     * Parse the query string of a URL into an object (hash). The URL provided
+     * MUST contain a "?" query string indicator or it will be ignored.
+     *
+     * @return an object of key-value string pairs (dictionary/hash)
+     * @static
+     */
+    public static function parseQuery(
+      url:String
     ): Object {  // NOPMD
-      //
-      // TODO: Implement this for real
-      // See:  https://github.com/zeroclipboard/zeroclipboard/pull/336
-      //
-      return parameters;
+      var queryParams:Object = {};  // NOPMD
+      if (url) {
+       var index:Number = url.indexOf("?");
+       url = index !== -1 ? url.slice(index + 1) : "";
+       index = url.indexOf("#");
+       url = index === -1 ? url : url.slice(0, index);
+
+       //
+       // Try to achieve parity with `LoaderInfo#parameters`
+       //
+       // Eliminate invalid URL escapes. This can prevent a lot of XSS hacks.
+       url = url.replace(/%[A-Fa-f0-9]?([^A-Fa-f0-9]|$)/g, "");
+       // Double-encode the NUL (null) character. In Firefox, this character actually prevents Flash from loading the SWF at all.
+       url = url.replace(/%00/g, "%2500");
+       // Eliminate extraneous ampersands
+       url = url.replace(/&&+/g, "&");
+
+       if (url) {
+          queryParams = new URLVariables(url);
+
+          // If any query with multiple of the same key present, only take the last value
+          for (var key:String in queryParams) {
+            if (queryParams.hasOwnProperty(key) && queryParams[key] is Array && queryParams[key].length) {
+              queryParams[key] = queryParams[key].pop() as String;
+            }
+          }
+        }
+      }
+      return queryParams;
     }
 
   }

@@ -90,7 +90,8 @@ var _eventMessages = {
     "flash-deactivated": "Flash is too outdated for your browser and/or is configured as click-to-activate",
     "flash-overdue": "Flash communication was established but NOT within the acceptable time limit",
     "version-mismatch": "ZeroClipboard JS version number does not match ZeroClipboard SWF version number",
-    "clipboard-error": "At least one error was thrown while ZeroClipboard was attempting to inject your data into the clipboard"
+    "clipboard-error": "At least one error was thrown while ZeroClipboard was attempting to inject your data into the clipboard",
+    "config-mismatch": "ZeroClipboard configuration does not match Flash's reality"
   }
 };
 

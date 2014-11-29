@@ -72,19 +72,22 @@ function decodeDataFromFlash(data) {\
       return processData(data, decodeURIComponent);
     };
 
-    private var hosted:Boolean = false;
-    private var bidirectional:Boolean = false;
-    private var disabled:Boolean = false;
-    private var fidelityEnsured:Boolean = false;
+    private var metadata:Object = { // NOPMD
+      objectId: null,
+      hosted: false,
+      bidirectional: false,
+      disabled: false,
+      fidelityEnsured: false
+    };
 
 
     /**
      * @constructor
      */
-    public function JsProxy(expectedObjectId:String = null) {
+    public function JsProxy() {
       // The JIT Compiler does not compile constructors, so any
       // cyclomatic complexity higher than 1 is discouraged.
-      this.ctor(expectedObjectId);
+      this.ctor();
     }
 
 
@@ -93,28 +96,29 @@ function decodeDataFromFlash(data) {\
      *
      * @return `undefined`
      */
-    private function ctor(expectedObjectId:String = null): void {
+    private function ctor(): void {
       // We do NOT want to marshall JS exceptions into Flash (other than during detection)
       var preferredMarshalling:Boolean = false;
       ExternalInterface.marshallExceptions = preferredMarshalling;
 
+      // What is the HTML element ID that is actually hosting this SWF object?
+      this.metadata.objectId = ExternalInterface.objectID || null;
+
       // Do we authoritatively know that this Flash object is hosted in a browser?
-      this.hosted = ExternalInterface.available === true &&
-        ExternalInterface.objectID &&
-        (expectedObjectId ? (expectedObjectId === ExternalInterface.objectID) : true);
+      this.metadata.hosted = ExternalInterface.available === true && !!this.metadata.objectId;
 
       // Temporarily start marshalling JS exceptions into Flash
       ExternalInterface.marshallExceptions = true;
 
-      // Try this regardless of the value of `this.hosted`.
+      // Try this regardless of the value of `this.metadata.hosted`.
       try {
         // Can we retrieve values from JavaScript?
-        this.bidirectional = ExternalInterface.call("(function() { return true; })") === true;
+        this.metadata.bidirectional = ExternalInterface.call("(function() { return true; })") === true;
       }
       catch (err:Error) {
         // We do NOT authoritatively know if this Flash object is hosted in a browser,
         // nor if JavaScript is disabled.
-        this.bidirectional = false;
+        this.metadata.bidirectional = false;
       }
 
       // Revert the behavior for marshalling JS exceptions into Flash
@@ -122,11 +126,11 @@ function decodeDataFromFlash(data) {\
 
       // If hosted but cannot bidirectionally communicate with JavaScript,
       // then JavaScript is disabled on the page!
-      this.disabled = this.hosted && !this.bidirectional;
+      this.metadata.disabled = this.metadata.hosted && !this.metadata.bidirectional;
 
       // Do some feature testing and patching to ensure string fidelity
       // during cross-boundary communications between Flash and JavaScript.
-      this.fidelityEnsured = this.ensureStringFidelity();
+      this.metadata.fidelityEnsured = this.ensureStringFidelity();
     }
 
 
@@ -147,7 +151,7 @@ function decodeDataFromFlash(data) {\
           '(function() {',
           JS_DATA_PROCESSOR_FN,
           '',
-          '  var objectId = "' + ExternalInterface.objectID + '",',
+          '  var objectId = "' + this.metadata.objectId + '",',
           '      swf = document[objectId] || document.getElementById(objectId);',
           '  if (swf) {',
           '    swf._encodeDataForFlash = ' + JS_DATA_ENCODER_FN + ';',
@@ -166,12 +170,22 @@ function decodeDataFromFlash(data) {\
 
 
     /**
+     * What is the actual `ExternalInterface.objectID`?
+     *
+     * @return Boolean
+     */
+    public function getObjectId(): String {
+      return this.metadata.objectId;
+    }
+
+
+    /**
      * Are we authoritatively certain that we can execute JavaScript bidirectionally?
      *
      * @return Boolean
      */
     public function isComplete(): Boolean {
-      return this.hosted && this.bidirectional;
+      return this.metadata.hosted && this.metadata.bidirectional;
     }
 
 
@@ -181,7 +195,7 @@ function decodeDataFromFlash(data) {\
      * @return Boolean
      */
     public function isHighFidelity(): Boolean {
-      return this.isComplete() && this.fidelityEnsured;
+      return this.isComplete() && this.metadata.fidelityEnsured;
     }
 
 
@@ -223,7 +237,7 @@ function decodeDataFromFlash(data) {\
         this.call(
           [
             '(function() {',
-            '  var objectId = "' + ExternalInterface.objectID + '",',
+            '  var objectId = "' + this.metadata.objectId + '",',
             '      swf = document[objectId] || document.getElementById(objectId),',
             '      desiredSwfCallbackName = "' + functionName + '",',
             '      actualSwfCallbackName = "' + proxiedFunctionName + '",',
@@ -268,7 +282,7 @@ function decodeDataFromFlash(data) {\
         this.call(
           [
             '(function() {',
-            '  var objectId = "' + ExternalInterface.objectID + '",',
+            '  var objectId = "' + this.metadata.objectId + '",',
             '      swf = document[objectId] || document.getElementById(objectId),',
             '      desiredSwfCallbackName = "' + functionName + '";',
             '',
@@ -309,7 +323,7 @@ function decodeDataFromFlash(data) {\
 
         jsFuncExpr = [
           '(function() {',
-          '  var objectId = "' + ExternalInterface.objectID + '",',
+          '  var objectId = "' + this.metadata.objectId + '",',
           '      swf = document[objectId] || document.getElementById(objectId),',
           '      args, result;',
           '  if (swf && typeof swf._encodeDataForFlash === "function" && typeof swf._decodeDataFromFlash === "function") {',
@@ -343,7 +357,7 @@ function decodeDataFromFlash(data) {\
         if (this.isComplete()) {
           this.call.apply(this, [jsFuncExpr].concat(args));
         }
-        else if (!this.disabled) {
+        else if (!this.metadata.disabled) {
           var argsStr:String = "";
           for (var counter:int = 0; counter < args.length; counter++) {
             argsStr += JSON.stringify(args[counter]);
