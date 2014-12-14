@@ -14,13 +14,13 @@
     "clippy"
   ],
   "main": [
-    "./dist/ZeroClipboard.js"
+    "dist/ZeroClipboard.js"
   ],
   "scripts": [
-    "./dist/ZeroClipboard.js"
+    "dist/ZeroClipboard.js"
   ],
   "files": [
-    "./dist/ZeroClipboard.swf"
+    "dist/ZeroClipboard.swf"
   ],
   "license": "MIT",
   "authors": [

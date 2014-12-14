@@ -62,7 +62,7 @@
     "qunitjs": "^1.15.0",
     "spm": "^3.2.3"
   },
-  "main": "./dist/ZeroClipboard.js",
+  "main": "dist/ZeroClipboard.js",
   "spm": {
     "main": "dist/ZeroClipboard.js",
     "output": [
