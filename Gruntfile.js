@@ -214,6 +214,21 @@ module.exports = function(grunt) {
         }
       }
     },
+    "json-format": {
+      options: {
+        indent: 2
+      },
+      meta: {
+        files: [
+          {
+            expand: true,
+            cwd: "./",
+            src: ["./*.json"],
+            dest: "./"
+          }
+        ]
+      }
+    },
     chmod: {
       options: {
         mode: "444"
@@ -324,7 +339,7 @@ module.exports = function(grunt) {
   grunt.registerTask("jshint-prebuild", ["jshint:gruntfile", "jshint:js", "jshint:test"]);
   grunt.registerTask("prep-flash",      ["clean:flashTemp", "concat:flash"]);
   grunt.registerTask("validate",        ["jshint-prebuild", "prep-flash", "flexpmd"]);
-  grunt.registerTask("build",           ["clean", "concat", "jshint:dist", "uglify", "mxmlc", "template", "chmod"]);
+  grunt.registerTask("build",           ["clean", "concat", "jshint:dist", "uglify", "mxmlc", "template", "json-format", "chmod"]);
   grunt.registerTask("build-travis",    ["clean", "concat", "jshint:dist", "mxmlc", "chmod:dist"]);
   grunt.registerTask("test",            ["connect", "qunit:file", "qunit:http"]);
 
