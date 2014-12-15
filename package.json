@@ -63,6 +63,11 @@
     "spm": "^3.2.3"
   },
   "main": "dist/ZeroClipboard.js",
+  "files": [
+    "dist/ZeroClipboard.*",
+    "package.json",
+    "LICENSE"
+  ],
   "spm": {
     "main": "dist/ZeroClipboard.js",
     "output": [
