@@ -1,9 +1,9 @@
-/*global ZeroClipboard, _currentElement:true, _flashState:true, _zcSwfVersion:true, _extend, _deepCopy, _clipData, _clipDataFormatMap:true, _copyTarget:true */
+/*global ZeroClipboard, _currentElement:true, _flashState:true, _zcSwfVersion:true, _extend, _deepCopy, _clipData, _clipDataFormatMap:true, _copyTarget:true, _detectSandbox:true */
 
 (function(module, test) {
   "use strict";
 
-  var originalFlashState, originalConfig, originalFlashDetect;
+  var originalFlashState, originalConfig, originalFlashDetect, originalSandboxDetect;
 
 
   module("client/api.js unit tests - constructor and bridge", {
@@ -323,6 +323,7 @@
       originalFlashState = _extend({}, _flashState);
       originalConfig = ZeroClipboard.config();
       originalFlashDetect = ZeroClipboard.isFlashUnusable;
+      originalSandboxDetect = _detectSandbox;
       // Modify
       _currentElement = null;
       _flashState = {
@@ -330,11 +331,13 @@
         version: "0.0.0",
         disabled: null,
         outdated: null,
+        sandboxed: null,
         unavailable: null,
         degraded: null,
         deactivated: null,
         ready: null
       };
+      _detectSandbox = function() {};
       //ZeroClipboard.config({ swfPath: originalConfig.swfPath.replace(/\/(?:src|test)\/.*$/i, "/dist/ZeroClipboard.swf") });
     },
     teardown: function() {
@@ -343,6 +346,7 @@
       _flashState = originalFlashState;
       ZeroClipboard.config(originalConfig);
       ZeroClipboard.isFlashUnusable = originalFlashDetect;
+      _detectSandbox = originalSandboxDetect;
     }
   });
 
@@ -839,12 +843,46 @@
   });
 
 
+  test("Test sandboxedFlash Event", function(assert) {
+    assert.expect(8);
+
+    // Arrange
+    _flashState.disabled = false;
+    _flashState.outdated = false;
+    _flashState.sandboxed = true;
+    _flashState.version = "11.0.0";
+    var client = new ZeroClipboard();
+    var id = client.id;
+    var currentEl = document.getElementById("d_clip_button");
+
+    // Act
+    client.on( "ready", function(/* event */) {
+      assert.ok(false, "The `ready` event should NOT have fired!");
+    } );
+    client.on( "error", function(event) {
+      // Assert
+      assert.strictEqual(this, client);
+      assert.strictEqual(this.id, id);
+      assert.strictEqual(_flashState.sandboxed, true);
+      assert.strictEqual(event.type, "error");
+      assert.strictEqual(event.name, "flash-sandboxed");
+      assert.strictEqual(event.target, null);
+      assert.strictEqual(event.version, "11.0.0");
+      assert.strictEqual(event.minimumVersion, "11.0.0");
+      QUnit.start();
+    } );
+    QUnit.stop();
+    client.clip(currentEl);
+  });
+
+
   test("Test deactivatedFlash Event", function(assert) {
     assert.expect(10);
 
     // Arrange
     _flashState.disabled = false;
     _flashState.outdated = false;
+    _flashState.sandboxed = false;
     _flashState.unavailable = false;
     _flashState.degraded = false;
     _flashState.version = "11.0.0";
@@ -883,6 +921,7 @@
     // Arrange
     _flashState.disabled = false;
     _flashState.outdated = false;
+    _flashState.sandboxed = false;
     _flashState.deactivated = true;
     _flashState.unavailable = false;
     _flashState.degraded = false;
@@ -917,6 +956,7 @@
     // Arrange
     _flashState.disabled = false;
     _flashState.outdated = false;
+    _flashState.sandboxed = false;
     _flashState.deactivated = false;
     _flashState.unavailable = false;
     _flashState.version = "11.0.0";
@@ -951,6 +991,7 @@
     // Arrange
     _flashState.disabled = false;
     _flashState.outdated = false;
+    _flashState.sandboxed = false;
     _flashState.deactivated = false;
     _flashState.unavailable = false;
     _flashState.degraded = false;
@@ -987,6 +1028,7 @@
     // Arrange
     _flashState.disabled = false;
     _flashState.outdated = false;
+    _flashState.sandboxed = false;
     _flashState.deactivated = false;
     _flashState.unavailable = false;
     _flashState.degraded = false;
@@ -1031,6 +1073,7 @@
     // Arrange
     _flashState.disabled = false;
     _flashState.outdated = false;
+    _flashState.sandboxed = false;
     _flashState.deactivated = false;
     _flashState.unavailable = false;
     _flashState.degraded = false;
@@ -1072,6 +1115,7 @@
     // Arrange
     _flashState.disabled = false;
     _flashState.outdated = false;
+    _flashState.sandboxed = false;
     _flashState.deactivated = false;
     _flashState.unavailable = false;
     _flashState.degraded = false;
@@ -1103,6 +1147,7 @@
     // Arrange
     _flashState.disabled = false;
     _flashState.outdated = false;
+    _flashState.sandboxed = false;
     _flashState.deactivated = false;
     _flashState.unavailable = false;
     _flashState.degraded = false;
@@ -1133,6 +1178,7 @@
     // Arrange
     _flashState.disabled = false;
     _flashState.outdated = false;
+    _flashState.sandboxed = false;
     _flashState.unavailable = false;
     _flashState.degraded = false;
     _flashState.version = "11.0.0";
@@ -1182,6 +1228,7 @@
     // Arrange
     _flashState.disabled = false;
     _flashState.outdated = false;
+    _flashState.sandboxed = false;
     _flashState.deactivated = false;
     _flashState.unavailable = false;
     _flashState.degraded = false;
@@ -1278,6 +1325,7 @@
     // Arrange
     _flashState.disabled = false;
     _flashState.outdated = false;
+    _flashState.sandboxed = false;
     _flashState.deactivated = false;
     _flashState.unavailable = false;
     _flashState.degraded = false;
@@ -1397,7 +1445,7 @@
 
 
   test("Test for appropriate context inside of invoked event handlers", function(assert) {
-    assert.expect(14);
+    assert.expect(15);
 
     // Arrange
     var client = new ZeroClipboard();
@@ -1433,6 +1481,7 @@
     ZeroClipboard.emit("ready");
     ZeroClipboard.emit({"type":"error", "name":"flash-disabled"});
     ZeroClipboard.emit({"type":"error", "name":"flash-outdated"});
+    ZeroClipboard.emit({"type":"error", "name":"flash-sandboxed"});
     ZeroClipboard.emit({"type":"error", "name":"flash-unavailable"});
     ZeroClipboard.emit({"type":"error", "name":"flash-degraded"});
     ZeroClipboard.emit({"type":"error", "name":"flash-deactivated"});

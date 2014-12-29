@@ -85,12 +85,11 @@ var _clientOn = function(eventType, listener) {
       });
     }
     if (added.error) {
-      var flashErrorTypes = ["disabled", "outdated", "unavailable", "degraded", "deactivated", "overdue"];
-      for (i = 0, len = flashErrorTypes.length; i < len; i++) {
-        if (_flashState[flashErrorTypes[i]]) {
+      for (i = 0, len = _flashStateErrorNames.length; i < len; i++) {
+        if (_flashState[_flashStateErrorNames[i].replace(/^flash-/, "")]) {
           this.emit({
             type: "error",
-            name: "flash-" + flashErrorTypes[i],
+            name: _flashStateErrorNames[i],
             client: this
           });
           break;

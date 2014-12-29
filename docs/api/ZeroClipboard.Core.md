@@ -413,7 +413,7 @@ ZeroClipboard.on("error", function(e) {
   e = {
     type: "error",
     name: "flash-disabled",
-    messsage: "Flash is disabled or not installed",
+    messsage: "Flash is disabled or not installed. May also be attempting to run Flash in a sandboxed iframe, which is impossible.",
     target: null,
     relatedTarget: null,
     currentTarget: flashSwfObjectRef,
@@ -443,6 +443,29 @@ ZeroClipboard.on("error", function(e) {
     timeStamp: Date.now(),
     minimumVersion: "11.0.0",
     version: "10.3.183"
+  };
+*/
+});
+```
+
+
+##### `error[name = "flash-sandboxed"]`
+
+This type of `error` event fires when the page is within a `sandbox`ed `iframe` element. It is impossible for Flash Player to run in such a sandbox.
+
+```js
+ZeroClipboard.on("error", function(e) {
+/*
+  e = {
+    type: "error",
+    name: "flash-sandboxed",
+    messsage: "Attempting to run Flash in a sandboxed iframe, which is impossible",
+    target: null,
+    relatedTarget: null,
+    currentTarget: flashSwfObjectRef,
+    timeStamp: Date.now(),
+    minimumVersion: "11.0.0",
+    version: "11.2.202"
   };
 */
 });
@@ -510,7 +533,7 @@ ZeroClipboard.on("error", function(e) {
   e = {
     type: "error",
     name: "flash-deactivated",
-    messsage: "Flash is too outdated for your browser and/or is configured as click-to-activate",
+    messsage: "Flash is too outdated for your browser and/or is configured as click-to-activate. This may also mean that the ZeroClipboard SWF object could not be loaded, so please check your `swfPath` configuration and/or network connectivity. May also be attempting to run Flash in a sandboxed iframe, which is impossible.",
     target: null,
     relatedTarget: null,
     currentTarget: flashSwfObjectRef,

@@ -272,6 +272,13 @@
     return jsDir + "ZeroClipboard.swf";
   };
   /**
+ * Keep track of if the page is framed (in an `iframe`). This can never change.
+ * @private
+ */
+  var _pageIsFramed = function() {
+    return window.opener == null && (!!window.top && window != window.top || !!window.parent && window != window.parent);
+  }();
+  /**
  * Keep track of the state of the Flash object.
  * @private
  */
@@ -281,6 +288,7 @@
     pluginType: "unknown",
     disabled: null,
     outdated: null,
+    sandboxed: null,
     unavailable: null,
     degraded: null,
     deactivated: null,
@@ -339,11 +347,12 @@
   var _eventMessages = {
     ready: "Flash communication is established",
     error: {
-      "flash-disabled": "Flash is disabled or not installed",
+      "flash-disabled": "Flash is disabled or not installed. May also be attempting to run Flash in a sandboxed iframe, which is impossible.",
       "flash-outdated": "Flash is too outdated to support ZeroClipboard",
+      "flash-sandboxed": "Attempting to run Flash in a sandboxed iframe, which is impossible",
       "flash-unavailable": "Flash is unable to communicate bidirectionally with JavaScript",
       "flash-degraded": "Flash is unable to preserve data fidelity when communicating with JavaScript",
-      "flash-deactivated": "Flash is too outdated for your browser and/or is configured as click-to-activate.\nThis may also mean that the ZeroClipboard SWF object could not be loaded, so please check your `swfPath` configuration and/or network connectivity.",
+      "flash-deactivated": "Flash is too outdated for your browser and/or is configured as click-to-activate.\nThis may also mean that the ZeroClipboard SWF object could not be loaded, so please check your `swfPath` configuration and/or network connectivity.\nMay also be attempting to run Flash in a sandboxed iframe, which is impossible.",
       "flash-overdue": "Flash communication was established but NOT within the acceptable time limit",
       "version-mismatch": "ZeroClipboard JS version number does not match ZeroClipboard SWF version number",
       "clipboard-error": "At least one error was thrown while ZeroClipboard was attempting to inject your data into the clipboard",
@@ -351,6 +360,33 @@
       "swf-not-found": "The ZeroClipboard SWF object could not be loaded, so please check your `swfPath` configuration and/or network connectivity"
     }
   };
+  /**
+ * The `name`s of `error` events that can only occur is Flash has at least
+ * been able to load the SWF successfully.
+ * @private
+ */
+  var _errorsThatOnlyOccurAfterFlashLoads = [ "flash-unavailable", "flash-degraded", "flash-overdue", "version-mismatch", "config-mismatch", "clipboard-error" ];
+  /**
+ * The `name`s of `error` events that should likely result in the `_flashState`
+ * variable's property values being updated.
+ * @private
+ */
+  var _flashStateErrorNames = [ "flash-disabled", "flash-outdated", "flash-sandboxed", "flash-unavailable", "flash-degraded", "flash-deactivated", "flash-overdue" ];
+  /**
+ * A RegExp to match the `name` property of `error` events related to Flash.
+ * @private
+ */
+  var _flashStateErrorNameMatchingRegex = new RegExp("^flash-(" + _flashStateErrorNames.map(function(errorName) {
+    return errorName.replace(/^flash-/, "");
+  }).join("|") + ")$");
+  /**
+ * A RegExp to match the `name` property of `error` events related to Flash,
+ * which is enabled.
+ * @private
+ */
+  var _flashStateEnabledErrorNameMatchingRegex = new RegExp("^flash-(" + _flashStateErrorNames.slice(1).map(function(errorName) {
+    return errorName.replace(/^flash-/, "");
+  }).join("|") + ")$");
   /**
  * ZeroClipboard configuration defaults for the Core module.
  * @private
@@ -409,6 +445,7 @@
  * @private
  */
   var _state = function() {
+    _detectSandbox();
     return {
       browser: _pick(_navigator, [ "userAgent", "platform", "appName" ]),
       flash: _omit(_flashState, [ "bridge" ]),
@@ -423,7 +460,7 @@
  * @private
  */
   var _isFlashUnusable = function() {
-    return !!(_flashState.disabled || _flashState.outdated || _flashState.unavailable || _flashState.degraded || _flashState.deactivated);
+    return !!(_flashState.disabled || _flashState.outdated || _flashState.sandboxed || _flashState.unavailable || _flashState.degraded || _flashState.deactivated);
   };
   /**
  * The underlying implementation of `ZeroClipboard.on`.
@@ -455,12 +492,11 @@
         });
       }
       if (added.error) {
-        var flashErrorTypes = [ "disabled", "outdated", "unavailable", "degraded", "deactivated", "overdue" ];
-        for (i = 0, len = flashErrorTypes.length; i < len; i++) {
-          if (_flashState[flashErrorTypes[i]] === true) {
+        for (i = 0, len = _flashStateErrorNames.length; i < len; i++) {
+          if (_flashState[_flashStateErrorNames[i].replace(/^flash-/, "")] === true) {
             ZeroClipboard.emit({
               type: "error",
-              name: "flash-" + flashErrorTypes[i]
+              name: _flashStateErrorNames[i]
             });
             break;
           }
@@ -559,10 +595,18 @@
  * @private
  */
   var _create = function() {
+    var previousState = _flashState.sandboxed;
+    _detectSandbox();
     if (typeof _flashState.ready !== "boolean") {
       _flashState.ready = false;
     }
-    if (!ZeroClipboard.isFlashUnusable() && _flashState.bridge === null) {
+    if (_flashState.sandboxed !== previousState && _flashState.sandboxed === true) {
+      _flashState.ready = false;
+      ZeroClipboard.emit({
+        type: "error",
+        name: "flash-sandboxed"
+      });
+    } else if (!ZeroClipboard.isFlashUnusable() && _flashState.bridge === null) {
       var maxWait = _globalConfig.flashLoadTimeout;
       if (typeof maxWait === "number" && maxWait >= 0) {
         _flashCheckTimeout = _setTimeout(function() {
@@ -674,7 +718,7 @@
       htmlBridge.style.left = "0px";
       htmlBridge.style.top = "-9999px";
       htmlBridge.style.width = "1px";
-      htmlBridge.style.top = "1px";
+      htmlBridge.style.height = "1px";
     }
     if (_currentElement) {
       _removeClass(_currentElement, _globalConfig.hoverClass);
@@ -736,13 +780,13 @@
       });
     }
     if (event.type === "error") {
-      if (/^flash-(disabled|outdated|unavailable|degraded|deactivated|overdue)$/.test(event.name)) {
+      if (_flashStateErrorNameMatchingRegex.test(event.name)) {
         _extend(event, {
           target: null,
           minimumVersion: _minimumFlashVersion
         });
       }
-      if (/^flash-(outdated|unavailable|degraded|deactivated|overdue)$/.test(event.name)) {
+      if (_flashStateEnabledErrorNameMatchingRegex.test(event.name)) {
         _extend(event, {
           version: _flashState.version
         });
@@ -876,6 +920,18 @@
     return this;
   };
   /**
+ * Check an `error` event's `name` property to see if Flash has
+ * already loaded, which rules out possible `iframe` sandboxing.
+ * @private
+ */
+  var _getSandboxStatusFromErrorEvent = function(event) {
+    var isSandboxed = null;
+    if (_pageIsFramed === false || event && event.type === "error" && event.name && _errorsThatOnlyOccurAfterFlashLoads.indexOf(event.name) !== -1) {
+      isSandboxed = false;
+    }
+    return isSandboxed;
+  };
+  /**
  * Preprocess any special behaviors, reactions, or state changes after receiving this event.
  * Executes only once per event emitted, NOT once per client.
  * @private
@@ -884,10 +940,13 @@
     var element = event.target || _currentElement || null;
     var sourceIsSwf = event._source === "swf";
     delete event._source;
-    var flashErrorNames = [ "flash-disabled", "flash-outdated", "flash-unavailable", "flash-degraded", "flash-deactivated", "flash-overdue" ];
     switch (event.type) {
      case "error":
-      if (flashErrorNames.indexOf(event.name) !== -1) {
+      var isSandboxed = event.name === "flash-sandboxed" || _getSandboxStatusFromErrorEvent(event);
+      if (typeof isSandboxed === "boolean") {
+        _flashState.sandboxed = isSandboxed;
+      }
+      if (_flashStateErrorNames.indexOf(event.name) !== -1) {
         _extend(_flashState, {
           disabled: event.name === "flash-disabled",
           outdated: event.name === "flash-outdated",
@@ -918,6 +977,7 @@
       _extend(_flashState, {
         disabled: false,
         outdated: false,
+        sandboxed: false,
         unavailable: false,
         degraded: false,
         deactivated: false,
@@ -1648,6 +1708,54 @@
     return typeof zIndex === "number" ? zIndex : "auto";
   };
   /**
+ * Attempt to detect if ZeroClipboard is executing inside of a sandboxed iframe.
+ * If it is, Flash Player cannot be used, so ZeroClipboard is dead in the water.
+ *
+ * @see {@link http://lists.w3.org/Archives/Public/public-whatwg-archive/2014Dec/0002.html}
+ * @see {@link https://github.com/zeroclipboard/zeroclipboard/issues/511}
+ * @see {@link http://zeroclipboard.org/test-iframes.html}
+ *
+ * @returns `true` (is sandboxed), `false` (is not sandboxed), or `null` (uncertain) 
+ * @private
+ */
+  var _detectSandbox = function(doNotReassessFlashSupport) {
+    var effectiveScriptOrigin, frame, frameError, previousState = _flashState.sandboxed, isSandboxed = null;
+    doNotReassessFlashSupport = doNotReassessFlashSupport === true;
+    if (_pageIsFramed === false) {
+      isSandboxed = false;
+    } else {
+      try {
+        frame = window.frameElement || null;
+      } catch (e) {
+        frameError = {
+          name: e.name,
+          message: e.message
+        };
+      }
+      if (frame && frame.nodeType === 1 && frame.nodeName === "IFRAME") {
+        try {
+          isSandboxed = frame.hasAttribute("sandbox");
+        } catch (e) {
+          isSandboxed = null;
+        }
+      } else {
+        try {
+          effectiveScriptOrigin = document.domain || null;
+        } catch (e) {
+          effectiveScriptOrigin = null;
+        }
+        if (effectiveScriptOrigin === null || frameError && frameError.name === "SecurityError" && /(^|[\s\(\[@])sandbox(es|ed|ing|[\s\.,!\)\]@]|$)/.test(frameError.message.toLowerCase())) {
+          isSandboxed = true;
+        }
+      }
+    }
+    _flashState.sandboxed = isSandboxed;
+    if (previousState !== isSandboxed && !doNotReassessFlashSupport) {
+      _detectFlashSupport(_ActiveXObject);
+    }
+    return isSandboxed;
+  };
+  /**
  * Detect the Flash Player status, version, and plugin type.
  *
  * @see {@link https://code.google.com/p/doctype-mirror/wiki/ArticleDetectFlash#The_code}
@@ -1728,6 +1836,10 @@
  * Invoke the Flash detection algorithms immediately upon inclusion so we're not waiting later.
  */
   _detectFlashSupport(_ActiveXObject);
+  /**
+ * Always assess the `sandboxed` state of the page at important Flash-related moments.
+ */
+  _detectSandbox(true);
   /**
  * A shell constructor for `ZeroClipboard` client instances.
  *
@@ -2001,12 +2113,11 @@
         });
       }
       if (added.error) {
-        var flashErrorTypes = [ "disabled", "outdated", "unavailable", "degraded", "deactivated", "overdue" ];
-        for (i = 0, len = flashErrorTypes.length; i < len; i++) {
-          if (_flashState[flashErrorTypes[i]]) {
+        for (i = 0, len = _flashStateErrorNames.length; i < len; i++) {
+          if (_flashState[_flashStateErrorNames[i].replace(/^flash-/, "")]) {
             this.emit({
               type: "error",
-              name: "flash-" + flashErrorTypes[i],
+              name: _flashStateErrorNames[i],
               client: this
             });
             break;
