@@ -589,7 +589,7 @@ ZeroClipboard.on("error", function(e) {
 
 ##### `error[name = "version-mismatch"]`
 
-_Added in `v2.2.0-beta.2`._
+_Added in `v2.2.0`._
 
 This type of `error` event fires when the JavaScript side's `ZeroClipboard.version` property value
 does not exactly match the `ZeroClipboard.VERSION` property value that was compiled into the SWF.
@@ -620,7 +620,7 @@ ZeroClipboard.on("error", function(e) {
 
 ##### `error[name = "clipboard-error"]`
 
-_Added in `v2.2.0-beta.3`._
+_Added in `v2.2.0`._
 
 This type of `error` event fires when any error occurs while the Flash layer is attempting to inject the pending clipboard data into the clipboard. This event is fired only if the injection of at least 1 data format into the clipboard threw an error but does **not** necessarily mean that the injection failed for _every_ data format.
 
@@ -660,7 +660,7 @@ ZeroClipboard.on("error", function(e) {
 
 ##### `error[name = "config-mismatch"]`
 
-_Added in `v2.2.0-beta.3`._
+_Added in `v2.2.0`._
 
 This type of `error` event fires when the certain properties within the
 `ZeroClipboard.config` configured values do not match real values within
