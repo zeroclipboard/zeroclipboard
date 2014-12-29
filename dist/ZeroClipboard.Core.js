@@ -1515,29 +1515,23 @@
  * @private
  */
   var _addClass = function(element, value) {
-    if (!element || element.nodeType !== 1) {
-      return element;
+    var c, cl, className, classNames = [];
+    if (typeof value === "string" && value) {
+      classNames = value.split(/\s+/);
     }
-    if (element.classList) {
-      if (!element.classList.contains(value)) {
-        element.classList.add(value);
-      }
-      return element;
-    }
-    if (value && typeof value === "string") {
-      var classNames = (value || "").split(/\s+/);
-      if (element.nodeType === 1) {
-        if (!element.className) {
-          element.className = value;
-        } else {
-          var className = " " + element.className + " ", setClass = element.className;
-          for (var c = 0, cl = classNames.length; c < cl; c++) {
-            if (className.indexOf(" " + classNames[c] + " ") < 0) {
-              setClass += " " + classNames[c];
-            }
-          }
-          element.className = setClass.replace(/^\s+|\s+$/g, "");
+    if (element && element.nodeType === 1 && classNames.length > 0) {
+      if (element.classList) {
+        for (c = 0, cl = classNames.length; c < cl; c++) {
+          element.classList.add(classNames[c]);
         }
+      } else if (element.hasOwnProperty("className")) {
+        className = " " + element.className + " ";
+        for (c = 0, cl = classNames.length; c < cl; c++) {
+          if (className.indexOf(" " + classNames[c] + " ") === -1) {
+            className += classNames[c] + " ";
+          }
+        }
+        element.className = className.replace(/^\s+|\s+$/g, "");
       }
     }
     return element;
@@ -1549,20 +1543,18 @@
  * @private
  */
   var _removeClass = function(element, value) {
-    if (!element || element.nodeType !== 1) {
-      return element;
-    }
-    if (element.classList) {
-      if (element.classList.contains(value)) {
-        element.classList.remove(value);
-      }
-      return element;
-    }
+    var c, cl, className, classNames = [];
     if (typeof value === "string" && value) {
-      var classNames = value.split(/\s+/);
-      if (element.nodeType === 1 && element.className) {
-        var className = (" " + element.className + " ").replace(/[\n\t]/g, " ");
-        for (var c = 0, cl = classNames.length; c < cl; c++) {
+      classNames = value.split(/\s+/);
+    }
+    if (element && element.nodeType === 1 && classNames.length > 0) {
+      if (element.classList && element.classList.length > 0) {
+        for (c = 0, cl = classNames.length; c < cl; c++) {
+          element.classList.remove(classNames[c]);
+        }
+      } else if (element.className) {
+        className = (" " + element.className + " ").replace(/[\r\n\t]/g, " ");
+        for (c = 0, cl = classNames.length; c < cl; c++) {
           className = className.replace(" " + classNames[c] + " ", " ");
         }
         element.className = className.replace(/^\s+|\s+$/g, "");

@@ -1527,36 +1527,31 @@ var _safeActiveElement = function() {
  * @private
  */
 var _addClass = function(element, value) {
+  var c, cl, className,
+      classNames = [];
 
-  if (!element || element.nodeType !== 1) {
-    return element;
+  if (typeof value === "string" && value) {
+    classNames = value.split(/\s+/);
   }
 
-  // If the element has `classList`
-  if (element.classList) {
-    if (!element.classList.contains(value)) {
-      element.classList.add(value);
+  if (element && element.nodeType === 1 && classNames.length > 0) {
+    // If the element has `classList`
+    if (element.classList) {
+      // IE11 cannot add a list of classNames anyway, so just iterate
+      for (c = 0, cl = classNames.length; c < cl; c++) {
+        // Supposedly do NOT need to check if the class is not contained first
+        element.classList.add(classNames[c]);
+      }
     }
-    return element;
-  }
-
-  if (value && typeof value === "string") {
-    var classNames = (value || "").split(/\s+/);
-
-    if (element.nodeType === 1) {
-      if (!element.className) {
-        element.className = value;
-      }
-      else {
-        var className = " " + element.className + " ", setClass = element.className;
-        for (var c = 0, cl = classNames.length; c < cl; c++) {
-          if (className.indexOf(" " + classNames[c] + " ") < 0) {
-            setClass += " " + classNames[c];
-          }
+    else if (element.hasOwnProperty("className")) {
+      className = " " + element.className + " ";
+      for (c = 0, cl = classNames.length; c < cl; c++) {
+        if (className.indexOf(" " + classNames[c] + " ") === -1) {
+          className += classNames[c] + " ";
         }
-        // jank trim
-        element.className = setClass.replace(/^\s+|\s+$/g, "");
       }
+      // trim
+      element.className = className.replace(/^\s+|\s+$/g, "");
     }
   }
 
@@ -1571,28 +1566,30 @@ var _addClass = function(element, value) {
  * @private
  */
 var _removeClass = function(element, value) {
-
-  if (!element || element.nodeType !== 1) {
-    return element;
-  }
-
-  // If the element has `classList`
-  if (element.classList) {
-    if (element.classList.contains(value)) {
-      element.classList.remove(value);
-    }
-    return element;
-  }
+  var c, cl, className,
+      classNames = [];
 
   if (typeof value === "string" && value) {
-    var classNames = value.split(/\s+/);
+    classNames = value.split(/\s+/);
+  }
 
-    if (element.nodeType === 1 && element.className) {
-      var className = (" " + element.className + " ").replace(/[\n\t]/g, " ");
-      for (var c = 0, cl = classNames.length; c < cl; c++) {
+  if (element && element.nodeType === 1 && classNames.length > 0) {
+    // If the element has `classList`
+    if (element.classList && element.classList.length > 0) {
+      for (c = 0, cl = classNames.length; c < cl; c++) {
+        // Supposedly do NOT need to check if the class is contained first
+        element.classList.remove(classNames[c]);
+      }
+    }
+    // Checking the actual `className` property vs. its `hasOwnProperty`
+    // existence is OK here since we need it to have content in order to
+    // have any removable classes
+    else if (element.className) {
+      className = (" " + element.className + " ").replace(/[\r\n\t]/g, " ");
+      for (c = 0, cl = classNames.length; c < cl; c++) {
         className = className.replace(" " + classNames[c] + " ", " ");
       }
-      // jank trim
+      // trim
       element.className = className.replace(/^\s+|\s+$/g, "");
     }
   }
