@@ -34,6 +34,10 @@ See [Support](#support) and [Browser-Specific Known Issues](#browser-specific-kn
 
 See [OS Considerations](#os-considerations) below.
 
+### Sandboxing Limitations
+
+See [`sandbox`ed `iframe` Limitations](#sandboxed-iframe-limitations) below.
+
 ### Protocol Limitations
 
 See [Cross-Protocol Limitations](#cross-protocol-limitations) and [`file://` Protocol Limitations](#file-protocol-limitations) below.
@@ -344,6 +348,19 @@ Here is a more complete example which exercises many of the configuration option
 ```
 
 
+### "Starter Snippets" for Playground Sites
+
+ - JSFiddle
+     - View: http://fiddle.jshell.net/JamesMGreene/k9psq1da/show/
+     - Edit: http://jsfiddle.net/JamesMGreene/k9psq1da/
+ - CodePen
+     - View: http://s.codepen.io/boomerang/b82185b7ceb35fc9b3829895d38348a31420091710997/index.html
+     - Edit: http://codepen.io/JamesMGreene/pen/zxorvW
+ - JSBin
+     - View: http://jsbin.com/lozuda/
+     - Edit: http://jsbin.com/lozuda/edit?html,js,css
+
+
 ## Namespacing ZeroClipboard
 
 ZeroClipboard creates DOM elements with pre-configured attributes, e.g. a `div` element with an ID of `"global-zeroclipboard-html-bridge"` to encapsulate the Flash object.
@@ -491,7 +508,28 @@ decisions of how _your_ site should handle each of these situations.
 
 
 
-## Protocol Limitations
+## Security Limitations
+
+### `sandbox`ed `iframe` Limitations
+
+The `sandbox` attribute of the `iframe` element (new in HTML5, supported in IE10+ and all other evergreen browsers) provides web developers with a way tighten the restrictions on framed content beyond what Content Security Policy (CSP) provides for un`sandbox`ed cross-origin `iframe`s.  With the `sandbox` attribute, you can instruct the browser to load a specific frame's content in a low-privilege environment, starting with the least privilege possible and then whitelisting the necessary subset of capabilities.
+
+It is also very important to note, however, that the `sandbox` attribute takes away some privileges from the framed content that **CANNOT** be whitelisted "back in". For example, any framed page running in a sandbox absolutely _cannot_ run native plugins (e.g. Flash, Silverlight, Java, etc.). This decision was made because native plugins run unmanaged code that the browser cannot offer any further security verifications on, and are frequently sourced from third parties.
+
+As such, ZeroClipboard is completely unusable inside of a `sandbox`ed `iframe`. Best efforts have been taken to detect sandboxing and notify consumers via an `error` event (`error[name = "flash-sandboxed"]`) but, unfortunately, not all configurations of sandboxing can be reliably detected from within the framed content.
+
+This sandboxing is also why ZeroClipboard cannot be used as normal on many online code playground sites like JSFiddle, CodePen, etc. However, we have put together a few ["starter snippets" for such sites](#starter-snippets-for-playground-sites) to get you up and running quickly.
+
+For a deeper analysis and a few _"naughty"_ workarounds (which only work in limited situations), check
+out the [sandblaster.js (JamesMGreene/sandblaster)](https://github.com/JamesMGreene/sandblaster) project.
+
+#### See Also
+
+ - [HTML5 Rocks :metal: article on `sandbox`ed `iframe`s](http://www.html5rocks.com/en/tutorials/security/sandboxed-iframes/)
+ - [HTML spec: `iframe` `sandbox` attribute](https://html.spec.whatwg.org/multipage/embedded-content.html#attr-iframe-sandbox)
+ - [HTML spec: Browser sandboxing](http://www.w3.org/TR/html/browsers.html#sandboxing)
+ - [HTML5 Rocks :metal: article on Content Security Policy (CSP)](http://www.html5rocks.com/en/tutorials/security/content-security-policy/)
+
 
 ### Cross-Protocol Limitations
 

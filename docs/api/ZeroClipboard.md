@@ -1041,7 +1041,9 @@ You can override the defaults by making calls like `ZeroClipboard.config({ swfPa
 before you create any clients.
 
 
-### SWF Inbound Scripting Access: The `trustedDomains` option
+### SWF Scripting Access
+
+#### SWF Inbound Scripting Access: The `trustedDomains` option
 
 This allows other SWF files and HTML pages from the allowed domains to access/call publicly
 exposed ActionScript code, e.g. functions shared via `ExternalInterface.addCallback`. In other
@@ -1055,13 +1057,13 @@ other domains (e.g. in `iframe`s or child windows).
 For more information about trusted domains, consult the [_official Flash documentation for `flash.system.Security.allowDomain(...)`_](http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/Security.html#allowDomain\(\)).
 
 
-### SWF Outbound Scripting Access
+#### SWF Outbound Scripting Access
 
 The `allowScriptAccess` parameter (for Flash embedding markup) allows the SWF file to access/call
 JavaScript/HTML functionality of HTML pages on allowed domains, e.g. invoking functions via
 `ExternalInterface.call`. In other words, it controls the SWF outbound scripting access.
 
-As of version `v2.0.0-alpha.2`, the `allowScriptAccess` configuration option no longer exists. The
+As of version `v2.0.0`, the `allowScriptAccess` configuration option no longer exists. The
 appropriate value will be determined immediately before the Flash object is embedded on the page.
 The value is based on a relationship between the current domain (`window.location.host`) and the
 value of the `trustedDomains` configuration option.
@@ -1069,7 +1071,11 @@ value of the `trustedDomains` configuration option.
 For more information about `allowScriptAccess`, consult the [_official Flash documentation_](http://helpx.adobe.com/flash/kb/control-access-scripts-host-web.html).
 
 
-## Protocol Limitations
+## Security Limitations
+
+### `sandbox`ed `iframe` Limitations
+
+The `sandbox` attribute of the `iframe` element (new in HTML5, supported in IE10+ and all other evergreen browsers) provides web developers with a way to instruct the browser to load a specific frame's content in a low-privilege environment, starting with the least privilege possible and then whitelisting the necessary subset of capabilities. However, that the `sandbox` attribute takes away some privileges from the framed content that **CANNOT** be whitelisted "back in", including the ability to run native plugins (e.g. Flash), ergo causing ZeroClipboard to be completely unusable. See [../instructions.md#sandboxed-iframe-limitations](../instructions.md#sandboxed-iframe-limitations) for an in-depth explanation of this limitation and _"naughty"_ workarounds.
 
 ### Cross-Protocol Limitations
 
