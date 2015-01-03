@@ -86,9 +86,9 @@ var _isBrowserSupported = function() {
  */
 var _isFlashUnusable = function() {
   return !!(
+    _flashState.sandboxed ||
     _flashState.disabled ||
     _flashState.outdated ||
-    _flashState.sandboxed ||
     _flashState.unavailable ||
     _flashState.degraded ||
     _flashState.deactivated
@@ -147,9 +147,11 @@ var _on = function(eventType, listener) {
             type: "error",
             name: _flashStateErrorNames[i]
           });
+          // Stop after the first `_flashState` error is found (should be the most severe)
           break;
         }
       }
+
       if (_zcSwfVersion !== undefined && ZeroClipboard.version !== _zcSwfVersion) {
         ZeroClipboard.emit({
           type: "error",
@@ -247,7 +249,7 @@ var _emit = function(event) {
 
   // If this was a Flash "ready" event that was overdue, bail out and fire an "error" event instead
   if (event.type === "ready" && _flashState.overdue === true) {
-    return ZeroClipboard.emit({ "type": "error", "name": "flash-overdue" });
+    return ZeroClipboard.emit({ type: "error", name: "flash-overdue" });
   }
 
   // Trigger any and all registered event handlers
@@ -265,12 +267,38 @@ var _emit = function(event) {
 
 
 /**
+ * Get the protocol of the configured SWF path.
+ * @private
+ */
+var _getSwfPathProtocol = function() {
+  var swfPath = _globalConfig.swfPath || "",
+      swfPathFirstTwoChars = swfPath.slice(0, 2),
+      swfProtocol = swfPath.slice(0, swfPath.indexOf("://") + 1);
+
+  return (
+    // If swfPath is a UNC path (`file://`-based)
+    swfPathFirstTwoChars === "\\\\" ?
+      "file:" :
+      (
+        // If no protocol, or relative protocol, then...
+        swfPathFirstTwoChars === "//" || swfProtocol === "" ?
+          // use the page's protocol
+          _window.location.protocol :
+          // otherwise, use the protocol from the SWF path
+          swfProtocol
+      )
+  );
+};
+
+
+/**
  * The underlying implementation of `ZeroClipboard.create`.
  * @private
  */
 var _create = function() {
-  // Make note of the most recent sandbox assessment
-  var previousState = _flashState.sandboxed;
+  var maxWait, swfProtocol,
+      // Make note of the most recent sandbox assessment
+      previousState = _flashState.sandboxed;
 
   if (!_isBrowserSupported()) {
     _flashState.ready = false;
@@ -292,25 +320,32 @@ var _create = function() {
     ZeroClipboard.emit({ type: "error", name: "flash-sandboxed" });
   }
   else if (!ZeroClipboard.isFlashUnusable() && _flashState.bridge === null) {
-    var maxWait = _globalConfig.flashLoadTimeout;
-    if (typeof maxWait === "number" && maxWait >= 0) {
-      _flashCheckTimeout = _setTimeout(function() {
-        // If it took longer than `_globalConfig.flashLoadTimeout` milliseconds to receive
-        // a `ready` event, so consider Flash "deactivated".
-        if (typeof _flashState.deactivated !== "boolean") {
-          _flashState.deactivated = true;
-        }
-        if (_flashState.deactivated === true) {
-          ZeroClipboard.emit({ "type": "error", "name": "flash-deactivated" });
-        }
-      }, maxWait);
+    swfProtocol = _getSwfPathProtocol();
+
+    if (swfProtocol && swfProtocol !== _window.location.protocol) {
+      ZeroClipboard.emit({ type: "error", name: "flash-insecure" });
     }
+    else {
+      maxWait = _globalConfig.flashLoadTimeout;
+      if (typeof maxWait === "number" && maxWait >= 0) {
+        _flashCheckTimeout = _setTimeout(function() {
+          // If it took longer than `_globalConfig.flashLoadTimeout` milliseconds to receive
+          // a `ready` event, so consider Flash "deactivated".
+          if (typeof _flashState.deactivated !== "boolean") {
+            _flashState.deactivated = true;
+          }
+          if (_flashState.deactivated === true) {
+            ZeroClipboard.emit({ type: "error", name: "flash-deactivated" });
+          }
+        }, maxWait);
+      }
 
-    // If attempting a fresh SWF embedding, it is safe to ignore the `overdue` status
-    _flashState.overdue = false;
+      // If attempting a fresh SWF embedding, it is safe to ignore the `overdue` status
+      _flashState.overdue = false;
 
-    // Embed the SWF
-    _embedSwf();
+      // Embed the SWF
+      _embedSwf();
+    }
   }
 };
 
@@ -497,7 +532,7 @@ var _isValidHtml4Id = function(id) {
  * @private
  */
 var _createEvent = function(event) {
-  /*jshint maxstatements:30 */
+  /*jshint maxstatements:32 */
 
   var eventType;
   if (typeof event === "string" && event) {
@@ -558,6 +593,12 @@ var _createEvent = function(event) {
     if (_flashStateEnabledErrorNameMatchingRegex.test(event.name)) {
       _extend(event, {
         version: _flashState.version
+      });
+    }
+    if (event.name === "flash-insecure") {
+      _extend(event, {
+        pageProtocol: _window.location.protocol,
+        swfProtocol: _getSwfPathProtocol()
       });
     }
   }
@@ -797,6 +838,7 @@ var _preprocessEvent = function(event) {
         _extend(_flashState, {
           disabled:    event.name === "flash-disabled",
           outdated:    event.name === "flash-outdated",
+          insecure:    event.name === "flash-insecure",
           unavailable: event.name === "flash-unavailable",
           degraded:    event.name === "flash-degraded",
           deactivated: event.name === "flash-deactivated",
@@ -810,6 +852,7 @@ var _preprocessEvent = function(event) {
         _extend(_flashState, {
           disabled:    false,
           outdated:    false,
+          insecure:    false,
           unavailable: false,
           degraded:    false,
           deactivated: false,
@@ -828,9 +871,10 @@ var _preprocessEvent = function(event) {
 
       var wasDeactivated = _flashState.deactivated === true;
       _extend(_flashState, {
+        sandboxed:   false,
         disabled:    false,
         outdated:    false,
-        sandboxed:   false,
+        insecure:    false,
         unavailable: false,
         degraded:    false,
         deactivated: false,
@@ -1079,7 +1123,7 @@ var _watchForSwfFallbackContent = function() {
         // Do NOT count a missing SWF as a Flash deactivation
         _flashState.deactivated = null;
 
-        ZeroClipboard.emit({ "type": "error", "name": "swf-not-found" });
+        ZeroClipboard.emit({ type: "error", name: "swf-not-found" });
       }
     }, pollWait);
   }
@@ -1262,8 +1306,11 @@ var _unembedSwf = function() {
     // after receiving an `error[name="flash-overdue"]` event
     _flashState.deactivated = null;
 
+    // Reset the `insecure` status in case the user reconfigures the `swfPath`
+    _flashState.insecure = null;
+
     // Don't keep track of the SWF's ZC library version number
-    // The use of `undefined` here instead of `null` is important
+    // NOTE: The use of `undefined` here instead of `null` is important!
     _zcSwfVersion = undefined;
   }
 };

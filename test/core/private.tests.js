@@ -1,5 +1,4 @@
-/*global _flashState:true, _currentElement:true, _copyTarget:true, _isWindows:true, _globalConfig:true, _extend, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _extractDomain, _determineScriptAccess, _mapClipDataToFlash, _mapClipResultsFromFlash, _createEvent, _preprocessEvent, _getRelatedTarget, _shouldPerformAsync, _dispatchCallback, _detectFlashSupport, _encodeURIComponent, _fixLineEndings, _isBrowserSupported */
-
+/*global _flashState:true, _currentElement:true, _copyTarget:true, _isWindows:true, _globalConfig:true, _extend, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _extractDomain, _determineScriptAccess, _mapClipDataToFlash, _mapClipResultsFromFlash, _createEvent, _preprocessEvent, _getRelatedTarget, _shouldPerformAsync, _dispatchCallback, _detectFlashSupport, _encodeURIComponent, _fixLineEndings, _isBrowserSupported, _getSwfPathProtocol, _config */
 
 (function(module, test) {
   "use strict";
@@ -589,6 +588,57 @@
 
     // Stop test evaluation
     QUnit.stop();
+  });
+
+
+  test("`_getSwfPathProtocol` should work", function(assert) {
+    assert.expect(9);
+
+    var pageProtocol = window.location.protocol,
+        origSwfPath = _config("swfPath");
+
+    try {
+      // Current, whatever that is
+      assert.strictEqual(_getSwfPathProtocol(), pageProtocol);
+
+      // Specifically no path (so current protocol)
+      _config({ swfPath: "" });
+      assert.strictEqual(_getSwfPathProtocol(), pageProtocol);
+
+      // Specifically relative path (so current protocol)
+      _config({ swfPath: "js/zc/blah.swf" });
+      assert.strictEqual(_getSwfPathProtocol(), pageProtocol);
+
+      // Specifically relative protocol (so current)
+      _config({ swfPath: "//zeroclipboard.org/blah.swf" });
+      assert.strictEqual(_getSwfPathProtocol(), pageProtocol);
+
+      // Specifically `http://`
+      _config({ swfPath: "http://zeroclipboard.org/blah.swf" });
+      assert.strictEqual(_getSwfPathProtocol(), "http:");
+
+      // Specifically `https://`
+      _config({ swfPath: "https://zeroclipboard.org/blah.swf" });
+      assert.strictEqual(_getSwfPathProtocol(), "https:");
+
+      // Specifically `file://`
+      _config({ swfPath: "file://192.168.0.100/path/blah.swf" });
+      assert.strictEqual(_getSwfPathProtocol(), "file:");
+
+      // Specifically UNC-based `file://` (for non-IE)
+      _config({ swfPath: "file://///192.168.0.100/path/blah.swf" });
+      assert.strictEqual(_getSwfPathProtocol(), "file:");
+
+      // Specifically UNC-based `file://` (for IE only)
+      _config({ swfPath: "\\\\192.168.0.100\\path\\blah.swf" });
+      assert.strictEqual(_getSwfPathProtocol(), "file:");
+    }
+    catch (err) {
+      assert.ok(false, "Unexpected error was thrown: " + err);
+    }
+    finally {
+      _config({ swfPath: origSwfPath });
+    }
   });
 
 

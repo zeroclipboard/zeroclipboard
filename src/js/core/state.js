@@ -6,10 +6,10 @@ var _pageIsFramed = (function() {
   /*jshint eqeqeq:false */
   // Cannot use ===/!== for comparing WindowProxy objects
   return (
-    window.opener == null &&
+    _window.opener == null &&
     (
-      (!!window.top && window != window.top) ||
-      (!!window.parent && window != window.parent)
+      (!!_window.top && _window != _window.top) ||
+      (!!_window.parent && _window != _window.parent)
     )
   );
 })();
@@ -28,9 +28,10 @@ var _flashState = {
   pluginType: "unknown",
 
   // Flash SWF state
+  sandboxed: null,
   disabled: null,
   outdated: null,
-  sandboxed: null,
+  insecure: null,
   unavailable: null,
   degraded: null,
   deactivated: null,
@@ -108,9 +109,10 @@ var _swfFallbackCheckInterval = 0;
 var _eventMessages = {
   "ready": "Flash communication is established",
   "error": {
+    "flash-sandboxed": "Attempting to run Flash in a sandboxed iframe, which is impossible",
     "flash-disabled": "Flash is disabled or not installed. May also be attempting to run Flash in a sandboxed iframe, which is impossible.",
     "flash-outdated": "Flash is too outdated to support ZeroClipboard",
-    "flash-sandboxed": "Attempting to run Flash in a sandboxed iframe, which is impossible",
+    "flash-insecure": "Flash will be unable to communicate due to a protocol mismatch between your `swfPath` configuration and the page",
     "flash-unavailable": "Flash is unable to communicate bidirectionally with JavaScript",
     "flash-degraded": "Flash is unable to preserve data fidelity when communicating with JavaScript",
     "flash-deactivated": "Flash is too outdated for your browser and/or is configured as click-to-activate.\nThis may also mean that the ZeroClipboard SWF object could not be loaded, so please check your `swfPath` configuration and/or network connectivity.\nMay also be attempting to run Flash in a sandboxed iframe, which is impossible.",
@@ -145,9 +147,10 @@ var _errorsThatOnlyOccurAfterFlashLoads = [
  * @private
  */
 var _flashStateErrorNames = [
+  "flash-sandboxed",
   "flash-disabled",
   "flash-outdated",
-  "flash-sandboxed",
+  "flash-insecure",
   "flash-unavailable",
   "flash-degraded",
   "flash-deactivated",
@@ -180,7 +183,9 @@ var _flashStateEnabledErrorNameMatchingRegex =
   new RegExp(
     "^flash-(" +
     _flashStateErrorNames
-      .slice(1)
+      .filter(function(errorName) {
+        return errorName !== "flash-disabled";
+      })
       .map(function(errorName) {
         return errorName.replace(/^flash-/, "");
       })
@@ -201,7 +206,7 @@ var _globalConfig = {
 
   // SWF inbound scripting policy: page domains that the SWF should trust.
   // (single string, or array of strings)
-  trustedDomains: window.location.host ? [window.location.host] : [],
+  trustedDomains: _window.location.host ? [_window.location.host] : [],
 
   // Include a "noCache" query parameter on requests for the SWF.
   cacheBust: true,

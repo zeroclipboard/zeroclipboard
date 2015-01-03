@@ -286,7 +286,7 @@
  * @private
  */
   var _pageIsFramed = function() {
-    return window.opener == null && (!!window.top && window != window.top || !!window.parent && window != window.parent);
+    return _window.opener == null && (!!_window.top && _window != _window.top || !!_window.parent && _window != _window.parent);
   }();
   /**
  * Keep track of the state of the Flash object.
@@ -296,9 +296,10 @@
     bridge: null,
     version: "0.0.0",
     pluginType: "unknown",
+    sandboxed: null,
     disabled: null,
     outdated: null,
-    sandboxed: null,
+    insecure: null,
     unavailable: null,
     degraded: null,
     deactivated: null,
@@ -357,9 +358,10 @@
   var _eventMessages = {
     ready: "Flash communication is established",
     error: {
+      "flash-sandboxed": "Attempting to run Flash in a sandboxed iframe, which is impossible",
       "flash-disabled": "Flash is disabled or not installed. May also be attempting to run Flash in a sandboxed iframe, which is impossible.",
       "flash-outdated": "Flash is too outdated to support ZeroClipboard",
-      "flash-sandboxed": "Attempting to run Flash in a sandboxed iframe, which is impossible",
+      "flash-insecure": "Flash will be unable to communicate due to a protocol mismatch between your `swfPath` configuration and the page",
       "flash-unavailable": "Flash is unable to communicate bidirectionally with JavaScript",
       "flash-degraded": "Flash is unable to preserve data fidelity when communicating with JavaScript",
       "flash-deactivated": "Flash is too outdated for your browser and/or is configured as click-to-activate.\nThis may also mean that the ZeroClipboard SWF object could not be loaded, so please check your `swfPath` configuration and/or network connectivity.\nMay also be attempting to run Flash in a sandboxed iframe, which is impossible.",
@@ -382,7 +384,7 @@
  * variable's property values being updated.
  * @private
  */
-  var _flashStateErrorNames = [ "flash-disabled", "flash-outdated", "flash-sandboxed", "flash-unavailable", "flash-degraded", "flash-deactivated", "flash-overdue" ];
+  var _flashStateErrorNames = [ "flash-sandboxed", "flash-disabled", "flash-outdated", "flash-insecure", "flash-unavailable", "flash-degraded", "flash-deactivated", "flash-overdue" ];
   /**
  * A RegExp to match the `name` property of `error` events related to Flash.
  * @private
@@ -395,7 +397,9 @@
  * which is enabled.
  * @private
  */
-  var _flashStateEnabledErrorNameMatchingRegex = new RegExp("^flash-(" + _flashStateErrorNames.slice(1).map(function(errorName) {
+  var _flashStateEnabledErrorNameMatchingRegex = new RegExp("^flash-(" + _flashStateErrorNames.filter(function(errorName) {
+    return errorName !== "flash-disabled";
+  }).map(function(errorName) {
     return errorName.replace(/^flash-/, "");
   }).join("|") + ")$");
   /**
@@ -404,7 +408,7 @@
  */
   var _globalConfig = {
     swfPath: _getDefaultSwfPath(),
-    trustedDomains: window.location.host ? [ window.location.host ] : [],
+    trustedDomains: _window.location.host ? [ _window.location.host ] : [],
     cacheBust: true,
     forceEnhancedClipboard: false,
     flashLoadTimeout: 3e4,
@@ -481,7 +485,7 @@
  * @private
  */
   var _isFlashUnusable = function() {
-    return !!(_flashState.disabled || _flashState.outdated || _flashState.sandboxed || _flashState.unavailable || _flashState.degraded || _flashState.deactivated);
+    return !!(_flashState.sandboxed || _flashState.disabled || _flashState.outdated || _flashState.unavailable || _flashState.degraded || _flashState.deactivated);
   };
   /**
  * The underlying implementation of `ZeroClipboard.on`.
@@ -618,11 +622,19 @@
     return returnVal;
   };
   /**
+ * Get the protocol of the configured SWF path.
+ * @private
+ */
+  var _getSwfPathProtocol = function() {
+    var swfPath = _globalConfig.swfPath || "", swfPathFirstTwoChars = swfPath.slice(0, 2), swfProtocol = swfPath.slice(0, swfPath.indexOf("://") + 1);
+    return swfPathFirstTwoChars === "\\\\" ? "file:" : swfPathFirstTwoChars === "//" || swfProtocol === "" ? _window.location.protocol : swfProtocol;
+  };
+  /**
  * The underlying implementation of `ZeroClipboard.create`.
  * @private
  */
   var _create = function() {
-    var previousState = _flashState.sandboxed;
+    var maxWait, swfProtocol, previousState = _flashState.sandboxed;
     if (!_isBrowserSupported()) {
       _flashState.ready = false;
       ZeroClipboard.emit({
@@ -642,22 +654,30 @@
         name: "flash-sandboxed"
       });
     } else if (!ZeroClipboard.isFlashUnusable() && _flashState.bridge === null) {
-      var maxWait = _globalConfig.flashLoadTimeout;
-      if (typeof maxWait === "number" && maxWait >= 0) {
-        _flashCheckTimeout = _setTimeout(function() {
-          if (typeof _flashState.deactivated !== "boolean") {
-            _flashState.deactivated = true;
-          }
-          if (_flashState.deactivated === true) {
-            ZeroClipboard.emit({
-              type: "error",
-              name: "flash-deactivated"
-            });
-          }
-        }, maxWait);
+      swfProtocol = _getSwfPathProtocol();
+      if (swfProtocol && swfProtocol !== _window.location.protocol) {
+        ZeroClipboard.emit({
+          type: "error",
+          name: "flash-insecure"
+        });
+      } else {
+        maxWait = _globalConfig.flashLoadTimeout;
+        if (typeof maxWait === "number" && maxWait >= 0) {
+          _flashCheckTimeout = _setTimeout(function() {
+            if (typeof _flashState.deactivated !== "boolean") {
+              _flashState.deactivated = true;
+            }
+            if (_flashState.deactivated === true) {
+              ZeroClipboard.emit({
+                type: "error",
+                name: "flash-deactivated"
+              });
+            }
+          }, maxWait);
+        }
+        _flashState.overdue = false;
+        _embedSwf();
       }
-      _flashState.overdue = false;
-      _embedSwf();
     }
   };
   /**
@@ -824,6 +844,12 @@
       if (_flashStateEnabledErrorNameMatchingRegex.test(event.name)) {
         _extend(event, {
           version: _flashState.version
+        });
+      }
+      if (event.name === "flash-insecure") {
+        _extend(event, {
+          pageProtocol: _window.location.protocol,
+          swfProtocol: _getSwfPathProtocol()
         });
       }
     }
@@ -995,6 +1021,7 @@
         _extend(_flashState, {
           disabled: event.name === "flash-disabled",
           outdated: event.name === "flash-outdated",
+          insecure: event.name === "flash-insecure",
           unavailable: event.name === "flash-unavailable",
           degraded: event.name === "flash-degraded",
           deactivated: event.name === "flash-deactivated",
@@ -1006,6 +1033,7 @@
         _extend(_flashState, {
           disabled: false,
           outdated: false,
+          insecure: false,
           unavailable: false,
           degraded: false,
           deactivated: false,
@@ -1020,9 +1048,10 @@
       _zcSwfVersion = event.swfVersion;
       var wasDeactivated = _flashState.deactivated === true;
       _extend(_flashState, {
+        sandboxed: false,
         disabled: false,
         outdated: false,
-        sandboxed: false,
+        insecure: false,
         unavailable: false,
         degraded: false,
         deactivated: false,
@@ -1318,6 +1347,7 @@
       _flashState.ready = null;
       _flashState.bridge = null;
       _flashState.deactivated = null;
+      _flashState.insecure = null;
       _zcSwfVersion = undefined;
     }
   };
