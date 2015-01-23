@@ -1535,7 +1535,7 @@ var _addClass = function(element, value) {
   }
 
   if (element && element.nodeType === 1 && classNames.length > 0) {
-    // If the element has `classList`
+    // If the element has `classList`...
     if (element.classList) {
       // IE11 cannot add a list of classNames anyway, so just iterate
       for (c = 0, cl = classNames.length; c < cl; c++) {
@@ -1543,15 +1543,20 @@ var _addClass = function(element, value) {
         element.classList.add(classNames[c]);
       }
     }
-    else if (element.hasOwnProperty("className")) {
-      className = " " + element.className + " ";
+    else {
+      className = (" " + (element.className || "") + " ").replace(/[\t\r\n\f]/g, " ");
       for (c = 0, cl = classNames.length; c < cl; c++) {
         if (className.indexOf(" " + classNames[c] + " ") === -1) {
           className += classNames[c] + " ";
         }
       }
       // trim
-      element.className = className.replace(/^\s+|\s+$/g, "");
+      className = className.replace(/^\s+|\s+$/g, "");
+
+      // Only assign if different to avoid unneeded rendering.
+      if (className !== element.className) {
+        element.className = className;
+      }
     }
   }
 
@@ -1574,23 +1579,25 @@ var _removeClass = function(element, value) {
   }
 
   if (element && element.nodeType === 1 && classNames.length > 0) {
-    // If the element has `classList`
+    // If the element has `classList`...
     if (element.classList && element.classList.length > 0) {
       for (c = 0, cl = classNames.length; c < cl; c++) {
         // Supposedly do NOT need to check if the class is contained first
         element.classList.remove(classNames[c]);
       }
     }
-    // Checking the actual `className` property vs. its `hasOwnProperty`
-    // existence is OK here since we need it to have content in order to
-    // have any removable classes
     else if (element.className) {
-      className = (" " + element.className + " ").replace(/[\r\n\t]/g, " ");
+      className = (" " + element.className + " ").replace(/[\t\r\n\f]/g, " ");
       for (c = 0, cl = classNames.length; c < cl; c++) {
         className = className.replace(" " + classNames[c] + " ", " ");
       }
       // trim
-      element.className = className.replace(/^\s+|\s+$/g, "");
+      className = className.replace(/^\s+|\s+$/g, "");
+
+      // Only assign if different to avoid unneeded rendering.
+      if (className !== element.className) {
+        element.className = className;
+      }
     }
   }
 

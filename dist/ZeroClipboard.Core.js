@@ -1535,14 +1535,17 @@
         for (c = 0, cl = classNames.length; c < cl; c++) {
           element.classList.add(classNames[c]);
         }
-      } else if (element.hasOwnProperty("className")) {
-        className = " " + element.className + " ";
+      } else {
+        className = (" " + (element.className || "") + " ").replace(/[\t\r\n\f]/g, " ");
         for (c = 0, cl = classNames.length; c < cl; c++) {
           if (className.indexOf(" " + classNames[c] + " ") === -1) {
             className += classNames[c] + " ";
           }
         }
-        element.className = className.replace(/^\s+|\s+$/g, "");
+        className = className.replace(/^\s+|\s+$/g, "");
+        if (className !== element.className) {
+          element.className = className;
+        }
       }
     }
     return element;
@@ -1564,11 +1567,14 @@
           element.classList.remove(classNames[c]);
         }
       } else if (element.className) {
-        className = (" " + element.className + " ").replace(/[\r\n\t]/g, " ");
+        className = (" " + element.className + " ").replace(/[\t\r\n\f]/g, " ");
         for (c = 0, cl = classNames.length; c < cl; c++) {
           className = className.replace(" " + classNames[c] + " ", " ");
         }
-        element.className = className.replace(/^\s+|\s+$/g, "");
+        className = className.replace(/^\s+|\s+$/g, "");
+        if (className !== element.className) {
+          element.className = className;
+        }
       }
     }
     return element;
