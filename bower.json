@@ -16,7 +16,7 @@
     "clip",
     "clippy"
   ],
-  "license": "https://github.com/zeroclipboard/zeroclipboard/blob/master/LICENSE",
+  "license": "MIT",
   "authors": [
     {
       "name": "Jon Rohan",
