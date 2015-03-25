@@ -1681,6 +1681,11 @@ var _isElementVisible = function(el) {
   }
 
   var styles = _getComputedStyle(el, null);
+  
+  if (!styles) {
+    return false;
+  }
+
   var hasCssHeight = _parseFloat(styles.height) > 0;
   var hasCssWidth = _parseFloat(styles.width) > 0;
   var hasCssTop = _parseFloat(styles.top) >= 0;
