@@ -47,14 +47,14 @@ It's not required to label your issue or pull request, but here is the structure
   - Chrome/Opera
   - Android Browser
   - Other Browser
-- Platform
+- Platform #207de5
   - Flash
   - JS
   - CSS
   - HTML
   - Events
   - API
-- Type
+- Type 
   - Security
   - Bug
   - Enhancement
@@ -74,7 +74,7 @@ It's not required to label your issue or pull request, but here is the structure
 - Inactive Status
   - More Info Required
   - Help Wanted
-- Closed Status
+- Closed Status #d3d3d3
   - Resolved _(may be implicit by Closed state without other "Closed" labels but could be nice for querying)_
   - Invalid
   - Duplicate
@@ -86,6 +86,6 @@ It's not required to label your issue or pull request, but here is the structure
   - Bootstrap
   - Module Loaders
   - Other Integration
-- External Limitations
+- External Limitations #000000
   - HTML TopLayer
   - Security Restriction
