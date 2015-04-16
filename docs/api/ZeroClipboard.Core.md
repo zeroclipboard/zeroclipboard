@@ -270,7 +270,7 @@ ZeroClipboard.on("ready", function(e) {
 #### `"beforecopy"`
 
 On `click`, the Flash object will fire off a `beforecopy` event. This event is generally only
-used for "UI prepartion" if you want to alter anything before the `copy` event fires.
+used for "UI preparation" if you want to alter anything before the `copy` event fires.
 
 **IMPORTANT:** Handlers of this event are expected to operate synchronously if they intend to be
 finished before the "copy" event is triggered.
