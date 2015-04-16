@@ -248,7 +248,7 @@ var _getCurrentScriptUrl = function() {
   }
 
   // If `script` elements have the `readyState` property in this browser
-  if ("readyState" in scripts[0]) {
+  if ("readyState" in (scripts[0] || document.createElement("script"))) {
     for (i = scripts.length; i--; ) {
       if (scripts[i].readyState === "interactive" && (jsPath = scripts[i].src)) {
         return jsPath;
