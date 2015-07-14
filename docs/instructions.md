@@ -96,7 +96,7 @@ To use the library, simply include the following JavaScript file in your page:
 ```
 
 You also need to have the "`ZeroClipboard.swf`" file available to the browser.  If this file is
-located in the same directory as your web page, then it will work out of the box.  However, if the
+located in the same directory as your ZeroClipboard.js files, then it will work out of the box.  However, if the
 SWF file is hosted elsewhere, you need to set the URL like this (place this code _after_ the script
 tag):
 
