@@ -160,7 +160,7 @@ see the [api/ZeroClipboard.Core.md](api/ZeroClipboard.Core.md) documentation ins
 
 ### Text To Copy
 
-Setting the clipboard text can be done in 4 ways:
+Setting the clipboard text can be done in a variety of ways:
 
 1. Add a `copy` event handler in which you call `event.clipboardData.setData` to set the appropriate data. This event is triggered every time ZeroClipboard tries to inject into the clipboard. Example:
 
