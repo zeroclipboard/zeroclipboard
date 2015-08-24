@@ -753,13 +753,16 @@ var _globalConfig = {
   // Bubble synthetic events in JavaScript after they are received by the Flash object.
   bubbleEvents: true,
 
+  // Ensure OS-compliant line endings, i.e. "\r\n" on Windows, "\n" elsewhere
+  fixLineEndings: true,
+
   // Sets the ID of the `div` encapsulating the Flash object.
   // Value is validated against the [HTML4 spec for `ID` tokens][valid_ids].
   containerId: "global-zeroclipboard-html-bridge",
- 
+
   // Sets the class of the `div` encapsulating the Flash object.
   containerClass: "global-zeroclipboard-container",
- 
+
   // Sets the ID and name of the Flash `object` element.
   // Value is validated against the [HTML4 spec for `ID` and `Name` tokens][valid_ids].
   swfObjectId: "global-zeroclipboard-flash-bridge",

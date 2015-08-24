@@ -272,6 +272,16 @@
     return jsDir + "ZeroClipboard.swf";
   };
   /**
+ * Is the client's operating system some version of Windows?
+ *
+ * @returns Boolean
+ * @private
+ */
+  var _isWindows = function() {
+    var isWindowsRegex = /win(dows|[\s]?(nt|me|ce|xp|vista|[\d]+))/i;
+    return !!_navigator && (isWindowsRegex.test(_navigator.appVersion || "") || isWindowsRegex.test(_navigator.platform || "") || (_navigator.userAgent || "").indexOf("Windows") !== -1);
+  };
+  /**
  * Keep track of if the page is framed (in an `iframe`). This can never change.
  * @private
  */
@@ -399,6 +409,7 @@
     flashLoadTimeout: 3e4,
     autoActivate: true,
     bubbleEvents: true,
+    fixLineEndings: true,
     containerId: "global-zeroclipboard-html-bridge",
     containerClass: "global-zeroclipboard-container",
     swfObjectId: "global-zeroclipboard-flash-bridge",
@@ -416,7 +427,7 @@
     if (typeof options === "object" && options !== null) {
       for (var prop in options) {
         if (_hasOwn.call(options, prop)) {
-          if (/^(?:forceHandCursor|title|zIndex|bubbleEvents)$/.test(prop)) {
+          if (/^(?:forceHandCursor|title|zIndex|bubbleEvents|fixLineEndings)$/.test(prop)) {
             _globalConfig[prop] = options[prop];
           } else if (_flashState.bridge == null) {
             if (prop === "containerId" || prop === "swfObjectId") {
@@ -447,7 +458,7 @@
   var _state = function() {
     _detectSandbox();
     return {
-      browser: _pick(_navigator, [ "userAgent", "platform", "appName" ]),
+      browser: _pick(_navigator, [ "userAgent", "platform", "appName", "appVersion" ]),
       flash: _omit(_flashState, [ "bridge" ]),
       zeroclipboard: {
         version: ZeroClipboard.version,
@@ -653,7 +664,7 @@
     }
     for (var dataFormat in dataObj) {
       if (typeof dataFormat === "string" && dataFormat && _hasOwn.call(dataObj, dataFormat) && typeof dataObj[dataFormat] === "string" && dataObj[dataFormat]) {
-        _clipData[dataFormat] = dataObj[dataFormat];
+        _clipData[dataFormat] = _fixLineEndings(dataObj[dataFormat]);
       }
     }
   };
@@ -1703,6 +1714,25 @@
     return typeof zIndex === "number" ? zIndex : "auto";
   };
   /**
+ * Ensure OS-compliant line endings, i.e. "\r\n" on Windows, "\n" elsewhere
+ *
+ * @returns string
+ * @private
+ */
+  var _fixLineEndings = function(content) {
+    var replaceRegex = /(\r\n|\r|\n)/g;
+    if (typeof content === "string" && _globalConfig.fixLineEndings === true) {
+      if (_isWindows()) {
+        if (/((^|[^\r])\n|\r([^\n]|$))/.test(content)) {
+          content = content.replace(replaceRegex, "\r\n");
+        }
+      } else if (/\r/.test(content)) {
+        content = content.replace(replaceRegex, "\n");
+      }
+    }
+    return content;
+  };
+  /**
  * Attempt to detect if ZeroClipboard is executing inside of a sandboxed iframe.
  * If it is, Flash Player cannot be used, so ZeroClipboard is dead in the water.
  *
@@ -1710,7 +1740,7 @@
  * @see {@link https://github.com/zeroclipboard/zeroclipboard/issues/511}
  * @see {@link http://zeroclipboard.org/test-iframes.html}
  *
- * @returns `true` (is sandboxed), `false` (is not sandboxed), or `null` (uncertain) 
+ * @returns `true` (is sandboxed), `false` (is not sandboxed), or `null` (uncertain)
  * @private
  */
   var _detectSandbox = function(doNotReassessFlashSupport) {

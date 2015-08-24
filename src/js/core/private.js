@@ -8,7 +8,7 @@ var _config = function(options) {
     for (var prop in options) {
       if (_hasOwn.call(options, prop)) {
         // These configuration values CAN be modified while a SWF is actively embedded.
-        if (/^(?:forceHandCursor|title|zIndex|bubbleEvents)$/.test(prop)) {
+        if (/^(?:forceHandCursor|title|zIndex|bubbleEvents|fixLineEndings)$/.test(prop)) {
           _globalConfig[prop] = options[prop];
         }
         // All other configuration values CANNOT be modified while a SWF is actively embedded.
@@ -55,7 +55,7 @@ var _state = function() {
   _detectSandbox();
 
   return {
-    browser: _pick(_navigator, ["userAgent", "platform", "appName"]),
+    browser: _pick(_navigator, ["userAgent", "platform", "appName", "appVersion"]),
     flash: _omit(_flashState, ["bridge"]),
     zeroclipboard: {
       version: ZeroClipboard.version,
@@ -335,10 +335,10 @@ var _setData = function(format, data) {
   // Copy over owned properties with non-empty string values
   for (var dataFormat in dataObj) {
     if (
-      typeof dataFormat === "string" && dataFormat &&
-      _hasOwn.call(dataObj, dataFormat) && typeof dataObj[dataFormat] === "string" && dataObj[dataFormat]
+      typeof dataFormat === "string" && dataFormat && _hasOwn.call(dataObj, dataFormat) &&
+      typeof dataObj[dataFormat] === "string" && dataObj[dataFormat]
     ) {
-      _clipData[dataFormat] = dataObj[dataFormat];
+      _clipData[dataFormat] = _fixLineEndings(dataObj[dataFormat]);
     }
   }
 };
@@ -846,7 +846,7 @@ var _preprocessEvent = function(event) {
     case "_mouseover":
       // Set this as the new currently active element
       ZeroClipboard.focus(element);
-      
+
       if (_globalConfig.bubbleEvents === true && sourceIsSwf) {
         if (
           element &&
@@ -1681,7 +1681,6 @@ var _isElementVisible = function(el) {
   }
 
   var styles = _getComputedStyle(el, null);
-  
   if (!styles) {
     return false;
   }
@@ -1791,6 +1790,29 @@ var _getSafeZIndex = function(val) {
 
 
 /**
+ * Ensure OS-compliant line endings, i.e. "\r\n" on Windows, "\n" elsewhere
+ *
+ * @returns string
+ * @private
+ */
+var _fixLineEndings = function(content) {
+  var replaceRegex = /(\r\n|\r|\n)/g;
+
+  if (typeof content === "string" && _globalConfig.fixLineEndings === true) {
+    if (_isWindows()) {
+      if (/((^|[^\r])\n|\r([^\n]|$))/.test(content)) {
+        content = content.replace(replaceRegex, "\r\n");
+      }
+    }
+    else if (/\r/.test(content)) {
+      content = content.replace(replaceRegex, "\n");
+    }
+  }
+  return content;
+};
+
+
+/**
  * Attempt to detect if ZeroClipboard is executing inside of a sandboxed iframe.
  * If it is, Flash Player cannot be used, so ZeroClipboard is dead in the water.
  *
@@ -1798,7 +1820,7 @@ var _getSafeZIndex = function(val) {
  * @see {@link https://github.com/zeroclipboard/zeroclipboard/issues/511}
  * @see {@link http://zeroclipboard.org/test-iframes.html}
  *
- * @returns `true` (is sandboxed), `false` (is not sandboxed), or `null` (uncertain) 
+ * @returns `true` (is sandboxed), `false` (is not sandboxed), or `null` (uncertain)
  * @private
  */
 var _detectSandbox = function(doNotReassessFlashSupport) {

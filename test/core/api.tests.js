@@ -1,4 +1,4 @@
-/*global ZeroClipboard, _globalConfig:true, _flashState, _clipData, _clipDataFormatMap, _deleteOwnProperties */
+/*global ZeroClipboard, _globalConfig:true, _isWindows:true, _flashState, _clipData, _clipDataFormatMap, _deleteOwnProperties */
 
 (function(module, test) {
   "use strict";
@@ -10,7 +10,7 @@
     }
   };
 
-  var originalConfig, originalFlashDetect;
+  var isWindowsFn, originalConfig, originalFlashDetect;
 
 
   module("core/api.js unit tests - state");
@@ -93,6 +93,7 @@
       swfPath: _swfPath,
       trustedDomains: window.location.host ? [window.location.host] : [],
       cacheBust: true,
+      fixLineEndings: true,
       forceEnhancedClipboard: false,
       flashLoadTimeout: 30000,
       autoActivate: true,
@@ -112,6 +113,7 @@
       swfPath: _swfPath,
       trustedDomains: window.location.host ? [window.location.host] : [],
       cacheBust: true,
+      fixLineEndings: false,
       forceEnhancedClipboard: false,
       flashLoadTimeout: 30000,
       autoActivate: true,
@@ -137,6 +139,7 @@
       swfPath: "/path/to/test.swf",
       trustedDomains: ["test.domain.com"],
       cacheBust: false,
+      fixLineEndings: false,
       forceEnhancedClipboard: true,
       flashLoadTimeout: 15000,
       autoActivate: false,
@@ -160,7 +163,13 @@
 
 
   module("core/api.js unit tests - clipboard", {
+    setup: function() {
+      originalConfig = ZeroClipboard.config();
+      isWindowsFn = _isWindows;
+    },
     teardown: function() {
+      _isWindows = isWindowsFn;
+      _globalConfig = originalConfig;
       _deleteOwnProperties(_clipData);
     }
   });
@@ -180,6 +189,65 @@
 
     ZeroClipboard.setData({ "text/html": "<b>Win</b>" });
     assert.deepEqual(_clipData, { "text/html": "<b>Win</b>" }, "`_clipData` contains expected HTML and cleared out old data because an object was passed in");
+  });
+
+
+  test("`setData` adjusts line endings as needed", function(assert) {
+    assert.expect(14);
+
+    // Assert, Act, repeat ad nauseam
+    assert.strictEqual(ZeroClipboard.config().fixLineEndings, true, "`fixLineEndings` config option is enabled by default");
+    assert.deepEqual(_clipData, {}, "`_clipData` is empty");
+
+
+    _isWindows = function() { return true; };
+
+    ZeroClipboard.setData("text/plain", "\nzc\r\n4evar\r");
+    assert.deepEqual(_clipData, { "text/plain": "\r\nzc\r\n4evar\r\n" }, "`_clipData` contains expected text, and adjusted line endings on Windows: " + JSON.stringify(_clipData));
+
+    ZeroClipboard.setData("text/x-markdown", "\n**Zero\r\nClipboard**\r");
+    assert.deepEqual(_clipData, { "text/plain": "\r\nzc\r\n4evar\r\n", "text/x-markdown": "\r\n**Zero\r\nClipboard**\r\n" }, "`_clipData` contains expected text and custom format, and adjusted line endings on Windows: " + JSON.stringify(_clipData));
+
+    ZeroClipboard.setData({ "text/html": "\n<b>W\r\nin</b>\r" });
+    assert.deepEqual(_clipData, { "text/html": "\r\n<b>W\r\nin</b>\r\n" }, "`_clipData` contains expected HTML and cleared out old data because an object was passed in, and adjusted line endings on Windows: " + JSON.stringify(_clipData));
+
+    _isWindows = function() { return false; };
+    ZeroClipboard.clearData();
+
+    ZeroClipboard.setData("text/plain", "\nzc\r\n4evar\r");
+    assert.deepEqual(_clipData, { "text/plain": "\nzc\n4evar\n" }, "`_clipData` contains expected text, and adjusted line endings on non-Windows: " + JSON.stringify(_clipData));
+
+    ZeroClipboard.setData("text/x-markdown", "\n**Zero\r\nClipboard**\r");
+    assert.deepEqual(_clipData, { "text/plain": "\nzc\n4evar\n", "text/x-markdown": "\n**Zero\nClipboard**\n" }, "`_clipData` contains expected text and custom format, and adjusted line endings on non-Windows: " + JSON.stringify(_clipData));
+
+    ZeroClipboard.setData({ "text/html": "\n<b>W\r\nin</b>\r" });
+    assert.deepEqual(_clipData, { "text/html": "\n<b>W\nin</b>\n" }, "`_clipData` contains expected HTML and cleared out old data because an object was passed in, and adjusted line endings on non-Windows: " + JSON.stringify(_clipData));
+
+
+    ZeroClipboard.config({ fixLineEndings: false });
+    _isWindows = function() { return true; };
+    ZeroClipboard.clearData();
+
+    ZeroClipboard.setData("text/plain", "\nzc\r\n4evar\r");
+    assert.deepEqual(_clipData, { "text/plain": "\nzc\r\n4evar\r" }, "`_clipData` contains expected text, and left line endings intact on Windows: " + JSON.stringify(_clipData));
+
+    ZeroClipboard.setData("text/x-markdown", "\n**Zero\r\nClipboard**\r");
+    assert.deepEqual(_clipData, { "text/plain": "\nzc\r\n4evar\r", "text/x-markdown": "\n**Zero\r\nClipboard**\r" }, "`_clipData` contains expected text and custom format, and left line endings intact on Windows: " + JSON.stringify(_clipData));
+
+    ZeroClipboard.setData({ "text/html": "\n<b>W\r\nin</b>\r" });
+    assert.deepEqual(_clipData, { "text/html": "\n<b>W\r\nin</b>\r" }, "`_clipData` contains expected HTML and cleared out old data because an object was passed in, and left line endings intact on Windows: " + JSON.stringify(_clipData));
+
+    _isWindows = function() { return false; };
+    ZeroClipboard.clearData();
+
+    ZeroClipboard.setData("text/plain", "\nzc\r\n4evar\r");
+    assert.deepEqual(_clipData, { "text/plain": "\nzc\r\n4evar\r" }, "`_clipData` contains expected text, and left line endings intact on non-Windows: " + JSON.stringify(_clipData));
+
+    ZeroClipboard.setData("text/x-markdown", "\n**Zero\r\nClipboard**\r");
+    assert.deepEqual(_clipData, { "text/plain": "\nzc\r\n4evar\r", "text/x-markdown": "\n**Zero\r\nClipboard**\r" }, "`_clipData` contains expected text and custom format, and left line endings intact on non-Windows: " + JSON.stringify(_clipData));
+
+    ZeroClipboard.setData({ "text/html": "\n<b>W\r\nin</b>\r" });
+    assert.deepEqual(_clipData, { "text/html": "\n<b>W\r\nin</b>\r" }, "`_clipData` contains expected HTML and cleared out old data because an object was passed in, and left line endings intact on non-Windows: " + JSON.stringify(_clipData));
   });
 
 

@@ -1,17 +1,19 @@
-/*global _document:true, _Error:true, _args, _extend, _deepCopy, _pick, _omit, _deleteOwnProperties, _containedBy, _getDirPathOfUrl, _getCurrentScriptUrlFromErrorStack, _getCurrentScriptUrlFromError:true, _getCurrentScriptUrl, _getUnanimousScriptParentDir, _getDefaultSwfPath */
+/*global _document:true, _navigator:true, _Error:true, _args, _extend, _deepCopy, _pick, _omit, _deleteOwnProperties, _containedBy, _getDirPathOfUrl, _getCurrentScriptUrlFromErrorStack, _getCurrentScriptUrlFromError:true, _getCurrentScriptUrl, _getUnanimousScriptParentDir, _getDefaultSwfPath, _isWindows */
 
 (function(module, test) {
   "use strict";
 
-  var doc, errorDef, getUrlFromError;
+  var doc, nav, errorDef, getUrlFromError;
   module("shared/private.js unit tests", {
     setup: function() {
       doc = _document;
+      nav = _navigator;
       errorDef = _Error;
       getUrlFromError = _getCurrentScriptUrlFromError;
     },
     teardown: function() {
       _document = doc;
+      _navigator = nav;
       _Error = errorDef;
       _getCurrentScriptUrlFromError = getUrlFromError;
     }
@@ -906,6 +908,43 @@
     assert.strictEqual(actual9, expected9, "No value can be confirmed due to the existence of inline scripts");
     assert.strictEqual(actual10, expected10, "No value can be confirmed as the last script is an inline script");
     assert.strictEqual(actual11, expected11, "No value can be confirmed as the only script is an inline script");
+  });
+
+
+  test("`_isWindows` can accurately detect Windows OS", function(assert) {
+    assert.expect(7);
+
+    _navigator = {
+      userAgent: "",
+      platform: "",
+      appName: "",
+      appVersion: ""
+    };
+
+    assert.strictEqual(_isWindows(), false, "Empty values does not result in Windows");
+
+    _navigator.appVersion = "5.0 (compatible; MSIE 5.5; Windows 98; Win 9x 4.90)";
+    assert.strictEqual(_isWindows(), true, "Windows appVersion value does result in Windows");
+
+    _navigator.appVersion = "";
+    _navigator.platform = "Win32";
+    assert.strictEqual(_isWindows(), true, "Windows platform value does result in Windows");
+
+    _navigator.platform = "";
+    _navigator.userAgent = "User-Agent: Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; MSAppHost/1.0;)";
+    assert.strictEqual(_isWindows(), true, "Windows userAgent value does result in Windows");
+
+    _navigator.userAgent = "";
+    _navigator.appVersion = "5.0 (Macintosh; Intel Mac OS X 10_10_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36";
+    assert.strictEqual(_isWindows(), false, "Mac appVersion value does not result in Windows");
+
+    _navigator.appVersion = "";
+    _navigator.platform = "MacIntel";
+    assert.strictEqual(_isWindows(), false, "Mac platform value does not result in Windows");
+
+    _navigator.platform = "";
+    _navigator.userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36";
+    assert.strictEqual(_isWindows(), false, "Mac userAgent value does not result in Windows");
   });
 
 })(QUnit.module, QUnit.test);

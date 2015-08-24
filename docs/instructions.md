@@ -4,7 +4,7 @@
 
 # Overview
 
-The ZeroClipboard library provides an easy way to copy text to the clipboard using an invisible [Adobe Flash](http://en.wikipedia.org/wiki/Adobe_Flash) movie and a [JavaScript](http://en.wikipedia.org/wiki/JavaScript) interface. The "Zero" signifies that the library is invisible and the user interface is left entirely up to you. 
+The ZeroClipboard library provides an easy way to copy text to the clipboard using an invisible [Adobe Flash](http://en.wikipedia.org/wiki/Adobe_Flash) movie and a [JavaScript](http://en.wikipedia.org/wiki/JavaScript) interface. The "Zero" signifies that the library is invisible and the user interface is left entirely up to you.
 
 This is achieved by automatically floating the invisible movie on top of a [DOM](http://en.wikipedia.org/wiki/Document_Object_Model) element of your choice. Standard mouse events are even propagated out to your DOM element, so you can still have rollover and mousedown effects.
 
@@ -369,7 +369,7 @@ If you have a need to change the default values, they can be configured by passi
 
 Values for `containerId` and `swfObjectId` are validated against the [HTML4 spec for `ID` and `Name` tokens][valid_ids].
 
-  
+
 ## AMD
 
 If using [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) with a library such as [RequireJS](http://requirejs.org/), etc., you shouldn't need to do any special configuration for ZeroClipboard to work correctly as an AMD module.
@@ -475,17 +475,12 @@ Because ZeroClipboard will be interacting with your users' system clipboards, th
 specific to the users' operating systems that you should be aware of. With this information, you can make informed
 decisions of how _your_ site should handle each of these situations.
 
-### Windows
- - If you want to ensure that your Windows users will be able to paste their copied text into Windows
-   Notepad and have it honor line breaks, you'll need to ensure that the text uses the sequence `\r\n`
-   instead of just `\n` for line breaks.  If the text to copy is based on user input (e.g. a `textarea`),
-   then you can achieve this transformation by utilizing the `copy` event handler, e.g.  
+### All OSs
+ - By default, ZeroClipboard will ensure OS-compliant line endings, i.e. `"\r\n"` on Windows, `"\n"` on all non-Windows operating systems. If this behavior is not desirable, you can disable it by setting the `fixLineEndings` [configuration option](api/ZeroClipboard.md#configuration-options) to `false`, i.e.:
 
     ```js
-    client.on('copy', function(event) {
-        var text = document.getElementById('yourTextArea').value;
-        var windowsText = text.replace(/\n/g, '\r\n');
-        event.clipboardData.setData('text/plain', windowsText);
+    ZeroClipboard.config({
+        fixLineEndings: false
     });
     ```
 
@@ -535,7 +530,7 @@ out the [sandblaster.js (JamesMGreene/sandblaster)](https://github.com/JamesMGre
 
 ZeroClipboard was intentionally configured to _not_ allow the SWF to be served from a secure domain (HTTPS) but scripted by an insecure domain (HTTP).
 
-If you find yourself in this situation (as in [Issue #170](https://github.com/zeroclipboard/zeroclipboard/issues/170)), please consider the following options:  
+If you find yourself in this situation (as in [Issue #170](https://github.com/zeroclipboard/zeroclipboard/issues/170)), please consider the following options:
  1. Serve the SWF over HTTP instead of HTTPS. If the page's protocol can vary (e.g. authorized/unauthorized, staging/production, etc.), you should include add the SWF with a relative protocol (`//s3.amazonaws.com/blah/ZeroClipboard.swf`) instead of an absolute protocol (`https://s3.amazonaws.com/blah/ZeroClipboard.swf`).
  2. Serve the page over HTTPS instead of HTTP. If the page's protocol can vary, see the note on the previous option (1).
  3. Fork ZeroClipboard and update "src/flash/ZeroClipboard.as" to call the [`allowInsecureDomain`](http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/Security.html#allowInsecureDomain\(\)) method as needed, then recompile the SWF with your custom changes.

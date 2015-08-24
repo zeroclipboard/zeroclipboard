@@ -1,12 +1,20 @@
-/*global _flashState:true, _currentElement:true, _copyTarget:true, _extend, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _extractDomain, _determineScriptAccess, _mapClipDataToFlash, _mapClipResultsFromFlash, _createEvent, _preprocessEvent, _getRelatedTarget, _shouldPerformAsync, _dispatchCallback, _detectFlashSupport, _encodeURIComponent */
+/*global _flashState:true, _currentElement:true, _copyTarget:true, _isWindows:true, _globalConfig:true, _extend, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _extractDomain, _determineScriptAccess, _mapClipDataToFlash, _mapClipResultsFromFlash, _createEvent, _preprocessEvent, _getRelatedTarget, _shouldPerformAsync, _dispatchCallback, _detectFlashSupport, _encodeURIComponent, _fixLineEndings */
+
 
 (function(module, test) {
   "use strict";
 
-  var mimeType, ax, flashState;
+  var mimeType, ax, flashState, isWindowsFn;
 
 
-  module("core/private.js unit tests - utils");
+  module("core/private.js unit tests - utils", {
+    setup: function() {
+      isWindowsFn = _isWindows;
+    },
+    teardown: function() {
+      _isWindows = isWindowsFn;
+    }
+  });
 
 
   test("`_getStyle` returns computed styles", function(assert) {
@@ -237,6 +245,44 @@
   });
 
 
+  test("`_fixLineEndings` works", function(assert) {
+    assert.expect(17);
+
+    // Disable the config option
+    assert.strictEqual(_globalConfig.fixLineEndings, true, "The `fixLineEnding` config option is enabled by default");
+
+    _isWindows = function() { return true; };
+    assert.strictEqual(_fixLineEndings("\nHello\nWorld!\n"), "\r\nHello\r\nWorld!\r\n", "Properly adjusts LF to CRLF on Windows");
+    assert.strictEqual(_fixLineEndings("\r\nHello\r\nWorld!\r\n"), "\r\nHello\r\nWorld!\r\n", "Does not adjust existing CRLF on Windows");
+    assert.strictEqual(_fixLineEndings("\rHello\rWorld!\r"), "\r\nHello\r\nWorld!\r\n", "Properly adjusts weirdo old-Mac CR to CRLF on Windows");
+    assert.strictEqual(_fixLineEndings("\r\nHello\nWorld!\r"), "\r\nHello\r\nWorld!\r\n", "Properly adjusts CR/LF to CRLF while not adjusting existing CRLF on Windows");
+
+    _isWindows = function() { return false; };
+    assert.strictEqual(_fixLineEndings("\r\nHello\r\nWorld!\r\n"), "\nHello\nWorld!\n", "Properly adjusts CRLF to LF on non-Windows");
+    assert.strictEqual(_fixLineEndings("\nHello\nWorld!\n"), "\nHello\nWorld!\n", "Does not adjust existing LF on non-Windows");
+    assert.strictEqual(_fixLineEndings("\rHello\rWorld!\r"), "\nHello\nWorld!\n", "Properly adjusts weirdo old-Mac CR to LF on non-Windows");
+    assert.strictEqual(_fixLineEndings("\nHello\r\nWorld!\r"), "\nHello\nWorld!\n", "Properly adjusts CR/CRLF to LF while not adjusting existing LF on non-Windows");
+
+    // Disable the config option
+    _globalConfig.fixLineEndings = false;
+
+    _isWindows = function() { return true; };
+    assert.strictEqual(_fixLineEndings("\nHello\nWorld!\n"), "\nHello\nWorld!\n", "Does not adjust LF to CRLF on Windows if `fixLineEndings` config option is disabled");
+    assert.strictEqual(_fixLineEndings("\r\nHello\r\nWorld!\r\n"), "\r\nHello\r\nWorld!\r\n", "Does not adjust existing CRLF on Windows if `fixLineEndings` config option is disabled");
+    assert.strictEqual(_fixLineEndings("\rHello\rWorld!\r"), "\rHello\rWorld!\r", "Does not adjust weirdo old-Mac CR to CRLF on Windows if `fixLineEndings` config option is disabled");
+    assert.strictEqual(_fixLineEndings("\r\nHello\nWorld!\r"), "\r\nHello\nWorld!\r", "Does not adjust CR/LF to CRLF while not adjusting existing CRLF on Windows if `fixLineEndings` config option is disabled");
+
+    _isWindows = function() { return false; };
+    assert.strictEqual(_fixLineEndings("\r\nHello\r\nWorld!\r\n"), "\r\nHello\r\nWorld!\r\n", "Does not adjust CRLF to LF on non-Windows if `fixLineEndings` config option is disabled");
+    assert.strictEqual(_fixLineEndings("\nHello\nWorld!\n"), "\nHello\nWorld!\n", "Does not adjust existing LF on non-Windows if `fixLineEndings` config option is disabled");
+    assert.strictEqual(_fixLineEndings("\rHello\rWorld!\r"), "\rHello\rWorld!\r", "Does not adjust weirdo old-Mac CR to LF on non-Windows if `fixLineEndings` config option is disabled");
+    assert.strictEqual(_fixLineEndings("\nHello\r\nWorld!\r"), "\nHello\r\nWorld!\r", "Does not adjust CR/CRLF to LF while not adjusting existing LF on non-Windows if `fixLineEndings` config option is disabled");
+
+    // Re-enable the config option
+    _globalConfig.fixLineEndings = true;
+  });
+
+
   test("`_mapClipDataToFlash` works", function(assert) {
     assert.expect(1);
 
@@ -414,7 +460,7 @@
     var goodTarget = $("#goodTargetId")[0];
     var badTarget1 = $("#badTargetId1")[0];
     var badTarget2 = $("#badTargetId2")[0];
-    
+
     assert.notEqual(relTarget, null, "The related target is `null`");
     assert.strictEqual(_getRelatedTarget(goodTarget), relTarget, "Element with `data-clipboard-target` returns `null`");
     assert.strictEqual(_getRelatedTarget(badTarget1), null, "Element with `data-clipboard-target` that doesn't much any elements returns `null`");
