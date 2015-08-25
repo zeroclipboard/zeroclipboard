@@ -63,6 +63,7 @@
   /* Global variables */
   "globals": {
     "$": false,
-    "QUnit": false
+    "QUnit": false,
+    "JSON": false
   }
 }
