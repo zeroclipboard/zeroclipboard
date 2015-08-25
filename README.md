@@ -22,6 +22,8 @@ suffice as this would enable [clipboard poisoning](http://www.computerworld.com/
 
 For a complete list of limitations, see [docs/instructions.md#limitations](docs/instructions.md#limitations).
 
+On that page, you will also find an [explanation of why ZeroClipboard will _NOT_ work by default on code playground sites](docs/instructions.md#starter-snippets-for-playground-sites) like JSFiddle, JSBin, and CodePen, as well as the appropriate "View" URLs to use on those sites in order to allow ZeroClipboard to work.
+
 
 ## Simple Example
 

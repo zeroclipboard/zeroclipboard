@@ -350,15 +350,17 @@ Here is a more complete example which exercises many of the configuration option
 
 ### "Starter Snippets" for Playground Sites
 
+**IMPORTANT:** ZeroClipboard will _NOT_ work on the "Edit" pages for any of the following online code playground sites due to [security limitations imposed by their use of `iframe` `sandbox`ing](#sandboxed-iframe-limitations). However, ZeroClipboard _will_ work on the "View" pages _if and only if_ you use the very specifically formatted URL patterns provided below.
+
  - JSFiddle
-     - View: http://fiddle.jshell.net/JamesMGreene/k9psq1da/show/
      - Edit: http://jsfiddle.net/JamesMGreene/k9psq1da/
- - CodePen
-     - View: http://s.codepen.io/boomerang/b82185b7ceb35fc9b3829895d38348a31420091710997/index.html
-     - Edit: http://codepen.io/JamesMGreene/pen/zxorvW
+     - View: http://fiddle.jshell.net/JamesMGreene/k9psq1da/show/
  - JSBin
-     - View: http://jsbin.com/lozuda/
      - Edit: http://jsbin.com/lozuda/edit?html,js,css
+     - View: http://jsbin.com/lozuda/
+ - CodePen
+     - Edit: http://codepen.io/JamesMGreene/pen/zxorvW
+     - View: http://s.codepen.io/JamesMGreene/full/zxorvW/
 
 
 ## Namespacing ZeroClipboard
@@ -513,7 +515,7 @@ It is also very important to note, however, that the `sandbox` attribute takes a
 
 As such, ZeroClipboard is completely unusable inside of a `sandbox`ed `iframe`. Best efforts have been taken to detect sandboxing and notify consumers via an `error` event (`error[name = "flash-sandboxed"]`) but, unfortunately, not all configurations of sandboxing can be reliably detected from within the framed content.
 
-This sandboxing is also why ZeroClipboard cannot be used as normal on many online code playground sites like JSFiddle, CodePen, etc. However, we have put together a few ["starter snippets" for such sites](#starter-snippets-for-playground-sites) to get you up and running quickly.
+This sandboxing is also why ZeroClipboard cannot be used as normal on many online code playground sites like JSFiddle, JSBin, CodePen, etc. However, we have put together a few ["starter snippets" for such sites](#starter-snippets-for-playground-sites) to get you up and running quickly.
 
 For a deeper analysis and a few _"naughty"_ workarounds (which only work in limited situations), check
 out the [sandblaster.js (JamesMGreene/sandblaster)](https://github.com/JamesMGreene/sandblaster) project.
