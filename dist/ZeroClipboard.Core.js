@@ -1531,21 +1531,15 @@
       classNames = value.split(/\s+/);
     }
     if (element && element.nodeType === 1 && classNames.length > 0) {
-      if (element.classList) {
-        for (c = 0, cl = classNames.length; c < cl; c++) {
-          element.classList.add(classNames[c]);
+      className = (" " + (element.className || "") + " ").replace(/[\t\r\n\f]/g, " ");
+      for (c = 0, cl = classNames.length; c < cl; c++) {
+        if (className.indexOf(" " + classNames[c] + " ") === -1) {
+          className += classNames[c] + " ";
         }
-      } else {
-        className = (" " + (element.className || "") + " ").replace(/[\t\r\n\f]/g, " ");
-        for (c = 0, cl = classNames.length; c < cl; c++) {
-          if (className.indexOf(" " + classNames[c] + " ") === -1) {
-            className += classNames[c] + " ";
-          }
-        }
-        className = className.replace(/^\s+|\s+$/g, "");
-        if (className !== element.className) {
-          element.className = className;
-        }
+      }
+      className = className.replace(/^\s+|\s+$/g, "");
+      if (className !== element.className) {
+        element.className = className;
       }
     }
     return element;
@@ -1562,11 +1556,7 @@
       classNames = value.split(/\s+/);
     }
     if (element && element.nodeType === 1 && classNames.length > 0) {
-      if (element.classList && element.classList.length > 0) {
-        for (c = 0, cl = classNames.length; c < cl; c++) {
-          element.classList.remove(classNames[c]);
-        }
-      } else if (element.className) {
+      if (element.className) {
         className = (" " + element.className + " ").replace(/[\t\r\n\f]/g, " ");
         for (c = 0, cl = classNames.length; c < cl; c++) {
           className = className.replace(" " + classNames[c] + " ", " ");
