@@ -1,4 +1,4 @@
-/*global ZeroClipboard, _currentElement:true, _flashState:true, _zcSwfVersion:true, _extend, _deepCopy, _clipData, _clipDataFormatMap:true, _copyTarget:true, _detectSandbox:true */
+/*global ZeroClipboard, _currentElement:true, _flashState:true, _zcSwfVersion:true, _extend, _deepCopy, _clipData, _clipDataFormatMap:true, _copyTarget:true, _detectSandbox:true, _fixLineEndings */
 
 (function(module, test) {
   "use strict";
@@ -170,11 +170,11 @@
     assert.deepEqual(_clipData, { "application/rtf": "zc4evar" }, "`_clipData` contains expected RTF");
 
     client.setRichText("{\\rtf1\\ansi\n{\\b ZeroClipboard}}");
-    assert.deepEqual(_clipData, { "application/rtf": "{\\rtf1\\ansi\n{\\b ZeroClipboard}}" }, "`_clipData` contains expected updated RTF");
+    assert.deepEqual(_clipData, { "application/rtf": _fixLineEndings("{\\rtf1\\ansi\n{\\b ZeroClipboard}}") }, "`_clipData` contains expected updated RTF");
 
     _clipData["text/plain"] = "blah";
     client.setRichText("{\\rtf1\\ansi\n{\\i Foo}}");
-    assert.deepEqual(_clipData, { "application/rtf": "{\\rtf1\\ansi\n{\\i Foo}}", "text/plain": "blah" }, "`_clipData` contains expected updated RTF AND the other data");
+    assert.deepEqual(_clipData, { "application/rtf": _fixLineEndings("{\\rtf1\\ansi\n{\\i Foo}}"), "text/plain": "blah" }, "`_clipData` contains expected updated RTF AND the other data");
   });
 
 
