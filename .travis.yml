@@ -1,5 +1,8 @@
 language: node_js
 node_js:
   - "0.10"
-before_script:
+before_install:
+  - npm update -g npm
   - npm install -g grunt-cli
+
+sudo: false
