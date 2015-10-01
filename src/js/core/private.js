@@ -155,7 +155,7 @@ var _off = function(eventType, listener) {
     events = _keys(_handlers);
   }
   else if (typeof eventType === "string" && eventType) {
-    events = eventType.split(/\s+/);
+    events = eventType.toLowerCase().split(/\s+/);
   }
   else if (typeof eventType === "object" && eventType && typeof listener === "undefined") {
     for (i in eventType) {
@@ -167,7 +167,7 @@ var _off = function(eventType, listener) {
 
   if (events && events.length) {
     for (i = 0, len = events.length; i < len; i++) {
-      eventType = events[i].toLowerCase().replace(/^on/, "");
+      eventType = events[i].replace(/^on/, "");
       perEventHandlers = _handlers[eventType];
       if (perEventHandlers && perEventHandlers.length) {
         if (listener) {
