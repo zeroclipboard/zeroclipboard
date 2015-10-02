@@ -9,6 +9,35 @@ The ZeroClipboard library provides an easy way to copy text to the clipboard usi
 
 This is achieved by automatically floating the invisible movie on top of a [DOM](http://en.wikipedia.org/wiki/Document_Object_Model) element of your choice. Standard mouse events are even propagated out to your DOM element, so you can still have rollover and mousedown effects.
 
+Suggestions welcome read over the [contributing](/CONTRIBUTING.md) guidelines.
+
+## Setup
+
+To setup the project for local development start with these commands in your terminal.
+
+```sh
+$ git clone https://github.com/zeroclipboard/zeroclipboard.git
+$ cd zeroclipboard/
+$ npm install -g grunt-cli
+$ npm install
+$ grunt
+```
+
+## Development
+
+Before submitting a pull request you'll need to validate, build, and test your code. Run the default grunt task in your terminal.
+
+```sh
+$ grunt
+```
+
+## Testing
+
+If you just want to run the tests, run grunt test.
+
+```sh
+$ grunt test
+```
 
 ## Limitations
 
@@ -63,7 +92,6 @@ Here is a working [test page](http://zeroclipboard.org/#demo) where you can try 
 
 To test the page [demo page](http://zeroclipboard.org/#demo) locally, clone the [website repo](https://github.com/zeroclipboard/zeroclipboard.org).
 
-
 ## Support
 
 This library is fully compatible with Flash Player 11.0.0 and above, which requires
@@ -77,18 +105,17 @@ ZeroClipboard `v2.x` is expected to work in IE9+ and all of the evergreen browse
 Although support for IE7 & IE8 was officially dropped in `v2.0.0`, it was actually
 still _technically_ supported through `v2.0.2`.
 
-## Contributing
-
-see [CONTRIBUTING.md](CONTRIBUTING.md)
-
-
 ## Releases
 
 Starting with version [1.1.7](https://github.com/zeroclipboard/zeroclipboard/releases/tag/v1.1.7), ZeroClipboard uses [semantic versioning](http://semver.org/).
 
 see [releases](https://github.com/zeroclipboard/zeroclipboard/releases)
 
+## Related
 
-## Roadmap
+* [jquery.zeroclipboard](https://github.com/zeroclipboard/jquery.zeroclipboard)
+* [zeroclipboard-rails](https://github.com/zeroclipboard/zeroclipboard-rails)
 
-see [roadmap.md](docs/roadmap.md)
+## License
+
+MIT &copy; [James M. Greene](http://greene.io/) [Jon Rohan](http://jonrohan.codes)
