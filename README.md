@@ -11,6 +11,33 @@ This is achieved by automatically floating the invisible movie on top of a [DOM]
 
 Suggestions welcome read over the [contributing](/CONTRIBUTING.md) guidelines.
 
+## Setup
+
+To setup the project for local development start with these commands in your terminal.
+
+```sh
+$ git clone https://github.com/zeroclipboard/zeroclipboard.git
+$ cd zeroclipboard/
+$ npm install -g grunt-cli
+$ npm install
+$ grunt
+```
+
+## Development
+
+Before submitting a pull request you'll need to validate, build, and test your code. Run the default grunt task in your terminal.
+
+```sh
+$ grunt
+```
+
+## Testing
+
+If you just want to run the tests, run grunt test.
+
+```sh
+$ grunt test
+```
 
 ## Limitations
 
