@@ -686,6 +686,7 @@ ZeroClipboard.on("error", function(e) {
   };
 */
 });
+```
 
 
 ##### `error[name = "swf-not-found"]`
