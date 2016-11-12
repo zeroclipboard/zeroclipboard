@@ -1,7 +1,7 @@
 /*!
  * ZeroClipboard
- * The ZeroClipboard library provides an easy way to copy text to the clipboard using an invisible Adobe Flash movie and a JavaScript interface.
- * Copyright (c) 2009-2015 Jon Rohan, James M. Greene
+ * The ZeroClipboard library provides an easy way to copy text to the clipboard using an invisible Adobe Flash movie and a JavaScript interface
+ * Copyright (c) 2009-2016 Jon Rohan, James M. Greene
  * Licensed MIT
  * http://zeroclipboard.org/
  * v2.3.0-beta.1
@@ -220,7 +220,7 @@
     if (scripts.length === 1) {
       return scripts[0].src || undefined;
     }
-    if ("readyState" in scripts[0]) {
+    if ("readyState" in (scripts[0] || document.createElement("script"))) {
       for (i = scripts.length; i--; ) {
         if (scripts[i].readyState === "interactive" && (jsPath = scripts[i].src)) {
           return jsPath;
@@ -533,7 +533,7 @@
     if (arguments.length === 0) {
       events = _keys(_handlers);
     } else if (typeof eventType === "string" && eventType) {
-      events = eventType.split(/\s+/);
+      events = eventType.toLowerCase().split(/\s+/);
     } else if (typeof eventType === "object" && eventType && typeof listener === "undefined") {
       for (i in eventType) {
         if (_hasOwn.call(eventType, i) && typeof i === "string" && i && typeof eventType[i] === "function") {
@@ -543,7 +543,7 @@
     }
     if (events && events.length) {
       for (i = 0, len = events.length; i < len; i++) {
-        eventType = events[i].toLowerCase().replace(/^on/, "");
+        eventType = events[i].replace(/^on/, "");
         perEventHandlers = _handlers[eventType];
         if (perEventHandlers && perEventHandlers.length) {
           if (listener) {

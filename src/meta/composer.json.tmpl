@@ -3,7 +3,7 @@
   "description": "<%= description %>",
   "type": "component",
   "keywords": <%= JSON.stringify(keywords) %>,
-  "license": "<%= licenses[0].type %>",
+  "license": "<%= license %>",
   "authors": <%= JSON.stringify(_.filter(_.map(contributors, function(c) {
     var a;
     /* Does not currently support the NPM package.json string format (as opposed to object format) for "people" types */
