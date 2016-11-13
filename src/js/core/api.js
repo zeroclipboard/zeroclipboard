@@ -28,12 +28,7 @@ var ZeroClipboard = function() {
  * @readonly
  * @property {string}
  */
-_defineProperty(ZeroClipboard, "version", {
-  value: "<%= version %>",
-  writable: false,
-  configurable: true,
-  enumerable: true
-});
+ZeroClipboard.version = "<%= version %>";
 
 
 /**

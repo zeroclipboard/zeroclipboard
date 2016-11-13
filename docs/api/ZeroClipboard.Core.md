@@ -403,6 +403,27 @@ itself to implode by calling `ZeroClipboard.destroy()` under error conditions.  
 want to do just that.
 
 
+##### `error[name = "browser-unsupported"]`
+
+This type of `error` event fires when the browser does not support the required HTML DOM and JavaScript features. Check the ["Support" section of the README](../../README.md#support) for the browser support expectations.
+
+```js
+ZeroClipboard.on("error", function(e) {
+/*
+  e = {
+    type: "error",
+    name: "browser-unsupported",
+    messsage: "The browser does not support the required HTML DOM and JavaScript features",
+    target: null,
+    relatedTarget: null,
+    currentTarget: null,
+    timeStamp: Date.now()
+  };
+*/
+});
+```
+
+
 ##### `error[name = "flash-disabled"]`
 
 This type of `error` event fires when Flash Player is either not installed or not enabled in the browser.

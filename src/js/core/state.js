@@ -118,7 +118,8 @@ var _eventMessages = {
     "version-mismatch": "ZeroClipboard JS version number does not match ZeroClipboard SWF version number",
     "clipboard-error": "At least one error was thrown while ZeroClipboard was attempting to inject your data into the clipboard",
     "config-mismatch": "ZeroClipboard configuration does not match Flash's reality",
-    "swf-not-found": "The ZeroClipboard SWF object could not be loaded, so please check your `swfPath` configuration and/or network connectivity"
+    "swf-not-found": "The ZeroClipboard SWF object could not be loaded, so please check your `swfPath` configuration and/or network connectivity",
+    "browser-unsupported": "The browser does not support the required HTML DOM and JavaScript features"
   }
 };
 

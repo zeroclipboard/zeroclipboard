@@ -12,7 +12,7 @@
  * Store references to critically important global functions that may be
  * overridden on certain web pages.
  */
-  var _window = window, _document = _window.document, _navigator = _window.navigator, _setTimeout = _window.setTimeout, _clearTimeout = _window.clearTimeout, _setInterval = _window.setInterval, _clearInterval = _window.clearInterval, _getComputedStyle = _window.getComputedStyle, _encodeURIComponent = _window.encodeURIComponent, _ActiveXObject = _window.ActiveXObject, _Error = _window.Error, _parseInt = _window.Number.parseInt || _window.parseInt, _parseFloat = _window.Number.parseFloat || _window.parseFloat, _isNaN = _window.Number.isNaN || _window.isNaN, _now = _window.Date.now, _keys = _window.Object.keys, _defineProperty = _window.Object.defineProperty, _hasOwn = _window.Object.prototype.hasOwnProperty, _slice = _window.Array.prototype.slice, _unwrap = function() {
+  var _window = window, _document = _window.document, _navigator = _window.navigator, _setTimeout = _window.setTimeout, _clearTimeout = _window.clearTimeout, _setInterval = _window.setInterval, _clearInterval = _window.clearInterval, _getComputedStyle = _window.getComputedStyle, _encodeURIComponent = _window.encodeURIComponent, _ActiveXObject = _window.ActiveXObject, _Error = _window.Error, _parseInt = _window.Number.parseInt || _window.parseInt, _parseFloat = _window.Number.parseFloat || _window.parseFloat, _isNaN = _window.Number.isNaN || _window.isNaN, _now = _window.Date.now, _keys = _window.Object.keys, _hasOwn = _window.Object.prototype.hasOwnProperty, _slice = _window.Array.prototype.slice, _unwrap = function() {
     var unwrapper = function(el) {
       return el;
     };
@@ -367,7 +367,8 @@
       "version-mismatch": "ZeroClipboard JS version number does not match ZeroClipboard SWF version number",
       "clipboard-error": "At least one error was thrown while ZeroClipboard was attempting to inject your data into the clipboard",
       "config-mismatch": "ZeroClipboard configuration does not match Flash's reality",
-      "swf-not-found": "The ZeroClipboard SWF object could not be loaded, so please check your `swfPath` configuration and/or network connectivity"
+      "swf-not-found": "The ZeroClipboard SWF object could not be loaded, so please check your `swfPath` configuration and/or network connectivity",
+      "browser-unsupported": "The browser does not support the required HTML DOM and JavaScript features"
     }
   };
   /**
@@ -458,13 +459,22 @@
   var _state = function() {
     _detectSandbox();
     return {
-      browser: _pick(_navigator, [ "userAgent", "platform", "appName", "appVersion" ]),
+      browser: _extend(_pick(_navigator, [ "userAgent", "platform", "appName", "appVersion" ]), {
+        isSupported: _isBrowserSupported()
+      }),
       flash: _omit(_flashState, [ "bridge" ]),
       zeroclipboard: {
         version: ZeroClipboard.version,
         config: ZeroClipboard.config()
       }
     };
+  };
+  /**
+ * Does this browser support all of the necessary DOM and JS features necessary?
+ * @private
+ */
+  var _isBrowserSupported = function() {
+    return !!(_document.addEventListener && _window.Object.keys && _window.Array.prototype.map);
   };
   /**
  * The underlying implementation of `ZeroClipboard.isFlashUnusable`.
@@ -503,6 +513,12 @@
         });
       }
       if (added.error) {
+        if (!_isBrowserSupported()) {
+          ZeroClipboard.emit({
+            type: "error",
+            name: "browser-unsupported"
+          });
+        }
         for (i = 0, len = _flashStateErrorNames.length; i < len; i++) {
           if (_flashState[_flashStateErrorNames[i].replace(/^flash-/, "")] === true) {
             ZeroClipboard.emit({
@@ -607,6 +623,14 @@
  */
   var _create = function() {
     var previousState = _flashState.sandboxed;
+    if (!_isBrowserSupported()) {
+      _flashState.ready = false;
+      ZeroClipboard.emit({
+        type: "error",
+        name: "browser-unsupported"
+      });
+      return;
+    }
     _detectSandbox();
     if (typeof _flashState.ready !== "boolean") {
       _flashState.ready = false;
@@ -957,7 +981,17 @@
       if (typeof isSandboxed === "boolean") {
         _flashState.sandboxed = isSandboxed;
       }
-      if (_flashStateErrorNames.indexOf(event.name) !== -1) {
+      if (event.name === "browser-unsupported") {
+        _extend(_flashState, {
+          disabled: false,
+          outdated: false,
+          unavailable: false,
+          degraded: false,
+          deactivated: false,
+          overdue: false,
+          ready: false
+        });
+      } else if (_flashStateErrorNames.indexOf(event.name) !== -1) {
         _extend(_flashState, {
           disabled: event.name === "flash-disabled",
           outdated: event.name === "flash-outdated",
@@ -1881,12 +1915,7 @@
  * @readonly
  * @property {string}
  */
-  _defineProperty(ZeroClipboard, "version", {
-    value: "2.3.0-beta.1",
-    writable: false,
-    configurable: true,
-    enumerable: true
-  });
+  ZeroClipboard.version = "2.3.0-beta.1";
   /**
  * Update or get a copy of the ZeroClipboard global configuration.
  * Returns a copy of the current/updated configuration.

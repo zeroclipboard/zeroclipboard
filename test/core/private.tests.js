@@ -1,4 +1,4 @@
-/*global _flashState:true, _currentElement:true, _copyTarget:true, _isWindows:true, _globalConfig:true, _extend, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _extractDomain, _determineScriptAccess, _mapClipDataToFlash, _mapClipResultsFromFlash, _createEvent, _preprocessEvent, _getRelatedTarget, _shouldPerformAsync, _dispatchCallback, _detectFlashSupport, _encodeURIComponent, _fixLineEndings */
+/*global _flashState:true, _currentElement:true, _copyTarget:true, _isWindows:true, _globalConfig:true, _extend, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _extractDomain, _determineScriptAccess, _mapClipDataToFlash, _mapClipResultsFromFlash, _createEvent, _preprocessEvent, _getRelatedTarget, _shouldPerformAsync, _dispatchCallback, _detectFlashSupport, _encodeURIComponent, _fixLineEndings, _isBrowserSupported */
 
 
 (function(module, test) {
@@ -211,6 +211,83 @@
         assert.strictEqual(_extractDomain(originOrUrl), inputToExpectedMap[originOrUrl], "Processing: \"" + originOrUrl + "\"");
       }
     }
+  });
+
+
+  test("`_isBrowserSupported` determines the appropriate browser support level", function(assert) {
+    /*jshint -W121 */
+
+    // Arrange
+
+    // DOM Level 2
+    var docAel = document.addEventListener;
+    // ECMAScript 5.1
+    var objKeys = Object.keys;
+    var arrMap = Array.prototype.map;
+
+    // Act
+    var isSupported1 = _isBrowserSupported();
+
+    document.addEventListener = function() {};
+    Object.keys = function() {};
+    Array.prototype.map = function() {};
+    var isSupported2 = _isBrowserSupported();
+
+    document.addEventListener = null;
+    Object.keys = null;
+    Array.prototype.map = null;
+    var isSupported3 = _isBrowserSupported();
+
+    document.addEventListener = function() {};
+    Object.keys = null;
+    Array.prototype.map = null;
+    var isSupported4 = _isBrowserSupported();
+
+    document.addEventListener = function() {};
+    Object.keys = function() {};
+    Array.prototype.map = null;
+    var isSupported5 = _isBrowserSupported();
+
+    document.addEventListener = null;
+    Object.keys = function() {};
+    Array.prototype.map = null;
+    var isSupported6 = _isBrowserSupported();
+
+    document.addEventListener = null;
+    Object.keys = null;
+    Array.prototype.map = function() {};
+    var isSupported7 = _isBrowserSupported();
+
+    document.addEventListener = null;
+    Object.keys = function() {};
+    Array.prototype.map = function() {};
+    var isSupported8 = _isBrowserSupported();
+
+    document.addEventListener = function() {};
+    Object.keys = null;
+    Array.prototype.map = function() {};
+    var isSupported9 = _isBrowserSupported();
+
+    // Restore
+    document.addEventListener = docAel;
+    Object.keys = objKeys;
+    Array.prototype.map = arrMap;
+    var isSupported10 = _isBrowserSupported();
+
+    // Assert
+    assert.expect(10);
+    assert.strictEqual(typeof isSupported1, "boolean");
+    assert.strictEqual(isSupported2, true);
+    assert.strictEqual(isSupported3, false);
+    assert.strictEqual(isSupported4, false);
+    assert.strictEqual(isSupported5, false);
+    assert.strictEqual(isSupported6, false);
+    assert.strictEqual(isSupported7, false);
+    assert.strictEqual(isSupported8, false);
+    assert.strictEqual(isSupported9, false);
+    assert.strictEqual(isSupported10, isSupported1);
+
+    /*jshint +W121 */
   });
 
 

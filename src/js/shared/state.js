@@ -20,7 +20,6 @@ var _window = window,
     _isNaN = _window.Number.isNaN || _window.isNaN,
     _now = _window.Date.now,
     _keys = _window.Object.keys,
-    _defineProperty = _window.Object.defineProperty,
     _hasOwn = _window.Object.prototype.hasOwnProperty,
     _slice = _window.Array.prototype.slice,
     _unwrap = (function() {
