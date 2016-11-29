@@ -2102,7 +2102,8 @@
  *   _clientMeta[client.id] = {
  *     instance: client,
  *     elements: [],
- *     handlers: {}
+ *     handlers: {},
+ *     coreWildcardHandler: function(event) { return client.emit(event); }
  *   };
  */
   var _clientMeta = {};
@@ -2141,19 +2142,21 @@
  * @private
  */
   var _clientConstructor = function(elements) {
-    var client = this;
+    var meta, client = this;
     client.id = "" + _clientIdCounter++;
-    _clientMeta[client.id] = {
+    meta = {
       instance: client,
       elements: [],
-      handlers: {}
+      handlers: {},
+      coreWildcardHandler: function(event) {
+        return client.emit(event);
+      }
     };
+    _clientMeta[client.id] = meta;
     if (elements) {
       client.clip(elements);
     }
-    ZeroClipboard.on("*", function(event) {
-      return client.emit(event);
-    });
+    ZeroClipboard.on("*", meta.coreWildcardHandler);
     ZeroClipboard.on("destroy", function() {
       client.destroy();
     });
@@ -2368,11 +2371,13 @@
  * @private
  */
   var _clientDestroy = function() {
-    if (!_clientMeta[this.id]) {
+    var meta = _clientMeta[this.id];
+    if (!meta) {
       return;
     }
     this.unclip();
     this.off();
+    ZeroClipboard.off("*", meta.coreWildcardHandler);
     delete _clientMeta[this.id];
   };
   /**

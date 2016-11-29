@@ -4,17 +4,22 @@
  */
 var _clientConstructor = function(elements) {
   // Save a closure reference for the following event handlers
-  var client = this;
+  var meta,
+      client = this;
 
   // Assign an ID to the client instance
   client.id = "" + (_clientIdCounter++);
 
   // Create the meta information store for this client
-  _clientMeta[client.id] = {
+  meta = {
     instance: client,
     elements: [],
-    handlers: {}
+    handlers: {},
+    coreWildcardHandler: function(event) {
+      return client.emit(event);
+    }
   };
+  _clientMeta[client.id] = meta;
 
   // If the elements argument exists, clip it
   if (elements) {
@@ -22,9 +27,7 @@ var _clientConstructor = function(elements) {
   }
 
   // ECHO! Our client's sounding board.
-  ZeroClipboard.on("*", function(event) {
-    return client.emit(event);
-  });
+  ZeroClipboard.on("*", meta.coreWildcardHandler);
 
   // Await imminent destruction...
   ZeroClipboard.on("destroy", function() {
@@ -303,7 +306,9 @@ var _clientElements = function() {
  * @private
  */
 var _clientDestroy = function() {
-  if (!_clientMeta[this.id]) {
+  var meta = _clientMeta[this.id];
+
+  if (!meta) {
     return;
   }
 
@@ -312,6 +317,9 @@ var _clientDestroy = function() {
 
   // Remove all event handlers
   this.off();
+
+  // Remove the integrated sounding board
+  ZeroClipboard.off("*", meta.coreWildcardHandler);
 
   // Delete the client's metadata store
   delete _clientMeta[this.id];

@@ -11,7 +11,8 @@ var _clientIdCounter = 0;
  *   _clientMeta[client.id] = {
  *     instance: client,
  *     elements: [],
- *     handlers: {}
+ *     handlers: {},
+ *     coreWildcardHandler: function(event) { return client.emit(event); }
  *   };
  */
 var _clientMeta = {};
