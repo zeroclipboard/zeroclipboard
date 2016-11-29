@@ -16,6 +16,6 @@ else {
 }
 
 })((function() {
-  /*jshint strict: false */
+  /*jshint strict:false */
   return this || window;
 })());
