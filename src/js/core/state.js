@@ -16,6 +16,17 @@ var _pageIsFramed = (function() {
 
 
 /**
+ * Keep track of if the page is XHTML (vs. HTML), which requires that everything
+ * be rendering in XML mode.
+ * @private
+ */
+// This check works because a `nodeName` property always returns the name in all
+// uppercase letters if the browser is rendering in HTML mode, e.g. "HTML", but
+// all lowercase letters if rendering in XHTML/XML mode.
+var _pageIsXhtml = _document.documentElement.nodeName === "html";
+
+
+/**
  * Keep track of the state of the Flash object.
  * @private
  */

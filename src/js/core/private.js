@@ -1161,13 +1161,41 @@ var _getHtmlBridge = function(flashBridge) {
 
 
 /**
+ *
+ * @private
+ */
+var _escapeXmlValue = function(val) {
+  if (typeof val !== "string" || !val) {
+    return val;
+  }
+
+  return val.replace(/["&'<>]/g, function(chr) {
+    switch (chr) {
+      case "\"":
+        return "&quot;";
+      case "&":
+        return "&amp;";
+      case "'":
+        return "&apos;";
+      case "<":
+        return "&lt;";
+      case ">":
+        return "&gt;";
+      default:
+        return chr;
+    }
+  });
+};
+
+
+/**
  * Create the SWF object.
  *
  * @returns The SWF object reference.
  * @private
  */
 var _embedSwf = function() {
-  /*jshint maxstatements:26 */
+  /*jshint maxstatements:28 */
 
   var len,
       flashBridge = _flashState.bridge,
@@ -1178,9 +1206,16 @@ var _embedSwf = function() {
     var allowScriptAccess = _determineScriptAccess(_window.location.host, _globalConfig);
     var allowNetworking = allowScriptAccess === "never" ? "none" : "all";
 
-    // Prepare the FlashVars and cache-busting query param
+    // Prepare the FlashVars
     var flashvars = _vars(_extend({ jsVersion: ZeroClipboard.version }, _globalConfig));
+
+    // Prepare the SWF URL, possibly with a cache-busting query param
     var swfUrl = _globalConfig.swfPath + _cacheBust(_globalConfig.swfPath, _globalConfig);
+
+    // Update the SWF URL for XHTML escaping, if necessary
+    if (_pageIsXhtml) {
+      swfUrl = _escapeXmlValue(swfUrl);
+    }
 
     // Create the outer container
     container = _createHtmlBridge();

@@ -1,4 +1,4 @@
-/*global _flashState:true, _currentElement:true, _copyTarget:true, _isWindows:true, _globalConfig:true, _extend, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _extractDomain, _determineScriptAccess, _mapClipDataToFlash, _mapClipResultsFromFlash, _createEvent, _preprocessEvent, _getRelatedTarget, _shouldPerformAsync, _dispatchCallback, _detectFlashSupport, _encodeURIComponent, _fixLineEndings, _isBrowserSupported, _getSwfPathProtocol, _config */
+/*global _flashState:true, _currentElement:true, _copyTarget:true, _isWindows:true, _globalConfig:true, _extend, _getStyle, _removeClass, _addClass, _vars, _cacheBust, _extractDomain, _determineScriptAccess, _mapClipDataToFlash, _mapClipResultsFromFlash, _createEvent, _preprocessEvent, _getRelatedTarget, _shouldPerformAsync, _dispatchCallback, _detectFlashSupport, _encodeURIComponent, _fixLineEndings, _isBrowserSupported, _getSwfPathProtocol, _config, _escapeXmlValue */
 
 (function(module, test) {
   "use strict";
@@ -639,6 +639,26 @@
     finally {
       _config({ swfPath: origSwfPath });
     }
+  });
+
+
+  test("`_escapeXmlValue` should work", function(assert) {
+    assert.expect(11);
+
+    // Unexpected values
+    assert.strictEqual(_escapeXmlValue(undefined), undefined);
+    assert.strictEqual(_escapeXmlValue(null), null);
+    assert.strictEqual(_escapeXmlValue(false), false);
+    assert.strictEqual(_escapeXmlValue(true), true);
+
+    // Expected values
+    assert.strictEqual(_escapeXmlValue(""), "");
+    assert.strictEqual(_escapeXmlValue("http://zeroclipboard.org/blah.swf"), "http://zeroclipboard.org/blah.swf");
+    assert.strictEqual(_escapeXmlValue("http://zeroclipboard.org/blah.swf?cache=bust"), "http://zeroclipboard.org/blah.swf?cache=bust");
+    assert.strictEqual(_escapeXmlValue("http://zeroclipboard.org/blah.swf?cache=bust&foo=bar"), "http://zeroclipboard.org/blah.swf?cache=bust&amp;foo=bar");
+    assert.strictEqual(_escapeXmlValue("http://zeroclipboard.org/blah.swf?cache='bust'"), "http://zeroclipboard.org/blah.swf?cache=&apos;bust&apos;");
+    assert.strictEqual(_escapeXmlValue("http://zeroclipboard.org/blah.swf?cache=\"bust\""), "http://zeroclipboard.org/blah.swf?cache=&quot;bust&quot;");
+    assert.strictEqual(_escapeXmlValue("http://zeroclipboard.org/blah.swf?cache=<bust>"), "http://zeroclipboard.org/blah.swf?cache=&lt;bust&gt;");
   });
 
 

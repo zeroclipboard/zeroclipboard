@@ -289,6 +289,12 @@
     return _window.opener == null && (!!_window.top && _window != _window.top || !!_window.parent && _window != _window.parent);
   }();
   /**
+ * Keep track of if the page is XHTML (vs. HTML), which requires that everything
+ * be rendering in XML mode.
+ * @private
+ */
+  var _pageIsXhtml = _document.documentElement.nodeName === "html";
+  /**
  * Keep track of the state of the Flash object.
  * @private
  */
@@ -1267,6 +1273,36 @@
     return htmlBridge || null;
   };
   /**
+ *
+ * @private
+ */
+  var _escapeXmlValue = function(val) {
+    if (typeof val !== "string" || !val) {
+      return val;
+    }
+    return val.replace(/["&'<>]/g, function(chr) {
+      switch (chr) {
+       case '"':
+        return "&quot;";
+
+       case "&":
+        return "&amp;";
+
+       case "'":
+        return "&apos;";
+
+       case "<":
+        return "&lt;";
+
+       case ">":
+        return "&gt;";
+
+       default:
+        return chr;
+      }
+    });
+  };
+  /**
  * Create the SWF object.
  *
  * @returns The SWF object reference.
@@ -1281,6 +1317,9 @@
         jsVersion: ZeroClipboard.version
       }, _globalConfig));
       var swfUrl = _globalConfig.swfPath + _cacheBust(_globalConfig.swfPath, _globalConfig);
+      if (_pageIsXhtml) {
+        swfUrl = _escapeXmlValue(swfUrl);
+      }
       container = _createHtmlBridge();
       var divToBeReplaced = _document.createElement("div");
       container.appendChild(divToBeReplaced);
