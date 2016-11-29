@@ -41,12 +41,10 @@ var _clientConstructor = function(elements) {
  * @private
  */
 var _clientOn = function(eventType, listener) {
-  /*jshint maxstatements:26 */
-
-  // add user event handler for event
   var i, len, events,
       added = {},
-      meta = _clientMeta[this.id],
+      client = this,
+      meta = _clientMeta[client.id],
       handlers = meta && meta.handlers;
 
   if (!meta) {
@@ -56,15 +54,16 @@ var _clientOn = function(eventType, listener) {
   if (typeof eventType === "string" && eventType) {
     events = eventType.toLowerCase().split(/\s+/);
   }
-  else if (typeof eventType === "object" && eventType && typeof listener === "undefined") {
-    for (i in eventType) {
-      if (_hasOwn.call(eventType, i) && typeof i === "string" && i && typeof eventType[i] === "function") {
-        this.on(i, eventType[i]);
+  else if (typeof eventType === "object" && eventType && !("length" in eventType) && typeof listener === "undefined") {
+    _keys(eventType).forEach(function(key) {
+      var listener = eventType[key];
+      if (typeof listener === "function") {
+        client.on(key, listener);
       }
-    }
+    });
   }
 
-  if (events && events.length) {
+  if (events && events.length && listener) {
     for (i = 0, len = events.length; i < len; i++) {
       eventType = events[i].replace(/^on/, "");
       added[eventType] = true;
@@ -105,7 +104,8 @@ var _clientOn = function(eventType, listener) {
       }
     }
   }
-  return this;
+
+  return client;
 };
 
 
@@ -115,11 +115,12 @@ var _clientOn = function(eventType, listener) {
  */
 var _clientOff = function(eventType, listener) {
   var i, len, foundIndex, events, perEventHandlers,
-      meta = _clientMeta[this.id],
+      client = this,
+      meta = _clientMeta[client.id],
       handlers = meta && meta.handlers;
 
   if (!handlers) {
-    return this;
+    return client;
   }
 
   if (arguments.length === 0) {
@@ -129,12 +130,13 @@ var _clientOff = function(eventType, listener) {
   else if (typeof eventType === "string" && eventType) {
     events = eventType.split(/\s+/);
   }
-  else if (typeof eventType === "object" && eventType && typeof listener === "undefined") {
-    for (i in eventType) {
-      if (_hasOwn.call(eventType, i) && typeof i === "string" && i && typeof eventType[i] === "function") {
-        this.off(i, eventType[i]);
+  else if (typeof eventType === "object" && eventType && !("length" in eventType) && typeof listener === "undefined") {
+    _keys(eventType).forEach(function(key) {
+      var listener = eventType[key];
+      if (typeof listener === "function") {
+        client.off(key, listener);
       }
-    }
+    });
   }
 
   if (events && events.length) {
@@ -156,7 +158,7 @@ var _clientOff = function(eventType, listener) {
       }
     }
   }
-  return this;
+  return client;
 };
 
 
@@ -186,15 +188,17 @@ var _clientListeners = function(eventType) {
  * @private
  */
 var _clientEmit = function(event) {
-  if (_clientShouldEmit.call(this, event)) {
+  var eventCopy,
+      client = this;
+  if (_clientShouldEmit.call(client, event)) {
     // Don't modify the original Event, if it is an object (as expected)
     if (typeof event === "object" && event && typeof event.type === "string" && event.type) {
       event = _extend({}, event);
     }
-    var eventCopy = _extend({}, _createEvent(event), { client: this });
-    _clientDispatchCallbacks.call(this, eventCopy);
+    eventCopy = _extend({}, _createEvent(event), { client: client });
+    _clientDispatchCallbacks.call(client, eventCopy);
   }
-  return this;
+  return client;
 };
 
 
