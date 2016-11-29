@@ -429,24 +429,22 @@
  * @private
  */
   var _config = function(options) {
-    if (typeof options === "object" && options !== null) {
-      for (var prop in options) {
-        if (_hasOwn.call(options, prop)) {
-          if (/^(?:forceHandCursor|title|zIndex|bubbleEvents|fixLineEndings)$/.test(prop)) {
-            _globalConfig[prop] = options[prop];
-          } else if (_flashState.bridge == null) {
-            if (prop === "containerId" || prop === "swfObjectId") {
-              if (_isValidHtml4Id(options[prop])) {
-                _globalConfig[prop] = options[prop];
-              } else {
-                throw new Error("The specified `" + prop + "` value is not valid as an HTML4 Element ID");
-              }
-            } else {
+    if (typeof options === "object" && options && !("length" in options)) {
+      _keys(options).forEach(function(prop) {
+        if (/^(?:forceHandCursor|title|zIndex|bubbleEvents|fixLineEndings)$/.test(prop)) {
+          _globalConfig[prop] = options[prop];
+        } else if (_flashState.bridge == null) {
+          if (prop === "containerId" || prop === "swfObjectId") {
+            if (_isValidHtml4Id(options[prop])) {
               _globalConfig[prop] = options[prop];
+            } else {
+              throw new Error("The specified `" + prop + "` value is not valid as an HTML4 Element ID");
             }
+          } else {
+            _globalConfig[prop] = options[prop];
           }
         }
-      }
+      });
     }
     if (typeof options === "string" && options) {
       if (_hasOwn.call(_globalConfig, options)) {
@@ -495,14 +493,15 @@
     var i, len, events, added = {};
     if (typeof eventType === "string" && eventType) {
       events = eventType.toLowerCase().split(/\s+/);
-    } else if (typeof eventType === "object" && eventType && typeof listener === "undefined") {
-      for (i in eventType) {
-        if (_hasOwn.call(eventType, i) && typeof i === "string" && i && typeof eventType[i] === "function") {
-          ZeroClipboard.on(i, eventType[i]);
+    } else if (typeof eventType === "object" && eventType && !("length" in eventType) && typeof listener === "undefined") {
+      _keys(eventType).forEach(function(key) {
+        var listener = eventType[key];
+        if (typeof listener === "function") {
+          ZeroClipboard.on(key, listener);
         }
-      }
+      });
     }
-    if (events && events.length) {
+    if (events && events.length && listener) {
       for (i = 0, len = events.length; i < len; i++) {
         eventType = events[i].replace(/^on/, "");
         added[eventType] = true;
@@ -554,12 +553,13 @@
       events = _keys(_handlers);
     } else if (typeof eventType === "string" && eventType) {
       events = eventType.toLowerCase().split(/\s+/);
-    } else if (typeof eventType === "object" && eventType && typeof listener === "undefined") {
-      for (i in eventType) {
-        if (_hasOwn.call(eventType, i) && typeof i === "string" && i && typeof eventType[i] === "function") {
-          ZeroClipboard.off(i, eventType[i]);
+    } else if (typeof eventType === "object" && eventType && !("length" in eventType) && typeof listener === "undefined") {
+      _keys(eventType).forEach(function(key) {
+        var listener = eventType[key];
+        if (typeof listener === "function") {
+          ZeroClipboard.off(key, listener);
         }
-      }
+      });
     }
     if (events && events.length) {
       for (i = 0, len = events.length; i < len; i++) {
@@ -2164,20 +2164,21 @@
  * @private
  */
   var _clientOn = function(eventType, listener) {
-    var i, len, events, added = {}, meta = _clientMeta[this.id], handlers = meta && meta.handlers;
+    var i, len, events, added = {}, client = this, meta = _clientMeta[client.id], handlers = meta && meta.handlers;
     if (!meta) {
       throw new Error("Attempted to add new listener(s) to a destroyed ZeroClipboard client instance");
     }
     if (typeof eventType === "string" && eventType) {
       events = eventType.toLowerCase().split(/\s+/);
-    } else if (typeof eventType === "object" && eventType && typeof listener === "undefined") {
-      for (i in eventType) {
-        if (_hasOwn.call(eventType, i) && typeof i === "string" && i && typeof eventType[i] === "function") {
-          this.on(i, eventType[i]);
+    } else if (typeof eventType === "object" && eventType && !("length" in eventType) && typeof listener === "undefined") {
+      _keys(eventType).forEach(function(key) {
+        var listener = eventType[key];
+        if (typeof listener === "function") {
+          client.on(key, listener);
         }
-      }
+      });
     }
-    if (events && events.length) {
+    if (events && events.length && listener) {
       for (i = 0, len = events.length; i < len; i++) {
         eventType = events[i].replace(/^on/, "");
         added[eventType] = true;
@@ -2213,27 +2214,28 @@
         }
       }
     }
-    return this;
+    return client;
   };
   /**
  * The underlying implementation of `ZeroClipboard.Client.prototype.off`.
  * @private
  */
   var _clientOff = function(eventType, listener) {
-    var i, len, foundIndex, events, perEventHandlers, meta = _clientMeta[this.id], handlers = meta && meta.handlers;
+    var i, len, foundIndex, events, perEventHandlers, client = this, meta = _clientMeta[client.id], handlers = meta && meta.handlers;
     if (!handlers) {
-      return this;
+      return client;
     }
     if (arguments.length === 0) {
       events = _keys(handlers);
     } else if (typeof eventType === "string" && eventType) {
       events = eventType.split(/\s+/);
-    } else if (typeof eventType === "object" && eventType && typeof listener === "undefined") {
-      for (i in eventType) {
-        if (_hasOwn.call(eventType, i) && typeof i === "string" && i && typeof eventType[i] === "function") {
-          this.off(i, eventType[i]);
+    } else if (typeof eventType === "object" && eventType && !("length" in eventType) && typeof listener === "undefined") {
+      _keys(eventType).forEach(function(key) {
+        var listener = eventType[key];
+        if (typeof listener === "function") {
+          client.off(key, listener);
         }
-      }
+      });
     }
     if (events && events.length) {
       for (i = 0, len = events.length; i < len; i++) {
@@ -2252,7 +2254,7 @@
         }
       }
     }
-    return this;
+    return client;
   };
   /**
  * The underlying implementation of `ZeroClipboard.Client.prototype.handlers`.
@@ -2274,16 +2276,17 @@
  * @private
  */
   var _clientEmit = function(event) {
-    if (_clientShouldEmit.call(this, event)) {
+    var eventCopy, client = this;
+    if (_clientShouldEmit.call(client, event)) {
       if (typeof event === "object" && event && typeof event.type === "string" && event.type) {
         event = _extend({}, event);
       }
-      var eventCopy = _extend({}, _createEvent(event), {
-        client: this
+      eventCopy = _extend({}, _createEvent(event), {
+        client: client
       });
-      _clientDispatchCallbacks.call(this, eventCopy);
+      _clientDispatchCallbacks.call(client, eventCopy);
     }
-    return this;
+    return client;
   };
   /**
  * The underlying implementation of `ZeroClipboard.Client.prototype.clip`.

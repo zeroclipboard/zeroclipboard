@@ -429,24 +429,22 @@
  * @private
  */
   var _config = function(options) {
-    if (typeof options === "object" && options !== null) {
-      for (var prop in options) {
-        if (_hasOwn.call(options, prop)) {
-          if (/^(?:forceHandCursor|title|zIndex|bubbleEvents|fixLineEndings)$/.test(prop)) {
-            _globalConfig[prop] = options[prop];
-          } else if (_flashState.bridge == null) {
-            if (prop === "containerId" || prop === "swfObjectId") {
-              if (_isValidHtml4Id(options[prop])) {
-                _globalConfig[prop] = options[prop];
-              } else {
-                throw new Error("The specified `" + prop + "` value is not valid as an HTML4 Element ID");
-              }
-            } else {
+    if (typeof options === "object" && options && !("length" in options)) {
+      _keys(options).forEach(function(prop) {
+        if (/^(?:forceHandCursor|title|zIndex|bubbleEvents|fixLineEndings)$/.test(prop)) {
+          _globalConfig[prop] = options[prop];
+        } else if (_flashState.bridge == null) {
+          if (prop === "containerId" || prop === "swfObjectId") {
+            if (_isValidHtml4Id(options[prop])) {
               _globalConfig[prop] = options[prop];
+            } else {
+              throw new Error("The specified `" + prop + "` value is not valid as an HTML4 Element ID");
             }
+          } else {
+            _globalConfig[prop] = options[prop];
           }
         }
-      }
+      });
     }
     if (typeof options === "string" && options) {
       if (_hasOwn.call(_globalConfig, options)) {
@@ -495,14 +493,15 @@
     var i, len, events, added = {};
     if (typeof eventType === "string" && eventType) {
       events = eventType.toLowerCase().split(/\s+/);
-    } else if (typeof eventType === "object" && eventType && typeof listener === "undefined") {
-      for (i in eventType) {
-        if (_hasOwn.call(eventType, i) && typeof i === "string" && i && typeof eventType[i] === "function") {
-          ZeroClipboard.on(i, eventType[i]);
+    } else if (typeof eventType === "object" && eventType && !("length" in eventType) && typeof listener === "undefined") {
+      _keys(eventType).forEach(function(key) {
+        var listener = eventType[key];
+        if (typeof listener === "function") {
+          ZeroClipboard.on(key, listener);
         }
-      }
+      });
     }
-    if (events && events.length) {
+    if (events && events.length && listener) {
       for (i = 0, len = events.length; i < len; i++) {
         eventType = events[i].replace(/^on/, "");
         added[eventType] = true;
@@ -554,12 +553,13 @@
       events = _keys(_handlers);
     } else if (typeof eventType === "string" && eventType) {
       events = eventType.toLowerCase().split(/\s+/);
-    } else if (typeof eventType === "object" && eventType && typeof listener === "undefined") {
-      for (i in eventType) {
-        if (_hasOwn.call(eventType, i) && typeof i === "string" && i && typeof eventType[i] === "function") {
-          ZeroClipboard.off(i, eventType[i]);
+    } else if (typeof eventType === "object" && eventType && !("length" in eventType) && typeof listener === "undefined") {
+      _keys(eventType).forEach(function(key) {
+        var listener = eventType[key];
+        if (typeof listener === "function") {
+          ZeroClipboard.off(key, listener);
         }
-      }
+      });
     }
     if (events && events.length) {
       for (i = 0, len = events.length; i < len; i++) {
