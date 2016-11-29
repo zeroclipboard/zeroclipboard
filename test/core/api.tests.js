@@ -184,8 +184,8 @@
     ZeroClipboard.setData("text/plain", "zc4evar");
     assert.deepEqual(_clipData, { "text/plain": "zc4evar" }, "`_clipData` contains expected text");
 
-    ZeroClipboard.setData("text/x-markdown", "**ZeroClipboard**");
-    assert.deepEqual(_clipData, { "text/plain": "zc4evar", "text/x-markdown": "**ZeroClipboard**" }, "`_clipData` contains expected text and custom format");
+    ZeroClipboard.setData("text/html", "<i>ZeroClipboard</i>");
+    assert.deepEqual(_clipData, { "text/plain": "zc4evar", "text/html": "<i>ZeroClipboard</i>" }, "`_clipData` contains expected text and HTML");
 
     ZeroClipboard.setData({ "text/html": "<b>Win</b>" });
     assert.deepEqual(_clipData, { "text/html": "<b>Win</b>" }, "`_clipData` contains expected HTML and cleared out old data because an object was passed in");
@@ -259,20 +259,20 @@
 
     // Arrange & Assert
     _clipData["text/plain"] = "zc4evar";
+    _clipData["application/rtf"] = "{\\rtf1\\ansi\n{\\i Foo}}";
     _clipData["text/html"] = "<b>Win</b>";
-    _clipData["text/x-markdown"] = "**ZeroClipboard**";
     assert.deepEqual(_clipData, {
       "text/plain": "zc4evar",
-      "text/html": "<b>Win</b>",
-      "text/x-markdown": "**ZeroClipboard**"
+      "application/rtf": "{\\rtf1\\ansi\n{\\i Foo}}",
+      "text/html": "<b>Win</b>"
     }, "`_clipData` contains all expected data");
 
     // Act & Assert
-    ZeroClipboard.clearData("text/html");
+    ZeroClipboard.clearData("application/rtf");
     assert.deepEqual(_clipData, {
       "text/plain": "zc4evar",
-      "text/x-markdown": "**ZeroClipboard**"
-    }, "`_clipData` had 'text/html' successfully removed");
+      "text/html": "<b>Win</b>"
+    }, "`_clipData` had 'application/rtf' successfully removed");
 
     // Act & Assert
     ZeroClipboard.clearData();
