@@ -1,4 +1,4 @@
-package {
+﻿package {
 
   import flash.system.Capabilities;
   import flash.system.System;

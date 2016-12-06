@@ -1,4 +1,4 @@
-package {
+﻿package {
 
   import flash.display.Stage;
   import flash.display.StageAlign;

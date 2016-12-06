@@ -1,4 +1,4 @@
-package {
+﻿package {
 
   import flash.external.ExternalInterface;
   import flash.net.navigateToURL;
@@ -217,7 +217,7 @@ function decodeDataFromFlash(data) {\
 
         // Patch addCallback's outgoing result value on Flash side before returning it
         var wrapperFn:Function = function(...args): * {  // NOPMD
-          args = decodeDataFromJS(args); 
+          args = decodeDataFromJS(args);
           var result:* = //NOPMD
                 closure.apply(this, args);
           return encodeDataForJS(result);
