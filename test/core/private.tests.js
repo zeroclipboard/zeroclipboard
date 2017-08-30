@@ -117,7 +117,7 @@
     assert.expect(6);
 
     // Arrange
-    var someDomain = "zeroclipboard.org";
+    var someDomain = "zeroclipboard.github.io";
     var clipOptionsEmpty = {};
     var clipOptionsTrustedDomainsWildcard = {
       trustedDomains: ["*"]
@@ -610,15 +610,15 @@
       assert.strictEqual(_getSwfPathProtocol(), pageProtocol);
 
       // Specifically relative protocol (so current)
-      _config({ swfPath: "//zeroclipboard.org/blah.swf" });
+      _config({ swfPath: "//zeroclipboard.github.io/blah.swf" });
       assert.strictEqual(_getSwfPathProtocol(), pageProtocol);
 
       // Specifically `http://`
-      _config({ swfPath: "http://zeroclipboard.org/blah.swf" });
+      _config({ swfPath: "http://zeroclipboard.github.io/blah.swf" });
       assert.strictEqual(_getSwfPathProtocol(), "http:");
 
       // Specifically `https://`
-      _config({ swfPath: "https://zeroclipboard.org/blah.swf" });
+      _config({ swfPath: "https://zeroclipboard.github.io/blah.swf" });
       assert.strictEqual(_getSwfPathProtocol(), "https:");
 
       // Specifically `file://`
@@ -653,12 +653,12 @@
 
     // Expected values
     assert.strictEqual(_escapeXmlValue(""), "");
-    assert.strictEqual(_escapeXmlValue("http://zeroclipboard.org/blah.swf"), "http://zeroclipboard.org/blah.swf");
-    assert.strictEqual(_escapeXmlValue("http://zeroclipboard.org/blah.swf?cache=bust"), "http://zeroclipboard.org/blah.swf?cache=bust");
-    assert.strictEqual(_escapeXmlValue("http://zeroclipboard.org/blah.swf?cache=bust&foo=bar"), "http://zeroclipboard.org/blah.swf?cache=bust&amp;foo=bar");
-    assert.strictEqual(_escapeXmlValue("http://zeroclipboard.org/blah.swf?cache='bust'"), "http://zeroclipboard.org/blah.swf?cache=&apos;bust&apos;");
-    assert.strictEqual(_escapeXmlValue("http://zeroclipboard.org/blah.swf?cache=\"bust\""), "http://zeroclipboard.org/blah.swf?cache=&quot;bust&quot;");
-    assert.strictEqual(_escapeXmlValue("http://zeroclipboard.org/blah.swf?cache=<bust>"), "http://zeroclipboard.org/blah.swf?cache=&lt;bust&gt;");
+    assert.strictEqual(_escapeXmlValue("http://zeroclipboard.github.io/blah.swf"), "http://zeroclipboard.github.io/blah.swf");
+    assert.strictEqual(_escapeXmlValue("http://zeroclipboard.github.io/blah.swf?cache=bust"), "http://zeroclipboard.github.io/blah.swf?cache=bust");
+    assert.strictEqual(_escapeXmlValue("http://zeroclipboard.github.io/blah.swf?cache=bust&foo=bar"), "http://zeroclipboard.github.io/blah.swf?cache=bust&amp;foo=bar");
+    assert.strictEqual(_escapeXmlValue("http://zeroclipboard.github.io/blah.swf?cache='bust'"), "http://zeroclipboard.github.io/blah.swf?cache=&apos;bust&apos;");
+    assert.strictEqual(_escapeXmlValue("http://zeroclipboard.github.io/blah.swf?cache=\"bust\""), "http://zeroclipboard.github.io/blah.swf?cache=&quot;bust&quot;");
+    assert.strictEqual(_escapeXmlValue("http://zeroclipboard.github.io/blah.swf?cache=<bust>"), "http://zeroclipboard.github.io/blah.swf?cache=&lt;bust&gt;");
   });
 
 

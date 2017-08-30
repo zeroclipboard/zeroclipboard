@@ -964,7 +964,7 @@
     _flashState.version = "11.0.0";
 
     // Act
-    ZeroClipboard.config({ swfPath: "https://zeroclipboard.org/blah/secure.swf" });
+    ZeroClipboard.config({ swfPath: "https://zeroclipboard.github.io/blah/secure.swf" });
     var client = new ZeroClipboard();
 
     // Arrange some more
@@ -1033,7 +1033,7 @@
 
     // HACK! Config cannot be changed while `bridge` exists but `destroy` would remove our event handlers
     _flashState.bridge = null;
-    ZeroClipboard.config({ swfPath: "https://zeroclipboard.org/blah/secure.swf" });
+    ZeroClipboard.config({ swfPath: "https://zeroclipboard.github.io/blah/secure.swf" });
 
     ZeroClipboard.emit({ type: "error", name: "flash-insecure" });
   });

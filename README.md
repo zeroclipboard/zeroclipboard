@@ -85,12 +85,12 @@ client.on( "ready", function( readyEvent ) {
 See [docs/instructions.md](docs/instructions.md) for more advanced options in using the library on your site.
 See [docs/api/ZeroClipboard.md](docs/api/ZeroClipboard.md) for the complete API documentation.
 
-Here is a working [test page](http://zeroclipboard.org/#demo) where you can try out ZeroClipboard in your browser.
+Here is a working [test page](http://zeroclipboard.github.io/#demo) where you can try out ZeroClipboard in your browser.
 
 
 ## Testing ZeroClipboard Locally
 
-To test the page [demo page](http://zeroclipboard.org/#demo) locally, clone the [website repo](https://github.com/zeroclipboard/zeroclipboard.org).
+To test the page [demo page](http://zeroclipboard.github.io/#demo) locally, clone the [website repo](https://github.com/zeroclipboard/zeroclipboard.github.io).
 
 ## Support
 

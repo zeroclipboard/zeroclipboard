@@ -1927,7 +1927,7 @@ var _fixLineEndings = function(content) {
  *
  * @see {@link http://lists.w3.org/Archives/Public/public-whatwg-archive/2014Dec/0002.html}
  * @see {@link https://github.com/zeroclipboard/zeroclipboard/issues/511}
- * @see {@link http://zeroclipboard.org/test-iframes.html}
+ * @see {@link http://zeroclipboard.github.io/test-iframes.html}
  *
  * @returns `true` (is sandboxed), `false` (is not sandboxed), or `null` (uncertain)
  * @private
