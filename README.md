@@ -1,4 +1,9 @@
-### WARNING
+### :warning: WARNING!
+This library is no longer maintained as it is no longer necessary for modern web development. If you want your frontend JavaScript to manipulate the clipboard, please look into the new HTML Clipboard API (various docs available on MDN) or a small convenience wrapper around it like [clipboard.js](https://github.com/zenorocha/clipboard.js). Thanks for all your support, this project was a labor of love for many years. :heart:
+
+---
+
+#### Note:
 **This `master` branch contains the `v2.x` codebase for ZeroClipboard! For the `v1.x` codebase, see the [`1.x-master`](https://github.com/zeroclipboard/zeroclipboard/tree/1.x-master) branch instead.**
 
 
